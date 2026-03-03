@@ -77,6 +77,38 @@ Al-Furkan is a modern, open-source Quran application built using Flutter and BLo
 | **flutter_animate** | المحرك المسؤول عن حيوية الحركة وانتقالات الواجهة السلسة. |
 
 ---
+## 🚀 التثبيت وطريقة التشغيل (Installation & Setup)
+
+لتشغيل تطبيق "الفُرقان" على جهازك أو المساهمة في تطويره، يرجى اتباع الخطوات التالية:
+
+### المتطلبات الأساسية (Prerequisites)
+* بيئة عمل [Flutter](https://docs.flutter.dev/get-started/install) (الإصدار 3.x أو أحدث).
+* محرر أكواد مثل VS Code أو Android Studio.
+
+### الخطوات (Steps)
+
+1. **استنساخ المشروع (Clone the repository):**
+```bash
+git clone https://github.com/IDRISIUMCorp/al-furkan-quran-flutter-app.git
+```
+
+ * الدخول لمجلد المشروع (Navigate to the project directory):
+```bash
+cd al-furkan-quran-flutter-app
+```
+
+ * تحميل المكاتب والاعتماديات (Install dependencies):
+```bash
+flutter pub get
+```
+
+ * تشغيل التطبيق (Run the app):
+   قم بتوصيل هاتفك أو تشغيل المحاكي (Emulator)، ثم نفذ الأمر التالي:
+```bash
+flutter run
+```
+> ملاحظة للمطورين: التطبيق يعتمد على قواعد بيانات محلية (hive_ce) ولا يتطلب أي إعدادات معقدة للخوادم أو مفاتيح API خارجية للعمل المبدئي. كل شيء جاهز للعمل بمجرد التشغيل!
+---
 
 ## 🤝 شكر وتقدير (Acknowledgments)
 
