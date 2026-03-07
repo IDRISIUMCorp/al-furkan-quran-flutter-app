@@ -1,63 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-// التصميم المرجعي اللي حسبنا عليه الأبعاد (من تطبيق quran_library)
-const double _quranLibraryDesignWidth = 392.7;
-
-double getFontSize(int pageIndex, BuildContext context) {
+/// Dynamic font size helper for Quran pages.
+/// Uses ScreenUtil `.sp` for automatic screen adaptation
+/// (same approach as the reference library `quran_library`).
+double getFontSize(int pageNumber, BuildContext context) {
   final media = MediaQuery.of(context);
-  final width = media.size.width;
-  final isLandscape = media.orientation == Orientation.landscape;
+  final isPortrait = media.orientation == Orientation.portrait;
   final shortestSide = media.size.shortestSide;
 
-  // تحويل الـ pageIndex لرقم الصفحة الفعلي (يبدأ من 1)
-  final page = pageIndex;
-
-  // 1. حساب نسبة التكبير/التصغير بناءً على عرض الشاشة الفعلي مقارنة بالمقاس الافتراضي
-  double ratio = (width / _quranLibraryDesignWidth).clamp(0.6, 1.8);
-  
-  // 2. القيمة الأساسية للخط التي نضربها في الـ Ratio
-  double size = 23.1 * ratio;
-
-  // 3. تعديل في وضع Landscape عشان الخط ميطولش برا الشاشة والأبعاد متضربش
-  if (isLandscape) {
-    size *= 0.85; 
+  // ── 1. Landscape mode ──
+  if (!isPortrait) {
+    return 35.sp;
   }
 
-  // 4. تعديلات الشاشات الضخمة (التابلت والويب)
+  // ── 2. Tablets & large screens (shortestSide > 600) ──
   if (shortestSide > 600) {
-    // تقليل الحجم في التابلت لأن التمدد بنسبة العرض بيخلي الكلمة عملاقة 
-    size = 18.0 * ratio;
-    if (isLandscape) size *= 0.8;
+    return 15.sp;
   }
 
-  // 5. تعديلات خاصة للصفحات اللي فيها هوامش كبيرة أو مزخرفة (زي الفاتحة وبداية البقرة)
-  if (page == 1 || page == 2) {
-    size *= 1.1; // نكبره شوية في البداية لأن السورتين قصيرتين
+  // ── 3. Very small screens (width < 360) ──
+  final screenWidth = media.size.width;
+  if (screenWidth < 360) {
+    return 20.sp;
   }
 
-  // 6. صفحات خاصة تحتاج لضبط دقيق كما في المكتبة المرجعية quran_library
-  final size23Pages = [
-    56, 57, 368, 269, 372, 376, 409, 435, 444, 448, 527, 535, 565, 566, 569,
-    574, 578, 581, 584, 587, 589, 590, 592, 593, 50, 568, 34
+  // ── 4. First two pages (Fatihah & start of Baqarah) ──
+  if (pageNumber == 1 || pageNumber == 2) {
+    return 25.sp;
+  }
+
+  // ── 5. Per-page overrides (from reference library quran_library) ──
+  if (pageNumber == 145 || pageNumber == 585) return 22.7.sp;
+  if ([532, 533, 523, 577].contains(pageNumber)) return 22.5.sp;
+  if (pageNumber == 116 || pageNumber == 156) return 23.4.sp;
+
+  const size23Pages = [
+    56, 57, 368, 269, 372, 376, 409, 435, 444, 448, 527, 535,
+    565, 566, 569, 574, 575, 578, 581, 584, 587, 589, 590, 592, 593, 50, 568, 34,
   ];
-  if (size23Pages.contains(page)) {
-    size = 23.0 * ratio;
-  } else if (page == 145 || page == 585) {
-    size = 22.7 * ratio;
-  } else if ([532, 533, 523, 577].contains(page)) {
-    size = 22.5 * ratio;
-  } else if (page == 116 || page == 156) {
-    size = 23.4 * ratio;
-  } else if (page == 70) {
-    size = 23.5 * ratio;
-  } else if (page == 51 || page == 501) {
-    size = 23.7 * ratio;
-  }
+  if (size23Pages.contains(pageNumber)) return 23.sp;
 
-  // 7. Clamp لحدود آمنة جداً
-  // أقل خط 16 وأكبر خط 45 عشان الشاشات متكسرش
-  return size.clamp(16.0, 45.0);
+  if (pageNumber == 70) return 23.5.sp;
+  if (pageNumber == 51 || pageNumber == 501) return 23.7.sp;
+
+  const size228Pages = [576, 567, 371, 446, 447];
+  if (size228Pages.contains(pageNumber)) return 22.8.sp;
+
+  // ── 6. Default ──
+  return 23.1.sp;
 }
 
 enum ScreenType { small, medium, large }
@@ -73,3 +64,4 @@ ScreenType getScreenType(BuildContext context) {
     return ScreenType.large;
   }
 }
+
