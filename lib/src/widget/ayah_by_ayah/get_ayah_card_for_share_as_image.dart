@@ -44,9 +44,7 @@ Widget getAyahCardForShareAsImage(
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(roundedRadius),
       border: Border.all(color: themeState.primary),
-      color: brightness == Brightness.dark
-          ? Colors.grey.shade900
-          : Colors.grey.shade100,
+      color: Theme.of(context).scaffoldBackgroundColor,
     ),
     child: Column(
       mainAxisSize: MainAxisSize.min,

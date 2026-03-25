@@ -274,7 +274,7 @@ class _BookSelectPopupState extends State<BookSelectPopup> {
                                 children: [
                                   if (book is TafsirBookModel)
                                     buildScoreIndicator(
-                                      percentage: (book).score,
+                                      percentage: 100.0,
                                       size: 20,
                                     ),
                                   if (book is TafsirBookModel) const Gap(10),

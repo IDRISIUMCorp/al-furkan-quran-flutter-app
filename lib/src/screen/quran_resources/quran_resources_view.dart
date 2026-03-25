@@ -52,11 +52,13 @@ class _QuranResourcesViewState extends State<QuranResourcesView>
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         flexibleSpace: ClipRRect(
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
             child: Container(
               decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: isDark ? 0.75 : 0.85),
                 border: Border(bottom: BorderSide(color: themeState.mutedGray)),
               ),
             ),
@@ -80,18 +82,18 @@ class _QuranResourcesViewState extends State<QuranResourcesView>
               padding: const EdgeInsets.all(8.0),
               child: ClipRRect(
                 child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                  filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
                   child: Container(
                     height: 40,
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF2C2C2C) : themeState.primaryShade100,
+                      color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: isDark ? 0.6 : 0.85),
                       borderRadius: BorderRadius.circular(100),
                     ),
                     child: TabBar(
                       splashBorderRadius: BorderRadius.circular(100),
                       controller: _tabController,
                       indicator: BoxDecoration(
-                        color: isDark ? themeState.primary.withValues(alpha: 0.2) : themeState.primaryShade200,
+                        color: isDark ? themeState.primary.withValues(alpha: 0.25) : themeState.primaryShade200,
                         borderRadius: BorderRadius.circular(100),
                       ),
                       indicatorSize: TabBarIndicatorSize.tab,

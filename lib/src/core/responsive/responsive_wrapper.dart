@@ -7,11 +7,11 @@ class ResponsiveWrapper extends StatelessWidget {
   final Widget? desktop;
 
   const ResponsiveWrapper({
-    Key? key,
+    super.key,
     required this.mobile,
     this.tablet,
     this.desktop,
-  }) : super(key: key);
+  });
 
   static bool isMobile(BuildContext context) =>
       MediaQuery.sizeOf(context).width < 600;

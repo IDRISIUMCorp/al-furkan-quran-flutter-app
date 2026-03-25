@@ -31,8 +31,10 @@ class HeaderWidget extends StatelessWidget {
           alignment: Alignment.center,
           children: [
             Image(
-              image: const AssetImage(
-                "assets/mainframe.png",
+              image: AssetImage(
+                ThemeData.estimateBrightnessForColor(effectiveTheme.pageBackgroundColor) == Brightness.dark 
+                  ? "assets/Darkmainframe.png" 
+                  : "assets/mainframe.png",
                 package: 'qcf_quran',
               ),
               width:

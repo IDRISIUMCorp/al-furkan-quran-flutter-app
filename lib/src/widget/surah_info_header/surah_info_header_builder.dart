@@ -6,7 +6,6 @@ import "package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.d
 import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
 import "package:al_quran_v3/src/core/audio/player/audio_player_manager.dart";
 import "package:al_quran_v3/src/resources/translation/language_cubit.dart";
-import "package:al_quran_v3/src/screen/audio/download_screen/audio_download_screen.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_translation_function.dart";
 import "package:al_quran_v3/src/resources/quran_resources/meaning_of_surah.dart";
 import "package:al_quran_v3/src/screen/quran_script_view/model/surah_header_info.dart";
@@ -15,7 +14,6 @@ import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_state.da
 import "package:al_quran_v3/src/screen/surah_info/surah_info_view.dart";
 import "package:al_quran_v3/src/theme/values/values.dart";
 import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
-import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
@@ -167,34 +165,7 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         if (!kIsWeb)
-                          IconButton(
-                            style: IconButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                              backgroundColor: themeState.primary,
-                              foregroundColor: Colors.white,
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => AudioDownloadScreen(
-                                        initDownloadSurah:
-                                            headerInfoModel.surahInfoModel,
-                                        reciterInfoModel:
-                                            context
-                                                .read<
-                                                  SegmentedQuranReciterCubit
-                                                >()
-                                                .state,
-                                      ),
-                                ),
-                              );
-                            },
-                            icon: const Icon(
-                              FluentIcons.arrow_download_24_filled,
-                            ),
-                          ),
+                          /* Download Icon Button removed */
                         IconButton(
                           style: IconButton.styleFrom(
                             padding: EdgeInsets.zero,

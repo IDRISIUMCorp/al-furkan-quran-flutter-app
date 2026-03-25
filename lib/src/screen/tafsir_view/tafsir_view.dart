@@ -417,8 +417,12 @@ class _TafsirViewState extends State<TafsirView> {
                       padding: HtmlPaddings.zero,
                       margin: Margins.zero,
                       fontSize: FontSize(state.translationFontSize),
-                      lineHeight: const LineHeight(1.6),
+                      lineHeight: const LineHeight(1.8), // increased line height
+                      textAlign: TextAlign.justify, // justify text
                       color: isDark ? Colors.white : Colors.black,
+                    ),
+                    "p": Style(
+                      textAlign: TextAlign.justify,
                     ),
                   },
                 );

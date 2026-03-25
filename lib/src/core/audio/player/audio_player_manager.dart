@@ -9,25 +9,21 @@ import "package:al_quran_v3/src/core/audio/cubit/audio_ui_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/ayah_key_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/player_position_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/player_state_cubit.dart";
-import "package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
 import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
 import "package:al_quran_v3/src/core/audio/model/recitation_info_model.dart";
 import "package:al_quran_v3/src/platform_services.dart";
-import "package:al_quran_v3/src/screen/audio/download_screen/audio_download_screen.dart";
 import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.dart";
 import "package:al_quran_v3/src/utils/quran_ayahs_function/gen_ayahs_key.dart";
 import "package:al_quran_v3/src/resources/quran_resources/meaning_of_surah.dart";
 import "package:al_quran_v3/src/screen/surah_list_view/model/surah_info_model.dart";
 import "package:al_quran_v3/src/widget/quran_script_words/cubit/word_playing_state_cubit.dart";
 import "package:dio/dio.dart";
-import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:just_audio/just_audio.dart";
 import "package:just_audio_background/just_audio_background.dart";
 import "package:path/path.dart";
 import "package:permission_handler/permission_handler.dart";
-import "package:al_quran_v3/src/screen/audio/download_screen/cubit/audio_download_cubit.dart";
 
 class AudioPlayerManager {
   static bool isListening = false;
@@ -258,63 +254,10 @@ class AudioPlayerManager {
   static Future<void> downloadSurah({
     required SurahInfoModel surahInfoModel,
     required ReciterInfoModel reciterInfoModel,
-    required AudioDownloadCubit audioDownloadCubit,
+    required dynamic audioDownloadCubit,
   }) async {
-    audioDownloadCubit.updateIsDownloading(true);
-    audioDownloadCubit.updateProgress(0.0);
-    _downloadCancelToken = CancelToken();
-    for (int i = 1; i <= surahInfoModel.versesCount; i++) {
-      String? expectedPath = getExpectedAudioFileLocation(
-        surahInfoModel: surahInfoModel,
-        ayahNumber: i,
-        reciterInfoModel: reciterInfoModel,
-      );
-      if (expectedPath == null) {
-        return;
-      }
-      log(expectedPath);
-      if (!await File(expectedPath).exists()) {
-        String url = getUrlOfAudioFromAyahKey(
-          "${surahInfoModel.id}:$i",
-          reciterInfoModel,
-        );
-        try {
-          Dio dio = Dio();
-          await dio.download(
-            url,
-            expectedPath,
-            cancelToken: _downloadCancelToken,
-            options: Options(
-              receiveTimeout: const Duration(seconds: 60),
-              sendTimeout: const Duration(seconds: 60),
-            ),
-            deleteOnError: true,
-            onReceiveProgress: (count, total) {
-              if (total != -1) {
-                audioDownloadCubit.updateProgress(
-                  (i - 1 + (count / total)) / surahInfoModel.versesCount,
-                );
-              }
-            },
-          );
-        } catch (e) {
-          log(e.toString());
-          if (e is DioException && e.type == DioExceptionType.cancel) {
-            if (await File(expectedPath).exists()) {
-              await File(expectedPath).delete();
-            }
-          }
-          audioDownloadCubit.updateIsDownloading(false);
-          audioDownloadCubit.updateProgress(0.0);
-          audioDownloadCubit.updateDownloadingSurahNumber(0);
-          return;
-        }
-      }
-      if (_downloadCancelToken?.isCancelled == true) {
-        return;
-      }
-      audioDownloadCubit.updateProgress(i / surahInfoModel.versesCount);
-    }
+    // Disabled functionality
+    // Removed download functionality
   }
 
   static Future<int> getFilesCount(
@@ -486,24 +429,7 @@ class AudioPlayerManager {
                   icon: const Icon(Icons.close),
                   label: Text(AppLocalizations.of(context).cancel),
                 ),
-                TextButton.icon(
-                  style: TextButton.styleFrom(foregroundColor: Colors.green),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AudioDownloadScreen(
-                          initDownloadSurah: surahInfoModel,
-                          reciterInfoModel: context
-                              .read<SegmentedQuranReciterCubit>()
-                              .state,
-                        ),
-                      ),
-                    );
-                  },
-                  icon: const Icon(FluentIcons.arrow_download_24_regular),
-                  label: Text(AppLocalizations.of(context).download),
-                ),
+                /* TextButton Download removed */
               ],
             );
           },

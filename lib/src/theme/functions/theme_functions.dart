@@ -48,10 +48,10 @@ class ThemeFunctions {
   static FlexScheme getFlexSchemeFromDB() {
     assert(preferences != null, "Theme Function need to be init first");
     String? schemeName = preferences!.getString("flex_scheme");
-    if (schemeName == null) return FlexScheme.flutterDash;
+    if (schemeName == null) return FlexScheme.espresso;
     return FlexScheme.values.firstWhere(
       (e) => e.toString() == schemeName,
-      orElse: () => FlexScheme.flutterDash,
+      orElse: () => FlexScheme.espresso,
     );
   }
 

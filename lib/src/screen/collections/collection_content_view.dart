@@ -182,15 +182,16 @@ class _CollectionContentViewState extends State<CollectionContentView> {
                             padding: const EdgeInsets.only(top: 6),
                             child: Text(
                               ayahPreview,
-                              maxLines: 4,
-                              overflow: TextOverflow.ellipsis,
+                              maxLines: 8,
+                              overflow: TextOverflow.visible,
+                              textAlign: TextAlign.justify,
                               textDirection: TextDirection.rtl,
                               style: TextStyle(
                                 fontFamily: "KFGQPC-Uthmanic-HAFS-Regular",
-                                fontSize: 15,
+                                fontSize: 18,
                                 height: 1.8,
                                 color: colorScheme.onSurface.withValues(
-                                  alpha: 0.7,
+                                  alpha: 0.85,
                                 ),
                               ),
                             ),

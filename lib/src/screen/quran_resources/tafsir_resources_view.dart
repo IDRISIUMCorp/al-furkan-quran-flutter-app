@@ -215,7 +215,7 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
         horizontal: 8.0,
         vertical: 2.0,
       ),
-      leading: buildScoreIndicator(percentage: tafsirBook.score, size: 32),
+      leading: buildScoreIndicator(percentage: 100.0, size: 32),
       title: Text(tafsirBook.name),
       trailing: SizedBox(
         height: 30,

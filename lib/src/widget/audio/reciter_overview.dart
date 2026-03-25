@@ -9,10 +9,7 @@ import "package:gap/gap.dart";
 import "package:url_launcher/url_launcher.dart";
 
 import "package:al_quran_v3/l10n/app_localizations.dart";
-import "../../core/audio/player/audio_player_manager.dart";
 import "../../utils/basic_functions.dart";
-import "../../screen/audio/change_reciter/popup_change_reciter.dart";
-import "../../screen/audio/cubit/audio_tab_screen_cubit.dart";
 import "../../theme/values/values.dart";
 
 Widget getReciterWidget({
@@ -29,28 +26,7 @@ Widget getReciterWidget({
     child: InkWell(
     borderRadius: BorderRadius.circular(roundedRadius),
     onTap: () {
-      popupChangeReciter(
-        context,
-        audioTabScreenState,
-        onReciterChanged ??
-            (ReciterInfoModel reciterInfoModel) async {
-              context.read<AudioTabReciterCubit>().changeReciter(
-                reciterInfoModel,
-              );
-              if (ayahKeyState != null) {
-                AudioPlayerManager.playMultipleAyahAsPlaylist(
-                  startAyahKey: ayahKeyState.ayahList.first,
-                  endAyahKey: ayahKeyState.ayahList.last,
-                  isInsideQuran: false,
-                  reciterInfoModel: reciterInfoModel,
-                  initialIndex: currentIndex ?? 0,
-                  instantPlay: AudioPlayerManager.audioPlayer.playing,
-                );
-              }
-              Navigator.pop(context);
-            },
-        isWordByWord: isWordByWord,
-      );
+      // Removed reciter change functionality
     },
 
     child: Row(

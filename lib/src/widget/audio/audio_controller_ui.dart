@@ -1,5 +1,4 @@
 
-import "dart:ui" as ui;
 import "package:al_quran_v3/l10n/app_localizations.dart";
 import "package:al_quran_v3/src/core/audio/cubit/audio_ui_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/ayah_key_cubit.dart";
@@ -10,7 +9,6 @@ import "package:al_quran_v3/src/core/audio/model/audio_player_position_model.dar
 import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
 import "package:al_quran_v3/src/core/audio/model/recitation_info_model.dart";
 import "package:al_quran_v3/src/core/audio/player/audio_player_manager.dart";
-import "package:al_quran_v3/src/screen/audio/change_reciter/popup_change_reciter.dart";
 import "package:al_quran_v3/src/utils/quran_ayahs_function/gen_ayahs_key.dart";
 import "package:al_quran_v3/src/resources/quran_resources/quran_ayah_count.dart";
 import "package:al_quran_v3/src/theme/values/values.dart";
@@ -84,116 +82,71 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
             duration: const Duration(milliseconds: 300),
             builder: (context, radius, child) {
               final isDark = Theme.of(context).brightness == Brightness.dark;
-              final colorScheme = Theme.of(context).colorScheme;
-              final Color collapsedSurface = isDark
-                  ? colorScheme.surface
-                  : colorScheme.surface;
-              final Color borderColor = themeState.primary.withValues(
-                alpha: isDark ? 0.20 : 0.14,
-              );
-              final Color glass = collapsedSurface.withValues(
-                alpha: isDark ? 0.72 : 0.78,
-              );
+              final Color bg = isDark
+                  ? const Color(0xFFE5D5BA)
+                  : const Color(0xFFF4EAD5);
+              final Color borderColor = isDark
+                  ? Colors.black.withValues(alpha: 0.1)
+                  : Colors.black.withValues(alpha: 0.05);
+
               return Padding(
                 padding: const EdgeInsets.only(left: 10, right: 10, bottom: 12),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(radius),
-                  child: BackdropFilter(
-                    filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      height: height,
-                      width: width,
-                      decoration: BoxDecoration(
-                        color: glass,
-                        borderRadius: BorderRadius.circular(radius),
-                        border: Border.all(
-                          color: borderColor,
-                          width: 0.8,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.06),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          )
-                        ],
+                child: Container(
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    color: bg,
+                    borderRadius: BorderRadius.circular(radius),
+                    border: Border.all(
+                      color: borderColor,
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(radius),
-                        child: Stack(
-                          children: [
-                        // Content
-                        Padding(
-                          padding: const EdgeInsets.all(5),
-                          child:
-                              (state.showUi && state.isInsideQuranPlayer)
-                                  ? Stack(
-                                    children: [
-                                      if (!state.isExpanded)
-                                        BlocBuilder<
-                                          SegmentedQuranReciterCubit,
-                                          ReciterInfoModel
-                                        >(
-                                          builder: (context, reciter) {
-                                            return BlocBuilder<
-                                              PlayerStateCubit,
-                                              PlayerState
-                                            >(
-                                              builder: (context, playerState) {
-                                                final isLoading =
-                                                    playerState.state ==
-                                                        just_audio
-                                                            .ProcessingState
-                                                            .loading ||
-                                                    playerState.state ==
-                                                        just_audio
-                                                            .ProcessingState
-                                                            .buffering;
+                    ],
+                  ),
+                  height: height,
+                  width: width,
+                  child: Stack(
+                    children: [
+                      // Content
+                      Padding(
+                        padding: const EdgeInsets.all(5),
+                        child:
+                            (state.showUi && state.isInsideQuranPlayer)
+                                ? Stack(
+                                  children: [
+                                    if (!state.isExpanded)
+                                      BlocBuilder<
+                                        SegmentedQuranReciterCubit,
+                                        ReciterInfoModel
+                                      >(
+                                        builder: (context, reciter) {
+                                          return BlocBuilder<
+                                            PlayerStateCubit,
+                                            PlayerState
+                                          >(
+                                            builder: (context, playerState) {
+                                              final isLoading =
+                                                  playerState.state ==
+                                                      just_audio
+                                                          .ProcessingState
+                                                          .loading ||
+                                                  playerState.state ==
+                                                      just_audio
+                                                          .ProcessingState
+                                                          .buffering;
 
-                                                final onSurface = colorScheme.onSurface;
+                                              final onSurface = isDark ? Colors.white : Colors.black;
 
-                                                final isPlaylist =
+                                              final isPlaylist =
                                                     context.read<AudioUiCubit>().state.isPlayList;
 
                                                 Future<void> openReciterPicker() async {
-                                                  if (!context.mounted) return;
-                                                  popupChangeReciter(
-                                                    context,
-                                                    reciter,
-                                                    (ReciterInfoModel reciterInfoModel) async {
-                                                      Navigator.pop(context);
-                                                      bool isSuccess = await context
-                                                          .read<SegmentedQuranReciterCubit>()
-                                                          .changeReciter(context, reciterInfoModel);
-
-                                                      if (!isSuccess) return;
-
-                                                      if (AudioPlayerManager.audioPlayer.playing) {
-                                                        final ayahState =
-                                                            context.read<AyahKeyCubit>().state;
-                                                        if (ayahState.ayahList.length > 1) {
-                                                          await AudioPlayerManager.playMultipleAyahAsPlaylist(
-                                                            startAyahKey: ayahState.start,
-                                                            endAyahKey: ayahState.end,
-                                                            isInsideQuran: true,
-                                                            reciterInfoModel: reciterInfoModel,
-                                                            initialIndex: ayahState.ayahList
-                                                                .indexOf(ayahState.current),
-                                                            instantPlay: true,
-                                                          );
-                                                        } else {
-                                                          await AudioPlayerManager.playSingleAyah(
-                                                            ayahKey: ayahState.current,
-                                                            reciterInfoModel: reciterInfoModel,
-                                                            instantPlay: true,
-                                                            isInsideQuran: true,
-                                                          );
-                                                        }
-                                                      }
-                                                    },
-                                                    isWordByWord: false,
-                                                  );
+                                                  // Removed reciter picker
                                                 }
 
                                                 return SizedBox(
@@ -420,10 +373,7 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
                       ],
                     ),
                   ),
-                ),
-                  ),
-                ),
-              );
+                );
             },
           ),
         );
