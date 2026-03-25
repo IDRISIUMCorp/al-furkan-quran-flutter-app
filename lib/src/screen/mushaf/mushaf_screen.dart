@@ -1373,37 +1373,40 @@ class _MushafRootState extends State<_MushafRoot> {
       return PopupMenuItem<int>(
         value: value,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF2A2A2A)
-                    : primary.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
+        child: Directionality(
+          textDirection: TextDirection.rtl,
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
                   color: isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : Colors.transparent,
+                      ? const Color(0xFF2A2A2A)
+                      : primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.transparent,
+                  ),
+                ),
+                child: Icon(
+                  icon,
+                  color: isDark ? Colors.white.withValues(alpha: 0.9) : primary,
+                  size: 20,
                 ),
               ),
-              child: Icon(
-                icon,
-                color: isDark ? Colors.white.withValues(alpha: 0.9) : primary,
-                size: 20,
+              const SizedBox(width: 14),
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                  color: textColor,
+                ),
               ),
-            ),
-            const SizedBox(width: 14),
-            Text(
-              title,
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 15,
-                color: textColor,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
@@ -1424,27 +1427,29 @@ class _MushafRootState extends State<_MushafRoot> {
           elevation: isDark ? 16 : 30,
         ),
       ),
-      child: PopupMenuButton<int>(
-        offset: const Offset(0, 50),
-        icon: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: isDark
-                ? const Color(0xFF222222)
-                : primary.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: PopupMenuButton<int>(
+          offset: const Offset(0, 50),
+          icon: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
               color: isDark
-                  ? Colors.white.withValues(alpha: 0.12)
-                  : Colors.transparent,
+                  ? const Color(0xFF222222)
+                  : primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.12)
+                    : Colors.transparent,
+              ),
+            ),
+            child: Icon(
+              Icons.more_horiz_rounded,
+              color: isDark ? Colors.white : primary,
             ),
           ),
-          child: Icon(
-            Icons.more_horiz_rounded,
-            color: isDark ? Colors.white : primary,
-          ),
-        ),
-        itemBuilder: (context) => [
+          itemBuilder: (context) => [
           buildPremiumMenuItem(0, Icons.settings_rounded, "الإعدادات"),
           buildPremiumMenuItem(7, Icons.auto_awesome_rounded, "إعدادات المصحف"),
           buildPremiumMenuItem(4, Icons.headphones_rounded, "الصوتيات"),
@@ -1512,6 +1517,7 @@ class _MushafRootState extends State<_MushafRoot> {
         }
       },
     ),
+   ),
    );
   }
 }
