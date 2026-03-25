@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:al_quran_v3/src/core/audio/player/audio_player_manager.dart';
 import 'package:al_quran_v3/src/theme/controller/theme_cubit.dart';
 import 'package:al_quran_v3/src/screen/surah_list_view/model/surah_info_model.dart';
 import 'package:qcf_quran/qcf_quran.dart';
@@ -10,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:al_quran_v3/src/utils/number_localization.dart';
 import 'package:al_quran_v3/src/resources/quran_resources/meta/meta_data_surah.dart';
 import 'package:al_quran_v3/src/utils/quran_ayahs_function/get_page_number.dart' as p;
-import 'package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart';
 class WahyIndexSheet extends StatefulWidget {
   final ValueChanged<int> onOpenPage;
   final ValueChanged<String>? onOpenAyah;

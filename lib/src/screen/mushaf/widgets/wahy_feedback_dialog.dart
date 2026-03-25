@@ -1,8 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:package_info_plus/package_info_plus.dart';
-import 'dart:io';
 
 import 'package:al_quran_v3/src/theme/app_colors.dart';
 import 'package:flutter_animate/flutter_animate.dart';

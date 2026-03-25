@@ -8,18 +8,14 @@ import 'package:al_quran_v3/src/screen/mushaf/widgets/search_sheet.dart';
 import "package:al_quran_v3/src/screen/mushaf/widgets/listen_range_sheet.dart";
 import "dart:convert";
 import "dart:developer";
-import "dart:io";
 import "dart:ui" as ui;
 
 import "package:flutter/material.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/rendering.dart";
 import "package:flutter/services.dart";
-import "package:flutter_animate/flutter_animate.dart";
 import "package:qcf_quran/qcf_quran.dart" hide getPageNumber;
-import "package:http/http.dart" as http;
 import "package:share_plus/share_plus.dart";
-import "package:path_provider/path_provider.dart";
 
 import "package:al_quran_v3/src/core/audio/cubit/player_position_cubit.dart";
 import "package:al_quran_v3/src/core/audio/model/audio_player_position_model.dart";
@@ -62,10 +58,9 @@ import "package:al_quran_v3/src/screen/mushaf/index/aya_index_page.dart";
 // Removed audio_page.dart import
 import "package:al_quran_v3/src/widget/add_collection_popup/add_note_popup.dart";
 import "package:al_quran_v3/src/screen/about/about_the_app.dart";
+import "package:al_quran_v3/src/screen/mushaf/widgets/image_share/ayah_image_generator.dart";
 import "package:al_quran_v3/src/screen/mushaf/widgets/khatma_sheet.dart";
 import "package:al_quran_v3/src/screen/smart_khatma/smart_khatma_page.dart";
-import "package:al_quran_v3/src/screen/surah_list_view/model/surah_info_model.dart";
-import "package:al_quran_v3/src/resources/quran_resources/meta/meta_data_surah.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
 import "package:al_quran_v3/src/theme/controller/theme_state.dart";

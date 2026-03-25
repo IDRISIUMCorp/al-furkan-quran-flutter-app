@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:al_quran_v3/src/theme/controller/theme_cubit.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qcf_quran/qcf_quran.dart';
 
 import 'package:al_quran_v3/src/utils/number_localization.dart';
-import 'package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart';
 
 class AyahSearchResult {
   final int surah;
