@@ -9,9 +9,10 @@ An extensively modified and ultra-optimized Flutter package for rendering the Ho
 ## 🚀 Recent Architecture Upgrades & Modifications
 This internal module has been significantly expanded beyond its original state to fit the **IDRISIUM Corp** standard of "Apple-Level Aesthetics" and pixel-perfect rendering.
 
-### 1. 🌓 Dynamic Dark Mode for Surah Banners (بانرات السور التفاعلية)
-- **Smart Banners (بانرات ذكية):** Automatically switches the Surah Name Banners to a custom dark frame (`Darkmainframe.png`) when the app is in Dark/OLED mode, providing a seamless premium look.
-- **Dynamic Text Colors (ألوان نصوص متكيفة):** The color of the Surah name inside the banner reacts and inverts beautifully to ensure maximum contrast and legibility regardless of OLED or Light scenarios.
+### 1. 🌓 Dynamic Dark Mode Deep-Integration (حساسية الوضع الداكن)
+- Added explicit support for `Brightness.dark` context awareness across the core engine.
+- **Smart Banners (بانرات ذكية متكيفة):** Refactored `HeaderWidget` to dynamically switch Surah Banners (e.g., loading `Darkmainframe.png` seamlessly) when the app is in Dark/OLED mode, providing a premium flush look.
+- **Dynamic Text Colors (نصوص ذكية):** In-built smart inversion of `headerTextColor` to ensure maximum contrast and legibility regardless of OLED or Light scenarios.
 
 ### 2. 📸 High-Definition "Share As Image" Engine
 - Completely overhauled how Ayahs are composed into images.
