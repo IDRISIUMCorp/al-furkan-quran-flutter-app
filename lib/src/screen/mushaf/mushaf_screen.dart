@@ -11,8 +11,6 @@ import "dart:developer";
 import "dart:ui" as ui;
 
 import "package:flutter/material.dart";
-import "package:flutter/foundation.dart";
-import "package:flutter/rendering.dart";
 import "package:flutter/services.dart";
 import "package:qcf_quran/qcf_quran.dart" hide getPageNumber;
 import "package:share_plus/share_plus.dart";
@@ -156,7 +154,6 @@ class _MushafRootState extends State<_MushafRoot> {
       ? Colors.white
       : Color(0xFF1B1B1B);
   static const _headerHeight = 56.0;
-  static const _miniPlayerBottomPadding = 0.0;
 
   static const int _kSearchMaxResults = 120;
   final Map<String, List<AyahSearchResult>> _ayahSearchCache =
@@ -836,10 +833,10 @@ class _MushafRootState extends State<_MushafRoot> {
   Widget build(BuildContext context) {
     final themeState = context.read<ThemeCubit>().state;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF0B0B0F) : AppColors.ayaBackground;
+    final bgColor = isDark ? const Color(0xFF000000) : AppColors.ayaBackground;
     final topBarColor = isDark
-        ? const Color(0xFF1B1B1F).withValues(alpha: 0.85)
-        : AppColors.ayaSurface.withValues(alpha: 0.85);
+        ? const Color(0xFF000000).withValues(alpha: 0.85)
+        : const Color(0xFFF4EAD5).withValues(alpha: 0.85);
     final topBarBorderColor = isDark
         ? Colors.white10
         : AppColors.ayaBorder.withValues(alpha: 0.5);
@@ -892,9 +889,9 @@ class _MushafRootState extends State<_MushafRoot> {
         useRootNavigator: true,
         backgroundColor: Colors.transparent,
         builder: (sheetContext) {
-          final bg = _bg(sheetContext);
-          const card = Color(0xFFFFF9F2);
-          final fontBase = _onBg(sheetContext);
+          final bg = isDark ? const Color(0xFF000000) : _bg(sheetContext);
+          final card = isDark ? const Color(0xFF111111) : const Color(0xFFFFF9F2);
+          final fontBase = isDark ? Colors.white : _onBg(sheetContext);
 
           Widget item({
             required IconData icon,
@@ -963,7 +960,7 @@ class _MushafRootState extends State<_MushafRoot> {
                                 width: 44,
                                 height: 4,
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.18),
+                                  color: isDark ? Colors.white.withValues(alpha: 0.25) : Colors.black.withValues(alpha: 0.18),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                               ),
@@ -982,7 +979,7 @@ class _MushafRootState extends State<_MushafRoot> {
                                   color: card,
                                   borderRadius: BorderRadius.circular(18),
                                   border: Border.all(
-                                    color: Colors.black.withValues(alpha: 0.06),
+                                    color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
                                   ),
                                 ),
                                 child: Column(
@@ -1111,14 +1108,8 @@ class _MushafRootState extends State<_MushafRoot> {
                 behavior: HitTestBehavior.translucent,
                 onTap: () => setState(() => _showHeader = !_showHeader),
                 child: Container(
-                  color: isDark ? const Color(0xFF0B0B0F) : _bg(context),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      top:
-                          44, // Adjusted further from 47 to 44 to raise headers more
-                      bottom: _miniPlayerBottomPadding,
-                    ),
-                    child: AnimatedSwitcher(
+                  color: _bg(context),
+                  child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 220),
                       switchInCurve: Curves.easeOutCubic,
                       switchOutCurve: Curves.easeOutCubic,
@@ -1148,12 +1139,10 @@ class _MushafRootState extends State<_MushafRoot> {
                               topPaddingOverride: 0,
                               showAudioController: false,
                             ),
-                    ),
+                      ),
                   ),
                 ),
               ),
-            ),
-
             // Top header (Beige)
             AnimatedSlide(
               duration: Duration(milliseconds: _showHeader ? 320 : 520),
@@ -1362,7 +1351,7 @@ class _MushafRootState extends State<_MushafRoot> {
   Widget _buildMoreMenu(Color primaryColor, bool isDark) {
     final themeState = context.read<ThemeCubit>().state;
     final primary = themeState.primary;
-    final Color bgColor = isDark ? const Color(0xFF141414) : Colors.white;
+    final Color bgColor = isDark ? const Color(0xFF000000) : const Color(0xFFF7F5EC);
     final Color textColor = isDark ? Colors.white : const Color(0xFF1E1E1E);
 
     PopupMenuItem<int> buildPremiumMenuItem(
@@ -1420,7 +1409,7 @@ class _MushafRootState extends State<_MushafRoot> {
             side: BorderSide(
               color: isDark
                   ? Colors.white.withValues(alpha: 0.1)
-                  : Colors.black.withValues(alpha: 0.04),
+                  : const Color(0xFFE5E0CF),
               width: 1,
             ),
           ),
@@ -1452,7 +1441,6 @@ class _MushafRootState extends State<_MushafRoot> {
           itemBuilder: (context) => [
           buildPremiumMenuItem(0, Icons.settings_rounded, "الإعدادات"),
           buildPremiumMenuItem(7, Icons.auto_awesome_rounded, "إعدادات المصحف"),
-          buildPremiumMenuItem(4, Icons.headphones_rounded, "الصوتيات"),
           buildPremiumMenuItem(5, Icons.access_time_filled_rounded, "مواقيت الصلاة"),
           buildPremiumMenuItem(6, Icons.explore_rounded, "القبلة"),
           buildPremiumMenuItem(1, Icons.menu_book_rounded, "التفاسير والترجمات"),
@@ -1500,8 +1488,6 @@ class _MushafRootState extends State<_MushafRoot> {
               );
             },
           );
-        } else if (val == 4) {
-          // AudioPage removed
         } else if (val == 5) {
           Navigator.push(
             context,
@@ -1936,10 +1922,8 @@ class MushafView extends StatefulWidget {
 class _MushafViewState extends State<MushafView> {
   static Color _bg(BuildContext ctx) =>
       Theme.of(ctx).brightness == Brightness.dark
-      ? Color(0xFF141414)
+      ? Color(0xFF000000)
       : Color(0xFFF7F1E6);
-  static const _pageHeaderSidePadding = 22.0;
-  static const _pageFooterBottomPadding = 10.0;
 
   static const String _kWahyBookmarks = "wahy_bookmarks";
   static const String _kWahyNotes = "wahy_notes";
@@ -2764,123 +2748,83 @@ class _MushafViewState extends State<MushafView> {
                     firstPagesTopSpacerFactor: 0.0,
                     pageTopOverlayBuilder: (pageNumber, surahNumber, startVerse) {
                       final juzNumber = getJuzNumber(surahNumber, startVerse);
-                      return Transform.translate(
-                        offset: const Offset(0, -2),
-                        child: IgnorePointer(
-                          ignoring: true,
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(
-                              _pageHeaderSidePadding,
-                              8, // Significantly reduced from 25 to 8 to raise it to the top
-                              _pageHeaderSidePadding,
-                              0,
+                      return IgnorePointer(
+                        ignoring: true,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                          child: DefaultTextStyle(
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              fontFamily: "Inter",
+                              color: pageBgIsDark
+                                  ? Colors.white.withValues(alpha: 0.90)
+                                  : const Color(0xFF111111)
+                                      .withValues(alpha: 0.88),
                             ),
-                            child: DefaultTextStyle(
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w900,
-                                fontFamily: "Inter",
-                                color: pageBgIsDark
-                                    ? Colors.white.withValues(alpha: 0.90)
-                                    : const Color(0xFF111111)
-                                        .withValues(alpha: 0.88),
-                              ),
-                              child: Directionality(
-                                textDirection: TextDirection.ltr,
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          getSurahNameArabic(surahNumber),
-                                          textDirection: TextDirection.rtl,
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                          "الجزء ${_arabicOrdinalLocal(context, juzNumber)}",
-                                          textDirection: TextDirection.rtl,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                            child: Directionality(
+                              textDirection: TextDirection.ltr,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    getSurahNameArabic(surahNumber),
+                                    textDirection: TextDirection.rtl,
+                                  ),
+                                  Text(
+                                    "الجزء ${_arabicOrdinalLocal(context, juzNumber)}",
+                                    textDirection: TextDirection.rtl,
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                         ),
                       );
                     },
-                    pageBottomOverlayBuilder:
-                        (pageNumber, surahNumber, startVerse) {
-                          final pageLabel = localizedNumber(
-                            context,
-                            pageNumber,
-                          );
-                          final hizbNumber = _hizbNumberFor(
-                            surahNumber,
-                            startVerse,
-                          );
-                          final hizbLabel =
-                              "الحزب ${localizedNumber(context, hizbNumber)}";
-                          final showHizb = _isHizbStart(
-                            surahNumber,
-                            startVerse,
-                          );
+                    pageBottomOverlayBuilder: (pageNumber, surahNumber, startVerse) {
+                      final pageLabel = localizedNumber(context, pageNumber);
+                      final hizbNumber = _hizbNumberFor(surahNumber, startVerse);
+                      final hizbLabel = "الحزب ${localizedNumber(context, hizbNumber)}";
+                      final showHizb = _isHizbStart(surahNumber, startVerse);
 
-                          return IgnorePointer(
-                            ignoring: true,
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                bottom: _pageFooterBottomPadding,
-                              ),
-                              child: Align(
-                                alignment: Alignment.bottomCenter,
-                                child: Directionality(
-                                  textDirection: TextDirection.rtl,
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (showHizb) ...[
-                                        Text(
-                                          hizbLabel,
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w700,
-                                            color: pageBgIsDark
-                                                ? Colors.white.withValues(
-                                                    alpha: 0.82,
-                                                  )
-                                                : const Color(0xFF111111)
-                                                    .withValues(alpha: 0.78),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                      ],
-                                      Text(
-                                        pageLabel,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w800,
-                                          color: pageBgIsDark
-                                              ? Colors.white.withValues(
-                                                  alpha: 0.90,
-                                                )
-                                              : const Color(0xFF111111)
-                                                  .withValues(alpha: 0.88),
-                                        ),
-                                      ),
-                                    ],
+                      return IgnorePointer(
+                        ignoring: true,
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (showHizb) ...[
+                                Text(
+                                  hizbLabel,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: pageBgIsDark
+                                        ? Colors.white.withValues(alpha: 0.82)
+                                        : const Color(0xFF111111)
+                                            .withValues(alpha: 0.78),
                                   ),
                                 ),
+                                const SizedBox(height: 2),
+                              ],
+                              Text(
+                                pageLabel,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  color: pageBgIsDark
+                                      ? Colors.white.withValues(alpha: 0.90)
+                                      : const Color(0xFF111111)
+                                          .withValues(alpha: 0.88),
+                                ),
                               ),
-                            ),
-                          );
-                        },
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   verseBackgroundColor: (surah, verse) {
                     final key = "$surah:$verse";

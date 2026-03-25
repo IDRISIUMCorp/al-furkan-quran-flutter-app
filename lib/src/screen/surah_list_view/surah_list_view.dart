@@ -91,7 +91,9 @@ class _SurahListViewState extends State<SurahListView> {
                     hintText: l10n.searchForASurah,
                     controller: searchController,
                     backgroundColor: WidgetStateProperty.all<Color?>(
-                      themeState.primaryShade100,
+                      brightness == Brightness.dark
+                          ? const Color(0xFF1E1E1E)
+                          : const Color(0xFFF3F4F6),
                     ),
                     leading: const Icon(FluentIcons.search_24_filled),
                     onChanged: (value) {

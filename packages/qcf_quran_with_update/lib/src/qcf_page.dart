@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:qcf_quran/qcf_quran.dart';
 // ignore: implementation_imports
-import 'package:qcf_quran/src/data/page_font_size.dart';
 
 ///
 /// Use this if you want to build your own [PageView] or layout
@@ -100,10 +99,10 @@ class QcfPage extends StatelessWidget {
     final size = MediaQuery.sizeOf(context);
     final isTablet = size.shortestSide >= 600;
 
-    final double _baselineWidth = isTablet ? 640 : 470;
-    final double _fontScale = isTablet ? 1.30 : 1.18;
+    final double baselineWidth = isTablet ? 640 : 470;
+    final double fontScale = isTablet ? 1.30 : 1.18;
     final double baseFontSize =
-        (fontSize ?? getFontSize(pageNumber, _baselineWidth)) * _fontScale;
+        (fontSize ?? getFontSize(pageNumber, baselineWidth)) * fontScale;
 
     final double minAllPagesFontSize =
         (size.width * (isTablet ? 0.048 : 0.045)).clamp(18.0, 34.0);
@@ -437,32 +436,35 @@ class QcfPage extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    FittedBox(
-                      fit: BoxFit.fitWidth,
-                      alignment: Alignment.center,
-                      child: SizedBox(
-                        width: _baselineWidth,
-                        child: ColoredBox(
-                          color: theme.pageBackgroundColor,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 4.0,
-                              right: 4.0,
-                              top: 0.0,
-                              bottom: 8.0,
-                            ),
-                            child: ExcludeSemantics(
-                              child: Text.rich(
-                                TextSpan(children: verseSpans),
-                                locale: const Locale("ar"),
-                                textAlign: TextAlign.center,
-                                textDirection: TextDirection.rtl,
-                                style: TextStyle(
-                                  fontSize: finalFontSize,
-                                  color: theme.verseTextColor,
-                                  height: finalHeight,
-                                  letterSpacing: theme.letterSpacing,
-                                  wordSpacing: theme.wordSpacing,
+                    Align(
+                      alignment: const Alignment(0.0, 0.1), // Moves the Ayahs slightly down
+                      child: FittedBox(
+                        fit: BoxFit.fitWidth,
+                        alignment: Alignment.center,
+                        child: SizedBox(
+                          width: baselineWidth,
+                          child: ColoredBox(
+                            color: theme.pageBackgroundColor,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                left: 4.0,
+                                right: 4.0,
+                                top: 15.0,
+                                bottom: 15.0,
+                              ),
+                              child: ExcludeSemantics(
+                                child: Text.rich(
+                                  TextSpan(children: verseSpans),
+                                  locale: const Locale("ar"),
+                                  textAlign: TextAlign.center,
+                                  textDirection: TextDirection.rtl,
+                                  style: TextStyle(
+                                    fontSize: finalFontSize,
+                                    color: theme.verseTextColor,
+                                    height: finalHeight,
+                                    letterSpacing: theme.letterSpacing,
+                                    wordSpacing: theme.wordSpacing,
+                                  ),
                                 ),
                               ),
                             ),
@@ -472,14 +474,14 @@ class QcfPage extends StatelessWidget {
                     ),
                     if (pageOverlayTop != null)
                       Positioned(
-                        top: 0,
+                        top: 45.0, // Push Surah/Juz down permanently below notch
                         left: 0,
                         right: 0,
                         child: pageOverlayTop,
                       ),
                     if (pageOverlayBottom != null)
                       Positioned(
-                        bottom: 0,
+                        bottom: 8.0, // Push Page Number down explicitly
                         left: 0,
                         right: 0,
                         child: pageOverlayBottom,

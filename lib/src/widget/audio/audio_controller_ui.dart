@@ -83,10 +83,10 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
             builder: (context, radius, child) {
               final isDark = Theme.of(context).brightness == Brightness.dark;
               final Color bg = isDark
-                  ? const Color(0xFFE5D5BA)
+                  ? const Color(0xFF000000)
                   : const Color(0xFFF4EAD5);
               final Color borderColor = isDark
-                  ? Colors.black.withValues(alpha: 0.1)
+                  ? Colors.white.withValues(alpha: 0.1)
                   : Colors.black.withValues(alpha: 0.05);
 
               return Padding(
