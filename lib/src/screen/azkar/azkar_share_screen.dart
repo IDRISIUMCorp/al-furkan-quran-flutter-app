@@ -22,7 +22,7 @@ import 'package:al_quran_v3/src/screen/azkar/services/azkar_share_preferences.da
 
 enum CustomizationField { global, zekr, category, description, reference }
 
-/// Tab Item ┘ä┘ä┘Ç TabBar
+/// Tab item for TabBar
 class _TabItem {
   final String label;
   final IconData icon;
@@ -30,9 +30,7 @@ class _TabItem {
   const _TabItem(this.label, this.icon);
 }
 
-// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
-// QUICK PRESETS - ╪¬╪╡┘à┘è┘à╪º╪¬ ╪¼╪º┘ç╪▓╪⌐ ╪│╪▒┘è╪╣╪⌐
-// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+// QUICK PRESETS
 
 enum SharePreset {
   elegant('أنيق', 'dark_royal', 'royal', 28, true, false, true),
@@ -93,11 +91,11 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
   double _lineHeight = 1.7;
   double _verticalAlignment = 0.0;
   
-  // Granular Element State
+  // Granular element state
   double? _zekrFontSize;
   double? _zekrLineHeight;
-  double _zekrOffsetX = 0.0; // ┘è┘à┘è┘å/╪┤┘à╪º┘ä
-  double _zekrOffsetY = 0.0; // ┘ü┘ê┘é/╪¬╪¡╪¬
+  double _zekrOffsetX = 0.0; // Horizontal offset
+  double _zekrOffsetY = 0.0; // Vertical offset
   
   double? _categoryFontSize;
   double? _categoryLineHeight;
@@ -138,14 +136,12 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
 
   bool _isSharing = false;
 
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
   // UNDO/REDO SYSTEM
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
   final List<String> _undoStack = [];
   final List<String> _redoStack = [];
   static const int _maxHistorySize = 20;
 
-  /// Helper: ╪¬╪¡┘ê┘è┘ä ╪º┘ä╪¡╪º┘ä╪⌐ ╪º┘ä╪¡╪º┘ä┘è╪⌐ ┘ä┘Ç JSON
+  /// Helper: encode the current customization state as JSON
   String _encodeCurrentState() {
     return jsonEncode({
       'themeId': _themeId,
@@ -278,9 +274,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     });
   }
 
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
   // THEMES
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 
   static const Map<String, _ThemePreview> _themes = {
     'glass_dark':       _ThemePreview('زجاجي داكن', Color(0xFF0A0A0A), Colors.white, Icons.dark_mode_rounded),
@@ -296,9 +290,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     'custom':           _ThemePreview('مخصص', Color(0xFF141414), Color(0xFF33B18E), Icons.color_lens_rounded),
   };
 
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
   // TABS STATE
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
   static const List<_TabItem> _tabs = [
     _TabItem('التصميم', Icons.palette_rounded),
     _TabItem('العناصر', Icons.text_fields_rounded),
@@ -306,7 +298,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     _TabItem('الهوية', Icons.verified_user_rounded),
   ];
 
-  // Custom Fonts ╪º┘ä┘à╪│╪¬┘ê╪▒╪»╪⌐
+  // Custom fonts
   List<String> _customFonts = [];
   List<String> _customFontNames = [];
 
@@ -351,7 +343,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     _loadCustomFonts();
   }
   
-  /// ╪¬╪¡┘à┘è┘ä ╪º┘ä╪Ñ╪╣╪»╪º╪»╪º╪¬ ╪º┘ä┘à╪¡┘ü┘ê╪╕╪⌐
+  /// Load saved share settings
   Future<void> _loadSavedSettings() async {
     final settings = await AzkarSharePreferences.loadSettings();
     if (settings != null && mounted) {
@@ -391,7 +383,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     }
   }
   
-  /// ╪¡┘ü╪╕ ╪º┘ä╪Ñ╪╣╪»╪º╪»╪º╪¬ ╪º┘ä╪¡╪º┘ä┘è╪⌐
+  /// Save current share settings
   Future<void> _saveCurrentSettings() async {
     final settings = AzkarShareSettings(
       themeId: _themeId,
@@ -420,7 +412,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     await AzkarSharePreferences.saveSettings(settings);
   }
   
-  /// ╪¬╪¡┘à┘è┘ä ╪º┘ä╪«╪╖┘ê╪╖ ╪º┘ä┘à╪│╪¬┘ê╪▒╪»╪⌐
+  /// Load custom fonts from preferences
   Future<void> _loadCustomFonts() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -434,7 +426,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     } catch (_) {}
   }
   
-  /// ╪º╪│╪¬┘è╪▒╪º╪» ╪«╪╖ ╪¼╪»┘è╪»
+  /// Import a custom font file
   Future<void> _importCustomFont() async {
     try {
       final result = await FilePicker.platform.pickFiles(
@@ -529,7 +521,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
   }
 
   Future<Uint8List> _capturePngBytes() async {
-    // ╪ú╪╣┘ä┘ë ╪¼┘ê╪»╪⌐ ┘à┘à┘â┘å╪⌐: devicePixelRatio ├ù 3
+    // High quality capture: devicePixelRatio * 3
     final deviceRatio = View.of(context).devicePixelRatio;
     final maxRatio = deviceRatio * 3;
     final image = await _screenshotController.capture(
@@ -606,9 +598,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     }
   }
 
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
   // UI HELPERS
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 
   Widget _buildCircleButton({
     required IconData icon,
@@ -775,9 +765,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     );
   }
 
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
   // PANEL CONTENT BUILDERS
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 
   Widget _buildDesignContent(Color primary, Color subtleColor, Color textColor, Color cardColor, bool isDark) {
     return Column(
@@ -901,7 +889,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     );
   }
 
-  // Elements Content - ┘à╪¡╪¬┘ê┘ë ╪º┘ä╪╣┘å╪º╪╡╪▒
+  // Elements Content
   Widget _buildElementsContent(Color primary, Color subtleColor, Color textColor, Color cardColor, bool isDark) {
     return SingleChildScrollView(
       child: Column(
@@ -926,7 +914,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
           ),
           const Gap(8),
 
-          // ╪º┘ä╪«╪╖ ╪º┘ä╪╣╪º┘à
+          // Global font
           _buildSectionTitle("تفاصيل الخط", Icons.font_download_rounded, primary, subtleColor),
           const Gap(12),
           Text(
@@ -948,7 +936,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
           ),
           const Gap(24),
           
-          // ┘å╪╡ ╪º┘ä╪░┘â╪▒
+          // Zekr
           _buildSectionTitle("نص الذكر", Icons.text_fields_rounded, primary, subtleColor),
           const Gap(12),
           _buildFullColorPicker(_zekrColor, (c) => setState(() => _zekrColor = c), primary),
@@ -1023,7 +1011,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
           ),
           const Gap(24),
           
-          // ╪º╪│┘à ╪º┘ä┘é╪│┘à
+          // Category
           _buildSectionTitle("عنوان القسم", Icons.category_rounded, primary, subtleColor),
           const Gap(12),
           _buildFullColorPicker(_categoryColor, (c) => setState(() => _categoryColor = c), primary),
@@ -1111,7 +1099,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
           ),
           const Gap(24),
           
-          // ╪º┘ä╪»┘ä┘è┘ä (Reference)
+          // Reference
           _buildSectionTitle("المصدر", Icons.bookmark_rounded, primary, subtleColor),
           _buildFullColorPicker(_referenceColor, (c) => setState(() => _referenceColor = c), primary),
           const Gap(12),
@@ -1202,7 +1190,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
           ),
           const Gap(24),
           
-          // ╪º┘ä┘ü╪╢┘ä (Description)
+          // Description
           _buildSectionTitle("وصف إضافي", Icons.star_rounded, primary, subtleColor),
           const Gap(12),
           _buildFullColorPicker(_descriptionColor, (c) => setState(() => _descriptionColor = c), primary),
@@ -1303,7 +1291,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
       children: [
         Row(
           children: [
-            // ╪▓╪▒ ╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å
+            // Reset color
             GestureDetector(
               onTap: () {
                 _saveState();
@@ -1379,10 +1367,10 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     );
   }
   
-  // Font Selector Horizontal - ┘à╪╣╪º┘è┘å╪⌐ ╪¿╪º┘ä╪«╪╖ ┘å┘ü╪│┘ç
+  // Font selector chips
   Widget _buildFontDropdown(String label, String? currentFont, Function(String?) onFontChanged, Color primary) {
     final fonts = <String?>[
-      null, // ╪º┘ü╪¬╪▒╪º╪╢┘è
+      null, // Default
       'KFGQPC-Uthmanic-HAFS-Regular',
       'Amiri-Regular',
       'Cairo-Bold',
@@ -1465,12 +1453,12 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     );
   }
 
-  // Layout Content - ┘à╪¡╪¬┘ê┘ë ╪º┘ä╪¬╪«╪╖┘è╪╖
+  // Layout Content
   Widget _buildLayoutContent(Color primary, Color subtleColor, Color textColor, Color cardColor, bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ┘å┘à╪╖ ╪º┘ä╪╣╪▒╪╢
+        // Output mode
         _buildSectionTitle("نمط الإخراج", Icons.aspect_ratio_rounded, primary, subtleColor),
         const Gap(12),
         Row(
@@ -1482,7 +1470,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
         ),
         const Gap(24),
         
-        // ╪º┘ä┘à╪¡╪º╪░╪º╪⌐
+        // Text alignment
         _buildSectionTitle("محاذاة النص", Icons.format_align_center_rounded, primary, subtleColor),
         const Gap(12),
         Row(
@@ -1495,7 +1483,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
         ),
         const Gap(24),
         
-        // ╪º┘ä╪ú╪¿╪╣╪º╪»
+        // Layout tuning
         _buildSectionTitle("إعدادات التنسيق", Icons.tune_rounded, primary, subtleColor),
         const Gap(12),
         _buildSliderRow("تباعد السطور", _lineHeight.toStringAsFixed(1), primary, textColor),
@@ -1554,7 +1542,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     );
   }
 
-  // Identity Content - ┘à╪¡╪¬┘ê┘ë ╪º┘ä┘ç┘ê┘è╪⌐
+  // Identity Content
   Widget _buildIdentityContent(Color primary, Color subtleColor, Color textColor, Color cardColor, bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1568,7 +1556,6 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     );
   }
 
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
   // HELPER WIDGETS
   // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 
@@ -2077,7 +2064,27 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                         children: [
                           Container(
                             padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
-                            child: _buildTabBar(primary, isDark),
+                            child: Row(
+                              children: [
+                                Expanded(child: _buildTabBar(primary, isDark)),
+                                const Gap(10),
+                                _buildFloatingButton(
+                                  icon: Icons.undo_rounded,
+                                  onPressed: _undo,
+                                  primary: primary,
+                                  isDark: isDark,
+                                  isEnabled: _undoStack.isNotEmpty,
+                                ),
+                                const Gap(8),
+                                _buildFloatingButton(
+                                  icon: Icons.redo_rounded,
+                                  onPressed: _redo,
+                                  primary: primary,
+                                  isDark: isDark,
+                                  isEnabled: _redoStack.isNotEmpty,
+                                ),
+                              ],
+                            ),
                           ),
                           Expanded(
                             child: _buildTabContent(primary, subtleColor, textColor, cardColor, isDark),
@@ -2089,32 +2096,6 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                 ),
                 ],
               ),
-              Positioned(
-                top: MediaQuery.of(context).padding.top + 12,
-                right: 16,
-                child: Material(
-                  color: Colors.transparent,
-                  child: Row(
-                    children: [
-                      _buildFloatingButton(
-                        icon: Icons.undo_rounded,
-                        onPressed: _undo,
-                        primary: primary,
-                        isDark: isDark,
-                        isEnabled: _undoStack.isNotEmpty,
-                      ),
-                      const Gap(8),
-                      _buildFloatingButton(
-                        icon: Icons.redo_rounded,
-                        onPressed: _redo,
-                        primary: primary,
-                        isDark: isDark,
-                        isEnabled: _redoStack.isNotEmpty,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ],
           ),
         ),
@@ -2122,9 +2103,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     );
   }
 
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
   // TAB BAR & CONTENT BUILDERS
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 
   Widget _buildFloatingButton({
     required IconData icon,
@@ -2560,13 +2539,13 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     }
 
     final Map<String, List<String>> families = {
-      "╪º┘ä╪«╪╖┘ê╪╖ ╪º┘ä╪ú╪│╪º╪│┘è╪⌐": ["IDRISIUM", "KFGQPC-Uthmanic-HAFS-Regular", "Amiri-Regular", "Cairo-Bold", "Tajawal-Regular"],
+      "الخطوط المقترحة": ["IDRISIUM", "KFGQPC-Uthmanic-HAFS-Regular", "Amiri-Regular", "Cairo-Bold", "Tajawal-Regular"],
     };
     for (var f in AppFonts.customFonts) {
       String prefix = f.split('-').first.split(' ').first;
       if (prefix.length < 3) prefix = f;
       if (!families.containsKey(prefix)) families[prefix] = [];
-      if (!families["╪º┘ä╪«╪╖┘ê╪╖ ╪º┘ä╪ú╪│╪º╪│┘è╪⌐"]!.contains(f)) {
+      if (!families["الخطوط المقترحة"]!.contains(f)) {
         families[prefix]!.add(f);
       }
     }
@@ -2583,7 +2562,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Font Families
-          _buildSubTitle("╪╣╪º╪ª┘ä╪º╪¬ ╪º┘ä╪«╪╖┘ê╪╖", primary),
+          _buildSubTitle("مجموعات الخطوط", primary),
           const Gap(12),
           SizedBox(
             height: 50,
@@ -2786,7 +2765,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
 
           // Style Selection (Only for Category and Description)
           if (field == CustomizationField.category || field == CustomizationField.description) ...[
-            _buildSubTitle("╪º┘ä╪│╪¬╪º┘è┘ä ╪º┘ä┘à╪▒╪ª┘è", primary),
+            _buildSubTitle("ستايل العنصر", primary),
             const Gap(12),
             _buildStyleSelector(field, primary, isDark),
             const Gap(24),
