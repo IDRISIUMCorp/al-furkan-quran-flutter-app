@@ -91,10 +91,6 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
   double _lineHeight = 1.7;
   double _verticalAlignment = 0.0;
   
-  // Aspect Ratio Control
-  String _aspectRatioMode = '1:1'; // '1:1', '9:16', '4:5', '16:9', '3:4', 'custom'
-  double _customAspectRatio = 1.0;
-  
   // Granular element state
   double? _zekrFontSize;
   double? _zekrLineHeight;
@@ -164,8 +160,6 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
       'showCategoryHeader': _showCategoryHeader,
       'padding': _padding,
       'isStoryMode': _isStoryMode,
-      'aspectRatioMode': _aspectRatioMode,
-      'customAspectRatio': _customAspectRatio,
       'borderRadius': _borderRadius,
       'bgOpacity': _bgOpacity,
       'textAlign': _textAlign.index,
@@ -238,8 +232,6 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
       _showCategoryHeader = data['showCategoryHeader'];
       _padding = data['padding'];
       _isStoryMode = data['isStoryMode'];
-      _aspectRatioMode = data['aspectRatioMode'] ?? '1:1';
-      _customAspectRatio = data['customAspectRatio'] ?? 1.0;
       _borderRadius = data['borderRadius'];
       _bgOpacity = data['bgOpacity'];
       _textAlign = TextAlign.values[data['textAlign']];
@@ -2160,7 +2152,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       child: Center(
                         child: AspectRatio(
-                          aspectRatio: _getAspectRatio(),
+                          aspectRatio: _isStoryMode ? 9 / 16 : 1,
                           child: Stack(
                             children: [
                               Screenshot(
