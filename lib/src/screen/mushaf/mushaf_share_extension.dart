@@ -941,7 +941,7 @@ extension _MushafShareExtension on _MushafViewState {
                               ? Colors.white.withValues(alpha: 0.06)
                               : Colors.black.withValues(alpha: 0.06),
                         ),
-                        // Condensed Ayah display (horizontal scroll)
+                        // Condensed Ayah display (vertical scroll)
                         Container(
                           margin: const EdgeInsets.fromLTRB(10, 12, 10, 6),
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -951,47 +951,49 @@ extension _MushafShareExtension on _MushafViewState {
                                 : const Color(0xFFF1E9DD),
                             borderRadius: BorderRadius.circular(14),
                           ),
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            reverse: true,
-                            physics: const BouncingScrollPhysics(),
-                            child: Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(text: qcfAyah),
-                                  const TextSpan(text: "\u200A"),
-                                  TextSpan(
-                                    text: getVerseNumberQCF(surahNumber, currentVerse),
-                                    style: TextStyle(
-                                      fontFamily: ayahPageFont,
-                                      package: "qcf_quran",
-                                      height: 1,
-                                      color: isDark
-                                          ? Colors.white.withValues(alpha: 0.70)
-                                          : const Color(0xFF1B1B1B)
-                                              .withValues(alpha: 0.70),
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxHeight: 70),
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.vertical,
+                              physics: const BouncingScrollPhysics(),
+                              child: Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(text: qcfAyah),
+                                    const TextSpan(text: "\u200A"),
+                                    TextSpan(
+                                      text: getVerseNumberQCF(surahNumber, currentVerse),
+                                      style: TextStyle(
+                                        fontFamily: ayahPageFont,
+                                        package: "qcf_quran",
+                                        height: 1,
+                                        color: isDark
+                                            ? Colors.white.withValues(alpha: 0.70)
+                                            : const Color(0xFF1B1B1B)
+                                                .withValues(alpha: 0.70),
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              locale: const Locale("ar"),
-                              textScaler: const TextScaler.linear(1),
-                              textAlign: TextAlign.center,
-                              textDirection: TextDirection.rtl,
-                              strutStyle: StrutStyle(
-                                fontFamily: ayahPageFont,
-                                package: "qcf_quran",
-                                fontSize: 14,
-                                height: 1.70,
-                                forceStrutHeight: true,
-                              ),
-                              style: TextStyle(
-                                fontFamily: ayahPageFont,
-                                package: "qcf_quran",
-                                fontSize: 14,
-                                height: 1.70,
-                                color:
-                                    isDark ? Colors.white : const Color(0xFF1B1B1B),
+                                  ],
+                                ),
+                                locale: const Locale("ar"),
+                                textScaler: const TextScaler.linear(1),
+                                textAlign: TextAlign.center,
+                                textDirection: TextDirection.rtl,
+                                strutStyle: StrutStyle(
+                                  fontFamily: ayahPageFont,
+                                  package: "qcf_quran",
+                                  fontSize: 14,
+                                  height: 1.70,
+                                  forceStrutHeight: true,
+                                ),
+                                style: TextStyle(
+                                  fontFamily: ayahPageFont,
+                                  package: "qcf_quran",
+                                  fontSize: 14,
+                                  height: 1.70,
+                                  color:
+                                      isDark ? Colors.white : const Color(0xFF1B1B1B),
+                                ),
                               ),
                             ),
                           ),
