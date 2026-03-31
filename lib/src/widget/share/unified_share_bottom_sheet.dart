@@ -1223,8 +1223,6 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
             child: HeaderWidget(
               suraNumber: group.surahNumber,
               theme: qcfTheme,
-              textScale: _surahNameScale,
-              bannerScale: _bannerScale,
             ),
           ),
         ),
