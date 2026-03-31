@@ -1033,7 +1033,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
             },
           ),
           const Gap(8),
-          _buildSliderRow("┘à┘ê╪╢╪╣ ╪ú┘ü┘é┘è", "${_categoryOffsetX.toInt()}", primary, textColor),
+          _buildSliderRow("إزاحة أفقي", "${_categoryOffsetX.toInt()}", primary, textColor),
           Row(
             children: [
               Expanded(
@@ -1055,12 +1055,12 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                   _saveState();
                   setState(() => _categoryOffsetX = 0.0);
                 },
-                tooltip: "╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å",
+                tooltip: "إعادة ضبط",
               ),
             ],
           ),
           const Gap(8),
-          _buildSliderRow("┘à┘ê╪╢╪╣ ╪╣┘à┘ê╪»┘è", "${_categoryOffsetY.toInt()}", primary, textColor),
+          _buildSliderRow("إزاحة رأسي", "${_categoryOffsetY.toInt()}", primary, textColor),
           Row(
             children: [
               Expanded(

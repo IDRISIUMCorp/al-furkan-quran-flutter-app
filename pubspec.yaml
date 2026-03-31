@@ -169,6 +169,74 @@ flutter:
         - asset: assets/fonts/App/NotoSans-SemiBold.ttf
           weight: 600
 
+    - family: Amiri-Regular
+      fonts:
+        - asset: assets/New Fonts/Amiri-Regular.ttf
+
+    - family: AmiriQuran-Regular
+      fonts:
+        - asset: assets/New Fonts/AmiriQuran-Regular.ttf
+
+    - family: Cairo-Regular
+      fonts:
+        - asset: assets/New Fonts/Cairo-Regular.ttf
+
+    - family: Cairo-Light
+      fonts:
+        - asset: assets/New Fonts/Cairo-Light.ttf
+
+    - family: Cairo-SemiBold
+      fonts:
+        - asset: assets/New Fonts/Cairo-SemiBold.ttf
+
+    - family: Cairo-Bold
+      fonts:
+        - asset: assets/New Fonts/Cairo-Bold.ttf
+
+    - family: Cairo-Black
+      fonts:
+        - asset: assets/New Fonts/Cairo-Black.ttf
+
+    - family: Aref Ruqaa Bold
+      fonts:
+        - asset: assets/New Fonts/Aref Ruqaa Bold.ttf
+
+    - family: al-majd
+      fonts:
+        - asset: assets/New Fonts/al-majd.ttf
+
+    - family: bader-lamsat
+      fonts:
+        - asset: assets/New Fonts/bader-lamsat.ttf
+
+    - family: Afsaneh-Font
+      fonts:
+        - asset: assets/New Fonts/Afsaneh-Font.ttf
+
+    - family: Abd-ElRady-Regular
+      fonts:
+        - asset: assets/New Fonts/Abd-ElRady-Regular.otf
+
+    - family: al-hadaribold
+      fonts:
+        - asset: assets/New Fonts/al-hadaribold.ttf
+
+    - family: a-massir-ballpoint
+      fonts:
+        - asset: assets/New Fonts/a-massir-ballpoint.ttf
+
+    - family: b-helal
+      fonts:
+        - asset: assets/New Fonts/b-helal.ttf
+
+    - family: ASane-Jaleh
+      fonts:
+        - asset: assets/New Fonts/ASane-Jaleh.ttf
+
+    - family: BritishCouncil-Arabic-Black
+      fonts:
+        - asset: assets/New Fonts/BritishCouncil-Arabic-Black.ttf
+
 icons_launcher:
   image_path: "assets/img/Quran_Logo_v3.png"
   platforms:
