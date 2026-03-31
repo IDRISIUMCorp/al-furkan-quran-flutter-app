@@ -53,6 +53,7 @@ class AyahOfTheDayService {
   }
 
   static Future<void> updateWidget({bool forceRefresh = false}) async {
+    await HomeWidget.setAppGroupId(appGroupId);
     final box = Hive.box("user");
     final customSurah = box.get("widget_custom_surah") as int?;
     final customVerse = box.get("widget_custom_verse") as int?;
@@ -131,7 +132,7 @@ class AyahOfTheDayService {
     ayahText = _preventOrphanFirstWord(ayahText);
 
     final surahNameAr = getSurahNameArabic(surah);
-    final formattedSurahName = "╪│┘ê╪▒╪⌐ $surahNameAr - ╪ó┘è╪⌐ ${_toArabicDigits(verse.toString())}";
+    final formattedSurahName = "سورة $surahNameAr - آية ${_toArabicDigits(verse.toString())}";
 
     // Save key to HomeWidget for deep linking
     final ayahKey = "$surah:$verse";
@@ -150,6 +151,7 @@ class AyahOfTheDayService {
         fontSize: widgetFontSize,
         themeId: widgetTheme,
         fontFamily: box.get("widget_font_family", defaultValue: "KFGQPC-Uthmanic-HAFS-Regular") as String,
+        ayahNumber: verse,
         customBgColor: customBgColor,
         customBgColor2: customBgColor2,
         isGradientBg: isGradientBg,
@@ -183,7 +185,7 @@ class AyahOfTheDayService {
   }
 
   static String _toArabicDigits(String number) {
-    const arabics = ['┘á', '┘í', '┘ó', '┘ú', '┘ñ', '┘Ñ', '┘ª', '┘º', '┘¿', '┘⌐'];
+    const arabics = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
     final buffer = StringBuffer();
     for (final ch in number.split('')) {
       final digit = int.tryParse(ch);

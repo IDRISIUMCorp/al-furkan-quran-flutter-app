@@ -59,6 +59,8 @@ import "package:al_quran_v3/src/screen/about/about_the_app.dart";
 import "package:al_quran_v3/src/screen/mushaf/widgets/image_share/ayah_image_generator.dart";
 import "package:al_quran_v3/src/screen/mushaf/widgets/khatma_sheet.dart";
 import "package:al_quran_v3/src/screen/smart_khatma/smart_khatma_page.dart";
+import "package:al_quran_v3/src/screen/azkar/azkar_categories_screen.dart";
+import "package:al_quran_v3/src/screen/settings/widgets/ayah_widget_settings_page.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
 import "package:al_quran_v3/src/theme/controller/theme_state.dart";
@@ -1439,15 +1441,18 @@ class _MushafRootState extends State<_MushafRoot> {
             ),
           ),
           itemBuilder: (context) => [
-          buildPremiumMenuItem(0, Icons.settings_rounded, "الإعدادات"),
-          buildPremiumMenuItem(7, Icons.auto_awesome_rounded, "إعدادات المصحف"),
-          buildPremiumMenuItem(5, Icons.access_time_filled_rounded, "مواقيت الصلاة"),
-          buildPremiumMenuItem(6, Icons.explore_rounded, "القبلة"),
-          buildPremiumMenuItem(1, Icons.menu_book_rounded, "التفاسير والترجمات"),
-          const PopupMenuDivider(height: 16),
-          buildPremiumMenuItem(2, Icons.info_outline_rounded, "عن التطبيق"),
-          buildPremiumMenuItem(3, Icons.bug_report_rounded, "إرسال ملاحظة"),
-        ],
+            buildPremiumMenuItem(0, Icons.settings_rounded, "الإعدادات"),
+            buildPremiumMenuItem(7, Icons.auto_awesome_rounded, "إعدادات المصحف"),
+            buildPremiumMenuItem(9, Icons.widgets_rounded, "ويدجت آية اليوم"),
+            buildPremiumMenuItem(1, Icons.menu_book_rounded, "التفاسير والترجمات"),
+            const PopupMenuDivider(height: 16),
+            buildPremiumMenuItem(8, Icons.auto_stories_rounded, "أذكار المسلم"),
+            buildPremiumMenuItem(5, Icons.access_time_filled_rounded, "مواقيت الصلاة"),
+            buildPremiumMenuItem(6, Icons.explore_rounded, "القبلة"),
+            const PopupMenuDivider(height: 16),
+            buildPremiumMenuItem(3, Icons.bug_report_rounded, "إرسال ملاحظة"),
+            buildPremiumMenuItem(2, Icons.info_outline_rounded, "عن التطبيق"),
+          ],
         onSelected: (val) {
         if (val == 0) {
           Navigator.push(
@@ -1500,6 +1505,16 @@ class _MushafRootState extends State<_MushafRoot> {
           );
         } else if (val == 7) {
           QuranSettingsBottomSheet.show(context);
+        } else if (val == 8) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AzkarCategoriesScreen()),
+          );
+        } else if (val == 9) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AyahWidgetSettingsPage()),
+          );
         }
       },
     ),

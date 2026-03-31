@@ -1,26 +1,30 @@
 import 'package:flutter/material.dart';
 
+/// Ayah Widget Design for Home Screen Widget
+/// Renders the ayah display with customizable styling
 class AyahWidgetDesign extends StatelessWidget {
   final String ayahText;
   final String surahName;
-  final double fontSize;
   final Color primaryColor;
+  final double fontSize;
   final String themeId;
-  final String? fontFamily;
+  final String fontFamily;
   final Color? customBgColor;
   final Color? customBgColor2;
   final bool isGradientBg;
   final Color? customTextColor;
   final Color? customSurahColor;
+  final int ayahNumber;
 
   const AyahWidgetDesign({
     super.key,
     required this.ayahText,
     required this.surahName,
-    this.fontSize = 24,
-    this.primaryColor = const Color(0xFF6C63FF),
-    this.themeId = 'glass_dark',
-    this.fontFamily,
+    required this.primaryColor,
+    required this.fontSize,
+    required this.themeId,
+    required this.fontFamily,
+    required this.ayahNumber,
     this.customBgColor,
     this.customBgColor2,
     this.isGradientBg = false,
@@ -30,152 +34,144 @@ class AyahWidgetDesign extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = themeId.contains('dark');
-    final bg = customBgColor ?? (isDark ? const Color(0xFF1A1A2E) : const Color(0xFFF5F5F5));
-    final bg2 = customBgColor2 ?? (isDark ? const Color(0xFF16213E) : const Color(0xFFE8E8E8));
-    final txtColor = customTextColor ?? (isDark ? Colors.white : const Color(0xFF1B1B1B));
+    final isDark = _isDarkTheme();
+    final bgColor = customBgColor ?? (isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFDFAF5));
+    final bgColor2 = customBgColor2 ?? (isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF5F0E8));
+    final textColor = customTextColor ?? (isDark ? Colors.white : Colors.black87);
     final surahColor = customSurahColor ?? primaryColor;
 
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: isGradientBg
-          ? BoxDecoration(
-              gradient: LinearGradient(
-                colors: [bg, bg2],
+      width: 800,
+      height: 400,
+      decoration: BoxDecoration(
+        gradient: isGradientBg
+            ? LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            )
-          : BoxDecoration(
-              color: bg,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+                colors: [bgColor, bgColor2],
+              )
+            : null,
+        color: isGradientBg ? null : bgColor,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Stack(
         children: [
-          // Ayah Text
-          Directionality(
-            textDirection: TextDirection.rtl,
-            child: Text(
-              ayahText,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: fontFamily ?? 'AmiriQuran',
-                fontSize: fontSize,
-                color: txtColor,
-                height: 2.0,
+          // Decorative Elements
+          Positioned(
+            top: 16,
+            right: 16,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: primaryColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(20),
               ),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
+              child: Text(
+                surahName,
+                style: TextStyle(
+                  color: surahColor,
+                  fontSize: fontSize * 0.5,
+                  fontFamily: fontFamily,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.right,
+              ),
             ),
           ),
-          const SizedBox(height: 16),
-          // Surah Name & Ayah Number
-          Directionality(
-            textDirection: TextDirection.rtl,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: surahColor.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    surahName,
-                    style: TextStyle(
-                      color: surahColor,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
+
+          // Ayah Number Badge
+          Positioned(
+            bottom: 16,
+            left: 16,
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: primaryColor.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                _toArabicDigits(ayahNumber.toString()),
+                style: TextStyle(
+                  color: primaryColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+
+          // Main Ayah Text
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+              child: Text(
+                ayahText,
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: fontSize,
+                  fontFamily: fontFamily,
+                  height: 1.8,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
                     ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+                textDirection: TextDirection.rtl,
+              ),
+            ),
+          ),
+
+          // Branding
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.auto_stories_rounded,
+                  size: 14,
+                  color: primaryColor.withValues(alpha: 0.6),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'الفُرقان',
+                  style: TextStyle(
+                    color: primaryColor.withValues(alpha: 0.6),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          // Branding
-          Opacity(
-            opacity: 0.5,
-            child: Text(
-              'الفُرقان',
-              style: TextStyle(
-                color: txtColor,
-                fontSize: 12,
-                fontWeight: FontWeight.w300,
-              ),
             ),
           ),
         ],
       ),
     );
   }
-}
 
-class AyahWidgetPreview extends StatefulWidget {
-  const AyahWidgetPreview({super.key});
+  bool _isDarkTheme() {
+    final darkThemes = ['glass_dark', 'dark_royal', 'midnight_blue', 'emerald_gradient', 'sunset', 'ocean_night', 'forest_green'];
+    return darkThemes.contains(themeId);
+  }
 
-  @override
-  State<AyahWidgetPreview> createState() => _AyahWidgetPreviewState();
-}
-
-class _AyahWidgetPreviewState extends State<AyahWidgetPreview> {
-  double _fontSize = 24;
-  bool _isDarkMode = true;
-  String _fontFamily = 'AmiriQuran';
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Preview
-        AyahWidgetDesign(
-          ayahText: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
-          surahName: 'الفاتحة',
-          fontSize: _fontSize,
-          primaryColor: const Color(0xFF6C63FF),
-          themeId: _isDarkMode ? 'glass_dark' : 'glass_light',
-          fontFamily: _fontFamily,
-        ),
-        const SizedBox(height: 20),
-        // Controls
-        Row(
-          children: [
-            const Text('حجم الخط:'),
-            Expanded(
-              child: Slider(
-                value: _fontSize,
-                min: 16,
-                max: 40,
-                onChanged: (v) => setState(() => _fontSize = v),
-              ),
-            ),
-            Text('${_fontSize.toInt()}'),
-          ],
-        ),
-        SwitchListTile(
-          title: const Text('الوضع الداكن'),
-          value: _isDarkMode,
-          onChanged: (v) => setState(() => _isDarkMode = v),
-        ),
-      ],
-    );
+  String _toArabicDigits(String number) {
+    const arabics = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    final buffer = StringBuffer();
+    for (final ch in number.split('')) {
+      final digit = int.tryParse(ch);
+      if (digit == null) {
+        buffer.write(ch);
+      } else {
+        buffer.write(arabics[digit]);
+      }
+    }
+    return buffer.toString();
   }
 }

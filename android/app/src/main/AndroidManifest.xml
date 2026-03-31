@@ -83,6 +83,17 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2"/>
+        <receiver
+            android:name="com.idrisium.alfurkan.AyahWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="es.antonborri.home_widget.action.WIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/ayah_widget_provider" />
+        </receiver>
         <!-- alarm -->
         <service
             android:name="com.gdelataillade.alarm.services.NotificationOnKillService"/>

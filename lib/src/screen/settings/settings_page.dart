@@ -6,6 +6,7 @@ import "package:al_quran_v3/src/screen/settings/theme_settings.dart";
 import "package:al_quran_v3/src/screen/settings/theme_preview_sheet.dart";
 import "package:al_quran_v3/src/screen/settings/notification_settings_page.dart";
 import "package:al_quran_v3/src/core/unified_quran_settings/quran_settings_bottom_sheet.dart";
+import "package:al_quran_v3/src/screen/settings/widgets/ayah_widget_settings_page.dart";
 import "package:al_quran_v3/src/widget/theme/theme_icon_button.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
@@ -129,6 +130,80 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   Divider(color: themeState.primaryShade300),
+                  const Gap(5),
+                  ListTile(
+                    onTap: () {
+                      // TODO: Navigate to audio settings
+                    },
+                    leading: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: themeState.primary.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.headphones_rounded,
+                        color: themeState.primary,
+                      ),
+                    ),
+                    title: const Text(
+                      "إعدادات التلاوة",
+                      style: TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                    subtitle: const Text(
+                      "القارئ • السرعة • التكرار",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    trailing: Icon(
+                      Icons.chevron_left_rounded,
+                      color: themeState.primary,
+                    ),
+                  ),
+                  const Gap(30),
+                  Text(
+                    "الويدجت",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Divider(color: themeState.primaryShade300),
+                  const Gap(5),
+                  ListTile(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const AyahWidgetSettingsPage(),
+                        ),
+                      );
+                    },
+                    leading: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: themeState.primary.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.widgets_rounded,
+                        color: themeState.primary,
+                      ),
+                    ),
+                    title: const Text(
+                      "ويدجت آية اليوم",
+                      style: TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                    subtitle: const Text(
+                      "تخصيص الشكل • معدل التحديث • آية محددة",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    trailing: Icon(
+                      Icons.chevron_left_rounded,
+                      color: themeState.primary,
+                    ),
+                  ),
                   const Gap(30),
                   Text(
                     "الإشعارات",

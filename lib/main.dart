@@ -36,6 +36,7 @@ import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
 import "package:al_quran_v3/src/widget/quran_script_words/cubit/word_playing_state_cubit.dart";
 import "package:al_quran_v3/src/screen/quran_reader/cubit/reader_ui_cubit.dart";
 import "package:al_quran_v3/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
+import "package:al_quran_v3/src/core/services/ayah_of_the_day_service.dart";
 import "dart:ui";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
@@ -149,6 +150,11 @@ Future<void> main() async {
   LocationQiblaPrayerDataState locationQiblaPrayerDataState =
       await LocationQiblaPrayerDataCubit.getSavedState();
   log(locationQiblaPrayerDataState.madhab.toString(), name: "Madhab");
+
+  if (platformOwn == platform_services.PlatformOwn.isAndroid || 
+      platformOwn == platform_services.PlatformOwn.isIos) {
+    await AyahOfTheDayService.setupBackgroundUpdates();
+  }
 
   runApp(
     MyApp(

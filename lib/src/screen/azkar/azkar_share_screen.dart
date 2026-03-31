@@ -35,11 +35,11 @@ class _TabItem {
 // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 
 enum SharePreset {
-  elegant('╪ú┘å┘è┘é', 'dark_royal', 'royal', 28, true, false, true),
-  minimal('╪¿╪│┘è╪╖', 'glass_light', 'minimalist', 24, false, false, false),
-  viral('┘ü┘è╪▒┘ê╪º┘ä', 'sunset', 'insta_quote', 32, true, true, true),
-  classic('┘â┘ä╪º╪│┘è┘â┘è', 'glass_dark', 'classic', 26, true, true, true),
-  nature('╪╖╪¿┘è╪╣┘è', 'emerald_gradient', 'zen', 24, true, false, true);
+  elegant('أنيق', 'dark_royal', 'royal', 28, true, false, true),
+  minimal('مُبسّط', 'glass_light', 'minimalist', 24, false, false, false),
+  viral('ستوري', 'sunset', 'insta_quote', 32, true, true, true),
+  classic('كلاسيكي', 'glass_dark', 'classic', 26, true, true, true),
+  nature('هادئ', 'emerald_gradient', 'zen', 24, true, false, true);
 
   final String label;
   final String themeId;
@@ -283,32 +283,60 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
   // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 
   static const Map<String, _ThemePreview> _themes = {
-    'glass_dark':       _ThemePreview('╪▓╪¼╪º╪¼┘è ╪»╪º┘â┘å', Color(0xFF0A0A0A), Colors.white, Icons.dark_mode_rounded),
-    'dark_royal':       _ThemePreview('┘à┘ä┘â┘è ╪░┘ç╪¿┘è', Color(0xFF0A0806), Color(0xFFD4A746), Icons.auto_awesome),
-    'midnight_blue':    _ThemePreview('╪ú╪▓╪▒┘é ╪»╪º┘â┘å', Color(0xFF0D1B2A), Color(0xFF64B5F6), Icons.nightlight_round),
-    'emerald_gradient': _ThemePreview('╪▓┘à╪▒╪»┘è', Color(0xFF0A1F1A), Color(0xFF80CBC4), Icons.eco_rounded),
-    'sunset':           _ThemePreview('╪¿┘å┘ü╪│╪¼', Color(0xFF1A0A2E), Color(0xFFCE93D8), Icons.gradient_rounded),
-    'sand_dunes':       _ThemePreview('┘â╪½╪¿╪º┘å ╪▒┘à┘ä┘è╪⌐', Color(0xFFEFEBE9), Color(0xFF8D6E63), Icons.landscape_rounded),
-    'ocean_night':      _ThemePreview('┘à╪¡┘è╪╖ ┘ä┘è┘ä┘è', Color(0xFF0A1628), Color(0xFF4DD0E1), Icons.water_rounded),
-    'rose_gold':        _ThemePreview('┘ê╪▒╪»┘è ╪░┘ç╪¿┘è', Color(0xFFFBE9E7), Color(0xFFB76E79), Icons.local_florist_rounded),
-    'forest_green':     _ThemePreview('╪║╪º╪¿╪⌐ ╪«╪╢╪▒╪º╪í', Color(0xFF0B1F0E), Color(0xFF66BB6A), Icons.park_rounded),
-    'glass_light':      _ThemePreview('╪▓╪¼╪º╪¼┘è ┘ü╪º╪¬╪¡', Color(0xFFFDFAF5), Color(0xFF1B1B1B), Icons.light_mode_rounded),
-    'custom':           _ThemePreview('┘à╪«╪╡╪╡', Color(0xFF141414), Color(0xFF33B18E), Icons.color_lens_rounded),
+    'glass_dark':       _ThemePreview('زجاجي داكن', Color(0xFF0A0A0A), Colors.white, Icons.dark_mode_rounded),
+    'dark_royal':       _ThemePreview('ملكي ذهبي', Color(0xFF0A0806), Color(0xFFD4A746), Icons.auto_awesome),
+    'midnight_blue':    _ThemePreview('ليلي أزرق', Color(0xFF0D1B2A), Color(0xFF64B5F6), Icons.nightlight_round),
+    'emerald_gradient': _ThemePreview('زمردي', Color(0xFF0A1F1A), Color(0xFF80CBC4), Icons.eco_rounded),
+    'sunset':           _ThemePreview('بنفسجي', Color(0xFF1A0A2E), Color(0xFFCE93D8), Icons.gradient_rounded),
+    'sand_dunes':       _ThemePreview('رملي', Color(0xFFEFEBE9), Color(0xFF8D6E63), Icons.landscape_rounded),
+    'ocean_night':      _ThemePreview('محيط ليلي', Color(0xFF0A1628), Color(0xFF4DD0E1), Icons.water_rounded),
+    'rose_gold':        _ThemePreview('روز جولد', Color(0xFFFBE9E7), Color(0xFFB76E79), Icons.local_florist_rounded),
+    'forest_green':     _ThemePreview('غابة خضراء', Color(0xFF0B1F0E), Color(0xFF66BB6A), Icons.park_rounded),
+    'glass_light':      _ThemePreview('زجاجي فاتح', Color(0xFFFDFAF5), Color(0xFF1B1B1B), Icons.light_mode_rounded),
+    'custom':           _ThemePreview('مخصص', Color(0xFF141414), Color(0xFF33B18E), Icons.color_lens_rounded),
   };
 
   // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
   // TABS STATE
   // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
   static const List<_TabItem> _tabs = [
-    _TabItem('╪º┘ä╪¬╪╡┘à┘è┘à', Icons.palette_rounded),
-    _TabItem('╪º┘ä╪╣┘å╪º╪╡╪▒', Icons.text_fields_rounded),
-    _TabItem('╪º┘ä╪¬╪«╪╖┘è╪╖', Icons.aspect_ratio_rounded),
-    _TabItem('╪º┘ä┘ç┘ê┘è╪⌐', Icons.verified_user_rounded),
+    _TabItem('التصميم', Icons.palette_rounded),
+    _TabItem('العناصر', Icons.text_fields_rounded),
+    _TabItem('التنسيق', Icons.aspect_ratio_rounded),
+    _TabItem('الهوية', Icons.verified_user_rounded),
   ];
 
   // Custom Fonts ╪º┘ä┘à╪│╪¬┘ê╪▒╪»╪⌐
   List<String> _customFonts = [];
   List<String> _customFontNames = [];
+
+  Future<void> _loadCustomFontIfSelected() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final selectedPath = prefs.getString('azkar_selected_custom_font_path');
+      if (selectedPath == null) return;
+      if (!_customFonts.contains(selectedPath)) return;
+      final idx = _customFonts.indexOf(selectedPath);
+      if (idx < 0 || idx >= _customFontNames.length) return;
+      await _loadCustomFontFromPath(selectedPath, _customFontNames[idx]);
+      if (mounted) {
+        setState(() {
+          _fontFamily = _customFontNames[idx];
+        });
+      }
+    } catch (_) {
+      return;
+    }
+  }
+
+  Future<void> _loadCustomFontFromPath(String fontPath, String familyName) async {
+    final file = File(fontPath);
+    if (!await file.exists()) return;
+    final bytes = await file.readAsBytes();
+    final loader = FontLoader(familyName);
+    loader.addFont(Future.value(ByteData.view(bytes.buffer)));
+    await loader.load();
+  }
   
   @override
   void initState() {
@@ -402,6 +430,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
         _customFonts = fonts;
         _customFontNames = names;
       });
+      await _loadCustomFontIfSelected();
     } catch (_) {}
   }
   
@@ -441,13 +470,18 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
       _customFontNames.add(fontFamilyName);
       await prefs.setStringList('azkar_custom_fonts', _customFonts);
       await prefs.setStringList('azkar_custom_font_names', _customFontNames);
-      
-      setState(() {});
+
+      await _loadCustomFontFromPath(newPath, fontFamilyName);
+      await prefs.setString('azkar_selected_custom_font_path', newPath);
+
+      setState(() {
+        _fontFamily = fontFamilyName;
+      });
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('╪¬┘à ╪º╪│╪¬┘è╪▒╪º╪» ╪º┘ä╪«╪╖: $fontFamilyName'),
+            content: Text('تم إضافة الخط: $fontFamilyName'),
             backgroundColor: Colors.green.shade700,
             behavior: SnackBarBehavior.floating,
           ),
@@ -457,7 +491,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('╪«╪╖╪ú ┘ü┘è ╪º╪│╪¬┘è╪▒╪º╪» ╪º┘ä╪«╪╖: $e'),
+            content: Text('فشل إضافة الخط: $e'),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
           ),
@@ -523,13 +557,13 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
       final bytes = await _capturePngBytes();
       if (share) {
         final file = await _writeTempPng(bytes);
-        await Share.shareXFiles([XFile(file.path)], text: '┘à╪┤╪º╪▒┘â╪⌐ ┘à┘å ╪¬╪╖╪¿┘è┘é ╪º┘ä┘ü┘Å╪▒┘é╪º┘å');
+        await Share.shareXFiles([XFile(file.path)], text: 'مشاركة من أذكار المسلم');
       } else {
         await Gal.putImageBytes(bytes, album: 'AlFurkan');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text("╪¬┘à ╪¡┘ü╪╕ ╪º┘ä╪╡┘ê╪▒╪⌐ ┘ü┘è ╪º┘ä┘à╪╣╪▒╪╢", textDirection: TextDirection.rtl),
+              content: const Text("تم حفظ الصورة في المعرض", textDirection: TextDirection.rtl),
               backgroundColor: Colors.green.shade700,
               behavior: SnackBarBehavior.floating,
             ),
@@ -540,7 +574,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("╪¡╪»╪½ ╪«╪╖╪ú: $e", textDirection: TextDirection.rtl),
+            content: Text("حصل خطأ: $e", textDirection: TextDirection.rtl),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
           ),
@@ -668,16 +702,16 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
 
   Widget _buildImageFilterSelector(Color primary, Color cardColor, bool isDark) {
     final filters = [
-      ('none', '╪╣╪º╪»┘è', null),
-      ('grayscale', '╪▒┘à╪º╪»┘è', Colors.grey),
-      ('sepia', '╪¿┘å┘è', const Color(0xFF8B7355)),
-      ('vintage', '┘é╪»┘è┘à', const Color(0xFFD4A574)),
-      ('cool', '╪¿╪º╪▒╪»', Colors.cyan),
-      ('warm', '╪»╪º┘ü╪ª', Colors.orange),
-      ('dramatic', '╪»╪▒╪º┘à┘è', Colors.purple),
-      ('fade', '╪¿╪º┘ç╪¬', Colors.grey),
-      ('contrast', '╪¬╪¿╪º┘è┘å', Colors.black),
-      ('bright', '┘à╪┤╪▒┘é', Colors.yellow),
+      ('none', 'بدون', null),
+      ('grayscale', 'أبيض وأسود', Colors.grey),
+      ('sepia', 'سيبيا', const Color(0xFF8B7355)),
+      ('vintage', 'فينتج', const Color(0xFFD4A574)),
+      ('cool', 'بارد', Colors.cyan),
+      ('warm', 'دافئ', Colors.orange),
+      ('dramatic', 'درامي', Colors.purple),
+      ('fade', 'باهت', Colors.grey),
+      ('contrast', 'تباين', Colors.black),
+      ('bright', 'ساطع', Colors.yellow),
     ];
     
     return SizedBox(
@@ -749,7 +783,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle("╪╖╪▒┘è┘é╪⌐ ╪º┘ä╪╣╪▒╪╢ (╪│╪¬╪º┘è┘ä╪º╪¬ ╪º╪¡╪¬╪▒╪º┘ü┘è╪⌐)", Icons.dashboard_customize_rounded, primary, subtleColor),
+        _buildSectionTitle("قوالب التصميم (ستوري/بوست)", Icons.dashboard_customize_rounded, primary, subtleColor),
         const Gap(12),
         SizedBox(
           height: 120,
@@ -757,15 +791,15 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             children: [
-              _buildTemplateOption('classic', '┘â┘ä╪º╪│┘è┘â┘è', Icons.crop_square_rounded, primary, cardColor, isDark),
-              _buildTemplateOption('minimalist', '╪¿╪│┘è╪╖', Icons.view_agenda_rounded, primary, cardColor, isDark),
-              _buildTemplateOption('elegant', '╪ú┘å┘è┘é', Icons.auto_awesome_rounded, primary, cardColor, isDark),
-              _buildTemplateOption('modern', '╪╣╪╡╪▒┘è', Icons.filter_vintage_rounded, primary, cardColor, isDark),
+              _buildTemplateOption('classic', 'كلاسيكي', Icons.crop_square_rounded, primary, cardColor, isDark),
+              _buildTemplateOption('minimalist', 'مُبسّط', Icons.view_agenda_rounded, primary, cardColor, isDark),
+              _buildTemplateOption('elegant', 'أنيق', Icons.auto_awesome_rounded, primary, cardColor, isDark),
+              _buildTemplateOption('modern', 'مودرن', Icons.filter_vintage_rounded, primary, cardColor, isDark),
             ],
           ),
         ),
         const Gap(24),
-        _buildSectionTitle("╪º┘ä╪½┘è┘à╪º╪¬", Icons.palette_rounded, primary, subtleColor),
+        _buildSectionTitle("الثيمات", Icons.palette_rounded, primary, subtleColor),
         const Gap(12),
         SizedBox(
           height: 100,
@@ -820,44 +854,48 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
           ),
         ),
         const Gap(24),
-        _buildSectionTitle("╪╡┘ê╪▒╪⌐ ╪«┘ä┘ü┘è╪⌐ ┘à╪«╪╡╪╡╪⌐", Icons.image_rounded, primary, subtleColor),
+        _buildSectionTitle("خلفية صورة", Icons.image_rounded, primary, subtleColor),
         const Gap(12),
         Row(
           children: [
-            _buildImageAction("╪º╪«╪¬┘è╪º╪▒ ╪╡┘ê╪▒╪⌐", Icons.add_photo_alternate_rounded, primary, () async {
+            _buildImageAction("اختيار صورة", Icons.add_photo_alternate_rounded, primary, () async {
               final ImagePicker picker = ImagePicker();
               final XFile? image = await picker.pickImage(source: ImageSource.gallery);
               if (image != null) setState(() => _backgroundImagePath = image.path);
             }),
             if (_backgroundImagePath != null) ...[
               const Gap(12),
-              _buildImageAction("╪¬╪╣╪»┘è┘ä", Icons.edit_attributes_rounded, primary, () => _showImageAdjuster()),
+              _buildImageAction("تعديل", Icons.edit_attributes_rounded, primary, () => _showImageAdjuster()),
               const Gap(12),
-              _buildImageAction("╪¡╪░┘ü", Icons.delete_forever_rounded, Colors.redAccent, () => setState(() => _backgroundImagePath = null)),
+              _buildImageAction("حذف", Icons.delete_forever_rounded, Colors.redAccent, () => setState(() => _backgroundImagePath = null)),
             ],
           ],
         ),
         if (_backgroundImagePath != null) ...[
           const Gap(16),
-          _buildAdjustmentSlider("╪º┘ä╪¬╪║╪¿┘è╪┤ (Blur)", _imageBlur, (v) => setState(() => _imageBlur = v), 0, 20, primary, textColor),
+          _buildAdjustmentSlider("تمويه الخلفية (Blur)", _imageBlur, (v) => setState(() => _imageBlur = v), 0, 20, primary, textColor),
           const Gap(12),
-          _buildAdjustmentSlider("╪¬╪╣╪¬┘è┘à (Opacity)", _imageOverlayOpacity, (v) => setState(() => _imageOverlayOpacity = v), 0, 1, primary, textColor),
+          _buildAdjustmentSlider("تعتيم الطبقة (Opacity)", _imageOverlayOpacity, (v) => setState(() => _imageOverlayOpacity = v), 0, 1, primary, textColor),
+          const Gap(12),
+          _buildSectionTitle("فلتر الصورة", Icons.filter_alt_rounded, primary, subtleColor),
+          const Gap(12),
+          _buildImageFilterSelector(primary, cardColor, isDark),
         ],
         if (_themeId == 'custom') ...[
           const Gap(24),
-          _buildSectionTitle("╪º┘ä╪ú┘ä┘ê╪º┘å ╪º┘ä┘à╪«╪╡╪╡╪⌐", Icons.color_lens_rounded, primary, subtleColor),
+          _buildSectionTitle("ألوان مخصصة", Icons.color_lens_rounded, primary, subtleColor),
           const Gap(16),
-          _buildColorOption("┘ä┘ê┘å ╪º┘ä╪«┘ä┘ü┘è╪⌐", _customBgColor, (c) => setState(() => _customBgColor = c), textColor),
+          _buildColorOption("لون الخلفية", _customBgColor, (c) => setState(() => _customBgColor = c), textColor),
           const Gap(12),
-          _buildToggle("╪«┘ä┘ü┘è╪⌐ ┘à╪¬╪»╪▒╪¼╪⌐", _isGradientBg, (val) => setState(() => _isGradientBg = val), primary, textColor),
+          _buildToggle("خلفية متدرجة", _isGradientBg, (val) => setState(() => _isGradientBg = val), primary, textColor),
           if (_isGradientBg) ...[
             const Gap(12),
-            _buildColorOption("╪º┘ä╪«┘ä┘ü┘è╪⌐ 2", _customBgColor2, (c) => setState(() => _customBgColor2 = c), textColor),
+            _buildColorOption("لون الخلفية 2", _customBgColor2, (c) => setState(() => _customBgColor2 = c), textColor),
           ],
           const Gap(12),
-          _buildColorOption("┘ä┘ê┘å ╪º┘ä┘å╪╡", _customTextColor, (c) => setState(() => _customTextColor = c), textColor),
+          _buildColorOption("لون النص", _customTextColor, (c) => setState(() => _customTextColor = c), textColor),
           const Gap(12),
-          _buildColorOption("┘ä┘ê┘å ╪º┘ä╪¬┘à┘è┘è╪▓", _customAccentColor, (c) => setState(() => _customAccentColor = c), textColor),
+          _buildColorOption("لون التمييز", _customAccentColor, (c) => setState(() => _customAccentColor = c), textColor),
         ],
       ],
     );
@@ -870,11 +908,11 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ╪º┘ä╪«╪╖ ╪º┘ä╪╣╪º┘à
-          _buildSectionTitle("╪º┘ä╪«╪╖ ╪º┘ä╪╣╪º┘à", Icons.font_download_rounded, primary, subtleColor),
+          _buildSectionTitle("الخط وحجم النص", Icons.font_download_rounded, primary, subtleColor),
           const Gap(12),
           _buildFontSelector(primary, cardColor, isDark),
           const Gap(16),
-          _buildSliderRow("╪¡╪¼┘à ╪º┘ä╪«╪╖", "${_fontSize.toInt()}", primary, textColor),
+          _buildSliderRow("الحجم", "${_fontSize.toInt()}", primary, textColor),
           Slider(
             value: _fontSize,
             min: 16,
@@ -889,13 +927,13 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
           const Gap(24),
           
           // ┘å╪╡ ╪º┘ä╪░┘â╪▒
-          _buildSectionTitle("┘å╪╡ ╪º┘ä╪░┘â╪▒", Icons.text_fields_rounded, primary, subtleColor),
+          _buildSectionTitle("نص الذكر", Icons.text_fields_rounded, primary, subtleColor),
           const Gap(12),
           _buildFullColorPicker(_zekrColor, (c) => setState(() => _zekrColor = c), primary),
           const Gap(12),
-          _buildFontDropdown("╪«╪╖ ╪º┘ä╪░┘â╪▒", _zekrFont, (f) => setState(() => _zekrFont = f), primary),
+          _buildFontDropdown("خط الذكر", _zekrFont, (f) => setState(() => _zekrFont = f), primary),
           const Gap(12),
-          _buildSliderRow("╪¡╪¼┘à ╪«╪╖ ╪º┘ä╪░┘â╪▒", "${(_zekrFontSize ?? _fontSize + 16).toInt()}", primary, textColor),
+          _buildSliderRow("حجم خط الذكر", "${(_zekrFontSize ?? _fontSize + 16).toInt()}", primary, textColor),
           Slider(
             value: _zekrFontSize ?? _fontSize + 16,
             min: 20,
@@ -908,7 +946,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
             },
           ),
           const Gap(8),
-          _buildSliderRow("┘à┘ê╪╢╪╣ ╪ú┘ü┘é┘è (┘è┘à┘è┘å/╪┤┘à╪º┘ä)", "${_zekrOffsetX.toInt()}", primary, textColor),
+          _buildSliderRow("إزاحة أفقي", "${_zekrOffsetX.toInt()}", primary, textColor),
           Row(
             children: [
               Expanded(
@@ -930,12 +968,12 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                   _saveState();
                   setState(() => _zekrOffsetX = 0.0);
                 },
-                tooltip: "╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å",
+                tooltip: "إعادة ضبط",
               ),
             ],
           ),
           const Gap(8),
-          _buildSliderRow("┘à┘ê╪╢╪╣ ╪╣┘à┘ê╪»┘è (┘ü┘ê┘é/╪¬╪¡╪¬)", "${_zekrOffsetY.toInt()}", primary, textColor),
+          _buildSliderRow("إزاحة رأسي", "${_zekrOffsetY.toInt()}", primary, textColor),
           Row(
             children: [
               Expanded(
@@ -957,32 +995,32 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                   _saveState();
                   setState(() => _zekrOffsetY = 0.0);
                 },
-                tooltip: "╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å",
+                tooltip: "إعادة ضبط",
               ),
             ],
           ),
           const Gap(24),
           
           // ╪º╪│┘à ╪º┘ä┘é╪│┘à
-          _buildSectionTitle("╪º╪│┘à ╪º┘ä┘é╪│┘à", Icons.category_rounded, primary, subtleColor),
+          _buildSectionTitle("عنوان القسم", Icons.category_rounded, primary, subtleColor),
           const Gap(12),
           _buildFullColorPicker(_categoryColor, (c) => setState(() => _categoryColor = c), primary),
           const Gap(12),
-          _buildFontDropdown("╪«╪╖ ╪º┘ä┘é╪│┘à", _categoryFont, (f) => setState(() => _categoryFont = f), primary),
+          _buildFontDropdown("خط العنوان", _categoryFont, (f) => setState(() => _categoryFont = f), primary),
           const Gap(12),
-          Text("╪│╪¬╪º┘è┘ä ╪º┘ä┘é╪│┘à:", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: textColor.withValues(alpha: 0.7))),
+          Text("ستايل العنوان:", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: textColor.withValues(alpha: 0.7))),
           const Gap(8),
           Row(
             children: [
-              _buildStyleChip('classic', '┘â┘ä╪º╪│┘è┘â┘è', _categoryStyleId == 'classic', primary),
+              _buildStyleChip('classic', 'كلاسيكي', _categoryStyleId == 'classic', primary),
               const Gap(8),
-              _buildStyleChip('pill', 'Pill', _categoryStyleId == 'pill', primary),
+              _buildStyleChip('pill', 'كبسولة', _categoryStyleId == 'pill', primary),
               const Gap(8),
-              _buildStyleChip('modern', '┘à┘ê╪»╪▒┘å', _categoryStyleId == 'modern', primary),
+              _buildStyleChip('modern', 'مودرن', _categoryStyleId == 'modern', primary),
             ],
           ),
           const Gap(12),
-          _buildSliderRow("╪¡╪¼┘à ╪«╪╖ ╪º┘ä┘é╪│┘à", "${(_categoryFontSize ?? _fontSize + 12).toInt()}", primary, textColor),
+          _buildSliderRow("حجم خط العنوان", "${(_categoryFontSize ?? _fontSize + 12).toInt()}", primary, textColor),
           Slider(
             value: _categoryFontSize ?? _fontSize + 12,
             min: 14,
@@ -1045,20 +1083,19 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                     _saveState();
                     setState(() => _categoryOffsetY = 0.0);
                   },
-                  tooltip: "╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å",
+                  tooltip: "إعادة ضبط",
                 ),
             ],
           ),
           const Gap(24),
           
           // ╪º┘ä╪»┘ä┘è┘ä (Reference)
-          _buildSectionTitle("╪º┘ä╪»┘ä┘è┘ä", Icons.bookmark_rounded, primary, subtleColor),
-          const Gap(12),
+          _buildSectionTitle("المصدر", Icons.bookmark_rounded, primary, subtleColor),
           _buildFullColorPicker(_referenceColor, (c) => setState(() => _referenceColor = c), primary),
           const Gap(12),
-          _buildFontDropdown("╪«╪╖ ╪º┘ä╪»┘ä┘è┘ä", _referenceFont, (f) => setState(() => _referenceFont = f), primary),
+          _buildFontDropdown("خط المصدر", _referenceFont, (f) => setState(() => _referenceFont = f), primary),
           const Gap(12),
-          _buildSliderRow("╪¡╪¼┘à ╪«╪╖ ╪º┘ä╪»┘ä┘è┘ä", "${(_referenceFontSize ?? _fontSize - 4).toInt()}", primary, textColor),
+          _buildSliderRow("حجم خط المصدر", "${(_referenceFontSize ?? _fontSize - 4).toInt()}", primary, textColor),
           Row(
             children: [
               Expanded(
@@ -1081,12 +1118,12 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                     _saveState();
                     setState(() => _referenceFontSize = null);
                   },
-                  tooltip: "╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å",
+                  tooltip: "إعادة ضبط",
                 ),
             ],
           ),
           const Gap(8),
-          _buildSliderRow("┘à┘ê╪╢╪╣ ╪ú┘ü┘é┘è", "${_referenceOffsetX.toInt()}", primary, textColor),
+          _buildSliderRow("إزاحة أفقي", "${_referenceOffsetX.toInt()}", primary, textColor),
           Row(
             children: [
               Expanded(
@@ -1109,12 +1146,12 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                     _saveState();
                     setState(() => _referenceOffsetX = 0.0);
                   },
-                  tooltip: "╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å",
+                  tooltip: "إعادة ضبط",
                 ),
             ],
           ),
           const Gap(8),
-          _buildSliderRow("┘à┘ê╪╢╪╣ ╪╣┘à┘ê╪»┘è", "${_referenceOffsetY.toInt()}", primary, textColor),
+          _buildSliderRow("إزاحة رأسي", "${_referenceOffsetY.toInt()}", primary, textColor),
           Row(
             children: [
               Expanded(
@@ -1137,20 +1174,20 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                     _saveState();
                     setState(() => _referenceOffsetY = 0.0);
                   },
-                  tooltip: "╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å",
+                  tooltip: "إعادة ضبط",
                 ),
             ],
           ),
           const Gap(24),
           
           // ╪º┘ä┘ü╪╢┘ä (Description)
-          _buildSectionTitle("╪º┘ä┘ü╪╢┘ä", Icons.star_rounded, primary, subtleColor),
+          _buildSectionTitle("وصف إضافي", Icons.star_rounded, primary, subtleColor),
           const Gap(12),
           _buildFullColorPicker(_descriptionColor, (c) => setState(() => _descriptionColor = c), primary),
           const Gap(12),
-          _buildFontDropdown("╪«╪╖ ╪º┘ä┘ü╪╢┘ä", _descriptionFont, (f) => setState(() => _descriptionFont = f), primary),
+          _buildFontDropdown("خط الوصف", _descriptionFont, (f) => setState(() => _descriptionFont = f), primary),
           const Gap(12),
-          _buildSliderRow("╪¡╪¼┘à ╪«╪╖ ╪º┘ä┘ü╪╢┘ä", "${(_descriptionFontSize ?? _fontSize + 4).toInt()}", primary, textColor),
+          _buildSliderRow("حجم خط الوصف", "${(_descriptionFontSize ?? _fontSize + 4).toInt()}", primary, textColor),
           Row(
             children: [
               Expanded(
@@ -1173,12 +1210,12 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                     _saveState();
                     setState(() => _descriptionFontSize = null);
                   },
-                  tooltip: "╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å",
+                  tooltip: "إعادة ضبط",
                 ),
             ],
           ),
           const Gap(8),
-          _buildSliderRow("┘à┘ê╪╢╪╣ ╪ú┘ü┘é┘è", "${_descriptionOffsetX.toInt()}", primary, textColor),
+          _buildSliderRow("إزاحة أفقي", "${_descriptionOffsetX.toInt()}", primary, textColor),
           Row(
             children: [
               Expanded(
@@ -1201,12 +1238,12 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                     _saveState();
                     setState(() => _descriptionOffsetX = 0.0);
                   },
-                  tooltip: "╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å",
+                  tooltip: "إعادة ضبط",
                 ),
             ],
           ),
           const Gap(8),
-          _buildSliderRow("┘à┘ê╪╢╪╣ ╪╣┘à┘ê╪»┘è", "${_descriptionOffsetY.toInt()}", primary, textColor),
+          _buildSliderRow("إزاحة رأسي", "${_descriptionOffsetY.toInt()}", primary, textColor),
           Row(
             children: [
               Expanded(
@@ -1229,7 +1266,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                     _saveState();
                     setState(() => _descriptionOffsetY = 0.0);
                   },
-                  tooltip: "╪Ñ╪╣╪º╪»╪⌐ ╪¬╪╣┘è┘è┘å",
+                  tooltip: "إعادة ضبط",
                 ),
             ],
           ),
@@ -1302,7 +1339,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                       ),
                       const Gap(12),
                       Text(
-                        currentColor != null ? "┘à╪«╪╡╪╡" : "╪º╪«╪¬╪▒ ┘ä┘ê┘å",
+                        currentColor != null ? "مخصص" : "اختيار لون",
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: currentColor != null ? FontWeight.bold : FontWeight.normal,
@@ -1340,20 +1377,20 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     ];
     
     final fontLabels = {
-      null: '╪º┘ü╪¬╪▒╪º╪╢┘è',
-      'KFGQPC-Uthmanic-HAFS-Regular': '╪╣╪½┘à╪º┘å┘è',
-      'Amiri-Regular': '╪ú┘à┘è╪▒┘è',
-      'Cairo-Bold': '┘é╪º┘ç╪▒╪⌐ ╪½┘é┘è┘ä',
-      'IDRISIUM': '╪Ñ╪»╪▒┘è╪│┘è┘ê┘à',
-      'AmiriQuran-Regular': '╪ú┘à┘è╪▒┘è ┘é╪▒╪ó┘å',
-      'Aref Ruqaa Bold': '╪▒┘é╪╣╪⌐ ╪½┘é┘è┘ä',
-      'Cairo-Regular': '┘é╪º┘ç╪▒╪⌐',
-      'Cairo-Light': '┘é╪º┘ç╪▒╪⌐ ╪«┘ü┘è┘ü',
-      'Cairo-SemiBold': '┘é╪º┘ç╪▒╪⌐ ┘à╪¬┘ê╪│╪╖',
-      'Cairo-Black': '┘é╪º┘ç╪▒╪⌐ ╪ú╪│┘ê╪»',
-      'al-majd': '╪º┘ä┘à╪¼╪»',
-      'bader-lamsat': '╪¿╪»╪▒',
-      'Afsaneh-Font': '╪ú┘ü╪│╪º┘å┘ç',
+      null: 'افتراضي',
+      'KFGQPC-Uthmanic-HAFS-Regular': 'عثماني',
+      'Amiri-Regular': 'أميري',
+      'Cairo-Bold': 'Cairo Bold',
+      'IDRISIUM': 'IDRISIUM',
+      'AmiriQuran-Regular': 'أميري قرآن',
+      'Aref Ruqaa Bold': 'عارف رقعة',
+      'Cairo-Regular': 'Cairo',
+      'Cairo-Light': 'Cairo Light',
+      'Cairo-SemiBold': 'Cairo SemiBold',
+      'Cairo-Black': 'Cairo Black',
+      'al-majd': 'المجد',
+      'bader-lamsat': 'بدر لمسات',
+      'Afsaneh-Font': 'Afsaneh',
     };
     
     return Column(
@@ -1370,7 +1407,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
             itemBuilder: (context, index) {
               final font = fonts[index];
               final isSelected = currentFont == font;
-              final label = fontLabels[font] ?? '╪«╪╖';
+              final label = fontLabels[font] ?? 'خط';
               return GestureDetector(
                 onTap: () {
                   _saveState();
@@ -1412,19 +1449,19 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ┘å┘à╪╖ ╪º┘ä╪╣╪▒╪╢
-        _buildSectionTitle("┘å┘à╪╖ ╪º┘ä╪╣╪▒╪╢", Icons.aspect_ratio_rounded, primary, subtleColor),
+        _buildSectionTitle("نمط الإخراج", Icons.aspect_ratio_rounded, primary, subtleColor),
         const Gap(12),
         Row(
           children: [
-            _buildPatternOption(false, Icons.crop_square_rounded, "┘à╪▒╪¿╪╣ (1:1)", primary),
+            _buildPatternOption(false, Icons.crop_square_rounded, "بوست (1:1)", primary),
             const Gap(12),
-            _buildPatternOption(true, Icons.phone_android_rounded, "╪│╪¬┘ê╪▒┘è (9:16)", primary),
+            _buildPatternOption(true, Icons.phone_android_rounded, "ستوري (9:16)", primary),
           ],
         ),
         const Gap(24),
         
         // ╪º┘ä┘à╪¡╪º╪░╪º╪⌐
-        _buildSectionTitle("╪º┘ä┘à╪¡╪º╪░╪º╪⌐", Icons.format_align_center_rounded, primary, subtleColor),
+        _buildSectionTitle("محاذاة النص", Icons.format_align_center_rounded, primary, subtleColor),
         const Gap(12),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1437,9 +1474,9 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
         const Gap(24),
         
         // ╪º┘ä╪ú╪¿╪╣╪º╪»
-        _buildSectionTitle("╪º┘ä╪ú╪¿╪╣╪º╪»", Icons.tune_rounded, primary, subtleColor),
+        _buildSectionTitle("إعدادات التنسيق", Icons.tune_rounded, primary, subtleColor),
         const Gap(12),
-        _buildSliderRow("╪º╪▒╪¬┘ü╪º╪╣ ╪º┘ä╪│╪╖╪▒", _lineHeight.toStringAsFixed(1), primary, textColor),
+        _buildSliderRow("تباعد السطور", _lineHeight.toStringAsFixed(1), primary, textColor),
         Slider(
           value: _lineHeight,
           min: 1.0,
@@ -1452,7 +1489,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
             setState(() => _lineHeight = val);
           },
         ),
-        _buildSliderRow("╪º┘ä┘ç┘ê╪º┘à╪┤", "${_padding.toInt()}", primary, textColor),
+        _buildSliderRow("المساحة الداخلية", "${_padding.toInt()}", primary, textColor),
         Slider(
           value: _padding,
           min: 20,
@@ -1465,7 +1502,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
             setState(() => _padding = val);
           },
         ),
-        _buildSliderRow("╪º┘ä╪▓┘ê╪º┘è╪º", "${_borderRadius.toInt()}", primary, textColor),
+        _buildSliderRow("تدوير الحواف", "${_borderRadius.toInt()}", primary, textColor),
         Slider(
           value: _borderRadius,
           min: 0,
@@ -1478,7 +1515,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
             setState(() => _borderRadius = val);
           },
         ),
-        _buildSliderRow("╪º┘ä╪╣╪¬╪º┘à╪⌐", _bgOpacity.toStringAsFixed(2), primary, textColor),
+        _buildSliderRow("شفافية الخلفية", _bgOpacity.toStringAsFixed(2), primary, textColor),
         Slider(
           value: _bgOpacity,
           min: 0.0,
@@ -1500,11 +1537,11 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle("╪Ñ╪╣╪»╪º╪»╪º╪¬ ╪º┘ä┘ç┘ê┘è╪⌐", Icons.verified_user_rounded, primary, subtleColor),
+        _buildSectionTitle("الهوية", Icons.verified_user_rounded, primary, subtleColor),
         const Gap(16),
-        _buildToggle("╪Ñ╪╕┘ç╪º╪▒ ╪º╪│┘à ╪º┘ä┘é╪│┘à", _showCategoryHeader, (val) => setState(() => _showCategoryHeader = val), primary, textColor),
+        _buildToggle("إظهار عنوان القسم", _showCategoryHeader, (val) => setState(() => _showCategoryHeader = val), primary, textColor),
         const Gap(8),
-        _buildToggle("┘ä┘ê╪¼┘ê ┘ê╪¡┘é┘ê┘é ╪º┘ä╪¬╪╖╪¿┘è┘é", _showBranding, (val) => setState(() => _showBranding = val), primary, textColor),
+        _buildToggle("إظهار الهوية (شعار/نص)", _showBranding, (val) => setState(() => _showBranding = val), primary, textColor),
         const Gap(24),
         Container(
           padding: const EdgeInsets.all(16),
@@ -1692,33 +1729,37 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     ];
     
     final fontLabels = {
-      'IDRISIUM': '╪Ñ╪»╪▒┘è╪│┘è┘ê┘à',
-      'KFGQPC-Uthmanic-HAFS-Regular': '╪╣╪½┘à╪º┘å┘è',
-      'Amiri-Regular': '╪ú┘à┘è╪▒┘è',
-      'Cairo-Bold': '┘é╪º┘ç╪▒╪⌐ ╪½┘é┘è┘ä',
-      'AmiriQuran-Regular': '╪ú┘à┘è╪▒┘è ┘é╪▒╪ó┘å',
-      'Aref Ruqaa Bold': '╪▒┘é╪╣╪⌐ ╪½┘é┘è┘ä',
-      'Cairo-Regular': '┘é╪º┘ç╪▒╪⌐',
-      'Cairo-Light': '┘é╪º┘ç╪▒╪⌐ ╪«┘ü┘è┘ü',
-      'Cairo-SemiBold': '┘é╪º┘ç╪▒╪⌐ ┘à╪¬┘ê╪│╪╖',
-      'Cairo-Black': '┘é╪º┘ç╪▒╪⌐ ╪ú╪│┘ê╪»',
-      'al-majd': '╪º┘ä┘à╪¼╪»',
-      'bader-lamsat': '╪¿╪»╪▒',
-      'Afsaneh-Font': '╪ú┘ü╪│╪º┘å┘ç',
-      'Abd-ElRady-Regular': '╪╣╪¿╪» ╪º┘ä╪▒╪º╪╢┘è',
-      'al-hadaribold': '┘ç╪»╪º╪▒┘è',
-      'a-massir-ballpoint': '┘à╪│┘è╪▒',
-      'b-helal': '┘ç┘ä╪º┘ä',
-      'ASane-Jaleh': '╪¼╪º┘ä┘ç',
-      'BritishCouncil-Arabic-Black': '╪¿╪▒┘è╪╖╪º┘å┘è',
+      'IDRISIUM': 'IDRISIUM',
+      'KFGQPC-Uthmanic-HAFS-Regular': 'عثماني',
+      'Amiri-Regular': 'أميري',
+      'Cairo-Bold': 'Cairo Bold',
+      'AmiriQuran-Regular': 'أميري قرآن',
+      'Aref Ruqaa Bold': 'عارف رقعة',
+      'Cairo-Regular': 'Cairo',
+      'Cairo-Light': 'Cairo Light',
+      'Cairo-SemiBold': 'Cairo SemiBold',
+      'Cairo-Black': 'Cairo Black',
+      'al-majd': 'المجد',
+      'bader-lamsat': 'بدر لمسات',
+      'Afsaneh-Font': 'Afsaneh',
+      'Abd-ElRady-Regular': 'Abd ElRady',
+      'al-hadaribold': 'Hadari',
+      'a-massir-ballpoint': 'Massir',
+      'b-helal': 'Helal',
+      'ASane-Jaleh': 'ASane Jaleh',
+      'BritishCouncil-Arabic-Black': 'British Council',
     };
     
-    // ╪»┘à╪¼ ╪º┘ä╪«╪╖┘ê╪╖ ╪º┘ä┘à╪»┘à╪¼╪⌐ ┘à╪╣ ╪º┘ä╪«╪╖┘ê╪╖ ╪º┘ä┘à╪│╪¬┘ê╪▒╪»╪⌐
-    final allFonts = [...fonts, ..._customFonts];
-    final allLabels = {...fontLabels};
-    for (int i = 0; i < _customFonts.length; i++) {
-      allLabels[_customFonts[i]] = _customFontNames[i];
+    final customFamilyToPath = <String, String>{};
+    for (int i = 0; i < _customFonts.length && i < _customFontNames.length; i++) {
+      customFamilyToPath[_customFontNames[i]] = _customFonts[i];
     }
+
+    final allFonts = [...fonts, ...customFamilyToPath.keys];
+    final allLabels = <String, String>{
+      ...fontLabels,
+      ...Map<String, String>.fromEntries(customFamilyToPath.keys.map((k) => MapEntry(k, k))),
+    };
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1751,7 +1792,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                         Icon(Icons.add_rounded, size: 16, color: primary),
                         const Gap(4),
                         Text(
-                          '╪Ñ╪╢╪º┘ü╪⌐ ╪«╪╖',
+                          'إضافة خط',
                           style: TextStyle(
                             fontSize: 12,
                             color: primary,
@@ -1766,12 +1807,21 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
               
               final font = allFonts[index];
               final isSelected = _fontFamily == font;
-              final label = allLabels[font] ?? '╪«╪╖';
-              final isCustom = _customFonts.contains(font);
+              final label = allLabels[font] ?? 'خط';
+              final isCustom = customFamilyToPath.containsKey(font);
               
               return GestureDetector(
                 onTap: () {
                   _saveState();
+                  if (isCustom) {
+                    final path = customFamilyToPath[font];
+                    if (path != null) {
+                      _loadCustomFontFromPath(path, font);
+                      SharedPreferences.getInstance().then((prefs) {
+                        prefs.setString('azkar_selected_custom_font_path', path);
+                      });
+                    }
+                  }
                   setState(() => _fontFamily = font);
                 },
                 child: Container(
@@ -1795,7 +1845,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                         Text(
                           label,
                           style: TextStyle(
-                            fontFamily: isCustom ? null : font,
+                            fontFamily: font,
                             fontSize: 14,
                             color: isSelected ? primary : (isDark ? Colors.white70 : Colors.black87),
                             fontWeight: FontWeight.w600,
@@ -1863,7 +1913,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
           title: FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
-              "┘à╪┤╪º╪▒┘â╪⌐ ╪º┘ä╪░┘â╪▒",
+              "مشاركة الذكر",
               style: TextStyle(color: textColor, fontWeight: FontWeight.w900, fontSize: 18),
             ),
           ),
@@ -1878,13 +1928,13 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
               TextButton.icon(
                 onPressed: _saveImage,
                 icon: const Icon(Icons.download_rounded, size: 20),
-                label: const Text("╪¡┘ü╪╕", style: TextStyle(fontWeight: FontWeight.bold)),
+                label: const Text("حفظ", style: TextStyle(fontWeight: FontWeight.bold)),
                 style: TextButton.styleFrom(foregroundColor: primary),
               ),
               TextButton.icon(
                 onPressed: _shareImage,
                 icon: const Icon(Icons.ios_share_rounded, size: 20),
-                label: const Text("┘à╪┤╪º╪▒┘â╪⌐", style: TextStyle(fontWeight: FontWeight.bold)),
+                label: const Text("مشاركة", style: TextStyle(fontWeight: FontWeight.bold)),
                 style: TextButton.styleFrom(foregroundColor: primary),
               ),
             ],
@@ -1942,6 +1992,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                               descriptionStyleId: _descriptionStyleId,
                               referenceColor: _referenceColor,
                               backgroundImagePath: _backgroundImagePath,
+                              imageFilter: _imageFilter,
                               imageOffset: _imageOffset,
                               imageScale: _imageScale,
                               imageBlur: _imageBlur,
@@ -2473,9 +2524,9 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
   }
 
   String _getAlignmentLabel(double val) {
-    if (val < -0.3) return "╪ú╪╣┘ä┘ë";
-    if (val > 0.3) return "╪ú╪│┘ü┘ä";
-    return "┘à┘å╪¬╪╡┘ü";
+    if (val < -0.3) return "أعلى";
+    if (val > 0.3) return "أسفل";
+    return "منتصف";
   }
 
   Widget _buildElementCustomizer(CustomizationField field, Color primary, Color cardColor, bool isDark) {

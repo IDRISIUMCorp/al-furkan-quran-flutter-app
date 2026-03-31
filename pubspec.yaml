@@ -81,9 +81,9 @@ dependencies:
   percent_indicator: ^4.2.5
   flex_color_scheme: ^8.4.0
   flutter_screenutil: ^5.9.3
-  home_widget: ^0.9.0
+  home_widget: ^0.7.0
   workmanager: ^0.9.0+3
-  file_picker: ^8.1.7
+  file_picker: ^10.0.0
   auto_size_text: ^3.0.0
   # background_fetch:
   #   git:
@@ -124,6 +124,8 @@ flutter:
     - assets/img/
     - assets/img/sunrise_forbidden_time.png
     - assets/
+    - assets/wahy/json/
+    - assets/wahy/json/azkar.json
     - packages/ar-tafsir-muyassar.json
     - packages/alrab-al-quran-li-da-as.json
     - assets/dev/

@@ -48,9 +48,11 @@ class UnifiedShareBottomSheet extends StatefulWidget {
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
         child: DraggableScrollableSheet(
-          initialChildSize: 0.90,
-          minChildSize: 0.60,
-          maxChildSize: 0.95,
+          initialChildSize: 0.95,
+          minChildSize: 0.80,
+          maxChildSize: 1.0,
+          snap: true,
+          snapSizes: const [0.80, 0.95, 1.0],
           builder: (context, scrollController) => UnifiedShareBottomSheet(
             initialSurahNumber: surahNumber,
             initialVerseNumber: verseNumber,
@@ -258,7 +260,7 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
     }
     var t = originalText.trimRight();
     t = t.replaceAll(RegExp(r"[\s\u06DD█¥]+$"), "");
-    t = t.replaceAll(RegExp(r"[\s0-9┘á-┘⌐█░-█╣]+$"), "");
+    t = t.replaceAll(RegExp(r"[\s0-9\u0660-\u0669]+$"), "");
     
     // If we stripped too much, return original
     if (t.trim().isEmpty && originalText.isNotEmpty) return originalText;
@@ -1220,9 +1222,12 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
         Center(
           child: SizedBox(
             width: bannerWidth,
-            child: HeaderWidget(
-              suraNumber: group.surahNumber,
-              theme: qcfTheme,
+            child: Transform.scale(
+              scale: _bannerScale,
+              child: HeaderWidget(
+                suraNumber: group.surahNumber,
+                theme: qcfTheme,
+              ),
             ),
           ),
         ),
@@ -1240,10 +1245,10 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
         final bool useCustomFont = _shareFontFamily != 'default';
         final String? customFontPackage = useCustomFont ? null : 'qcf_quran';
         final String effectiveFont = useCustomFont ? _shareFontFamily : pageFont;
-        final String? effectiveText = useCustomFont 
+        final String effectiveText = useCustomFont 
             ? getVerse(group.surahNumber, v, verseEndSymbol: false)
             : getVerseQCF(group.surahNumber, v, verseEndSymbol: false);
-        final String? effectiveNumber = useCustomFont
+        final String effectiveNumber = useCustomFont
             ? ' \u06DD${v.toString()} '
             : getVerseNumberQCF(group.surahNumber, v);
 

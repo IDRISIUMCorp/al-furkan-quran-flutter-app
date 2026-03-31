@@ -6,6 +6,8 @@ import "package:al_quran_v3/src/screen/smart_khatma/smart_khatma_page.dart";
 import "package:al_quran_v3/src/screen/qibla/qibla_direction.dart";
 import "package:al_quran_v3/src/screen/settings/settings_page.dart";
 import "package:al_quran_v3/src/screen/prayer_time/prayer_time_page.dart";
+import "package:al_quran_v3/src/screen/azkar/azkar_categories_screen.dart";
+import "package:al_quran_v3/src/screen/settings/widgets/ayah_widget_settings_page.dart";
 
 class WahySideDrawer extends StatefulWidget {
   final Color primary;
@@ -227,6 +229,28 @@ class _WahySideDrawerState extends State<WahySideDrawer>
                                     onTap: () => _closeThenPush(
                                       context,
                                       const QiblaDirection(),
+                                    ),
+                                  ),
+                                  const WahyDrawerDivider(),
+                                  WahyDrawerItem(
+                                    title: "الأذكار",
+                                    subtitle: "أذكار الصباح والمساء",
+                                    icon: Icons.auto_stories_rounded,
+                                    primary: widget.primary,
+                                    onTap: () => _closeThenPush(
+                                      context,
+                                      const AzkarCategoriesScreen(),
+                                    ),
+                                  ),
+                                  const WahyDrawerDivider(),
+                                  WahyDrawerItem(
+                                    title: "ويدجت آية اليوم",
+                                    subtitle: "تخصيص الشكل والتحديث",
+                                    icon: Icons.widgets_rounded,
+                                    primary: widget.primary,
+                                    onTap: () => _closeThenPush(
+                                      context,
+                                      const AyahWidgetSettingsPage(),
                                     ),
                                   ),
                                 ],

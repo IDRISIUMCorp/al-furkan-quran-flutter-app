@@ -62,7 +62,10 @@ class _AzkarDetailScreenState extends State<AzkarDetailScreen> {
           } else if (_currentIndex == widget.azkarList.length - 1 && mounted) {
              ScaffoldMessenger.of(context).showSnackBar(
                SnackBar(
-                 content: Text("╪¬┘à ╪º┘ä╪º┘å╪¬┘ç╪º╪í ┘à┘å ${widget.categoryName}", style: const TextStyle(fontWeight: FontWeight.bold)),
+                 content: Text(
+                   "تم الانتهاء من ${widget.categoryName}",
+                   style: const TextStyle(fontWeight: FontWeight.bold),
+                 ),
                  backgroundColor: widget.primary,
                )
              );
@@ -119,7 +122,7 @@ class _AzkarDetailScreenState extends State<AzkarDetailScreen> {
           children: [
             const Gap(12),
             Text(
-              "╪º┘ä╪░┘â╪▒ ${_currentIndex + 1} ┘à┘å ${widget.azkarList.length}",
+              "الذكر ${_currentIndex + 1} من ${widget.azkarList.length}",
               style: TextStyle(
                 color: widget.primary.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w800,
@@ -308,7 +311,7 @@ class _AzkarDetailScreenState extends State<AzkarDetailScreen> {
                 children: [
                    _buildActionButton(
                     icon: Icons.image_rounded,
-                    label: "╪╡┘ê╪▒╪⌐",
+                    label: "صورة",
                     color: widget.primary,
                     onTap: () {
                       Navigator.push(
@@ -324,13 +327,13 @@ class _AzkarDetailScreenState extends State<AzkarDetailScreen> {
                   ),
                   _buildActionButton(
                     icon: Icons.share_rounded,
-                    label: "┘å╪╡┘è╪º┘ï",
+                    label: "مشاركة",
                     color: widget.primary,
                     onTap: () {
                       final zekr = widget.azkarList[_currentIndex];
                       final text = zekr['zekr'].toString();
                       final ref = zekr['reference']?.toString() ?? '';
-                      final shareText = "$text\n\n${ref.isNotEmpty ? '╪º┘ä┘à╪╡╪»╪▒: $ref\n' : ''}ΓÇö ╪¬╪╖╪¿┘è┘é ╪º┘ä┘ü┘Å╪▒┘é╪º┘å";
+                      final shareText = "$text\n\n${ref.isNotEmpty ? 'المصدر: $ref\n' : ''}— أذكار المسلم";
                       Share.share(shareText);
                     },
                   ),
@@ -408,7 +411,7 @@ class _AzkarDetailScreenState extends State<AzkarDetailScreen> {
                   ),
                   const Gap(24),
                   Text(
-                    "╪¡╪¼┘à ╪º┘ä╪«╪╖",
+                    "حجم الخط",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
@@ -439,7 +442,7 @@ class _AzkarDetailScreenState extends State<AzkarDetailScreen> {
                   ),
                   const Gap(24),
                   const Text(
-                    "╪¿╪╡ ┘è╪º ╪▒┘è╪│╪î ╪º╪«╪¬╪▒ ╪º┘ä╪¡╪¼┘à ╪º┘ä┘ä┘è ┘è╪▒┘è╪¡┘â ╪╣╪┤╪º┘å ╪¬┘é╪▒╪ú ╪º┘ä╪░┘â╪▒ ╪¿┘ê╪╢┘ê╪¡ ┘ê╪│┘ä╪º╪│╪⌐.",
+                    "اسحب الشريط لتكبير أو تصغير الخط. سيتم حفظ الإعداد تلقائياً.",
                     style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w600),
                     textAlign: TextAlign.center,
                   ),

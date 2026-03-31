@@ -46,7 +46,9 @@ class _AzkarCategoriesScreenState extends State<AzkarCategoriesScreen> {
           _allAzkar = list;
           _categories = cats.toList();
           _isLoading = false;
-          _errorMessage = _categories.isEmpty ? "┘ä┘à ┘è╪¬┘à ╪º┘ä╪╣╪½┘ê╪▒ ╪╣┘ä┘ë ╪ú╪░┘â╪º╪▒" : null;
+          _errorMessage = _categories.isEmpty
+              ? "لا توجد أذكار متاحة حالياً"
+              : null;
         });
 
         // Auto-open logic
@@ -75,7 +77,7 @@ class _AzkarCategoriesScreenState extends State<AzkarCategoriesScreen> {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _errorMessage = "╪¡╪»╪½ ╪«╪╖╪ú ╪ú╪½┘å╪º╪í ╪¬╪¡┘à┘è┘ä ╪º┘ä╪ú╪░┘â╪º╪▒: $e";
+          _errorMessage = "حصل خطأ أثناء تحميل الأذكار: $e";
         });
       }
     }
@@ -103,7 +105,7 @@ class _AzkarCategoriesScreenState extends State<AzkarCategoriesScreen> {
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
-            "╪ú╪░┘â╪º╪▒ ╪º┘ä┘à╪│┘ä┘à",
+            "أذكار المسلم",
             style: TextStyle(
               color: textColor,
               fontWeight: FontWeight.w900,
@@ -133,7 +135,10 @@ class _AzkarCategoriesScreenState extends State<AzkarCategoriesScreen> {
                             _loadAzkarData();
                           },
                           style: ElevatedButton.styleFrom(backgroundColor: primary),
-                          child: const Text("╪Ñ╪╣╪º╪»╪⌐ ╪º┘ä┘à╪¡╪º┘ê┘ä╪⌐", style: TextStyle(color: Colors.white)),
+                          child: const Text(
+                            "إعادة المحاولة",
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                       ],
                     ),
@@ -186,21 +191,21 @@ class _AzkarCategoriesScreenState extends State<AzkarCategoriesScreen> {
   }) {
     // Generate icons dynamically based on category names
     IconData iconData = Icons.book_rounded;
-    if (category.contains("╪º┘ä╪╡╪¿╪º╪¡")) {
+    if (category.contains("الصباح")) {
       iconData = Icons.wb_sunny_rounded;
-    } else if (category.contains("╪º┘ä┘à╪│╪º╪í")) {
+    } else if (category.contains("المساء")) {
       iconData = Icons.nights_stay_rounded;
-    } else if (category.contains("╪º┘ä┘å┘ê┘à")) {
+    } else if (category.contains("النوم")) {
       iconData = Icons.bedtime_rounded;
-    } else if (category.contains("╪º┘ä┘à╪│╪¼╪»")) {
+    } else if (category.contains("الصلاة")) {
       iconData = Icons.mosque_rounded;
-    } else if (category.contains("╪º┘ä╪º╪│╪¬┘è┘é╪º╪╕")) {
+    } else if (category.contains("الأذان")) {
       iconData = Icons.wb_twilight_rounded;
-    } else if (category.contains("╪º┘ä┘ê╪╢┘ê╪í") || category.contains("╪º┘ä╪«┘ä╪º╪í")) {
+    } else if (category.contains("الوضوء") || category.contains("الطهارة")) {
       iconData = Icons.water_drop_rounded;
-    } else if (category.contains("╪º┘ä┘à┘å╪▓┘ä")) {
+    } else if (category.contains("المنزل") || category.contains("البيت")) {
       iconData = Icons.home_rounded;
-    } else if (category.contains("╪º┘ä╪╡┘ä╪º╪⌐")) {
+    } else if (category.contains("الخروج") || category.contains("السفر")) {
       iconData = Icons.pan_tool_rounded;
     }
 
@@ -250,7 +255,7 @@ class _AzkarCategoriesScreenState extends State<AzkarCategoriesScreen> {
                       ),
                       const Gap(4),
                       Text(
-                        "$count ╪░┘â╪▒",
+                        "$count ذكر",
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,

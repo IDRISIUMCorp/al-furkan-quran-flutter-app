@@ -66,6 +66,7 @@ class AzkarShareDesign extends StatelessWidget {
 
   // Image Background Customization
   final String? backgroundImagePath; // Local file path
+  final String imageFilter; // none, grayscale, sepia, vintage, cool, warm, dramatic, fade, contrast, bright
   final Offset imageOffset;
   final double imageScale;
   final double imageBlur;
@@ -108,6 +109,7 @@ class AzkarShareDesign extends StatelessWidget {
     this.referenceColor,
     this.referenceFont,
     this.backgroundImagePath,
+    this.imageFilter = 'none',
     this.imageOffset = Offset.zero,
     this.imageScale = 1.0,
     this.imageBlur = 0.0,
@@ -373,10 +375,12 @@ class AzkarShareDesign extends StatelessWidget {
                   offset: imageOffset,
                   child: Transform.scale(
                     scale: imageScale,
-                    child: Image.file(
-                      File(backgroundImagePath!),
-                      fit: BoxFit.cover,
-                      errorBuilder: (ctx, err, stack) => Container(color: Colors.red.withValues(alpha: 0.15)),
+                    child: _applyImageFilter(
+                      Image.file(
+                        File(backgroundImagePath!),
+                        fit: BoxFit.cover,
+                        errorBuilder: (ctx, err, stack) => Container(color: Colors.red.withValues(alpha: 0.15)),
+                      ),
                     ),
                   ),
                 ),
@@ -400,6 +404,83 @@ class AzkarShareDesign extends StatelessWidget {
     }
 
     return content;
+  }
+
+  Widget _applyImageFilter(Widget child) {
+    final filter = _getColorFilter(imageFilter);
+    if (filter == null) return child;
+    return ColorFiltered(colorFilter: filter, child: child);
+  }
+
+  ColorFilter? _getColorFilter(String id) {
+    switch (id) {
+      case 'grayscale':
+        return const ColorFilter.matrix(<double>[
+          0.2126, 0.7152, 0.0722, 0, 0,
+          0.2126, 0.7152, 0.0722, 0, 0,
+          0.2126, 0.7152, 0.0722, 0, 0,
+          0, 0, 0, 1, 0,
+        ]);
+      case 'sepia':
+        return const ColorFilter.matrix(<double>[
+          0.393, 0.769, 0.189, 0, 0,
+          0.349, 0.686, 0.168, 0, 0,
+          0.272, 0.534, 0.131, 0, 0,
+          0, 0, 0, 1, 0,
+        ]);
+      case 'vintage':
+        return const ColorFilter.matrix(<double>[
+          0.9, 0.1, 0.0, 0, 10,
+          0.0, 0.85, 0.1, 0, 10,
+          0.0, 0.1, 0.8, 0, 10,
+          0, 0, 0, 1, 0,
+        ]);
+      case 'cool':
+        return const ColorFilter.matrix(<double>[
+          1.0, 0.0, 0.0, 0, 0,
+          0.0, 1.0, 0.0, 0, 0,
+          0.0, 0.0, 1.15, 0, 0,
+          0, 0, 0, 1, 0,
+        ]);
+      case 'warm':
+        return const ColorFilter.matrix(<double>[
+          1.15, 0.0, 0.0, 0, 0,
+          0.0, 1.05, 0.0, 0, 0,
+          0.0, 0.0, 0.95, 0, 0,
+          0, 0, 0, 1, 0,
+        ]);
+      case 'dramatic':
+        return const ColorFilter.matrix(<double>[
+          1.25, 0.0, 0.0, 0, -20,
+          0.0, 1.25, 0.0, 0, -20,
+          0.0, 0.0, 1.25, 0, -20,
+          0, 0, 0, 1, 0,
+        ]);
+      case 'fade':
+        return const ColorFilter.matrix(<double>[
+          0.9, 0.0, 0.0, 0, 20,
+          0.0, 0.9, 0.0, 0, 20,
+          0.0, 0.0, 0.9, 0, 20,
+          0, 0, 0, 1, 0,
+        ]);
+      case 'contrast':
+        return const ColorFilter.matrix(<double>[
+          1.4, 0.0, 0.0, 0, -50,
+          0.0, 1.4, 0.0, 0, -50,
+          0.0, 0.0, 1.4, 0, -50,
+          0, 0, 0, 1, 0,
+        ]);
+      case 'bright':
+        return const ColorFilter.matrix(<double>[
+          1.1, 0.0, 0.0, 0, 15,
+          0.0, 1.1, 0.0, 0, 15,
+          0.0, 0.0, 1.1, 0, 15,
+          0, 0, 0, 1, 0,
+        ]);
+      case 'none':
+      default:
+        return null;
+    }
   }
 
   // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
