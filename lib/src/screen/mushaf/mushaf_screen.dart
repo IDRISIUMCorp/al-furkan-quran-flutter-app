@@ -37,7 +37,6 @@ import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.da
 import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_irab_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_translation_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_sarf_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/get_translation_with_word_by_word.dart";

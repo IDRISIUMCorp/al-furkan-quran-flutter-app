@@ -1044,6 +1044,7 @@ extension _MushafShareExtension on _MushafViewState {
                                 ayahKey: ayahKey,
                                 card: card,
                                 isDark: isDark,
+                                themeState: themeState,
                               ),
                               // Sarf Tab
                               _SarfTabContent(
@@ -1384,87 +1385,63 @@ extension _MushafShareExtension on _MushafViewState {
     );
   }
 
-  /// I'rab Tab Content Widget
+  /// I'rab Tab Content Widget - Updated
   Widget _IrabTabContent({
     required String ayahKey,
     required Color card,
     required bool isDark,
+    required ThemeState themeState,
   }) {
-    return FutureBuilder<String?>(
-      future: QuranIrabFunction.getIrabText(ayahKey),
-      builder: (context, snap) {
-        if (snap.connectionState != ConnectionState.done) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    final parts = ayahKey.split(':');
+    final surahNum = int.tryParse(parts[0]) ?? 1;
+    final ayahNum = int.tryParse(parts[1]) ?? 1;
 
-        final irabText = snap.data?.trim() ?? "";
-        if (irabText.isEmpty) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: card,
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Text(
-                "لا يوجد إعراب متاح لهذه الآية حالياً.",
-                textAlign: TextAlign.center,
-                textDirection: TextDirection.rtl,
-                style: TextStyle(
-                  fontSize: 16,
-                  height: 1.6,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : const Color(0xFF1B1B1B),
-                ),
-              ),
-            ),
+    return FutureBuilder<bool>(
+      future: Future.value(_wordInfoRepo.isKindDownloaded(WordInfoKind.eerab)),
+      builder: (context, downloadSnap) {
+        final isDownloaded = downloadSnap.data ?? false;
+
+        if (!isDownloaded) {
+          return _buildDownloadPrompt(
+            card: card,
+            isDark: isDark,
+            themeState: themeState,
+            title: "بيانات الإعراب",
+            description: "حمّل بيانات الإعراب لعرض التحليل الإعرابي للكلمات",
+            icon: Icons.text_fields,
+            kind: WordInfoKind.eerab,
           );
         }
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: card,
-              borderRadius: BorderRadius.circular(18),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 14,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  "إعراب القرآن الكريم",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.70)
-                        : const Color(0xFF1B1B1B).withValues(alpha: 0.70),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  _stripHtml(irabText),
-                  textDirection: TextDirection.rtl,
-                  style: TextStyle(
-                    fontSize: 16,
-                    height: 1.7,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : const Color(0xFF1B1B1B),
-                  ),
-                ),
-              ],
-            ),
+        return FutureBuilder<QiraatAyahWords?>(
+          future: _wordInfoRepo.getAyahWords(
+            kind: WordInfoKind.eerab,
+            surahNumber: surahNum,
+            ayahNumber: ayahNum,
           ),
+          builder: (context, snap) {
+            if (snap.connectionState != ConnectionState.done) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final ayahWords = snap.data;
+            if (ayahWords == null || ayahWords.words.isEmpty) {
+              return _buildEmptyState(
+                card: card,
+                isDark: isDark,
+                themeState: themeState,
+                message: "لا توجد بيانات إعراب لهذه الآية",
+              );
+            }
+
+            return _buildWordsInfoList(
+              card: card,
+              isDark: isDark,
+              themeState: themeState,
+              words: ayahWords.words,
+              title: "التحليل الإعرابي",
+            );
+          },
         );
       },
     );
