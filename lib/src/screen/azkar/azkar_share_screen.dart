@@ -907,10 +907,32 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ╪º┘ä╪«╪╖ ╪º┘ä╪╣╪º┘à
-          _buildSectionTitle("الخط وحجم النص", Icons.font_download_rounded, primary, subtleColor),
+          _buildSectionTitle("خط عام", Icons.font_download_rounded, primary, subtleColor),
           const Gap(12),
           _buildFontSelector(primary, cardColor, isDark),
+          const Gap(12),
+          _buildCircleButton(
+            icon: Icons.done_all_rounded,
+            onPressed: () {
+              _saveState();
+              setState(() {
+                _zekrFont = _fontFamily;
+                _categoryFont = _fontFamily;
+                _descriptionFont = _fontFamily;
+                _referenceFont = _fontFamily;
+              });
+            },
+            primary: primary,
+          ),
+          const Gap(8),
+
+          // ╪º┘ä╪«╪╖ ╪º┘ä╪╣╪º┘à
+          _buildSectionTitle("تفاصيل الخط", Icons.font_download_rounded, primary, subtleColor),
+          const Gap(12),
+          Text(
+            "اختيار الخط هنا بيأثر على النص الرئيسي (لو ماحددتش خطوط مختلفة لكل عنصر تحت).",
+            style: TextStyle(fontSize: 12, color: subtleColor, height: 1.4),
+          ),
           const Gap(16),
           _buildSliderRow("الحجم", "${_fontSize.toInt()}", primary, textColor),
           Slider(
@@ -1542,27 +1564,6 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
         _buildToggle("إظهار عنوان القسم", _showCategoryHeader, (val) => setState(() => _showCategoryHeader = val), primary, textColor),
         const Gap(8),
         _buildToggle("إظهار الهوية (شعار/نص)", _showBranding, (val) => setState(() => _showBranding = val), primary, textColor),
-        const Gap(24),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: primary.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: primary.withValues(alpha: 0.1)),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.info_outline_rounded, color: primary, size: 20),
-              const Gap(12),
-              Expanded(
-                child: Text(
-                  "╪¬╪¡┘â┘à ┘ü┘è ╪╕┘ç┘ê╪▒ ╪º┘ä╪╣┘ä╪º┘à╪⌐ ╪º┘ä┘à╪º╪ª┘è╪⌐ ┘ê╪º╪│┘à ╪º┘ä┘é╪│┘à ╪╣┘ä┘ë ╪º┘ä╪╡┘ê╪▒╪⌐ ╪º┘ä┘à╪┤╪º╪▒┘â╪⌐.",
-                  style: TextStyle(fontSize: 12, color: textColor.withValues(alpha: 0.7), height: 1.5),
-                ),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
@@ -1942,131 +1943,123 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
         ),
         body: AbsorbPointer(
           absorbing: _isSharing,
-          child: Column(
+          child: Stack(
             children: [
-            Expanded(
-              flex: 5,
-              child: Container(
-                color: bg,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Center(
-                  child: AspectRatio(
-                    aspectRatio: _isStoryMode ? 9 / 16 : 1,
-                    child: Stack(
-                      children: [
-                        Screenshot(
-                          controller: _screenshotController,
-                          child: FittedBox(
-                            fit: BoxFit.contain,
-                            child: AzkarShareDesign(
-                              zekr: widget.zekr['zekr'] ?? "",
-                              description: widget.zekr['description'],
-                              reference: widget.zekr['reference'],
-                              categoryName: widget.categoryName,
-                              primaryColor: primary,
-                              themeId: _themeId,
-                              templateType: _templateType,
-                              fontSize: _fontSize,
-                              isGradientBg: _isGradientBg,
-                              customBgColor: _customBgColor,
-                              customBgColor2: _customBgColor2,
-                              customTextColor: _customTextColor,
-                              customAccentColor: _customAccentColor,
-                              fontFamily: _fontFamily,
-                              showBranding: _showBranding,
-                              showCategoryHeader: _showCategoryHeader,
-                              padding: _padding,
-                              isStoryMode: _isStoryMode,
-                              borderRadius: _borderRadius,
-                              bgOpacity: _bgOpacity,
-                              textAlign: _textAlign,
-                              lineHeight: _lineHeight,
-                              verticalAlignment: _verticalAlignment,
-                              zekrColor: _zekrColor,
-                              zekrFont: _zekrFont,
-                              categoryColor: _categoryColor,
-                              categoryFont: _categoryFont,
-                              categoryStyleId: _categoryStyleId,
-                              descriptionColor: _descriptionColor,
-                              descriptionFont: _descriptionFont,
-                              descriptionStyleId: _descriptionStyleId,
-                              referenceColor: _referenceColor,
-                              backgroundImagePath: _backgroundImagePath,
-                              imageFilter: _imageFilter,
-                              imageOffset: _imageOffset,
-                              imageScale: _imageScale,
-                              imageBlur: _imageBlur,
-                              imageOverlayOpacity: _imageOverlayOpacity,
-                              zekrFontSize: _zekrFontSize,
-                              zekrLineHeight: _zekrLineHeight,
-                              zekrOffsetX: _zekrOffsetX,
-                              zekrOffsetY: _zekrOffsetY,
-                              categoryFontSize: _categoryFontSize,
-                              categoryLineHeight: _categoryLineHeight,
-                              categoryOffsetX: _categoryOffsetX,
-                              categoryOffsetY: _categoryOffsetY,
-                              descriptionFontSize: _descriptionFontSize,
-                              descriptionLineHeight: _descriptionLineHeight,
-                              descriptionOffsetX: _descriptionOffsetX,
-                              descriptionOffsetY: _descriptionOffsetY,
-                              referenceFontSize: _referenceFontSize,
-                              referenceLineHeight: _referenceLineHeight,
-                              referenceOffsetX: _referenceOffsetX,
-                              referenceOffsetY: _referenceOffsetY,
-                            ),
-                          ),
-                        ),
-                        
-                        // Floating Undo/Redo ┘ü┘ê┘é ╪º┘ä┘Ç Preview - ╪¬┘à ┘å┘é┘ä┘ç ┘ü┘ê┘é ╪º┘ä╪¬╪¿┘ê┘è╪¿╪º╪¬
-                        
-                        Positioned.fill(
-                          child: Column(
+              Column(
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: Container(
+                      color: bg,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      child: Center(
+                        child: AspectRatio(
+                          aspectRatio: _isStoryMode ? 9 / 16 : 1,
+                          child: Stack(
                             children: [
-                              if (_showCategoryHeader)
-                                Expanded(
-                                  flex: 2,
-                                  child: GestureDetector(
-                                    behavior: HitTestBehavior.translucent,
-                                    onTap: () => _scrollToField(CustomizationField.category),
-                                    child: Container(color: Colors.transparent),
+                              Screenshot(
+                                controller: _screenshotController,
+                                child: FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: AzkarShareDesign(
+                                    zekr: widget.zekr['zekr'] ?? "",
+                                    description: widget.zekr['description'],
+                                    reference: widget.zekr['reference'],
+                                    categoryName: widget.categoryName,
+                                    primaryColor: primary,
+                                    themeId: _themeId,
+                                    templateType: _templateType,
+                                    fontSize: _fontSize,
+                                    isGradientBg: _isGradientBg,
+                                    customBgColor: _customBgColor,
+                                    customBgColor2: _customBgColor2,
+                                    customTextColor: _customTextColor,
+                                    customAccentColor: _customAccentColor,
+                                    fontFamily: _fontFamily,
+                                    showBranding: _showBranding,
+                                    showCategoryHeader: _showCategoryHeader,
+                                    padding: _padding,
+                                    isStoryMode: _isStoryMode,
+                                    borderRadius: _borderRadius,
+                                    bgOpacity: _bgOpacity,
+                                    textAlign: _textAlign,
+                                    lineHeight: _lineHeight,
+                                    verticalAlignment: _verticalAlignment,
+                                    zekrColor: _zekrColor,
+                                    zekrFont: _zekrFont,
+                                    categoryColor: _categoryColor,
+                                    categoryFont: _categoryFont,
+                                    categoryStyleId: _categoryStyleId,
+                                    descriptionColor: _descriptionColor,
+                                    descriptionFont: _descriptionFont,
+                                    descriptionStyleId: _descriptionStyleId,
+                                    referenceColor: _referenceColor,
+                                    backgroundImagePath: _backgroundImagePath,
+                                    imageFilter: _imageFilter,
+                                    imageOffset: _imageOffset,
+                                    imageScale: _imageScale,
+                                    imageBlur: _imageBlur,
+                                    imageOverlayOpacity: _imageOverlayOpacity,
+                                    zekrFontSize: _zekrFontSize,
+                                    zekrLineHeight: _zekrLineHeight,
+                                    zekrOffsetX: _zekrOffsetX,
+                                    zekrOffsetY: _zekrOffsetY,
+                                    categoryFontSize: _categoryFontSize,
+                                    categoryLineHeight: _categoryLineHeight,
+                                    categoryOffsetX: _categoryOffsetX,
+                                    categoryOffsetY: _categoryOffsetY,
+                                    descriptionFontSize: _descriptionFontSize,
+                                    descriptionLineHeight: _descriptionLineHeight,
+                                    descriptionOffsetX: _descriptionOffsetX,
+                                    descriptionOffsetY: _descriptionOffsetY,
+                                    referenceFontSize: _referenceFontSize,
+                                    referenceLineHeight: _referenceLineHeight,
+                                    referenceOffsetX: _referenceOffsetX,
+                                    referenceOffsetY: _referenceOffsetY,
                                   ),
-                                ),
-                              Expanded(
-                                flex: 5,
-                                child: GestureDetector(
-                                  behavior: HitTestBehavior.translucent,
-                                  onTap: () => _scrollToField(CustomizationField.zekr),
-                                  child: Container(color: Colors.transparent),
                                 ),
                               ),
-                              if (widget.zekr['description'] != null)
-                                Expanded(
-                                  flex: 3,
-                                  child: GestureDetector(
-                                    behavior: HitTestBehavior.translucent,
-                                    onTap: () => _scrollToField(CustomizationField.description),
-                                    child: Container(color: Colors.transparent),
+                              Positioned.fill(
+                              child: Column(
+                                children: [
+                                  if (_showCategoryHeader)
+                                    Expanded(
+                                      flex: 2,
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.translucent,
+                                        onTap: () => _scrollToField(CustomizationField.category),
+                                        child: Container(color: Colors.transparent),
+                                      ),
+                                    ),
+                                  Expanded(
+                                    flex: 5,
+                                    child: GestureDetector(
+                                      behavior: HitTestBehavior.translucent,
+                                      onTap: () => _scrollToField(CustomizationField.zekr),
+                                      child: Container(color: Colors.transparent),
+                                    ),
                                   ),
-                                ),
-                            ],
-                          ),
+                                  if (widget.zekr['description'] != null)
+                                    Expanded(
+                                      flex: 3,
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.translucent,
+                                        onTap: () => _scrollToField(CustomizationField.description),
+                                        child: Container(color: Colors.transparent),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-            
-            // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
-            // TABS + CONTENT (┘à╪»┘à╪¼┘è┘å)
-            // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
-            Expanded(
-              flex: 6,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
+                Expanded(
+                  flex: 6,
+                  child: Container(
                     decoration: BoxDecoration(
                       color: cardColor,
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
@@ -2082,12 +2075,10 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
                       child: Column(
                         children: [
-                          // ╪º┘ä╪¬╪¿┘ê┘è╪¿╪º╪¬
                           Container(
                             padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
                             child: _buildTabBar(primary, isDark),
                           ),
-                          // ╪º┘ä┘à╪¡╪¬┘ê┘ë
                           Expanded(
                             child: _buildTabContent(primary, subtleColor, textColor, cardColor, isDark),
                           ),
@@ -2095,33 +2086,35 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                       ),
                     ),
                   ),
-                  // Undo/Redo ╪╣╪º╪ª┘à╪⌐ ┘ü┘ê┘é ┘â┘ä ╪¡╪º╪¼╪⌐
-                  Positioned(
-                    top: -23,
-                    right: 16,
-                    child: Row(
-                      children: [
-                        _buildFloatingButton(
-                          icon: Icons.undo_rounded,
-                          onPressed: _undo,
-                          primary: primary,
-                          isDark: isDark,
-                          isEnabled: _undoStack.isNotEmpty,
-                        ),
-                        const Gap(6),
-                        _buildFloatingButton(
-                          icon: Icons.redo_rounded,
-                          onPressed: _redo,
-                          primary: primary,
-                          isDark: isDark,
-                          isEnabled: _redoStack.isNotEmpty,
-                        ),
-                      ],
-                    ),
-                  ),
+                ),
                 ],
               ),
-            ),
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 12,
+                right: 16,
+                child: Material(
+                  color: Colors.transparent,
+                  child: Row(
+                    children: [
+                      _buildFloatingButton(
+                        icon: Icons.undo_rounded,
+                        onPressed: _undo,
+                        primary: primary,
+                        isDark: isDark,
+                        isEnabled: _undoStack.isNotEmpty,
+                      ),
+                      const Gap(8),
+                      _buildFloatingButton(
+                        icon: Icons.redo_rounded,
+                        onPressed: _redo,
+                        primary: primary,
+                        isDark: isDark,
+                        isEnabled: _redoStack.isNotEmpty,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -2634,7 +2627,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
           
           const Gap(16),
           // Font Variants (Weights/Styles)
-          _buildSubTitle("╪º┘ä╪ú╪┤┘â╪º┘ä ╪º┘ä┘à╪¬╪º╪¡╪⌐", primary.withValues(alpha: 0.6)),
+          _buildSubTitle("أنماط الخط", primary.withValues(alpha: 0.6)),
           const Gap(12),
           SizedBox(
             height: 90,
@@ -2643,7 +2636,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
               padding: const EdgeInsets.symmetric(horizontal: 4),
               children: families[currentFamily]!.map((fontName) {
                 final isSelected = currentFont == fontName;
-                const preview = "╪º┘ä┘ü┘Å╪▒┘é╪º┘å";
+                const preview = "الحمد لله";
 
                 return GestureDetector(
                   onTap: () => setState(() {
@@ -2697,10 +2690,10 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
 
           // Size and Height Adjustment
           if (field != CustomizationField.global) ...[
-            _buildSubTitle("╪¬╪¡╪¼┘è┘à ╪º┘ä╪╣┘å╪╡╪▒", primary),
+            _buildSubTitle("مقاس وتباعد", primary),
             const Gap(12),
             _buildAdjustmentSlider(
-              "╪¡╪¼┘à ╪º┘ä╪«╪╖", 
+              "حجم الخط", 
               currentSize ?? (field == CustomizationField.zekr ? 32 : (field == CustomizationField.category ? 24 : 18)),
               (val) => setState(() {
                 if (field == CustomizationField.zekr) _zekrFontSize = val;
@@ -2712,7 +2705,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
             ),
             const Gap(8),
             _buildAdjustmentSlider(
-              "╪º╪▒╪¬┘ü╪º╪╣ ╪º┘ä╪│╪╖╪▒", 
+              "تباعد الأسطر", 
               currentHeight ?? (field == CustomizationField.zekr ? 1.7 : 1.4), 
               (val) => setState(() {
                 if (field == CustomizationField.zekr) _zekrLineHeight = val;
@@ -2731,7 +2724,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                   if (field == CustomizationField.description) { _descriptionFontSize = null; _descriptionLineHeight = null; }
                   if (field == CustomizationField.reference) { _referenceFontSize = null; _referenceLineHeight = null; }
                 }),
-                child: const Text("╪º╪│╪¬╪╣╪º╪»╪⌐ ╪º┘ä╪¡╪¼┘à ╪º┘ä╪º┘ü╪¬╪▒╪º╪╢┘è", style: TextStyle(fontSize: 12)),
+                child: const Text("إعادة الضبط للوضع الافتراضي", style: TextStyle(fontSize: 12)),
               ),
             ),
             const Gap(24),
@@ -2739,7 +2732,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
 
           if (field != CustomizationField.global) ...[
             // Color Selection
-            _buildSubTitle("╪º┘ä┘ä┘ê┘å", primary),
+            _buildSubTitle("اللون", primary),
             const Gap(12),
             SizedBox(
               height: 350,
@@ -2779,7 +2772,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
               Center(
                 child: TextButton.icon(
                   icon: const Icon(Icons.refresh_rounded, size: 18),
-                  label: const Text("╪º╪│╪¬╪▒╪¼╪º╪╣ ╪º┘ä┘ä┘ê┘å ╪º┘ä╪º┘ü╪¬╪▒╪º╪╢┘è"),
+                  label: const Text("إلغاء اللون المخصص"),
                   onPressed: () => setState(() {
                       if (field == CustomizationField.zekr) _zekrColor = null;
                       if (field == CustomizationField.category) _categoryColor = null;
@@ -2810,8 +2803,8 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
 
   Widget _buildStyleSelector(CustomizationField field, Color primary, bool isDark) {
     final styles = field == CustomizationField.category 
-      ? {'classic': '┘â┘ä╪º╪│┘è┘â┘è', 'pill': '╪¿┘è╪╢╪º┘ê┘è', 'modern': '┘à┘ê╪»╪▒┘å'}
-      : {'classic': '┘â┘ä╪º╪│┘è┘â┘è', 'soft_pill': '╪«┘ä┘ü┘è╪⌐ ┘å╪º╪╣┘à╪⌐', 'quote': '╪º┘é╪¬╪¿╪º╪│', 'underline': '╪«╪╖ ╪│┘ü┘ä┘è'};
+      ? {'classic': 'كلاسيكي', 'pill': 'كبسولة', 'modern': 'مودرن'}
+      : {'classic': 'كلاسيكي', 'soft_pill': 'كبسولة ناعمة', 'quote': 'اقتباس', 'underline': 'خط سفلي'};
 
     String currentId = field == CustomizationField.category ? _categoryStyleId : _descriptionStyleId;
 
@@ -2908,7 +2901,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("╪¬╪╣╪»┘è┘ä ┘à┘â╪º┘å ╪º┘ä╪╡┘ê╪▒╪⌐ / ╪▓┘ê┘à", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    const Text("تعديل مكان الصورة / زوم", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                     IconButton(icon: const Icon(Icons.check_circle, color: Colors.greenAccent, size: 30), onPressed: () => Navigator.pop(context)),
                   ],
                 ),
@@ -2942,7 +2935,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
               const Padding(
                 padding: EdgeInsets.all(30),
                 child: Text(
-                  "╪º╪│╪¡╪¿ ╪º┘ä╪╡┘ê╪▒╪⌐ ┘ä╪¬╪¡╪▒┘è┘â┘ç╪º ┘ê╪º╪│╪¬╪«╪»┘à ╪Ñ╪╡╪¿╪╣┘è┘å ┘ä┘ä╪¬┘â╪¿┘è╪▒ ┘ê╪º┘ä╪¬╪╡╪║┘è╪▒",
+                  "كبر وصغر واسحب الصورة لمكان مناسب. التعديل بيتحفظ تلقائيًا بعد ما تسيب الزوم.",
                   style: TextStyle(color: Colors.white70, fontSize: 14),
                   textAlign: TextAlign.center,
                 ),
