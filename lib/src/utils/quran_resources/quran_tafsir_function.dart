@@ -349,6 +349,24 @@ class QuranTafsirFunction {
     return toReturn;
   }
 
+  static Future<List<TafsirOfAyah>> getDownloadedTafsirs(String ayahKey) async {
+    final List<TafsirOfAyah> toReturn = [];
+
+    List<TafsirBookModel> targetBooks = await getTafsirSelections() ?? [];
+    if (targetBooks.isEmpty) {
+      targetBooks = getDownloadedTafsirBooks();
+    }
+
+    for (TafsirBookModel bookModel in targetBooks) {
+       final result = await getTafsirForBook(bookModel, ayahKey);
+       if (result != null) {
+         toReturn.add(result);
+       }
+    }
+
+    return toReturn;
+  }
+
   static Future<TafsirOfAyah?> getTafsirForBook(
     TafsirBookModel tafsirBook,
     String ayahKey,

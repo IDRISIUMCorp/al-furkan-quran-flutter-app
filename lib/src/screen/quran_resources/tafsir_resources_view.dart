@@ -2,7 +2,7 @@ import "package:al_quran_v3/src/resources/quran_resources/tafsir_info_with_score
 import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
 import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
 import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
-import "package:al_quran_v3/src/theme/controller/theme_state.dart";
+import "package:al_quran_v3/src/theme/controller/theme_state.dart" as theme;
 import "package:al_quran_v3/src/screen/setup/cubit/resources_progress_cubit_cubit.dart";
 import "package:al_quran_v3/src/screen/setup/cubit/resources_progress_cubit_state.dart";
 import "package:flutter/material.dart";
@@ -20,39 +20,63 @@ class TafsirResourcesView extends StatefulWidget {
 class _TafsirResourcesViewState extends State<TafsirResourcesView> {
   final TextEditingController _searchController = TextEditingController();
   List<TafsirBookModel> _allBooks = [];
-  List<TafsirBookModel> _filteredBooks = [];
+  Map<String, List<TafsirBookModel>> _groupedBooks = {};
+  List<TafsirBookModel> _selectedBooks = [];
+  String? _animatingBook;
 
   @override
   void initState() {
     super.initState();
-    _loadBooks();
+    _loadData();
     _searchController.addListener(_filterBooks);
   }
 
-  void _loadBooks() {
+  Future<void> _loadData() async {
+    final selections = await QuranTafsirFunction.getTafsirSelections() ?? [];
     _allBooks = [];
     tafsirInformationWithScore.forEach((lang, books) {
       for (var bookMap in books) {
         _allBooks.add(TafsirBookModel.fromMap(bookMap));
       }
     });
-    // Sort: Downloaded first
-    _allBooks.sort((a, b) {
-      final aDownloaded = QuranTafsirFunction.isAlreadyDownloaded(a) == true;
-      final bDownloaded = QuranTafsirFunction.isAlreadyDownloaded(b) == true;
-      if (aDownloaded != bDownloaded) return aDownloaded ? -1 : 1;
-      return a.name.compareTo(b.name);
+
+    setState(() {
+      _selectedBooks = selections;
+      _filterBooks();
     });
-    _filteredBooks = List.from(_allBooks);
   }
 
   void _filterBooks() {
     final query = _searchController.text.toLowerCase();
+    final filtered = _allBooks.where((book) {
+      return book.name.toLowerCase().contains(query) || 
+             book.language.toLowerCase().contains(query);
+    }).toList();
+
+    // Group by language
+    _groupedBooks = {};
+    for (var book in filtered) {
+      final lang = book.language;
+      if (!_groupedBooks.containsKey(lang)) {
+        _groupedBooks[lang] = [];
+      }
+      _groupedBooks[lang]!.add(book);
+    }
+    
+    // Sort languages
+    final sortedKeys = _groupedBooks.keys.toList()..sort((a, b) {
+      if (a == "Arabic") return -1;
+      if (b == "Arabic") return 1;
+      return a.compareTo(b);
+    });
+    
+    final newGrouped = <String, List<TafsirBookModel>>{};
+    for (var key in sortedKeys) {
+      newGrouped[key] = _groupedBooks[key]!;
+    }
+    
     setState(() {
-      _filteredBooks = _allBooks.where((book) {
-        return book.name.toLowerCase().contains(query) || 
-               book.language.toLowerCase().contains(query);
-      }).toList();
+      _groupedBooks = newGrouped;
     });
   }
 
@@ -88,82 +112,127 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
           ),
         ),
         Expanded(
-          child: ListView.builder(
+          child: ListView(
             padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 80.h),
             physics: const BouncingScrollPhysics(),
-            itemCount: _filteredBooks.length,
-            itemBuilder: (context, index) {
-              return _buildBookCard(_filteredBooks[index], themeState, isDark);
-            },
+            children: _groupedBooks.entries.map((entry) {
+              return _buildCategorySection(entry.key, entry.value, themeState, isDark);
+            }).toList(),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildBookCard(TafsirBookModel book, ThemeState themeState, bool isDark) {
-    final isDownloaded = QuranTafsirFunction.isAlreadyDownloaded(book) == true;
-
-    return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDownloaded ? themeState.primary.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.03),
+  Widget _buildCategorySection(String language, List<TafsirBookModel> books, theme.ThemeState themeState, bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
+          child: Text(
+            language,
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w900,
+              color: themeState.primary,
+              letterSpacing: 0.5,
+            ),
+          ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+        ...books.map((book) => _buildBookCard(book, themeState, isDark)).toList(),
+      ],
+    );
+  }
+
+  Widget _buildBookCard(TafsirBookModel book, theme.ThemeState themeState, bool isDark) {
+    final isDownloaded = QuranTafsirFunction.isAlreadyDownloaded(book) == true;
+    final isSelected = _selectedBooks.any((b) => b.name == book.name);
+    final isAnimating = _animatingBook == book.name;
+
+    return AnimatedScale(
+      scale: isAnimating ? 0.98 : 1.0,
+      duration: const Duration(milliseconds: 200),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 12.h),
+        padding: EdgeInsets.all(14.w),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? themeState.primary.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.03),
+            width: isSelected ? 1.5 : 1,
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      book.name,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w800,
-                        color: isDark ? Colors.white : Colors.black87,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                if (isDownloaded)
+                  Checkbox(
+                    value: isSelected,
+                    activeColor: themeState.primary,
+                    onChanged: (val) async {
+                      if (val == true) {
+                        await QuranTafsirFunction.setTafsirSelection(book);
+                      } else {
+                        await QuranTafsirFunction.removeTafsirSelection(book);
+                      }
+                      _loadData();
+                    },
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                  ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        book.name,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w800,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
                       ),
-                    ),
-                    Text(
-                      book.language,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: isDark ? Colors.white38 : Colors.black38,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                      if (isSelected) 
+                        Padding(
+                          padding: EdgeInsets.only(top: 2.h),
+                          child: Text(
+                            "مُختار للعرض",
+                            style: TextStyle(
+                              fontSize: 10.sp,
+                              color: themeState.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-              if (isDownloaded)
-                IconButton(
-                  onPressed: () => _confirmDelete(book),
-                  icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
-                )
-              else
-                _buildDownloadButton(book, themeState, isDark),
-            ],
-          ),
-          _buildProgressIndicator(book, isDark, themeState),
-        ],
+                if (isDownloaded)
+                  IconButton(
+                    onPressed: () => _confirmDelete(book),
+                    icon: const Icon(Icons.delete_sweep_rounded, color: Colors.redAccent, size: 22),
+                  )
+                else
+                  _buildDownloadButton(book, themeState, isDark),
+              ],
+            ),
+            _buildProgressIndicator(book, isDark, themeState),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildDownloadButton(TafsirBookModel book, ThemeState themeState, bool isDark) {
+  Widget _buildDownloadButton(TafsirBookModel book, theme.ThemeState themeState, bool isDark) {
     return BlocBuilder<ResourcesProgressCubit, ResourcesProgressCubitState>(
       builder: (context, state) {
         final onProcess = (state.onProcess ?? false) && (state.processName == book.name);
@@ -171,27 +240,32 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
 
         return ElevatedButton(
           onPressed: () async {
+            setState(() => _animatingBook = book.name);
+            await Future.delayed(const Duration(milliseconds: 200));
+            setState(() => _animatingBook = null);
+
             context.read<ResourcesProgressCubit>().onProcess();
             await QuranTafsirFunction.downloadResources(
               context: context,
               tafsirBook: book,
             );
-            setState(() {});
+            _loadData();
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: themeState.primary.withValues(alpha: 0.1),
             foregroundColor: themeState.primary,
             elevation: 0,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            padding: EdgeInsets.symmetric(horizontal: 14.w),
+            minimumSize: Size(60.w, 32.h),
           ),
-          child: const Text("تحميل"),
+          child: Text("تحميل", style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w800)),
         );
       },
     );
   }
 
-  Widget _buildProgressIndicator(TafsirBookModel book, bool isDark, ThemeState themeState) {
+  Widget _buildProgressIndicator(TafsirBookModel book, bool isDark, theme.ThemeState themeState) {
     return BlocBuilder<ResourcesProgressCubit, ResourcesProgressCubitState>(
       builder: (context, state) {
         final onProcess = (state.onProcess ?? false) && (state.processName == book.name);
@@ -235,7 +309,7 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
             onPressed: () async {
               Navigator.pop(ctx);
               await QuranTafsirFunction.removeFromListAlreadyDownloaded(book);
-              setState(() {});
+              _loadData();
             },
             child: const Text("حذف", style: TextStyle(color: Colors.red)),
           ),

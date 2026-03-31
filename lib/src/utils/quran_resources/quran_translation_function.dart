@@ -428,9 +428,12 @@ class QuranTranslationFunction {
   static Future<List<TranslationOfAyah>> getDownloadedTranslations(String ayahKey) async {
     final List<TranslationOfAyah> toReturn = [];
 
-    List<TranslationBookModel> downloadedBooks = getDownloadedTranslationBooks();
+    List<TranslationBookModel> targetBooks = await getTranslationSelections() ?? [];
+    if (targetBooks.isEmpty) {
+      targetBooks = getDownloadedTranslationBooks();
+    }
 
-    for (TranslationBookModel bookModel in downloadedBooks) {
+    for (TranslationBookModel bookModel in targetBooks) {
       String boxName = getTranslationBoxName(translationBook: bookModel);
       LazyBox? translationBox;
       if (!Hive.isBoxOpen(boxName)) {

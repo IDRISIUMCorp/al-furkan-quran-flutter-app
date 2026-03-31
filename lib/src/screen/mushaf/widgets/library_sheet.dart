@@ -1,4 +1,3 @@
-import 'package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart';
 import 'package:al_quran_v3/src/resources/quran_resources/quran_ayah_count.dart';
 import 'package:al_quran_v3/src/resources/quran_resources/meaning_of_surah.dart';
 import 'package:al_quran_v3/src/screen/quran_resources/quran_resources_view.dart';
@@ -18,10 +17,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:qcf_quran/qcf_quran.dart' as qcf hide getPageNumber;
-import 'package:share_plus/share_plus.dart';
 
 class WahyLibrarySheet extends StatefulWidget {
   final int surahNumber;
@@ -162,7 +161,7 @@ class _WahyLibrarySheetState extends State<WahyLibrarySheet>
               padding: EdgeInsets.zero,
               physics: const BouncingScrollPhysics(),
               children: [
-                SizedBox(height: 12.h),
+                SizedBox(height: 4.h),
                 _buildHorizontalAyahSlider(words, pageFont, isDark, themeState),
                 if (_selectedWordNumber != null) ...[
                   _buildMinimalistTabBar(isDark, themeState),
@@ -177,19 +176,19 @@ class _WahyLibrarySheetState extends State<WahyLibrarySheet>
                   ),
                 ] else ...[
                   Padding(
-                    padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 6.h),
+                    padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 4.h),
                     child: Text(
-                      "اختار كلمة عشان تظهر المكتبة",
+                      "اختار كلمة تظهرلك المكتبة",
                       textAlign: TextAlign.right,
                       style: TextStyle(
-                        fontSize: 13.sp,
+                        fontSize: 12.sp,
                         fontWeight: FontWeight.w600,
                         color: isDark ? Colors.white54 : Colors.black45,
                       ),
                     ),
                   ),
                 ],
-                const Divider(indent: 20, endIndent: 20, height: 1),
+                const Divider(indent: 30, endIndent: 30, thickness: 0.3, height: 1),
                 _buildTafsirSection(
                   ayahKey: ayahKey,
                   surahNumber: widget.surahNumber,
@@ -252,69 +251,79 @@ class _WahyLibrarySheetState extends State<WahyLibrarySheet>
 
   Widget _buildHorizontalAyahSlider(
       List<String> words, String pageFont, bool isDark, theme.ThemeState themeState) {
-    // Add Ayah Number as a suffix word (non-selectable)
+    // Standard RTL ordering: [W1, W2, ..., WN]
+    // Ayah Number should be at the end (left side in RTL view)
     final ayahNumberWord = qcf.getVerseNumberQCF(widget.surahNumber, _currentVerse);
-    final allWords = [...words, ayahNumberWord];
 
     return Container(
-      height: 76.h,
-      margin: EdgeInsets.symmetric(horizontal: 16.w),
+      height: 72.h,
+      margin: EdgeInsets.symmetric(horizontal: 14.w),
       decoration: BoxDecoration(
         color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.02),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
       ),
-      alignment: Alignment.center, // Horizontal centering for short ayahs
-      child: ListView.separated(
-        padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        shrinkWrap: true, // Needed for alignment: center to work
-        reverse: true, // RTL
+        reverse: true, // Start from the right (item 0 is right)
         physics: const BouncingScrollPhysics(),
-        itemCount: allWords.length,
-        separatorBuilder: (_, __) => SizedBox(width: 6.w),
-        itemBuilder: (context, i) {
-          final isNumber = i == allWords.length - 1;
-          final wordNumber = i + 1;
-          final isSelected = _selectedWordNumber == wordNumber;
-          
-          return Center(
-            child: GestureDetector(
-              onTap: isNumber ? null : () {
-                setState(() {
-                  _selectedWordNumber = isSelected ? null : wordNumber;
-                });
-              },
-              child: AnimatedContainer(
-                duration: 250.ms,
-                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? themeState.primary.withValues(alpha: 0.18)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isSelected
-                        ? themeState.primary.withValues(alpha: 0.5)
-                        : Colors.transparent,
-                    width: 1.5,
-                  ),
-                ),
-                child: Text(
-                  allWords[i],
-                  style: TextStyle(
-                    fontFamily: pageFont,
-                    package: 'qcf_quran',
-                    fontSize: 24.sp,
-                    height: 1.2,
-                    color: isNumber 
-                        ? (isDark ? Colors.white38 : Colors.black38) 
-                        : (isDark ? Colors.white : Colors.black87),
-                  ),
-                ),
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Words from 1 to N
+            for (int i = 0; i < words.length; i++)
+              _buildWordItem(i + 1, words[i], pageFont, isDark, themeState),
+            
+            SizedBox(width: 8.w),
+            // Ayah Number (End of Ayah)
+            Text(
+              ayahNumberWord,
+              style: TextStyle(
+                fontFamily: pageFont,
+                package: 'qcf_quran',
+                fontSize: 22.sp,
+                color: isDark ? Colors.white38 : Colors.black38,
               ),
             ),
-          );
-        },
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWordItem(int wordNumber, String word, String font, bool isDark, theme.ThemeState themeState) {
+    final isSelected = _selectedWordNumber == wordNumber;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedWordNumber = isSelected ? null : wordNumber;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: EdgeInsets.symmetric(horizontal: 2.w),
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+        decoration: BoxDecoration(
+          color: isSelected ? themeState.primary.withValues(alpha: 0.2) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? themeState.primary.withValues(alpha: 0.4) : Colors.transparent,
+            width: 1,
+          ),
+        ),
+        child: Text(
+          word,
+          style: TextStyle(
+            fontFamily: font,
+            package: 'qcf_quran',
+            fontSize: 24.sp,
+            height: 1.1,
+            color: isSelected 
+                ? themeState.primary 
+                : (isDark ? Colors.white : Colors.black87),
+          ),
+        ),
       ),
     );
   }
@@ -322,10 +331,10 @@ class _WahyLibrarySheetState extends State<WahyLibrarySheet>
   Widget _buildMinimalistTabBar(bool isDark, theme.ThemeState themeState) {
     return Container(
       margin: EdgeInsets.fromLTRB(16.w, 4.h, 16.w, 6.h),
-      height: 42.h,
+      height: 38.h,
       decoration: BoxDecoration(
         color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.03),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: TabBar(
         controller: _tabController,
@@ -605,32 +614,17 @@ class _WahyLibrarySheetState extends State<WahyLibrarySheet>
     required Color cardColor,
     required theme.ThemeState themeState,
   }) {
-    return FutureBuilder<List<TafsirBookModel>?>(
-      future: QuranTafsirFunction.getTafsirSelections(),
-      builder: (context, booksSnap) {
-        if (booksSnap.connectionState != ConnectionState.done) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final rawBooks = booksSnap.data ?? [];
-        // Deduplicate Saadi and others
-        final seen = <String>{};
-        final books = <TafsirBookModel>[];
-        for (final b in rawBooks) {
-          final key = (b.fullPath.isNotEmpty ? b.fullPath : b.name).trim();
-          if (seen.add(key)) books.add(b);
-        }
-
-        if (books.isEmpty) {
+    return FutureBuilder<List<TafsirOfAyah>>(
+      future: QuranTafsirFunction.getDownloadedTafsirs(ayahKey),
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
           return Padding(
-            padding: EdgeInsets.all(20.w),
-            child: Text(
-              "مفيش تفسير مختار. اضغط تحرير واختار التفاسير.",
-              textAlign: TextAlign.center,
-              style: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
-            ),
+            padding: EdgeInsets.symmetric(vertical: 20.h),
+            child: const Center(child: CircularProgressIndicator()),
           );
         }
+        final list = snap.data ?? [];
+        if (list.isEmpty) return _buildEmptyState(isDark, "لم يتم تحميل أي تفاسير بعد");
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -659,16 +653,16 @@ class _WahyLibrarySheetState extends State<WahyLibrarySheet>
                 ],
               ),
             ),
-            ...books.map((book) => _buildTafsirCard(book, ayahKey, surahNumber, isDark, cardColor)),
+            ...list.map((tafsir) => _buildTafsirCard(tafsir, isDark, cardColor, themeState)),
           ],
         );
       },
     );
   }
 
-  Widget _buildTafsirCard(TafsirBookModel book, String ayahKey, int surahNumber,
-      bool isDark, Color cardColor) {
-    final tafsirFuture = QuranTafsirFunction.getResolvedTafsirTextForBook(book, ayahKey);
+  Widget _buildTafsirCard(TafsirOfAyah tafsir, bool isDark, Color cardColor, theme.ThemeState themeState) {
+    final bookName = tafsir.bookInfo.name;
+    final text = _stripHtml(tafsir.tafsir['t']?.toString() ?? "لا يوجد تفسير متاح.");
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
@@ -681,32 +675,34 @@ class _WahyLibrarySheetState extends State<WahyLibrarySheet>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            "${book.name}",
-            style: TextStyle(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w800,
-              color: isDark ? Colors.white54 : Colors.black45,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: themeState.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  bookName,
+                  style: TextStyle(
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.w700,
+                    color: themeState.primary,
+                  ),
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 10.h),
-          FutureBuilder<String?>(
-            future: tafsirFuture,
-            builder: (context, snap) {
-              if (snap.connectionState != ConnectionState.done) {
-                return const Center(child: CircularProgressIndicator(strokeWidth: 2));
-              }
-              final text = _stripHtml(snap.data ?? "لا يوجد تفسير متاح.");
-              return Text(
-                text,
-                textAlign: TextAlign.right,
-                style: TextStyle(
-                  fontSize: 15.sp,
-                  height: 1.7,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
-              );
-            },
+          Text(
+            text,
+            textAlign: TextAlign.right,
+            style: TextStyle(
+              fontSize: 14.sp,
+              height: 1.7,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
           ),
         ],
       ),
