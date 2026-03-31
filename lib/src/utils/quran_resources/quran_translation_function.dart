@@ -425,6 +425,34 @@ class QuranTranslationFunction {
     return toReturn;
   }
 
+  static Future<List<TranslationOfAyah>> getDownloadedTranslations(String ayahKey) async {
+    final List<TranslationOfAyah> toReturn = [];
+
+    List<TranslationBookModel> downloadedBooks = getDownloadedTranslationBooks();
+
+    for (TranslationBookModel bookModel in downloadedBooks) {
+      String boxName = getTranslationBoxName(translationBook: bookModel);
+      LazyBox? translationBox;
+      if (!Hive.isBoxOpen(boxName)) {
+        translationBox = await Hive.openLazyBox(boxName);
+      } else {
+        translationBox = Hive.lazyBox(boxName);
+      }
+      
+      final data = await translationBox.get(ayahKey);
+      if (data != null) {
+        toReturn.add(
+          TranslationOfAyah(
+            translation: Map<String, dynamic>.from(data),
+            bookInfo: bookModel,
+          ),
+        );
+      }
+    }
+
+    return toReturn;
+  }
+
   static Future<void> close() async {
     cacheOfAyahKeys.clear();
     List<TranslationBookModel> selectedBooks = getDownloadedTranslationBooks();

@@ -324,6 +324,30 @@ class WordInfoRepository {
     _cacheByKind[kind]?.clear();
   }
 
+  /// Delete a downloaded kind
+  Future<void> deleteKind(WordInfoKind kind) async {
+    try {
+      final dir = await _getKindDir(kind);
+      if (await dir.exists()) {
+        await dir.delete(recursive: true);
+      }
+      
+      if (!Hive.isBoxOpen('user')) await Hive.openBox('user');
+      final box = Hive.box('user');
+      final set = _downloadedKinds();
+      set.remove(kind.name);
+      await box.put(_downloadedKindsKey, set.toList());
+      
+      clearCache(kind);
+      _filePathBySurahByKind[kind]?.clear();
+      _indexReadyByKind[kind] = false;
+      
+      log("Deleted WordInfo kind: ${kind.name}");
+    } catch (e) {
+      log("Error deleting WordInfo kind ${kind.name}: $e");
+    }
+  }
+
   /// Clear all caches
   void clearAllCaches() {
     for (final k in WordInfoKind.values) {
