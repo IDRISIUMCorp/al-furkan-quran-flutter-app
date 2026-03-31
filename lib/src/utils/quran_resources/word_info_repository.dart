@@ -73,6 +73,10 @@ class WordInfoRepository {
     for (final k in WordInfoKind.values) k: <int, QiraatSurahWords>{},
   };
 
+  final Map<WordInfoKind, int?> _remoteZipSizeBytesCache = {
+    for (final k in WordInfoKind.values) k: null,
+  };
+
   /// Currently loading surahs
   final Map<WordInfoKind, Set<int>> _loadingSurahsByKind = {
     for (final k in WordInfoKind.values) k: <int>{},
@@ -145,6 +149,25 @@ class WordInfoRepository {
     } catch (e) {
       log('Error downloading ${kind.name}: $e', name: 'WordInfoRepository');
       rethrow;
+    }
+  }
+
+  Future<int?> getRemoteZipSizeBytes(WordInfoKind kind) async {
+    final cached = _remoteZipSizeBytesCache[kind];
+    if (cached != null) return cached;
+
+    final config = _configs[kind]!;
+    final url = config.zipUrls.first;
+    try {
+      final dio = Dio();
+      final response = await dio.head<dynamic>(url);
+      final raw = response.headers.value('content-length');
+      final bytes = raw == null ? null : int.tryParse(raw);
+      _remoteZipSizeBytesCache[kind] = bytes;
+      return bytes;
+    } catch (_) {
+      _remoteZipSizeBytesCache[kind] = null;
+      return null;
     }
   }
 

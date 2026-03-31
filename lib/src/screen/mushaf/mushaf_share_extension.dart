@@ -839,6 +839,7 @@ extension _MushafShareExtension on _MushafViewState {
     final total = getVerseCount(surahNumber);
 
     int currentVerse = verseNumber;
+    int? selectedWordNumber;
 
     await showModalBottomSheet(
       context: context,
@@ -870,6 +871,7 @@ extension _MushafShareExtension on _MushafViewState {
               currentVerse,
               verseEndSymbol: false,
             );
+            final List<String> ayahWords = _splitAyahWordsForChips(qcfAyah);
 
             return DefaultTabController(
               length: 4,
@@ -939,54 +941,137 @@ extension _MushafShareExtension on _MushafViewState {
                               ? Colors.white.withValues(alpha: 0.06)
                               : Colors.black.withValues(alpha: 0.06),
                         ),
-                        // Condensed Ayah display
+                        // Condensed Ayah display (horizontal scroll)
                         Container(
-                          margin: const EdgeInsets.fromLTRB(10, 12, 10, 8),
-                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.fromLTRB(10, 12, 10, 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                           decoration: BoxDecoration(
                             color: isDark
                                 ? const Color(0xFF1E1E1E)
                                 : const Color(0xFFF1E9DD),
                             borderRadius: BorderRadius.circular(14),
                           ),
-                          child: Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(text: qcfAyah),
-                                const TextSpan(text: "\u200A"),
-                                TextSpan(
-                                  text: getVerseNumberQCF(surahNumber, currentVerse),
-                                  style: TextStyle(
-                                    fontFamily: ayahPageFont,
-                                    package: "qcf_quran",
-                                    height: 1,
-                                    color: isDark
-                                        ? Colors.white.withValues(alpha: 0.70)
-                                        : const Color(0xFF1B1B1B).withValues(alpha: 0.70),
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            reverse: true,
+                            physics: const BouncingScrollPhysics(),
+                            child: Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(text: qcfAyah),
+                                  const TextSpan(text: "\u200A"),
+                                  TextSpan(
+                                    text: getVerseNumberQCF(surahNumber, currentVerse),
+                                    style: TextStyle(
+                                      fontFamily: ayahPageFont,
+                                      package: "qcf_quran",
+                                      height: 1,
+                                      color: isDark
+                                          ? Colors.white.withValues(alpha: 0.70)
+                                          : const Color(0xFF1B1B1B)
+                                              .withValues(alpha: 0.70),
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            locale: const Locale("ar"),
-                            textScaler: const TextScaler.linear(1),
-                            textAlign: TextAlign.center,
-                            textDirection: TextDirection.rtl,
-                            strutStyle: StrutStyle(
-                              fontFamily: ayahPageFont,
-                              package: "qcf_quran",
-                              fontSize: 14,
-                              height: 1.70,
-                              forceStrutHeight: true,
-                            ),
-                            style: TextStyle(
-                              fontFamily: ayahPageFont,
-                              package: "qcf_quran",
-                              fontSize: 14,
-                              height: 1.70,
-                              color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                                ],
+                              ),
+                              locale: const Locale("ar"),
+                              textScaler: const TextScaler.linear(1),
+                              textAlign: TextAlign.center,
+                              textDirection: TextDirection.rtl,
+                              strutStyle: StrutStyle(
+                                fontFamily: ayahPageFont,
+                                package: "qcf_quran",
+                                fontSize: 14,
+                                height: 1.70,
+                                forceStrutHeight: true,
+                              ),
+                              style: TextStyle(
+                                fontFamily: ayahPageFont,
+                                package: "qcf_quran",
+                                fontSize: 14,
+                                height: 1.70,
+                                color:
+                                    isDark ? Colors.white : const Color(0xFF1B1B1B),
+                              ),
                             ),
                           ),
                         ),
+
+                        // Word chips selector (shows tabs only after selection)
+                        SizedBox(
+                          height: 44,
+                          child: ListView.separated(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            scrollDirection: Axis.horizontal,
+                            reverse: true,
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: ayahWords.length,
+                            separatorBuilder: (_, __) => const SizedBox(width: 8),
+                            itemBuilder: (context, i) {
+                              final wordNumber = i + 1;
+                              final isSelected = selectedWordNumber == wordNumber;
+                              return InkWell(
+                                onTap: () {
+                                  setSheetState(() {
+                                    selectedWordNumber = isSelected ? null : wordNumber;
+                                  });
+                                },
+                                borderRadius: BorderRadius.circular(10),
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? themeState.primary.withValues(alpha: 0.14)
+                                        : (isDark
+                                            ? const Color(0xFF1E1E1E)
+                                            : const Color(0xFFF1E9DD)),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? themeState.primary.withValues(alpha: 0.40)
+                                          : Colors.black.withValues(alpha: 0.06),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    ayahWords[i],
+                                    textDirection: TextDirection.rtl,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w800,
+                                      color: isDark
+                                          ? Colors.white
+                                          : const Color(0xFF1B1B1B),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+
+                        if (selectedWordNumber == null)
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 8, 12, 2),
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                "اختار كلمة عشان تظهر المكتبة",
+                                textDirection: TextDirection.rtl,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: isDark
+                                      ? Colors.white.withValues(alpha: 0.55)
+                                      : const Color(0xFF1B1B1B)
+                                          .withValues(alpha: 0.55),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                        if (selectedWordNumber != null) ...[
                         // TabBar (بدون التفسير)
                         Container(
                           margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -994,7 +1079,7 @@ extension _MushafShareExtension on _MushafViewState {
                             color: isDark
                                 ? const Color(0xFF2A2A2A)
                                 : const Color(0xFFEFE3D2),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(14),
                           ),
                           child: TabBar(
                             labelColor: isDark ? Colors.white : const Color(0xFF1B1B1B),
@@ -1002,7 +1087,7 @@ extension _MushafShareExtension on _MushafViewState {
                                 ? Colors.white.withValues(alpha: 0.50)
                                 : const Color(0xFF1B1B1B).withValues(alpha: 0.50),
                             labelStyle: const TextStyle(
-                              fontSize: 13,
+                              fontSize: 12,
                               fontWeight: FontWeight.w700,
                             ),
                             indicator: BoxDecoration(
@@ -1014,6 +1099,9 @@ extension _MushafShareExtension on _MushafViewState {
                             indicatorSize: TabBarIndicatorSize.tab,
                             indicatorPadding: const EdgeInsets.all(4),
                             dividerColor: Colors.transparent,
+                            overlayColor: MaterialStatePropertyAll(
+                              Colors.black.withValues(alpha: 0.03),
+                            ),
                             tabs: const [
                               Tab(text: "ترجمة"),
                               Tab(text: "إعراب"),
@@ -1043,21 +1131,33 @@ extension _MushafShareExtension on _MushafViewState {
                                       ),
                                       // I'rab Tab
                                       _IrabTabContent(
-                                        ayahKey: ayahKey,
+                                        ref: WordRef(
+                                          surahNumber: surahNumber,
+                                          ayahNumber: currentVerse,
+                                          wordNumber: selectedWordNumber!,
+                                        ),
                                         card: card,
                                         isDark: isDark,
                                         themeState: themeState,
                                       ),
                                       // Sarf Tab
                                       _SarfTabContent(
-                                        ayahKey: ayahKey,
+                                        ref: WordRef(
+                                          surahNumber: surahNumber,
+                                          ayahNumber: currentVerse,
+                                          wordNumber: selectedWordNumber!,
+                                        ),
                                         card: card,
                                         isDark: isDark,
                                         themeState: themeState,
                                       ),
                                       // Qiraat Tab
                                       _QiraatTabContent(
-                                        ayahKey: ayahKey,
+                                        ref: WordRef(
+                                          surahNumber: surahNumber,
+                                          ayahNumber: currentVerse,
+                                          wordNumber: selectedWordNumber!,
+                                        ),
                                         card: card,
                                         isDark: isDark,
                                         themeState: themeState,
@@ -1113,6 +1213,7 @@ extension _MushafShareExtension on _MushafViewState {
                             ),
                           ),
                         ),
+                        ],
                         // Navigation arrows
                         Container(
                           height: 1,
@@ -1124,7 +1225,10 @@ extension _MushafShareExtension on _MushafViewState {
                             children: [
                               IconButton(
                                 onPressed: currentVerse > 1
-                                    ? () => setSheetState(() => currentVerse -= 1)
+                                    ? () => setSheetState(() {
+                                          currentVerse -= 1;
+                                          selectedWordNumber = null;
+                                        })
                                     : null,
                                 icon: const Icon(Icons.arrow_back_rounded),
                                 color: themeState.primary,
@@ -1143,7 +1247,10 @@ extension _MushafShareExtension on _MushafViewState {
                               ),
                               IconButton(
                                 onPressed: currentVerse < total
-                                    ? () => setSheetState(() => currentVerse += 1)
+                                    ? () => setSheetState(() {
+                                          currentVerse += 1;
+                                          selectedWordNumber = null;
+                                        })
                                     : null,
                                 icon: const Icon(Icons.arrow_forward_rounded),
                                 color: themeState.primary,
@@ -1188,9 +1295,20 @@ extension _MushafShareExtension on _MushafViewState {
     return FutureBuilder<List<TafsirBookModel>?>(
       future: QuranTafsirFunction.getTafsirSelections(),
       builder: (context, booksSnap) {
-        final books = booksSnap.connectionState == ConnectionState.done
+        final rawBooks = booksSnap.connectionState == ConnectionState.done
             ? (booksSnap.data ?? const <TafsirBookModel>[])
             : (cachedSelectedBooks ?? const <TafsirBookModel>[]);
+
+        // Dedupe (fix duplicated Saadi وغيره)
+        final seenKeys = <String>{};
+        final books = <TafsirBookModel>[];
+        for (final b in rawBooks) {
+          final key = (b.fullPath.isNotEmpty ? b.fullPath : b.name).trim();
+          if (key.isEmpty) continue;
+          if (seenKeys.add(key)) {
+            books.add(b);
+          }
+        }
 
         if (booksSnap.connectionState == ConnectionState.done && booksSnap.data != null) {
           cachedSelectedBooks = booksSnap.data;
@@ -1440,15 +1558,11 @@ extension _MushafShareExtension on _MushafViewState {
 
   /// I'rab Tab Content Widget - Updated
   Widget _IrabTabContent({
-    required String ayahKey,
+    required WordRef ref,
     required Color card,
     required bool isDark,
     required ThemeState themeState,
   }) {
-    final parts = ayahKey.split(':');
-    final surahNum = int.tryParse(parts[0]) ?? 1;
-    final ayahNum = int.tryParse(parts[1]) ?? 1;
-
     return FutureBuilder<bool>(
       future: Future.value(_wordInfoRepo.isKindDownloaded(WordInfoKind.eerab)),
       builder: (context, downloadSnap) {
@@ -1466,19 +1580,15 @@ extension _MushafShareExtension on _MushafViewState {
           );
         }
 
-        return FutureBuilder<QiraatAyahWords?>(
-          future: _wordInfoRepo.getAyahWords(
-            kind: WordInfoKind.eerab,
-            surahNumber: surahNum,
-            ayahNumber: ayahNum,
-          ),
+        return FutureBuilder<QiraatWordInfo?>(
+          future: _wordInfoRepo.getWordInfo(kind: WordInfoKind.eerab, ref: ref),
           builder: (context, snap) {
             if (snap.connectionState != ConnectionState.done) {
               return const Center(child: CircularProgressIndicator());
             }
 
-            final ayahWords = snap.data;
-            if (ayahWords == null || ayahWords.words.isEmpty) {
+            final word = snap.data;
+            if (word == null || word.content.trim().isEmpty) {
               return _buildEmptyState(
                 card: card,
                 isDark: isDark,
@@ -1487,12 +1597,12 @@ extension _MushafShareExtension on _MushafViewState {
               );
             }
 
-            return _buildWordsInfoList(
+            return _buildWordInfoCard(
               card: card,
               isDark: isDark,
               themeState: themeState,
-              words: ayahWords.words,
-              title: "التحليل الإعرابي",
+              word: word,
+              title: "الإعراب",
             );
           },
         );
@@ -1502,15 +1612,11 @@ extension _MushafShareExtension on _MushafViewState {
 
   /// Qiraat Tab Content Widget
   Widget _QiraatTabContent({
-    required String ayahKey,
+    required WordRef ref,
     required Color card,
     required bool isDark,
     required ThemeState themeState,
   }) {
-    final parts = ayahKey.split(':');
-    final surahNum = int.tryParse(parts[0]) ?? 1;
-    final ayahNum = int.tryParse(parts[1]) ?? 1;
-
     return FutureBuilder<bool>(
       future: Future.value(_wordInfoRepo.isKindDownloaded(WordInfoKind.recitations)),
       builder: (context, downloadSnap) {
@@ -1528,19 +1634,15 @@ extension _MushafShareExtension on _MushafViewState {
           );
         }
 
-        return FutureBuilder<QiraatAyahWords?>(
-          future: _wordInfoRepo.getAyahWords(
-            kind: WordInfoKind.recitations,
-            surahNumber: surahNum,
-            ayahNumber: ayahNum,
-          ),
+        return FutureBuilder<QiraatWordInfo?>(
+          future: _wordInfoRepo.getWordInfo(kind: WordInfoKind.recitations, ref: ref),
           builder: (context, snap) {
             if (snap.connectionState != ConnectionState.done) {
               return const Center(child: CircularProgressIndicator());
             }
 
-            final ayahWords = snap.data;
-            if (ayahWords == null || ayahWords.words.isEmpty) {
+            final word = snap.data;
+            if (word == null || word.content.trim().isEmpty) {
               return _buildEmptyState(
                 card: card,
                 isDark: isDark,
@@ -1549,11 +1651,11 @@ extension _MushafShareExtension on _MushafViewState {
               );
             }
 
-            return _buildWordsInfoList(
+            return _buildWordInfoCard(
               card: card,
               isDark: isDark,
               themeState: themeState,
-              words: ayahWords.words,
+              word: word,
               title: "القراءات",
             );
           },
@@ -1564,15 +1666,11 @@ extension _MushafShareExtension on _MushafViewState {
 
   /// Sarf Tab Content Widget - Updated
   Widget _SarfTabContent({
-    required String ayahKey,
+    required WordRef ref,
     required Color card,
     required bool isDark,
     required ThemeState themeState,
   }) {
-    final parts = ayahKey.split(':');
-    final surahNum = int.tryParse(parts[0]) ?? 1;
-    final ayahNum = int.tryParse(parts[1]) ?? 1;
-
     return FutureBuilder<bool>(
       future: Future.value(_wordInfoRepo.isKindDownloaded(WordInfoKind.tasreef)),
       builder: (context, downloadSnap) {
@@ -1590,19 +1688,15 @@ extension _MushafShareExtension on _MushafViewState {
           );
         }
 
-        return FutureBuilder<QiraatAyahWords?>(
-          future: _wordInfoRepo.getAyahWords(
-            kind: WordInfoKind.tasreef,
-            surahNumber: surahNum,
-            ayahNumber: ayahNum,
-          ),
+        return FutureBuilder<QiraatWordInfo?>(
+          future: _wordInfoRepo.getWordInfo(kind: WordInfoKind.tasreef, ref: ref),
           builder: (context, snap) {
             if (snap.connectionState != ConnectionState.done) {
               return const Center(child: CircularProgressIndicator());
             }
 
-            final ayahWords = snap.data;
-            if (ayahWords == null || ayahWords.words.isEmpty) {
+            final word = snap.data;
+            if (word == null || word.content.trim().isEmpty) {
               return _buildEmptyState(
                 card: card,
                 isDark: isDark,
@@ -1611,12 +1705,12 @@ extension _MushafShareExtension on _MushafViewState {
               );
             }
 
-            return _buildWordsInfoList(
+            return _buildWordInfoCard(
               card: card,
               isDark: isDark,
               themeState: themeState,
-              words: ayahWords.words,
-              title: "التحليل الصرفي",
+              word: word,
+              title: "الصرف",
             );
           },
         );
@@ -1634,6 +1728,8 @@ extension _MushafShareExtension on _MushafViewState {
     required IconData icon,
     required WordInfoKind kind,
   }) {
+    double progress = 0.0;
+    bool downloading = false;
     return StatefulBuilder(
       builder: (context, setState) {
         return SingleChildScrollView(
@@ -1678,19 +1774,51 @@ extension _MushafShareExtension on _MushafViewState {
                         : const Color(0xFF1B1B1B).withValues(alpha: 0.60),
                   ),
                 ),
+                const SizedBox(height: 10),
+                FutureBuilder<int?>(
+                  future: _wordInfoRepo.getRemoteZipSizeBytes(kind),
+                  builder: (context, sizeSnap) {
+                    final bytes = sizeSnap.data;
+                    final label = bytes == null
+                        ? ""
+                        : "(${_formatBytes(bytes)})";
+                    return Text(
+                      label,
+                      textDirection: TextDirection.rtl,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.55)
+                            : const Color(0xFF1B1B1B).withValues(alpha: 0.55),
+                      ),
+                    );
+                  },
+                ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
-                  onPressed: () async {
+                  onPressed: downloading
+                      ? null
+                      : () async {
                     try {
+                      downloading = true;
+                      progress = 0.0;
+                      setState(() {});
                       await _wordInfoRepo.downloadKind(
                         kind: kind,
                         onProgress: (p) {
+                          progress = p;
                           setState(() {});
                         },
                       );
+                      downloading = false;
+                      progress = 100.0;
                       setState(() {});
                     } catch (e) {
+                      downloading = false;
+                      progress = 0.0;
                       debugPrint('Download error: $e');
+                      setState(() {});
                     }
                   },
                   icon: const Icon(Icons.download_rounded),
@@ -1701,6 +1829,29 @@ extension _MushafShareExtension on _MushafViewState {
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   ),
                 ),
+                if (downloading || progress > 0) ...[
+                  const SizedBox(height: 12),
+                  LinearProgressIndicator(
+                    value: (progress / 100.0).clamp(0.0, 1.0),
+                    minHeight: 4,
+                    backgroundColor: Colors.black.withValues(alpha: 0.06),
+                    valueColor: AlwaysStoppedAnimation<Color>(themeState.primary),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    downloading
+                        ? "جاري التحميل ${progress.toStringAsFixed(0)}%"
+                        : "",
+                    textDirection: TextDirection.rtl,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.55)
+                          : const Color(0xFF1B1B1B).withValues(alpha: 0.55),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -1750,88 +1901,99 @@ extension _MushafShareExtension on _MushafViewState {
     );
   }
 
-  /// Build words info list
-  Widget _buildWordsInfoList({
+  Widget _buildWordInfoCard({
     required Color card,
     required bool isDark,
     required ThemeState themeState,
-    required List<QiraatWordInfo> words,
+    required QiraatWordInfo word,
     required String title,
   }) {
-    return ListView.builder(
+    return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
-      itemCount: words.length,
-      itemBuilder: (context, index) {
-        final word = words[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: card,
-            borderRadius: BorderRadius.circular(12),
-            border: word.hasKhilaf
-                ? Border.all(color: themeState.primary.withValues(alpha: 0.3), width: 1)
-                : null,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: themeState.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      "كلمة ${word.wordNumber}",
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: themeState.primary,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      word.word,
-                      textDirection: TextDirection.rtl,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : const Color(0xFF1B1B1B),
-                      ),
-                    ),
-                  ),
-                  if (word.hasKhilaf)
-                    Icon(
-                      Icons.star,
-                      size: 16,
-                      color: themeState.primary,
-                    ),
-                ],
-              ),
-              if (word.content.isNotEmpty) ...[
-                const SizedBox(height: 8),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: card,
+          borderRadius: BorderRadius.circular(18),
+          border: word.hasKhilaf
+              ? Border.all(color: themeState.primary.withValues(alpha: 0.30), width: 1)
+              : null,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 14,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
                 Text(
-                  word.content,
-                  textDirection: TextDirection.rtl,
+                  title,
                   style: TextStyle(
                     fontSize: 14,
-                    height: 1.6,
+                    fontWeight: FontWeight.w800,
                     color: isDark
-                        ? Colors.white.withValues(alpha: 0.80)
-                        : const Color(0xFF1B1B1B).withValues(alpha: 0.80),
+                        ? Colors.white.withValues(alpha: 0.70)
+                        : const Color(0xFF1B1B1B).withValues(alpha: 0.70),
+                  ),
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: themeState.primary.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    word.word,
+                    textDirection: TextDirection.rtl,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                      color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                    ),
                   ),
                 ),
               ],
-            ],
-          ),
-        );
-      },
+            ),
+            const SizedBox(height: 10),
+            Text(
+              word.content,
+              textDirection: TextDirection.rtl,
+              style: TextStyle(
+                fontSize: 14,
+                height: 1.7,
+                fontWeight: FontWeight.w600,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.85)
+                    : const Color(0xFF1B1B1B).withValues(alpha: 0.85),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
+  }
+
+  List<String> _splitAyahWordsForChips(String qcfAyah) {
+    final cleaned = qcfAyah
+        .replaceAll(RegExp(r"\s+"), " ")
+        .replaceAll(RegExp(r"[\u200A\u200B\u200C\u200D]"), " ")
+        .trim();
+    final words = cleaned.split(' ').where((e) => e.trim().isNotEmpty).toList();
+    return words;
+  }
+
+  String _formatBytes(int bytes) {
+    final kb = bytes / 1024.0;
+    if (kb < 1024) return "${kb.toStringAsFixed(0)} KB";
+    final mb = kb / 1024.0;
+    return "${mb.toStringAsFixed(1)} MB";
   }
 
 }
