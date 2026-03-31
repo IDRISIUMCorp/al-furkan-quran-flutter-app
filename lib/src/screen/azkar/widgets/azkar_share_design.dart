@@ -517,7 +517,7 @@ class AzkarShareDesign extends StatelessWidget {
                       const SizedBox(height: 20),
                       Transform.translate(
                         offset: Offset(descriptionOffsetX, descriptionOffsetY),
-                        child: _buildStyledDescription(descStyle, accentColor),
+                        child: _buildStyledDescription(descStyle, accentColor, textColor),
                       ),
                     ],
                   ],
@@ -556,7 +556,7 @@ class AzkarShareDesign extends StatelessWidget {
               if (showCategoryHeader) _buildStyledCategory(catHeaderStyle),
               const SizedBox(height: 30),
               AutoSizeText(zekr, textAlign: textAlign, textDirection: TextDirection.rtl, maxLines: 12, style: zekrStyle),
-              if (description != null) ...[const SizedBox(height: 20), _buildStyledDescription(descStyle, accentColor)],
+              if (description != null) ...[const SizedBox(height: 20), _buildStyledDescription(descStyle, accentColor, textColor)],
               if (showBranding) ...[const SizedBox(height: 30), _buildBranding(accentColor, textColor)],
             ],
           ),
@@ -766,7 +766,7 @@ class AzkarShareDesign extends StatelessWidget {
             children: [
               Expanded(flex: 2, child: _bentoCell(categoryName, catHeaderStyle, accentColor)),
               const SizedBox(width: 20),
-              Expanded(child: _bentoCell("╪º┘ä┘ü┘Å╪▒┘é╪º┘å", const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), accentColor)),
+              Expanded(child: _bentoCell("الفرقان", const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), accentColor)),
             ],
           ),
           const SizedBox(height: 20),
@@ -995,7 +995,7 @@ class AzkarShareDesign extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(9),
                   decoration: BoxDecoration(
                     color: accentColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
@@ -1003,7 +1003,7 @@ class AzkarShareDesign extends StatelessWidget {
                   child: Icon(
                     Icons.auto_awesome,
                     color: accentColor,
-                    size: 20,
+                    size: 18,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -1012,24 +1012,24 @@ class AzkarShareDesign extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "╪º┘ä┘ü┘Å╪▒┘é╪º┘å",
+                        "الفرقان",
                         style: TextStyle(
                           color: accentColor,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
                           fontFamily: "IDRISIUM",
-                          letterSpacing: 1,
+                          letterSpacing: 0.4,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 3),
                       Text(
                         "IDRISIUM Corp",
                         style: TextStyle(
                           color: textColor.withValues(alpha: 0.5),
-                          fontSize: 10,
+                          fontSize: 9.5,
                           fontWeight: FontWeight.w600,
                           fontFamily: "NotoSans",
-                          letterSpacing: 1.5,
+                          letterSpacing: 1.2,
                         ),
                       ),
                     ],
@@ -1047,14 +1047,14 @@ class AzkarShareDesign extends StatelessWidget {
                   accentColor.withValues(alpha: 0.1),
                 ],
               ),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(13),
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(11),
+              borderRadius: BorderRadius.circular(10),
               child: Image.asset(
                 "assets/img/Quran_Logo_v3.png",
-                width: 44,
-                height: 44,
+                width: 40,
+                height: 40,
                 fit: BoxFit.cover,
               ),
             ),
@@ -1144,7 +1144,7 @@ class AzkarShareDesign extends StatelessWidget {
     }
   }
 
-  Widget _buildStyledDescription(TextStyle style, Color accentColor) {
+  Widget _buildStyledDescription(TextStyle style, Color accentColor, Color textColor) {
     switch (descriptionStyleId) {
       case 'soft_pill':
         return Container(
@@ -1170,21 +1170,44 @@ class AzkarShareDesign extends StatelessWidget {
         );
       case 'underline':
         return Container(
-          padding: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: style.color!.withValues(alpha: 0.3), width: 2))),
-          child: Text(description!, textAlign: TextAlign.center, style: style),
+          margin: const EdgeInsets.only(top: 26),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.035),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: accentColor.withValues(alpha: 0.25),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: accentColor.withValues(alpha: 0.08),
+                blurRadius: 20,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Text(
+                "Quran App",
+                style: TextStyle(
+                  color: textColor.withValues(alpha: 0.5),
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: "NotoSans",
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
+          ),
         );
       case 'classic':
       default:
-        return Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-          decoration: BoxDecoration(
-            color: accentColor.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: accentColor.withValues(alpha: 0.15)),
-          ),
-          child: Text(description!, textAlign: TextAlign.center, style: style.copyWith(fontSize: style.fontSize! * 0.9)),
+        return Text(
+          description ?? '',
+          textAlign: TextAlign.center,
+          style: style,
         );
     }
   }
