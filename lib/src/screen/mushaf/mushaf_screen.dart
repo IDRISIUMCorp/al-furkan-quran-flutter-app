@@ -42,6 +42,8 @@ import "package:al_quran_v3/src/utils/quran_resources/quran_translation_function
 import "package:al_quran_v3/src/utils/quran_resources/quran_sarf_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/get_translation_with_word_by_word.dart";
 import "package:al_quran_v3/src/utils/quran_resources/word_by_word_function.dart";
+import "package:al_quran_v3/src/utils/quran_resources/word_info_models.dart";
+import "package:al_quran_v3/src/utils/quran_resources/word_info_repository.dart";
 import "package:al_quran_v3/src/utils/quran_word/show_popup_word_function.dart";
 import "package:hive_ce_flutter/hive_flutter.dart";
 import "package:al_quran_v3/src/utils/number_localization.dart";
@@ -1943,6 +1945,9 @@ class _MushafViewState extends State<MushafView> {
 
   static const String _kWahyBookmarks = "wahy_bookmarks";
   static const String _kWahyNotes = "wahy_notes";
+
+  /// Word Info Repository instance for Qiraat/Sarf/Irab
+  final WordInfoRepository _wordInfoRepo = WordInfoRepository();
 
   Timer? _menuTimer;
   bool _isSheetOpen = false;

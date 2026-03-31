@@ -1470,118 +1470,205 @@ extension _MushafShareExtension on _MushafViewState {
     );
   }
 
-  /// Sarf Tab Content Widget
+  /// Qiraat Tab Content Widget
+  Widget _QiraatTabContent({
+    required String ayahKey,
+    required Color card,
+    required bool isDark,
+    required ThemeState themeState,
+  }) {
+    final parts = ayahKey.split(':');
+    final surahNum = int.tryParse(parts[0]) ?? 1;
+    final ayahNum = int.tryParse(parts[1]) ?? 1;
+
+    return FutureBuilder<bool>(
+      future: Future.value(_wordInfoRepo.isKindDownloaded(WordInfoKind.recitations)),
+      builder: (context, downloadSnap) {
+        final isDownloaded = downloadSnap.data ?? false;
+
+        if (!isDownloaded) {
+          return _buildDownloadPrompt(
+            card: card,
+            isDark: isDark,
+            themeState: themeState,
+            title: "بيانات القراءات",
+            description: "حمّل بيانات القراءات (قراءات عشر) لعرض اختلافات الروايات للكلمات",
+            icon: Icons.record_voice_over_outlined,
+            kind: WordInfoKind.recitations,
+          );
+        }
+
+        return FutureBuilder<QiraatAyahWords?>(
+          future: _wordInfoRepo.getAyahWords(
+            kind: WordInfoKind.recitations,
+            surahNumber: surahNum,
+            ayahNumber: ayahNum,
+          ),
+          builder: (context, snap) {
+            if (snap.connectionState != ConnectionState.done) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final ayahWords = snap.data;
+            if (ayahWords == null || ayahWords.words.isEmpty) {
+              return _buildEmptyState(
+                card: card,
+                isDark: isDark,
+                themeState: themeState,
+                message: "لا توجد بيانات قراءات لهذه الآية",
+              );
+            }
+
+            return _buildWordsInfoList(
+              card: card,
+              isDark: isDark,
+              themeState: themeState,
+              words: ayahWords.words,
+              title: "القراءات",
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// Sarf Tab Content Widget - Updated
   Widget _SarfTabContent({
     required String ayahKey,
     required Color card,
     required bool isDark,
     required ThemeState themeState,
   }) {
-    return FutureBuilder<String?>(
-      future: QuranSarfFunction.getResolvedSarfTextForBook(
-        TafsirBookModel(
-          language: "arabic",
-          name: "معجم الصرف الميسر",
-          totalAyahs: 6236,
-          hasTafsir: 1,
-          score: 1.0,
-          fullPath: "sarf_db",
-        ),
-        ayahKey,
-      ),
-      builder: (context, snap) {
-        if (snap.connectionState != ConnectionState.done) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    final parts = ayahKey.split(':');
+    final surahNum = int.tryParse(parts[0]) ?? 1;
+    final ayahNum = int.tryParse(parts[1]) ?? 1;
 
-        final sarfText = snap.data?.trim() ?? "";
-        if (sarfText.isEmpty || sarfText.contains("قيد التطوير")) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: card,
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.auto_stories_outlined,
-                    size: 48,
-                    color: themeState.primary.withValues(alpha: 0.60),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    "قسم الصرف قيد التطوير",
-                    textAlign: TextAlign.center,
-                    textDirection: TextDirection.rtl,
-                    style: TextStyle(
-                      fontSize: 18,
-                      height: 1.5,
-                      fontWeight: FontWeight.w700,
-                      color: isDark ? Colors.white : const Color(0xFF1B1B1B),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "سيتم إضافة بيانات الصرف والتحليل الصرفي للكلمات قريباً إن شاء الله.",
-                    textAlign: TextAlign.center,
-                    textDirection: TextDirection.rtl,
-                    style: TextStyle(
-                      fontSize: 14,
-                      height: 1.6,
-                      fontWeight: FontWeight.w500,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.60)
-                          : const Color(0xFF1B1B1B).withValues(alpha: 0.60),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    return FutureBuilder<bool>(
+      future: Future.value(_wordInfoRepo.isKindDownloaded(WordInfoKind.tasreef)),
+      builder: (context, downloadSnap) {
+        final isDownloaded = downloadSnap.data ?? false;
+
+        if (!isDownloaded) {
+          return _buildDownloadPrompt(
+            card: card,
+            isDark: isDark,
+            themeState: themeState,
+            title: "بيانات الصرف",
+            description: "حمّل بيانات التصريف لعرض التحليل الصرفي للكلمات",
+            icon: Icons.auto_stories_outlined,
+            kind: WordInfoKind.tasreef,
           );
         }
 
+        return FutureBuilder<QiraatAyahWords?>(
+          future: _wordInfoRepo.getAyahWords(
+            kind: WordInfoKind.tasreef,
+            surahNumber: surahNum,
+            ayahNumber: ayahNum,
+          ),
+          builder: (context, snap) {
+            if (snap.connectionState != ConnectionState.done) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final ayahWords = snap.data;
+            if (ayahWords == null || ayahWords.words.isEmpty) {
+              return _buildEmptyState(
+                card: card,
+                isDark: isDark,
+                themeState: themeState,
+                message: "لا توجد بيانات صرف لهذه الآية",
+              );
+            }
+
+            return _buildWordsInfoList(
+              card: card,
+              isDark: isDark,
+              themeState: themeState,
+              words: ayahWords.words,
+              title: "التحليل الصرفي",
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// Build download prompt widget
+  Widget _buildDownloadPrompt({
+    required Color card,
+    required bool isDark,
+    required ThemeState themeState,
+    required String title,
+    required String description,
+    required IconData icon,
+    required WordInfoKind kind,
+  }) {
+    return StatefulBuilder(
+      builder: (context, setState) {
         return SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
+          padding: const EdgeInsets.all(16),
           child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: card,
               borderRadius: BorderRadius.circular(18),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 14,
-                  offset: const Offset(0, 8),
-                ),
-              ],
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  "التحليل الصرفي",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.70)
-                        : const Color(0xFF1B1B1B).withValues(alpha: 0.70),
-                  ),
+                Icon(
+                  icon,
+                  size: 48,
+                  color: themeState.primary.withValues(alpha: 0.60),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 Text(
-                  _stripHtml(sarfText),
+                  title,
+                  textAlign: TextAlign.center,
                   textDirection: TextDirection.rtl,
                   style: TextStyle(
-                    fontSize: 16,
-                    height: 1.7,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    height: 1.5,
+                    fontWeight: FontWeight.w700,
                     color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  description,
+                  textAlign: TextAlign.center,
+                  textDirection: TextDirection.rtl,
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.6,
+                    fontWeight: FontWeight.w500,
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.60)
+                        : const Color(0xFF1B1B1B).withValues(alpha: 0.60),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    try {
+                      await _wordInfoRepo.downloadKind(
+                        kind: kind,
+                        onProgress: (p) {
+                          setState(() {});
+                        },
+                      );
+                      setState(() {});
+                    } catch (e) {
+                      debugPrint('Download error: $e');
+                    }
+                  },
+                  icon: const Icon(Icons.download_rounded),
+                  label: const Text("تحميل"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: themeState.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   ),
                 ),
               ],
@@ -1592,15 +1679,13 @@ extension _MushafShareExtension on _MushafViewState {
     );
   }
 
-  /// Qiraat Tab Content Widget
-  Widget _QiraatTabContent({
-    required String ayahKey,
+  /// Build empty state widget
+  Widget _buildEmptyState({
     required Color card,
     required bool isDark,
     required ThemeState themeState,
+    required String message,
   }) {
-    // Placeholder for Qiraat/Riwayat differences
-    // TODO: Implement actual Qiraat data loading from external library
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Container(
@@ -1613,39 +1698,109 @@ extension _MushafShareExtension on _MushafViewState {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Icons.record_voice_over_outlined,
+              Icons.info_outline,
               size: 48,
               color: themeState.primary.withValues(alpha: 0.60),
             ),
             const SizedBox(height: 12),
             Text(
-              "قسم القراءات قيد التطوير",
+              message,
               textAlign: TextAlign.center,
               textDirection: TextDirection.rtl,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 height: 1.5,
-                fontWeight: FontWeight.w700,
-                color: isDark ? Colors.white : const Color(0xFF1B1B1B),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "سيتم إضافة اختلافات القراءات والروايات للآية قريباً إن شاء الله.",
-              textAlign: TextAlign.center,
-              textDirection: TextDirection.rtl,
-              style: TextStyle(
-                fontSize: 14,
-                height: 1.6,
                 fontWeight: FontWeight.w500,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.60)
-                    : const Color(0xFF1B1B1B).withValues(alpha: 0.60),
+                color: isDark ? Colors.white : const Color(0xFF1B1B1B),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  /// Build words info list
+  Widget _buildWordsInfoList({
+    required Color card,
+    required bool isDark,
+    required ThemeState themeState,
+    required List<QiraatWordInfo> words,
+    required String title,
+  }) {
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
+      itemCount: words.length,
+      itemBuilder: (context, index) {
+        final word = words[index];
+        return Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: card,
+            borderRadius: BorderRadius.circular(12),
+            border: word.hasKhilaf
+                ? Border.all(color: themeState.primary.withValues(alpha: 0.3), width: 1)
+                : null,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: themeState.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      "كلمة ${word.wordNumber}",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: themeState.primary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      word.word,
+                      textDirection: TextDirection.rtl,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                      ),
+                    ),
+                  ),
+                  if (word.hasKhilaf)
+                    Icon(
+                      Icons.star,
+                      size: 16,
+                      color: themeState.primary,
+                    ),
+                ],
+              ),
+              if (word.content.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  word.content,
+                  textDirection: TextDirection.rtl,
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.6,
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.80)
+                        : const Color(0xFF1B1B1B).withValues(alpha: 0.80),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
 
