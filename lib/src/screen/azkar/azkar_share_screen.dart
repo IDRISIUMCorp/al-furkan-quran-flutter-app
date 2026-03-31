@@ -302,6 +302,38 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
   List<String> _customFonts = [];
   List<String> _customFontNames = [];
 
+  Future<void> _deleteCustomFontByFamily(String family) async {
+    final index = _customFontNames.indexOf(family);
+    if (index < 0) return;
+
+    _saveState();
+
+    setState(() {
+      _customFontNames.removeAt(index);
+      _customFonts.removeAt(index);
+
+      if (_fontFamily == family) {
+        _fontFamily = 'IDRISIUM';
+      }
+
+      if (_zekrFont == family) _zekrFont = null;
+      if (_categoryFont == family) _categoryFont = null;
+      if (_descriptionFont == family) _descriptionFont = null;
+      if (_referenceFont == family) _referenceFont = null;
+    });
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('azkar_custom_fonts', _customFonts);
+      await prefs.setStringList('azkar_custom_font_names', _customFontNames);
+
+      final selectedPath = prefs.getString('azkar_selected_custom_font_path');
+      if (selectedPath != null && !_customFonts.contains(selectedPath)) {
+        await prefs.remove('azkar_selected_custom_font_path');
+      }
+    } catch (_) {}
+  }
+
   Future<void> _loadCustomFontIfSelected() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -898,20 +930,6 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
           _buildSectionTitle("خط عام", Icons.font_download_rounded, primary, subtleColor),
           const Gap(12),
           _buildFontSelector(primary, cardColor, isDark),
-          const Gap(12),
-          _buildCircleButton(
-            icon: Icons.done_all_rounded,
-            onPressed: () {
-              _saveState();
-              setState(() {
-                _zekrFont = _fontFamily;
-                _categoryFont = _fontFamily;
-                _descriptionFont = _fontFamily;
-                _referenceFont = _fontFamily;
-              });
-            },
-            primary: primary,
-          ),
           const Gap(8),
 
           // Global font
@@ -1557,7 +1575,6 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
   }
 
   // HELPER WIDGETS
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 
   Widget _buildColorChip(String label, Color? color, bool isSelected, Color primary) {
     return GestureDetector(
@@ -1585,28 +1602,28 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
   }
 
   Widget _buildColorPickerChip(String label, Color? currentColor, Function(Color?) onColorPicked, Color primary) {
-    // ╪ú┘ä┘ê╪º┘å ╪¼╪º┘ç╪▓╪⌐ ┘ä┘ä╪º╪«╪¬┘è╪º╪▒ ╪º┘ä╪│╪▒┘è╪╣
+    // Small preset palette chip
     final presetColors = [
       Colors.white,
       Colors.black,
-      const Color(0xFFD4A746), // ╪░┘ç╪¿┘è
-      const Color(0xFF33B18E), // ╪ú╪«╪╢╪▒
-      const Color(0xFF64B5F6), // ╪ú╪▓╪▒┘é
-      const Color(0xFFCE93D8), // ╪¿┘å┘ü╪│╪¼┘è
-      const Color(0xFFB76E79), // ┘ê╪▒╪»┘è
-      const Color(0xFF66BB6A), // ╪ú╪«╪╢╪▒ ┘ü╪º╪¬╪¡
-      const Color(0xFFFF7043), // ╪¿╪▒╪¬┘é╪º┘ä┘è
+      const Color(0xFFD4A746), // Gold
+      const Color(0xFF33B18E), // Teal
+      const Color(0xFF64B5F6), // Blue
+      const Color(0xFFCE93D8), // Purple
+      const Color(0xFFB76E79), // Rose
+      const Color(0xFF66BB6A), // Green
+      const Color(0xFFFF7043), // Orange
     ];
     
     return GestureDetector(
       onTap: () {
-        // Toggle: ┘ä┘ê ╪º┘ä┘à╪«╪╡╪╡ ┘à╪«╪¬╪º╪▒╪î ┘å┘ä╪║┘è┘ç ┘ê┘å╪▒╪¼╪╣ ╪º┘ü╪¬╪▒╪º╪╢┘è
+        // Toggle: tap again to clear
         if (currentColor != null) {
           _saveState();
           onColorPicked(null);
           return;
         }
-        // ┘ä┘ê ╪º┘ü╪¬╪▒╪º╪╢┘è╪î ┘å┘ü╪¬╪¡ ┘é╪º╪ª┘à╪⌐ ╪º┘ä╪ú┘ä┘ê╪º┘å
+        // Otherwise open the picker (handled by parent)
         setState(() {});
       },
       child: Container(
@@ -1647,10 +1664,10 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     );
   }
   
-  // ┘é╪º╪ª┘à╪⌐ ╪ú┘ä┘ê╪º┘å inline ┘ä┘ä╪╣╪▒╪╢ ╪¬╪¡╪¬ ╪º┘ä╪╣┘å╪╡╪▒
+  // Inline palette
   Widget _buildInlineColorPicker(Color? currentColor, Function(Color?) onColorPicked, Color primary) {
     final presetColors = [
-      null, // ╪º┘ü╪¬╪▒╪º╪╢┘è
+      null, // Default
       Colors.white,
       Colors.black,
       const Color(0xFFD4A746),
@@ -1756,10 +1773,10 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
           height: 44,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            itemCount: allFonts.length + 1, // +1 ┘ä╪▓╪▒ ╪º┘ä╪º╪│╪¬┘è╪▒╪º╪»
+            itemCount: allFonts.length + 1, // +1 = add font button
             separatorBuilder: (_, __) => const Gap(6),
             itemBuilder: (context, index) {
-              // ╪▓╪▒ ╪º╪│╪¬┘è╪▒╪º╪» ╪«╪╖ ╪¼╪»┘è╪»
+              // Add font button
               if (index == allFonts.length) {
                 return GestureDetector(
                   onTap: _importCustomFont,
@@ -1799,6 +1816,26 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
               final isCustom = customFamilyToPath.containsKey(font);
               
               return GestureDetector(
+                onLongPress: isCustom
+                    ? () async {
+                        final ok = await showDialog<bool>(
+                          context: context,
+                          builder: (ctx) {
+                            return AlertDialog(
+                              title: const Text('حذف الخط'),
+                              content: Text('هل تريد حذف الخط "$label"؟'),
+                              actions: [
+                                TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('إلغاء')),
+                                TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('حذف')),
+                              ],
+                            );
+                          },
+                        );
+                        if (ok == true) {
+                          await _deleteCustomFontByFamily(font);
+                        }
+                      }
+                    : null,
                 onTap: () {
                   _saveState();
                   if (isCustom) {
@@ -1810,7 +1847,13 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                       });
                     }
                   }
-                  setState(() => _fontFamily = font);
+                  setState(() {
+                    _fontFamily = font;
+                    _zekrFont = font;
+                    _categoryFont = font;
+                    _descriptionFont = font;
+                    _referenceFont = font;
+                  });
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -1826,18 +1869,42 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (isCustom) ...[
-                          Icon(Icons.folder_open_rounded, size: 12, color: primary.withValues(alpha: 0.6)),
-                          const Gap(4),
-                        ],
-                        Text(
-                          label,
-                          style: TextStyle(
-                            fontFamily: font,
-                            fontSize: 14,
-                            color: isSelected ? primary : (isDark ? Colors.white70 : Colors.black87),
-                            fontWeight: FontWeight.w600,
-                          ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'الحمد لله',
+                              style: TextStyle(
+                                fontFamily: font,
+                                fontSize: 14,
+                                color: isSelected ? primary : (isDark ? Colors.white : Colors.black),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const Gap(2),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (isCustom) ...[
+                                  Icon(Icons.folder_open_rounded, size: 12, color: primary.withValues(alpha: 0.6)),
+                                  const Gap(4),
+                                ],
+                                Text(
+                                  label,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: (isSelected ? primary : (isDark ? Colors.white70 : Colors.black87)).withValues(alpha: 0.75),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                if (isCustom) ...[
+                                  const Gap(6),
+                                  Icon(Icons.delete_outline_rounded, size: 14, color: Colors.redAccent.withValues(alpha: 0.85)),
+                                ],
+                              ],
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -1872,9 +1939,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     );
   }
 
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
   // ORIGINAL HELPER BUILDERS
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 
   @override
   Widget build(BuildContext context) {
@@ -2064,27 +2129,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                         children: [
                           Container(
                             padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
-                            child: Row(
-                              children: [
-                                Expanded(child: _buildTabBar(primary, isDark)),
-                                const Gap(10),
-                                _buildFloatingButton(
-                                  icon: Icons.undo_rounded,
-                                  onPressed: _undo,
-                                  primary: primary,
-                                  isDark: isDark,
-                                  isEnabled: _undoStack.isNotEmpty,
-                                ),
-                                const Gap(8),
-                                _buildFloatingButton(
-                                  icon: Icons.redo_rounded,
-                                  onPressed: _redo,
-                                  primary: primary,
-                                  isDark: isDark,
-                                  isEnabled: _redoStack.isNotEmpty,
-                                ),
-                              ],
-                            ),
+                            child: _buildTabBar(primary, isDark),
                           ),
                           Expanded(
                             child: _buildTabContent(primary, subtleColor, textColor, cardColor, isDark),
@@ -2095,6 +2140,32 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
                   ),
                 ),
                 ],
+              ),
+              Positioned(
+                top: 12,
+                right: 16,
+                child: Material(
+                  color: Colors.transparent,
+                  child: Row(
+                    children: [
+                      _buildFloatingButton(
+                        icon: Icons.undo_rounded,
+                        onPressed: _undo,
+                        primary: primary,
+                        isDark: isDark,
+                        isEnabled: _undoStack.isNotEmpty,
+                      ),
+                      const Gap(8),
+                      _buildFloatingButton(
+                        icon: Icons.redo_rounded,
+                        onPressed: _redo,
+                        primary: primary,
+                        isDark: isDark,
+                        isEnabled: _redoStack.isNotEmpty,
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -2207,24 +2278,22 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
       controller: _tabController,
       physics: const BouncingScrollPhysics(),
       children: [
-        // Tab 1: ╪º┘ä╪¬╪╡┘à┘è┘à
+        // Tab 1: التصميم
         _buildDesignTab(primary, subtleColor, textColor, cardColor, isDark),
         
-        // Tab 2: ╪º┘ä╪╣┘å╪º╪╡╪▒
+        // Tab 2: العناصر
         _buildElementsTab(primary, subtleColor, textColor, cardColor, isDark),
         
-        // Tab 3: ╪º┘ä╪¬╪«╪╖┘è╪╖
+        // Tab 3: التنسيق
         _buildLayoutTab(primary, subtleColor, textColor, cardColor, isDark),
         
-        // Tab 4: ╪º┘ä┘ç┘ê┘è╪⌐
+        // Tab 4: الهوية
         _buildIdentityTab(primary, subtleColor, textColor, cardColor, isDark),
       ],
     );
   }
 
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
   // TAB CONTENT BUILDERS
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 
   Widget _buildDesignTab(Color primary, Color subtleColor, Color textColor, Color cardColor, bool isDark) {
     return SingleChildScrollView(
@@ -2258,9 +2327,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     );
   }
 
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
   // Helper Builders
-  // ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 
   Widget _buildSectionTitle(String title, IconData icon, Color primary, Color subtleColor) {
     return Container(
@@ -2951,6 +3018,7 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
   late double _saturation;
   late double _value;
   late double _alpha;
+  late final TextEditingController _hexController;
   
   @override
   void initState() {
@@ -2960,9 +3028,38 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
     _saturation = hsv.saturation;
     _value = hsv.value;
     _alpha = hsv.alpha;
+
+    _hexController = TextEditingController(text: _toHex(HSVColor.fromAHSV(_alpha, _hue, _saturation, _value).toColor()));
+  }
+
+  @override
+  void dispose() {
+    _hexController.dispose();
+    super.dispose();
   }
   
   Color get _selectedColor => HSVColor.fromAHSV(_alpha, _hue, _saturation, _value).toColor();
+
+  String _toHex(Color c) {
+    final a = c.alpha.toRadixString(16).padLeft(2, '0').toUpperCase();
+    final r = c.red.toRadixString(16).padLeft(2, '0').toUpperCase();
+    final g = c.green.toRadixString(16).padLeft(2, '0').toUpperCase();
+    final b = c.blue.toRadixString(16).padLeft(2, '0').toUpperCase();
+    return '#$a$r$g$b';
+  }
+
+  Color? _parseHex(String input) {
+    var s = input.trim().toUpperCase();
+    if (s.startsWith('0X')) s = s.substring(2);
+    if (s.startsWith('#')) s = s.substring(1);
+    if (s.length == 6) {
+      s = 'FF$s';
+    }
+    if (s.length != 8) return null;
+    final value = int.tryParse(s, radix: 16);
+    if (value == null) return null;
+    return Color(value);
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -2985,6 +3082,65 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
               ),
             ),
             const Gap(20),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _hexController,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                    decoration: InputDecoration(
+                      labelText: 'HEX (AARRGGBB)',
+                      labelStyle: const TextStyle(color: Colors.white70, fontSize: 12),
+                      filled: true,
+                      fillColor: Colors.white.withValues(alpha: 0.06),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.12))),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.12))),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.22))),
+                    ),
+                    onSubmitted: (v) {
+                      final c = _parseHex(v);
+                      if (c == null) return;
+                      final hsv = HSVColor.fromColor(c);
+                      setState(() {
+                        _hue = hsv.hue;
+                        _saturation = hsv.saturation;
+                        _value = hsv.value;
+                        _alpha = hsv.alpha;
+                        _hexController.text = _toHex(_selectedColor);
+                      });
+                    },
+                  ),
+                ),
+                const Gap(10),
+                IconButton(
+                  tooltip: 'نسخ',
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: _toHex(_selectedColor)));
+                  },
+                  icon: const Icon(Icons.copy_rounded, color: Colors.white70),
+                ),
+                IconButton(
+                  tooltip: 'لصق',
+                  onPressed: () async {
+                    final data = await Clipboard.getData('text/plain');
+                    final text = data?.text;
+                    if (text == null) return;
+                    final c = _parseHex(text);
+                    if (c == null) return;
+                    final hsv = HSVColor.fromColor(c);
+                    setState(() {
+                      _hue = hsv.hue;
+                      _saturation = hsv.saturation;
+                      _value = hsv.value;
+                      _alpha = hsv.alpha;
+                      _hexController.text = _toHex(_selectedColor);
+                    });
+                  },
+                  icon: const Icon(Icons.content_paste_rounded, color: Colors.white70),
+                ),
+              ],
+            ),
+            const Gap(16),
             // Hue Slider
             Row(
               children: [
@@ -2998,7 +3154,10 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
                       min: 0,
                       max: 360,
                       activeColor: HSVColor.fromAHSV(1, _hue, 1, 1).toColor(),
-                      onChanged: (v) => setState(() => _hue = v),
+                      onChanged: (v) => setState(() {
+                        _hue = v;
+                        _hexController.text = _toHex(_selectedColor);
+                      }),
                     ),
                   ),
                 ),
@@ -3015,7 +3174,10 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
                     min: 0,
                     max: 1,
                     activeColor: _selectedColor,
-                    onChanged: (v) => setState(() => _saturation = v),
+                    onChanged: (v) => setState(() {
+                      _saturation = v;
+                      _hexController.text = _toHex(_selectedColor);
+                    }),
                   ),
                 ),
               ],
@@ -3031,7 +3193,10 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
                     min: 0,
                     max: 1,
                     activeColor: _selectedColor,
-                    onChanged: (v) => setState(() => _value = v),
+                    onChanged: (v) => setState(() {
+                      _value = v;
+                      _hexController.text = _toHex(_selectedColor);
+                    }),
                   ),
                 ),
               ],
@@ -3047,7 +3212,10 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
                     min: 0,
                     max: 1,
                     activeColor: _selectedColor.withValues(alpha: _alpha),
-                    onChanged: (v) => setState(() => _alpha = v),
+                    onChanged: (v) => setState(() {
+                      _alpha = v;
+                      _hexController.text = _toHex(_selectedColor);
+                    }),
                   ),
                 ),
               ],
@@ -3059,7 +3227,7 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text("╪Ñ┘ä╪║╪º╪í", style: TextStyle(color: Colors.white54)),
+                  child: const Text("إلغاء", style: TextStyle(color: Colors.white54)),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -3067,7 +3235,7 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () => Navigator.pop(context, _selectedColor),
-                  child: const Text("╪º╪«╪¬┘è╪º╪▒", style: TextStyle(color: Colors.white)),
+                  child: const Text("تطبيق", style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),
