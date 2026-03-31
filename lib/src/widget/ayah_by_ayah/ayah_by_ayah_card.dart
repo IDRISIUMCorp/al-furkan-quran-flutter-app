@@ -344,6 +344,13 @@ Widget getAyahByAyahTafsirCard({
 
       TafsirBookModel? book;
       for (final b in selected) {
+        if (b.name.contains("السعدي")) {
+          book = b;
+          break;
+        }
+      }
+      for (final b in selected) {
+        if (book != null) break;
         if (b.name.contains("الميسر")) {
           book = b;
           break;

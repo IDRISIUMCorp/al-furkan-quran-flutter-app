@@ -126,6 +126,7 @@ flutter:
     - assets/
     - assets/wahy/json/
     - assets/wahy/json/azkar.json
+    - assets/wahy/saadi.json.gz
     - packages/ar-tafsir-muyassar.json
     - packages/alrab-al-quran-li-da-as.json
     - assets/dev/

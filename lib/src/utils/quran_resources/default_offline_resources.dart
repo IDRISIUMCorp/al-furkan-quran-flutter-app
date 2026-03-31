@@ -3,6 +3,7 @@ import "dart:convert";
 import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_irab_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
+import "package:archive/archive.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/services.dart";
 import "package:hive_ce_flutter/hive_flutter.dart";
@@ -12,19 +13,16 @@ class DefaultOfflineResources {
   static const String _enforceFlagKey =
       "default_offline_resources_enforced_v2";
 
-  static const String _muyassarJsonAsset = "packages/ar-tafsir-muyassar.json";
+  static const String _saadiJsonGzAsset = "assets/wahy/saadi.json.gz";
 
-  static final TafsirBookModel defaultTafsirMuyassar = TafsirBookModel(
+  static final TafsirBookModel defaultTafsirSaadi = TafsirBookModel(
     language: "Arabic",
-    name: "التفسير الميسر",
+    name: "تفسير السعدي",
     totalAyahs: 6236,
-    hasTafsir: 5278,
-    score: 84,
-    fullPath: "bundled/Arabic/Tafsir_Muyassar.json",
+    hasTafsir: 6236,
+    score: 95,
+    fullPath: "bundled/Arabic/Tafsir_Saadi.json",
   );
-
-  static const String remoteMuyassarFullPath =
-      "quranic_universal_library/compressed_tafsir/Arabic/Tafsir_Muyassar.json.txt";
 
   static Future<void> ensureInstalled() async {
     if (!Hive.isBoxOpen("user")) {
@@ -33,16 +31,13 @@ class DefaultOfflineResources {
 
     final userBox = Hive.box("user");
 
-    // Always keep user selections clean (fast operation, no heavy IO)
-    await _cleanupDuplicateMuyassar();
-
     final tafsirBoxName = QuranTafsirFunction.getTafsirBoxName(
-      tafsirBook: defaultTafsirMuyassar,
+      tafsirBook: defaultTafsirSaadi,
     );
 
     await _ensureBoxHasAyahDataOrReinstall(
       boxName: tafsirBoxName,
-      reinstall: _installMuyassarTafsir,
+      reinstall: _installSaadiTafsir,
     );
 
     final bool alreadyEnforced =
@@ -57,21 +52,21 @@ class DefaultOfflineResources {
     final bool alreadyInstalled =
         userBox.get(_installFlagKey, defaultValue: false) == true;
     if (alreadyInstalled) {
-      // Do NOT force-enable Muyassar every start.
+      // Do NOT force-enable Saadi every start.
       // Only auto-select if the user has no tafsir selected at all.
       final currentSelections = await QuranTafsirFunction.getTafsirSelections();
       if (currentSelections == null || currentSelections.isEmpty) {
-        await QuranTafsirFunction.setTafsirSelection(defaultTafsirMuyassar);
+        await QuranTafsirFunction.setTafsirSelection(defaultTafsirSaadi);
       }
       return;
     }
 
-    await _installMuyassarTafsir();
+    await _installSaadiTafsir();
 
-    // First install: make sure at least one tafsir is enabled (Muyassar).
+    // First install: make sure at least one tafsir is enabled (Saadi).
     final currentSelections = await QuranTafsirFunction.getTafsirSelections();
     if (currentSelections == null || currentSelections.isEmpty) {
-      await QuranTafsirFunction.setTafsirSelection(defaultTafsirMuyassar);
+      await QuranTafsirFunction.setTafsirSelection(defaultTafsirSaadi);
     }
 
     await userBox.put(_installFlagKey, true);
@@ -105,98 +100,30 @@ class DefaultOfflineResources {
     await reinstall();
   }
 
-  static Future<void> _installMuyassarTafsir() async {
+  static Future<void> _installSaadiTafsir() async {
     final boxName = QuranTafsirFunction.getTafsirBoxName(
-      tafsirBook: defaultTafsirMuyassar,
+      tafsirBook: defaultTafsirSaadi,
     );
 
     final LazyBox box = await Hive.openLazyBox(boxName);
 
-    final String jsonString = await rootBundle.loadString(_muyassarJsonAsset);
+    final ByteData bytes = await rootBundle.load(_saadiJsonGzAsset);
+    final raw = bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+    final decoded = GZipDecoder().decodeBytes(raw);
+    final jsonString = utf8.decode(decoded);
     final Map<dynamic, dynamic> data = await compute(_decodeJsonToMap, jsonString);
 
     for (final entry in data.entries) {
-      await box.put(entry.key, entry.value);
+      await box.put(entry.key.toString(), entry.value);
     }
 
-    await box.put("meta_data", defaultTafsirMuyassar.toMap());
+    await box.put("meta_data", defaultTafsirSaadi.toMap());
 
     await QuranTafsirFunction.setToListAlreadyDownloaded(
-      tafsirBook: defaultTafsirMuyassar,
+      tafsirBook: defaultTafsirSaadi,
     );
 
-    await QuranTafsirFunction.setTafsirSelection(defaultTafsirMuyassar);
-  }
-
-  static Future<void> _cleanupDuplicateMuyassar() async {
-    final userBox = Hive.box("user");
-
-    final List<dynamic> downloadedRaw =
-        List<dynamic>.from(userBox.get(QuranTafsirFunction.downloadedTafsirBooksKey, defaultValue: []));
-
-    final downloaded = downloadedRaw
-        .whereType<Map>()
-        .map((e) => Map<String, dynamic>.from(e))
-        .toList();
-
-    final cleanedDownloaded = downloaded
-        .where((m) {
-          final name = (m["name"] ?? "").toString();
-          final fullPath = (m["full_path"] ?? "").toString();
-          final isMuyassarByName = name.trim() == "التفسير الميسر";
-          final isMuyassarByPath = fullPath.toLowerCase().contains("muyassar");
-          final isBundled = fullPath == defaultTafsirMuyassar.fullPath;
-          final isRemote = fullPath == remoteMuyassarFullPath;
-          if ((isMuyassarByName || isMuyassarByPath) && !isBundled) {
-            return false;
-          }
-          if (isRemote) {
-            return false;
-          }
-          return true;
-        })
-        .toList();
-
-    await userBox.put(QuranTafsirFunction.downloadedTafsirBooksKey, cleanedDownloaded);
-
-    final List<dynamic> selectedRaw =
-        List<dynamic>.from(userBox.get(QuranTafsirFunction.selectedTafsirListKey, defaultValue: []));
-    final selected = selectedRaw
-        .whereType<Map>()
-        .map((e) => Map<String, dynamic>.from(e))
-        .toList();
-
-    final cleanedSelected = selected
-        .where((m) {
-          final name = (m["name"] ?? "").toString();
-          final fullPath = (m["full_path"] ?? "").toString();
-          final isMuyassarByName = name.trim() == "التفسير الميسر";
-          final isMuyassarByPath = fullPath.toLowerCase().contains("muyassar");
-          final isBundled = fullPath == defaultTafsirMuyassar.fullPath;
-          final isRemote = fullPath == remoteMuyassarFullPath;
-          if ((isMuyassarByName || isMuyassarByPath) && !isBundled) {
-            return false;
-          }
-          if (isRemote) {
-            return false;
-          }
-          return true;
-        })
-        .toList();
-
-    await userBox.put(QuranTafsirFunction.selectedTafsirListKey, cleanedSelected);
-
-    // If remote Muyassar was previously downloaded, delete its Hive box so it stops showing.
-    try {
-      final remote = defaultTafsirMuyassar.copyWith(fullPath: remoteMuyassarFullPath);
-      final remoteBoxName = QuranTafsirFunction.getTafsirBoxName(tafsirBook: remote);
-      if (await Hive.boxExists(remoteBoxName)) {
-        if (Hive.isBoxOpen(remoteBoxName)) {
-          await Hive.lazyBox(remoteBoxName).close();
-        }
-        await Hive.deleteBoxFromDisk(remoteBoxName);
-      }
-    } catch (_) {}
+    await QuranTafsirFunction.setTafsirSelection(defaultTafsirSaadi);
   }
 
   static Map<dynamic, dynamic> _decodeJsonToMap(String source) {

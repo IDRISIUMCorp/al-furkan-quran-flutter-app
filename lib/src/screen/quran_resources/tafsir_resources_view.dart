@@ -2,7 +2,6 @@ import "dart:developer";
 
 import "package:al_quran_v3/l10n/app_localizations.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/default_offline_resources.dart";
 import "package:al_quran_v3/src/resources/quran_resources/language_resources.dart";
 import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
 import "package:al_quran_v3/src/resources/quran_resources/tafsir_info_with_score.dart";
@@ -120,20 +119,6 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
               }
 
               if (languageKey.toLowerCase() == "arabic") {
-                booksInLanguage = booksInLanguage
-                    .map((b) {
-                      final name = b.name.trim();
-                      final isMuyassarByName = name == "التفسير الميسر";
-                      final isMuyassarByPath = b.fullPath == DefaultOfflineResources.remoteMuyassarFullPath;
-                      if (isMuyassarByName || isMuyassarByPath) {
-                        return DefaultOfflineResources.defaultTafsirMuyassar;
-                      }
-                      return b;
-                    })
-                    .where((b) =>
-                        b.fullPath != DefaultOfflineResources.remoteMuyassarFullPath)
-                    .toList();
-
                 final seen = <String>{};
                 booksInLanguage = booksInLanguage.where((b) => seen.add(b.fullPath)).toList();
               }

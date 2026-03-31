@@ -270,7 +270,7 @@ class _TafsirViewState extends State<TafsirView> {
           children: [
             if (data.surahNamingHtml != null && data.surahNamingHtml!.trim().isNotEmpty)
               _sectionCard(
-                title: "التفسير الميسر (العربية)",
+                title: "التفسير (العربية)",
                 html: data.surahNamingHtml!,
                 shareTitle: "تسمية السورة",
               ),
@@ -279,7 +279,7 @@ class _TafsirViewState extends State<TafsirView> {
                 data.surahObjectivesHtml!.trim().isNotEmpty) ...[
               const Gap(12),
               _sectionCard(
-                title: "التفسير الميسر (العربية)",
+                title: "التفسير (العربية)",
                 html: data.surahObjectivesHtml!,
                 shareTitle: "مقاصد السورة",
               ),
@@ -291,7 +291,7 @@ class _TafsirViewState extends State<TafsirView> {
                   ? "إعراب القرآن (الدعاس)"
                   : _selectedTab == 2
                       ? "الميزان الصرفي"
-                      : "التفسير الميسر (العربية)",
+                      : "التفسير (العربية)",
               html: _selectedTab == 0 ? _removeBasmala(data.ayahTafsirHtml ?? "") : (data.ayahTafsirHtml ?? ""),
               shareTitle: _selectedTab == 1
                   ? "الإعراب"

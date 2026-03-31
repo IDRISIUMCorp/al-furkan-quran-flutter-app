@@ -570,6 +570,13 @@ extension _MushafShareExtension on _MushafViewState {
       final selectedList = (selectedBooks ?? []).toList();
       TafsirBookModel? selectedBook;
       for (final b in selectedList) {
+        if (b.name.contains("السعدي")) {
+          selectedBook = b;
+          break;
+        }
+      }
+      for (final b in selectedList) {
+        if (selectedBook != null) break;
         if (b.name.contains("الميسر")) {
           selectedBook = b;
           break;
@@ -592,28 +599,12 @@ extension _MushafShareExtension on _MushafViewState {
     TafsirBookModel? muyassar = _findTafsirBookByNameContains("الميسر");
     final TafsirBookModel? mukhtasar = _findTafsirBookByNameContains("المختصر");
 
-    // Ensure we treat the offline bundled Muyassar as the authoritative one.
-    if (muyassar != null && muyassar.name.contains("الميسر")) {
-      muyassar = DefaultOfflineResources.defaultTafsirMuyassar;
-    }
-
     bool muyassarDownloaded =
         muyassar != null &&
         _isDownloadedByFullPath(muyassar.fullPath, downloadedBooks);
     final bool mukhtasarDownloaded =
         mukhtasar != null &&
         _isDownloadedByFullPath(mukhtasar.fullPath, downloadedBooks);
-
-    // Extra safety: bundled offline Muyassar might not exist in downloadedBooks list.
-    if (muyassar != null &&
-        muyassar.fullPath ==
-            DefaultOfflineResources.defaultTafsirMuyassar.fullPath) {
-      final boxName = QuranTafsirFunction.getTafsirBoxName(
-        tafsirBook: muyassar,
-      );
-      final exists = await Hive.boxExists(boxName);
-      muyassarDownloaded = muyassarDownloaded || exists;
-    }
 
     final bool selectedMuyassar = selected.any(
       (b) => b.name.contains("الميسر"),
@@ -848,10 +839,6 @@ extension _MushafShareExtension on _MushafViewState {
     final total = getVerseCount(surahNumber);
 
     int currentVerse = verseNumber;
-    final Map<String, Future<String?>> tafsirFutureByPath =
-        <String, Future<String?>>{};
-
-    List<TafsirBookModel>? cachedSelectedBooks;
 
     await showModalBottomSheet(
       context: context,
@@ -869,11 +856,6 @@ extension _MushafShareExtension on _MushafViewState {
                 ? const Color(0xFF2A2A2A)
                 : const Color(0xFFFFF9F2);
 
-            final downloadedBooks =
-                QuranTafsirFunction.getDownloadedTafsirBooks();
-            final selectedBooksFuture =
-                QuranTafsirFunction.getTafsirSelections();
-
             final String ayahKey = "$surahNumber:$currentVerse";
             final String ayahTextRaw = _getAyahText(
               sheetContext,
@@ -889,907 +871,237 @@ extension _MushafShareExtension on _MushafViewState {
               verseEndSymbol: false,
             );
 
-            Future<String?> loadTafsir() async {
-              final selectedBooks = await selectedBooksFuture;
-              final selectedList = (selectedBooks ?? []).toList();
-              TafsirBookModel? selectedBook;
-              for (final b in selectedList) {
-                if (b.name.contains("الميسر")) {
-                  selectedBook = b;
-                  break;
-                }
-              }
-              selectedBook ??= (selectedList.isNotEmpty
-                  ? selectedList.first
-                  : null);
-              if (selectedBook == null) return null;
-              return QuranTafsirFunction.getResolvedTafsirTextForBook(
-                selectedBook,
-                ayahKey,
-              );
-            }
-
-            String? extractSectionHtml(String? html, String title) {
-              if (html == null || html.trim().isEmpty) return null;
-              final pattern = RegExp(
-                r"<h3>\s*${RegExp.escape(title)}\s*<\/h3>([\s\S]*?)(?=<h3>|$)",
-                caseSensitive: false,
-              );
-              final match = pattern.firstMatch(html);
-              final content = match?.group(1);
-              return content?.trim();
-            }
-
-            Future<List<MapEntry<String, String?>>>
-            loadAllSelectedTafsirs() async {
-              final selectedBooks = await selectedBooksFuture;
-              final books = (selectedBooks ?? []).toList();
-              if (books.isEmpty) return [];
-              final List<MapEntry<String, String?>> out = [];
-              for (final b in books) {
-                final t =
-                    await QuranTafsirFunction.getResolvedTafsirTextForBook(
-                      b,
-                      ayahKey,
-                    );
-                out.add(MapEntry(b.name, t));
-              }
-              return out;
-            }
-
-            Future<void> openShareOptions() async {
-              final selectedBooks = await selectedBooksFuture;
-              final selected = (selectedBooks ?? []).toList();
-              final String tafsirTitle = selected.isNotEmpty
-                  ? selected.first.name
-                  : "التفسير";
-
-              TafsirBookModel? muyassar = _findTafsirBookByNameContains(
-                "الميسر",
-              );
-              final TafsirBookModel? mukhtasar = _findTafsirBookByNameContains(
-                "المختصر",
-              );
-
-              // Ensure we treat the offline bundled Muyassar as the authoritative one.
-              if (muyassar != null && muyassar.name.contains("الميسر")) {
-                muyassar = DefaultOfflineResources.defaultTafsirMuyassar;
-              }
-
-              bool muyassarDownloaded =
-                  muyassar != null &&
-                  _isDownloadedByFullPath(muyassar.fullPath, downloadedBooks);
-              final bool mukhtasarDownloaded =
-                  mukhtasar != null &&
-                  _isDownloadedByFullPath(mukhtasar.fullPath, downloadedBooks);
-
-              // Extra safety: bundled offline Muyassar might not exist in downloadedBooks list.
-              if (muyassar != null &&
-                  muyassar.fullPath ==
-                      DefaultOfflineResources.defaultTafsirMuyassar.fullPath) {
-                final boxName = QuranTafsirFunction.getTafsirBoxName(
-                  tafsirBook: muyassar,
-                );
-                final exists = await Hive.boxExists(boxName);
-                muyassarDownloaded = muyassarDownloaded || exists;
-              }
-
-              final bool showDownloadMuyassar =
-                  muyassar != null &&
-                  !muyassarDownloaded &&
-                  muyassar.fullPath !=
-                      DefaultOfflineResources.defaultTafsirMuyassar.fullPath;
-              // Intentionally no "download mukhtasar" from share sheet (download happens from Resources only).
-              const bool showDownloadMukhtasar = false;
-
-              final bool selectedMuyassar = selected.any(
-                (b) => b.name.contains("الميسر"),
-              );
-              final bool selectedMukhtasar = selected.any(
-                (b) => b.name.contains("المختصر"),
-              );
-              final bool showPickBetweenImageBooks =
-                  selectedMuyassar && selectedMukhtasar;
-
-              final bool isAyahDayn = ayahKey == "2:282";
-              final bool isVeryLongAyah =
-                  isAyahDayn ||
-                  ayahTextRaw.replaceAll(RegExp(r"\s+"), "").length > 280;
-              final bool allowImageShareWithTafsir =
-                  !isVeryLongAyah &&
-                  (selectedMuyassar || selectedMukhtasar) &&
-                  (muyassarDownloaded || mukhtasarDownloaded);
-
-              await showModalBottomSheet(
-                context: sheetContext,
-                useRootNavigator: true,
-                backgroundColor: Colors.transparent,
-                builder: (ctx) {
-                  return Directionality(
-                    textDirection: TextDirection.rtl,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(ctx).brightness == Brightness.dark
-                            ? const Color(0xFF1E1E1E)
-                            : const Color(0xFFFFF9F2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ListTile(
-                            leading: Icon(
-                              Icons.copy_rounded,
-                              color: themeState.primary,
-                            ),
-                            title: const Text("كنص"),
-                            subtitle: const Text(
-                              "ينسخ الآية + كل التفاسير المختارة بشكل مرتب",
-                            ),
-                            onTap: () async {
-                              Navigator.pop(ctx);
-                              await _shareLibraryAsText(
-                                context: sheetContext,
-                                surahNumber: surahNumber,
-                                verseNumber: currentVerse,
-                                ayahText: ayahTextRaw,
-                                loadTafsirs: loadAllSelectedTafsirs,
-                              );
-                            },
-                          ),
-                          Container(
-                            height: 1,
-                            margin: const EdgeInsets.symmetric(horizontal: 16),
-                            color: Colors.black.withValues(alpha: 0.06),
-                          ),
-
-                          if (showDownloadMuyassar || showDownloadMukhtasar)
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-                              child: Column(
-                                children: [
-                                  if (showDownloadMuyassar)
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: ElevatedButton.icon(
-                                        onPressed: () async {
-                                          final TafsirBookModel? book =
-                                              muyassar;
-                                          if (book == null) return;
-                                          await _downloadAndSelectTafsir(
-                                            sheetContext,
-                                            book,
-                                          );
-                                          if (ctx.mounted) Navigator.pop(ctx);
-                                          setSheetState(() {});
-                                        },
-                                        icon: const Icon(
-                                          Icons.download_rounded,
-                                        ),
-                                        label: const Text(
-                                          "تحميل التفسير الميسر",
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-
-                          ListTile(
-                            leading: Icon(
-                              Icons.image_outlined,
-                              color: themeState.primary,
-                            ),
-                            title: const Text("كصورة (بدون تفسير)"),
-                            subtitle: const Text(
-                              "مشاركة الآية فقط كصورة — مناسب للآيات الطويلة",
-                            ),
-                            onTap: () async {
-                              Navigator.pop(ctx);
-                              await _shareAsImage(
-                                sheetContext,
-                                ayahKey,
-                                ayahTextRaw,
-                              );
-                            },
-                          ),
-
-                          if (allowImageShareWithTafsir &&
-                              showPickBetweenImageBooks) ...[
-                            ListTile(
-                              leading: Icon(
-                                Icons.image_outlined,
-                                color: themeState.primary,
-                              ),
-                              title: const Text("كصورة - التفسير الميسر"),
-                              subtitle: const Text(
-                                "مشاركة صورة بالتفسير الميسر",
-                              ),
-                              onTap: () async {
-                                Navigator.pop(ctx);
-                                final b = selected.firstWhere(
-                                  (x) => x.name.contains("الميسر"),
-                                  orElse: () => selected.first,
-                                );
-                                await _shareLibraryAsImage(
-                                  context: sheetContext,
-                                  surahNumber: surahNumber,
-                                  verseNumber: currentVerse,
-                                  ayahKey: ayahKey,
-                                  tafsirTitle: "التفسير الميسر",
-                                  loadTafsir: () =>
-                                      QuranTafsirFunction.getResolvedTafsirTextForBook(
-                                        b,
-                                        ayahKey,
-                                      ),
-                                );
-                              },
-                            ),
-                            ListTile(
-                              leading: Icon(
-                                Icons.image_outlined,
-                                color: themeState.primary,
-                              ),
-                              title: const Text("كصورة - التفسير المختصر"),
-                              subtitle: const Text(
-                                "مشاركة صورة بالتفسير المختصر",
-                              ),
-                              onTap: () async {
-                                Navigator.pop(ctx);
-                                final b = selected.firstWhere(
-                                  (x) => x.name.contains("المختصر"),
-                                  orElse: () => selected.first,
-                                );
-                                await _shareLibraryAsImage(
-                                  context: sheetContext,
-                                  surahNumber: surahNumber,
-                                  verseNumber: currentVerse,
-                                  ayahKey: ayahKey,
-                                  tafsirTitle: "التفسير المختصر",
-                                  loadTafsir: () =>
-                                      QuranTafsirFunction.getResolvedTafsirTextForBook(
-                                        b,
-                                        ayahKey,
-                                      ),
-                                );
-                              },
-                            ),
-                          ] else if (allowImageShareWithTafsir)
-                            ListTile(
-                              leading: Icon(
-                                Icons.image_outlined,
-                                color: themeState.primary,
-                              ),
-                              title: const Text("كصورة"),
-                              subtitle: Text(
-                                "يصنع صورة بنفس تنسيق المكتبة ($tafsirTitle)",
-                              ),
-                              onTap: () async {
-                                Navigator.pop(ctx);
-                                await _shareLibraryAsImage(
-                                  context: sheetContext,
-                                  surahNumber: surahNumber,
-                                  verseNumber: currentVerse,
-                                  ayahKey: ayahKey,
-                                  tafsirTitle: tafsirTitle,
-                                  loadTafsir: loadTafsir,
-                                );
-                              },
-                            ),
-
-                          const SizedBox(height: 6),
-                        ],
-                      ),
+            return DefaultTabController(
+              length: 5,
+              child: Directionality(
+                textDirection: TextDirection.rtl,
+                child: Container(
+                  height: MediaQuery.of(sheetContext).size.height * 0.92,
+                  decoration: BoxDecoration(
+                    color: bg,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(24),
+                      topRight: Radius.circular(24),
                     ),
-                  );
-                },
-              );
-            }
-
-            return Directionality(
-              textDirection: TextDirection.rtl,
-              child: Container(
-                height: MediaQuery.of(sheetContext).size.height * 0.92,
-                decoration: BoxDecoration(
-                  color: bg,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    topRight: Radius.circular(24),
                   ),
-                ),
-                child: SafeArea(
-                  top: false,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
-                        child: Row(
-                          children: [
-                            TextButton(
-                              onPressed: () async {
-                                await Navigator.of(
-                                  sheetContext,
-                                  rootNavigator: true,
-                                ).push(
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        const QuranResourcesView(initTab: 1),
-                                  ),
-                                );
-                                setSheetState(() {});
-                              },
-                              child: Text(
-                                "تحرير",
-                                style: TextStyle(
-                                  color: themeState.primary,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                            const Spacer(),
-                            Text(
-                              "المكتبة",
-                              style: TextStyle(
-                                fontSize: 20,
-                                height: 1.2,
-                                fontWeight: FontWeight.w800,
-                                color:
-                                    Theme.of(sheetContext).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white
-                                    : const Color(0xFF1B1B1B),
-                              ),
-                            ),
-                            const Spacer(),
-                            IconButton(
-                              onPressed: () => Navigator.pop(sheetContext),
-                              icon: const Icon(Icons.close_rounded),
-                              color: themeState.primary,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        height: 1,
-                        color:
-                            Theme.of(sheetContext).brightness == Brightness.dark
-                            ? Colors.white.withValues(alpha: 0.06)
-                            : Colors.black.withValues(alpha: 0.06),
-                      ),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.fromLTRB(10, 16, 10, 16), // قللنا الحواف لزيادة المساحة للآيات
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                  child: SafeArea(
+                    top: false,
+                    child: Column(
+                      children: [
+                        // Header
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+                          child: Row(
                             children: [
-                              Container(
-                                padding: const EdgeInsets.all(12), // قللنا الحواف لزيادة المساحة للآيات
-                                decoration: BoxDecoration(
-                                  color:
-                                      Theme.of(sheetContext).brightness ==
-                                          Brightness.dark
-                                      ? const Color(0xFF1E1E1E)
-                                      : const Color(0xFFF1E9DD),
-                                  borderRadius: BorderRadius.circular(18),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Text.rich(
-                                      TextSpan(
-                                        children: [
-                                          TextSpan(text: qcfAyah),
-                                          const TextSpan(text: "\u200A"),
-                                          TextSpan(
-                                            text: getVerseNumberQCF(
-                                              surahNumber,
-                                              currentVerse,
-                                            ),
-                                            style: TextStyle(
-                                              fontFamily: ayahPageFont,
-                                              package: "qcf_quran",
-                                              height: 1,
-                                              color:
-                                                  Theme.of(
-                                                        sheetContext,
-                                                      ).brightness ==
-                                                      Brightness.dark
-                                                  ? Colors.white.withValues(
-                                                      alpha: 0.70,
-                                                    )
-                                                  : const Color(
-                                                      0xFF1B1B1B,
-                                                    ).withValues(alpha: 0.70),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      locale: const Locale("ar"),
-                                      textScaler: const TextScaler.linear(1),
-                                      textAlign: TextAlign.center,
-                                      textDirection: TextDirection.rtl,
-                                      strutStyle: StrutStyle(
-                                        fontFamily: ayahPageFont,
-                                        package: "qcf_quran",
-                                        fontSize: 15, // تصغير للتأكد من عدم الإلتفاف
-                                        height: 1.80, // تباعد سطور أفضل
-                                        forceStrutHeight: true,
-                                      ),
-                                      style: TextStyle(
-                                        fontFamily: ayahPageFont,
-                                        package: "qcf_quran",
-                                        fontSize: 15, // تصغير
-                                        height: 1.80,
-                                        color:
-                                            Theme.of(sheetContext).brightness ==
-                                                Brightness.dark
-                                            ? Colors.white
-                                            : const Color(0xFF1B1B1B),
-                                      ),
+                              TextButton(
+                                onPressed: () async {
+                                  await Navigator.of(
+                                    sheetContext,
+                                    rootNavigator: true,
+                                  ).push(
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const QuranResourcesView(initTab: 1),
                                     ),
-                                  ],
+                                  );
+                                  setSheetState(() {});
+                                },
+                                child: Text(
+                                  "تحرير",
+                                  style: TextStyle(
+                                    color: themeState.primary,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: 14),
-                              Row(
-                                children: [
-                                  IconButton(
-                                    onPressed: openShareOptions,
-                                    icon: const Icon(Icons.share_rounded),
-                                    color: themeState.primary,
-                                  ),
-                                  const Spacer(),
-                                  FutureBuilder<List<TafsirBookModel>?>(
-                                    future: selectedBooksFuture,
-                                    builder: (context, snap) {
-                                      final books =
-                                          snap.connectionState ==
-                                              ConnectionState.done
-                                          ? (snap.data ??
-                                                const <TafsirBookModel>[])
-                                          : (cachedSelectedBooks ??
-                                                const <TafsirBookModel>[]);
-
-                                      if (snap.connectionState ==
-                                              ConnectionState.done &&
-                                          snap.data != null) {
-                                        cachedSelectedBooks = snap.data;
-                                      }
-
-                                      final String label;
-                                      if (books.isEmpty) {
-                                        label = "التفسير";
-                                      } else if (books.length == 1) {
-                                        label = books.first.name;
-                                      } else {
-                                        label =
-                                            "${_toArabicDigits(books.length.toString())} تفاسير";
-                                      }
-
-                                      log(
-                                        "[Library] header ayahKey=$ayahKey selectedCount=${books.length}",
-                                        name: "LibrarySheet",
-                                      );
-
-                                      return Text(
-                                        label,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w700,
-                                          color:
-                                              Theme.of(
-                                                    sheetContext,
-                                                  ).brightness ==
-                                                  Brightness.dark
-                                              ? Colors.white.withValues(
-                                                  alpha: 0.60,
-                                                )
-                                              : const Color(
-                                                  0xFF1B1B1B,
-                                                ).withValues(alpha: 0.60),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ],
+                              const Spacer(),
+                              Text(
+                                "المكتبة",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  height: 1.2,
+                                  fontWeight: FontWeight.w800,
+                                  color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                                ),
                               ),
-                              const SizedBox(height: 10),
-                              FutureBuilder<List<TafsirBookModel>?>(
-                                future: selectedBooksFuture,
-                                builder: (context, booksSnap) {
-                                  final books =
-                                      booksSnap.connectionState ==
-                                          ConnectionState.done
-                                      ? (booksSnap.data ??
-                                            const <TafsirBookModel>[])
-                                      : (cachedSelectedBooks ??
-                                            const <TafsirBookModel>[]);
-
-                                  if (booksSnap.connectionState ==
-                                          ConnectionState.done &&
-                                      booksSnap.data != null) {
-                                    cachedSelectedBooks = booksSnap.data;
-                                  }
-
-                                  log(
-                                    "[Library] ayahKey=$ayahKey selectedTafsirs=${books.map((e) => e.fullPath).toList()}",
-                                    name: "LibrarySheet",
-                                  );
-
-                                  if (books.isEmpty) {
-                                    return Container(
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: card,
-                                        borderRadius: BorderRadius.circular(18),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withValues(
-                                              alpha: 0.05,
-                                            ),
-                                            blurRadius: 14,
-                                            offset: const Offset(0, 8),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Text(
-                                        "مفيش تفسير مختار حالياً. اضغط تحرير واختار التفاسير اللي عايزها.",
-                                        textAlign: TextAlign.center,
-                                        textDirection: TextDirection.rtl,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          height: 1.6,
-                                          fontWeight: FontWeight.w600,
-                                          color:
-                                              Theme.of(
-                                                    sheetContext,
-                                                  ).brightness ==
-                                                  Brightness.dark
-                                              ? Colors.white
-                                              : const Color(0xFF1B1B1B),
-                                        ),
-                                      ),
-                                    );
-                                  }
-
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children:
-                                        books.map<Widget>((book) {
-                                          final Future<String?>
-                                          ayahTafsirFuture = tafsirFutureByPath
-                                              .putIfAbsent(
-                                                "${book.fullPath}|$ayahKey",
-                                                () =>
-                                                    QuranTafsirFunction.getResolvedTafsirTextForBook(
-                                                      book,
-                                                      ayahKey,
-                                                    ),
-                                              );
-
-                                          final bool isMuyassarBook = book.name
-                                              .contains("الميسر");
-                                          final Future<List<String?>>
-                                          mergedFuture;
-                                          if (isMuyassarBook) {
-                                            final Future<String?> introFuture =
-                                                tafsirFutureByPath.putIfAbsent(
-                                                  "${book.fullPath}|$surahNumber:1",
-                                                  () =>
-                                                      QuranTafsirFunction.getResolvedTafsirTextForBook(
-                                                        book,
-                                                        "$surahNumber:1",
-                                                      ),
-                                                );
-                                            mergedFuture = Future.wait([
-                                              introFuture,
-                                              ayahTafsirFuture,
-                                            ]);
-                                          } else {
-                                            mergedFuture = Future.wait([
-                                              Future<String?>.value(null),
-                                              ayahTafsirFuture,
-                                            ]);
-                                          }
-
-                                          return Container(
-                                            width: double.infinity,
-                                            margin: const EdgeInsets.only(
-                                              bottom: 12,
-                                            ),
-                                            padding: const EdgeInsets.all(16),
-                                            decoration: BoxDecoration(
-                                              color: card,
-                                              borderRadius:
-                                                  BorderRadius.circular(18),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withValues(alpha: 0.05),
-                                                  blurRadius: 14,
-                                                  offset: const Offset(0, 8),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.stretch,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "${book.name} (العربية)",
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w800,
-                                                        color:
-                                                            Theme.of(
-                                                                  sheetContext,
-                                                                ).brightness ==
-                                                                Brightness.dark
-                                                            ? Colors.white
-                                                                  .withValues(
-                                                                    alpha: 0.70,
-                                                                  )
-                                                            : const Color(
-                                                                0xFF1B1B1B,
-                                                              ).withValues(
-                                                                alpha: 0.70,
-                                                              ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(height: 10),
-                                                FutureBuilder<List<String?>>(
-                                                  future: mergedFuture,
-                                                  builder: (context, mergedSnap) {
-                                                    if (mergedSnap
-                                                            .connectionState !=
-                                                        ConnectionState.done) {
-                                                      return const SizedBox.shrink();
-                                                    }
-                                                    final introRaw =
-                                                        mergedSnap.data?.first
-                                                            ?.trim() ??
-                                                        "";
-                                                    final ayahRaw =
-                                                        mergedSnap.data?.last
-                                                            ?.trim() ??
-                                                        "";
-
-                                                    final String shown;
-                                                    if (isMuyassarBook) {
-                                                      final naming =
-                                                          extractSectionHtml(
-                                                            introRaw,
-                                                            "تسمية السورة",
-                                                          ) ??
-                                                          "";
-                                                      final objectives =
-                                                          extractSectionHtml(
-                                                            introRaw,
-                                                            "من مقاصد السورة",
-                                                          ) ??
-                                                          "";
-
-                                                      final buffer =
-                                                          StringBuffer();
-                                                      if (naming
-                                                          .trim()
-                                                          .isNotEmpty) {
-                                                        buffer.writeln(
-                                                          "تسمية السورة:\n${_stripHtml(naming)}\n",
-                                                        );
-                                                      }
-                                                      if (objectives
-                                                          .trim()
-                                                          .isNotEmpty) {
-                                                        buffer.writeln(
-                                                          "من مقاصد السورة:\n${_stripHtml(objectives)}\n",
-                                                        );
-                                                      }
-                                                      if (ayahRaw
-                                                          .trim()
-                                                          .isNotEmpty) {
-                                                        buffer.writeln(
-                                                          _stripHtml(ayahRaw),
-                                                        );
-                                                      }
-                                                      shown = buffer
-                                                          .toString()
-                                                          .trim();
-                                                    } else {
-                                                      shown = _stripHtml(
-                                                        ayahRaw,
-                                                      ).trim();
-                                                    }
-
-                                                    if (shown.isEmpty) {
-                                                      return const Text(
-                                                        "لا يوجد تفسير لهذه الآية.",
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        textDirection:
-                                                            TextDirection.rtl,
-                                                      );
-                                                    }
-
-                                                    return Text(
-                                                      shown,
-                                                      textDirection:
-                                                          TextDirection.rtl,
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        height: 1.7,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        color:
-                                                            Theme.of(
-                                                                  sheetContext,
-                                                                ).brightness ==
-                                                                Brightness.dark
-                                                            ? Colors.white
-                                                            : const Color(
-                                                                0xFF1B1B1B,
-                                                              ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        }).toList()..add(
-                                          FutureBuilder<String?>(
-                                            future:
-                                                QuranIrabFunction.getIrabText(
-                                                  ayahKey,
-                                                ),
-                                            builder: (context, irabSnap) {
-                                              if (irabSnap.connectionState !=
-                                                      ConnectionState.done ||
-                                                  irabSnap.data == null ||
-                                                  irabSnap.data!
-                                                      .trim()
-                                                      .isEmpty) {
-                                                return const SizedBox.shrink();
-                                              }
-                                              return Container(
-                                                width: double.infinity,
-                                                margin: const EdgeInsets.only(
-                                                  bottom: 12,
-                                                ),
-                                                padding: const EdgeInsets.all(
-                                                  16,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: card,
-                                                  borderRadius:
-                                                      BorderRadius.circular(18),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.black
-                                                          .withValues(
-                                                            alpha: 0.05,
-                                                          ),
-                                                      blurRadius: 14,
-                                                      offset: const Offset(
-                                                        0,
-                                                        8,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .stretch,
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        Text(
-                                                          "إعراب القرآن الكريم",
-                                                          style: TextStyle(
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight.w800,
-                                                            color:
-                                                                Theme.of(
-                                                                      sheetContext,
-                                                                    ).brightness ==
-                                                                    Brightness
-                                                                        .dark
-                                                                ? Colors.white
-                                                                      .withValues(
-                                                                        alpha:
-                                                                            0.70,
-                                                                      )
-                                                                : const Color(
-                                                                    0xFF1B1B1B,
-                                                                  ).withValues(
-                                                                    alpha: 0.70,
-                                                                  ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    const SizedBox(height: 10),
-                                                    Text(
-                                                      _stripHtml(
-                                                        irabSnap.data!,
-                                                      ),
-                                                      textDirection:
-                                                          TextDirection.rtl,
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        height: 1.7,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        color:
-                                                            Theme.of(
-                                                                  sheetContext,
-                                                                ).brightness ==
-                                                                Brightness.dark
-                                                            ? Colors.white
-                                                            : const Color(
-                                                                0xFF1B1B1B,
-                                                              ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                  );
-                                },
+                              const Spacer(),
+                              IconButton(
+                                onPressed: () => Navigator.pop(sheetContext),
+                                icon: const Icon(Icons.close_rounded),
+                                color: themeState.primary,
                               ),
                             ],
                           ),
                         ),
-                      ),
-                      Container(
-                        height: 1,
-                        color: Colors.black.withValues(alpha: 0.06),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-                        child: Row(
-                          children: [
-                            IconButton(
-                              onPressed: currentVerse > 1
-                                  ? () => setSheetState(() => currentVerse -= 1)
-                                  : null,
-                              icon: const Icon(Icons.arrow_back_rounded),
-                              color: themeState.primary,
+                        Container(
+                          height: 1,
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.06)
+                              : Colors.black.withValues(alpha: 0.06),
+                        ),
+                        // Condensed Ayah display
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(10, 12, 10, 8),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFF1E1E1E)
+                                : const Color(0xFFF1E9DD),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(text: qcfAyah),
+                                const TextSpan(text: "\u200A"),
+                                TextSpan(
+                                  text: getVerseNumberQCF(surahNumber, currentVerse),
+                                  style: TextStyle(
+                                    fontFamily: ayahPageFont,
+                                    package: "qcf_quran",
+                                    height: 1,
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.70)
+                                        : const Color(0xFF1B1B1B).withValues(alpha: 0.70),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Expanded(
-                              child: Text(
-                                "${getSurahNameArabic(surahNumber)}: ${_toArabicDigits(currentVerse.toString())}",
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  height: 1.2,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF1B1B1B),
+                            locale: const Locale("ar"),
+                            textScaler: const TextScaler.linear(1),
+                            textAlign: TextAlign.center,
+                            textDirection: TextDirection.rtl,
+                            strutStyle: StrutStyle(
+                              fontFamily: ayahPageFont,
+                              package: "qcf_quran",
+                              fontSize: 14,
+                              height: 1.70,
+                              forceStrutHeight: true,
+                            ),
+                            style: TextStyle(
+                              fontFamily: ayahPageFont,
+                              package: "qcf_quran",
+                              fontSize: 14,
+                              height: 1.70,
+                              color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                            ),
+                          ),
+                        ),
+                        // TabBar
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 8),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFF2A2A2A)
+                                : const Color(0xFFEFE3D2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: TabBar(
+                            labelColor: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                            unselectedLabelColor: isDark
+                                ? Colors.white.withValues(alpha: 0.50)
+                                : const Color(0xFF1B1B1B).withValues(alpha: 0.50),
+                            labelStyle: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            indicator: BoxDecoration(
+                              color: themeState.primary,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            indicatorPadding: const EdgeInsets.all(4),
+                            dividerColor: Colors.transparent,
+                            tabs: const [
+                              Tab(text: "تفسير"),
+                              Tab(text: "ترجمة"),
+                              Tab(text: "إعراب"),
+                              Tab(text: "صرف"),
+                              Tab(text: "قراءات"),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        // TabBarView
+                        Expanded(
+                          child: TabBarView(
+                            children: [
+                              // Tafsir Tab
+                              _TafsirTabContent(
+                                ayahKey: ayahKey,
+                                surahNumber: surahNumber,
+                                card: card,
+                                isDark: isDark,
+                              ),
+                              // Translation Tab
+                              _TranslationTabContent(
+                                ayahKey: ayahKey,
+                                card: card,
+                                isDark: isDark,
+                              ),
+                              // I'rab Tab
+                              _IrabTabContent(
+                                ayahKey: ayahKey,
+                                card: card,
+                                isDark: isDark,
+                              ),
+                              // Sarf Tab
+                              _SarfTabContent(
+                                ayahKey: ayahKey,
+                                card: card,
+                                isDark: isDark,
+                                themeState: themeState,
+                              ),
+                              // Qiraat Tab
+                              _QiraatTabContent(
+                                ayahKey: ayahKey,
+                                card: card,
+                                isDark: isDark,
+                                themeState: themeState,
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Navigation arrows
+                        Container(
+                          height: 1,
+                          color: Colors.black.withValues(alpha: 0.06),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                onPressed: currentVerse > 1
+                                    ? () => setSheetState(() => currentVerse -= 1)
+                                    : null,
+                                icon: const Icon(Icons.arrow_back_rounded),
+                                color: themeState.primary,
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "${getSurahNameArabic(surahNumber)}: ${_toArabicDigits(currentVerse.toString())}",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    height: 1.2,
+                                    fontWeight: FontWeight.w800,
+                                    color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                                  ),
                                 ),
                               ),
-                            ),
-                            IconButton(
-                              onPressed: currentVerse < total
-                                  ? () => setSheetState(() => currentVerse += 1)
-                                  : null,
-                              icon: const Icon(Icons.arrow_forward_rounded),
-                              color: themeState.primary,
-                            ),
-                          ],
+                              IconButton(
+                                onPressed: currentVerse < total
+                                    ? () => setSheetState(() => currentVerse += 1)
+                                    : null,
+                                icon: const Icon(Icons.arrow_forward_rounded),
+                                color: themeState.primary,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -1797,6 +1109,543 @@ extension _MushafShareExtension on _MushafViewState {
           },
         );
       },
+    );
+  }
+
+  /// Tafsir Tab Content Widget
+  Widget _TafsirTabContent({
+    required String ayahKey,
+    required int surahNumber,
+    required Color card,
+    required bool isDark,
+  }) {
+    final Map<String, Future<String?>> tafsirFutureByPath = <String, Future<String?>>{};
+    List<TafsirBookModel>? cachedSelectedBooks;
+
+    String? extractSectionHtml(String? html, String title) {
+      if (html == null || html.trim().isEmpty) return null;
+      final pattern = RegExp(
+        r"<h3>\s*${RegExp.escape(title)}\s*<\/h3>([\s\S]*?)(?=<h3>|$)",
+        caseSensitive: false,
+      );
+      final match = pattern.firstMatch(html);
+      final content = match?.group(1);
+      return content?.trim();
+    }
+
+    return FutureBuilder<List<TafsirBookModel>?>(
+      future: QuranTafsirFunction.getTafsirSelections(),
+      builder: (context, booksSnap) {
+        final books = booksSnap.connectionState == ConnectionState.done
+            ? (booksSnap.data ?? const <TafsirBookModel>[])
+            : (cachedSelectedBooks ?? const <TafsirBookModel>[]);
+
+        if (booksSnap.connectionState == ConnectionState.done && booksSnap.data != null) {
+          cachedSelectedBooks = booksSnap.data;
+        }
+
+        if (books.isEmpty) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: card,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Text(
+                "مفيش تفسير مختار حالياً. اضغط تحرير واختار التفاسير اللي عايزها.",
+                textAlign: TextAlign.center,
+                textDirection: TextDirection.rtl,
+                style: TextStyle(
+                  fontSize: 16,
+                  height: 1.6,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                ),
+              ),
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
+          itemCount: books.length,
+          itemBuilder: (context, index) {
+            final book = books[index];
+            final ayahTafsirFuture = tafsirFutureByPath.putIfAbsent(
+              "${book.fullPath}|$ayahKey",
+              () => QuranTafsirFunction.getResolvedTafsirTextForBook(book, ayahKey),
+            );
+
+            final bool isMuyassarBook = book.name.contains("الميسر");
+            final Future<List<String?>> mergedFuture;
+            if (isMuyassarBook) {
+              final introFuture = tafsirFutureByPath.putIfAbsent(
+                "${book.fullPath}|$surahNumber:1",
+                () => QuranTafsirFunction.getResolvedTafsirTextForBook(book, "$surahNumber:1"),
+              );
+              mergedFuture = Future.wait([introFuture, ayahTafsirFuture]);
+            } else {
+              mergedFuture = Future.wait([Future<String?>.value(null), ayahTafsirFuture]);
+            }
+
+            return Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: card,
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 14,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    "${book.name} (العربية)",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.70)
+                          : const Color(0xFF1B1B1B).withValues(alpha: 0.70),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  FutureBuilder<List<String?>>(
+                    future: mergedFuture,
+                    builder: (context, mergedSnap) {
+                      if (mergedSnap.connectionState != ConnectionState.done) {
+                        return const Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        );
+                      }
+                      final introRaw = mergedSnap.data?.first?.trim() ?? "";
+                      final ayahRaw = mergedSnap.data?.last?.trim() ?? "";
+
+                      final String shown;
+                      if (isMuyassarBook) {
+                        final naming = extractSectionHtml(introRaw, "تسمية السورة") ?? "";
+                        final objectives = extractSectionHtml(introRaw, "من مقاصد السورة") ?? "";
+                        final buffer = StringBuffer();
+                        if (naming.trim().isNotEmpty) {
+                          buffer.writeln("تسمية السورة:\n${_stripHtml(naming)}\n");
+                        }
+                        if (objectives.trim().isNotEmpty) {
+                          buffer.writeln("من مقاصد السورة:\n${_stripHtml(objectives)}\n");
+                        }
+                        if (ayahRaw.trim().isNotEmpty) {
+                          buffer.writeln(_stripHtml(ayahRaw));
+                        }
+                        shown = buffer.toString().trim();
+                      } else {
+                        shown = _stripHtml(ayahRaw).trim();
+                      }
+
+                      if (shown.isEmpty) {
+                        return const Text(
+                          "لا يوجد تفسير لهذه الآية.",
+                          textAlign: TextAlign.center,
+                          textDirection: TextDirection.rtl,
+                        );
+                      }
+
+                      return Text(
+                        shown,
+                        textDirection: TextDirection.rtl,
+                        style: TextStyle(
+                          fontSize: 16,
+                          height: 1.7,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// Translation Tab Content Widget
+  Widget _TranslationTabContent({
+    required String ayahKey,
+    required Color card,
+    required bool isDark,
+  }) {
+    return FutureBuilder<List<TranslationOfAyah>>(
+      future: QuranTranslationFunction.getTranslation(ayahKey),
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final translations = snap.data ?? [];
+
+        if (translations.isEmpty) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: card,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Text(
+                "مفيش ترجمة مختارة. اضغط تحرير واختار الترجمات.",
+                textAlign: TextAlign.center,
+                textDirection: TextDirection.rtl,
+                style: TextStyle(
+                  fontSize: 16,
+                  height: 1.6,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                ),
+              ),
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
+          itemCount: translations.length,
+          itemBuilder: (context, index) {
+            final item = translations[index];
+            final transMap = item.translation;
+            final text = transMap != null ? (transMap['t'] ?? '').toString().trim() : '';
+            final bookName = item.bookInfo?.name ?? "ترجمة";
+            return Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: card,
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 14,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    bookName,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.70)
+                          : const Color(0xFF1B1B1B).withValues(alpha: 0.70),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  if (text.isEmpty || text.contains("Not Found"))
+                    const Text(
+                      "لا توجد ترجمة لهذه الآية.",
+                      textAlign: TextAlign.center,
+                      textDirection: TextDirection.rtl,
+                    )
+                  else
+                    Text(
+                      text,
+                      textDirection: TextDirection.rtl,
+                      style: TextStyle(
+                        fontSize: 16,
+                        height: 1.7,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// I'rab Tab Content Widget
+  Widget _IrabTabContent({
+    required String ayahKey,
+    required Color card,
+    required bool isDark,
+  }) {
+    return FutureBuilder<String?>(
+      future: QuranIrabFunction.getIrabText(ayahKey),
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final irabText = snap.data?.trim() ?? "";
+        if (irabText.isEmpty) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: card,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Text(
+                "لا يوجد إعراب متاح لهذه الآية حالياً.",
+                textAlign: TextAlign.center,
+                textDirection: TextDirection.rtl,
+                style: TextStyle(
+                  fontSize: 16,
+                  height: 1.6,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                ),
+              ),
+            ),
+          );
+        }
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: card,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 14,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  "إعراب القرآن الكريم",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.70)
+                        : const Color(0xFF1B1B1B).withValues(alpha: 0.70),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  _stripHtml(irabText),
+                  textDirection: TextDirection.rtl,
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.7,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Sarf Tab Content Widget
+  Widget _SarfTabContent({
+    required String ayahKey,
+    required Color card,
+    required bool isDark,
+    required ThemeState themeState,
+  }) {
+    return FutureBuilder<String?>(
+      future: QuranSarfFunction.getResolvedSarfTextForBook(
+        TafsirBookModel(
+          language: "arabic",
+          name: "معجم الصرف الميسر",
+          totalAyahs: 6236,
+          hasTafsir: 1,
+          score: 1.0,
+          fullPath: "sarf_db",
+        ),
+        ayahKey,
+      ),
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final sarfText = snap.data?.trim() ?? "";
+        if (sarfText.isEmpty || sarfText.contains("قيد التطوير")) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: card,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.auto_stories_outlined,
+                    size: 48,
+                    color: themeState.primary.withValues(alpha: 0.60),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    "قسم الصرف قيد التطوير",
+                    textAlign: TextAlign.center,
+                    textDirection: TextDirection.rtl,
+                    style: TextStyle(
+                      fontSize: 18,
+                      height: 1.5,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "سيتم إضافة بيانات الصرف والتحليل الصرفي للكلمات قريباً إن شاء الله.",
+                    textAlign: TextAlign.center,
+                    textDirection: TextDirection.rtl,
+                    style: TextStyle(
+                      fontSize: 14,
+                      height: 1.6,
+                      fontWeight: FontWeight.w500,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.60)
+                          : const Color(0xFF1B1B1B).withValues(alpha: 0.60),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: card,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 14,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  "التحليل الصرفي",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.70)
+                        : const Color(0xFF1B1B1B).withValues(alpha: 0.70),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  _stripHtml(sarfText),
+                  textDirection: TextDirection.rtl,
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.7,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Qiraat Tab Content Widget
+  Widget _QiraatTabContent({
+    required String ayahKey,
+    required Color card,
+    required bool isDark,
+    required ThemeState themeState,
+  }) {
+    // Placeholder for Qiraat/Riwayat differences
+    // TODO: Implement actual Qiraat data loading from external library
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: card,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.record_voice_over_outlined,
+              size: 48,
+              color: themeState.primary.withValues(alpha: 0.60),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "قسم القراءات قيد التطوير",
+              textAlign: TextAlign.center,
+              textDirection: TextDirection.rtl,
+              style: TextStyle(
+                fontSize: 18,
+                height: 1.5,
+                fontWeight: FontWeight.w700,
+                color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "سيتم إضافة اختلافات القراءات والروايات للآية قريباً إن شاء الله.",
+              textAlign: TextAlign.center,
+              textDirection: TextDirection.rtl,
+              style: TextStyle(
+                fontSize: 14,
+                height: 1.6,
+                fontWeight: FontWeight.w500,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.60)
+                    : const Color(0xFF1B1B1B).withValues(alpha: 0.60),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

@@ -7,7 +7,6 @@ import 'package:al_quran_v3/src/screen/mushaf/widgets/wahy_index_sheet.dart';
 import 'package:al_quran_v3/src/screen/mushaf/widgets/search_sheet.dart';
 import "package:al_quran_v3/src/screen/mushaf/widgets/listen_range_sheet.dart";
 import "dart:convert";
-import "dart:developer";
 import "dart:ui" as ui;
 
 import "package:flutter/material.dart";
@@ -39,7 +38,9 @@ import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_mod
 import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_irab_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/default_offline_resources.dart";
+import "package:al_quran_v3/src/utils/quran_resources/quran_translation_function.dart";
+import "package:al_quran_v3/src/utils/quran_resources/quran_sarf_function.dart";
+import "package:al_quran_v3/src/utils/quran_resources/get_translation_with_word_by_word.dart";
 import "package:al_quran_v3/src/utils/quran_resources/word_by_word_function.dart";
 import "package:al_quran_v3/src/utils/quran_word/show_popup_word_function.dart";
 import "package:hive_ce_flutter/hive_flutter.dart";

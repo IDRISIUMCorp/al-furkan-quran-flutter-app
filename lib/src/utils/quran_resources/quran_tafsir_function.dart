@@ -2,7 +2,6 @@ import "dart:convert";
 import "dart:developer";
 
 import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
-import "package:al_quran_v3/src/utils/quran_resources/default_offline_resources.dart";
 import "package:dio/dio.dart" as dio;
 import "package:flutter/cupertino.dart";
 import "package:flutter/foundation.dart";
@@ -122,17 +121,6 @@ class QuranTafsirFunction {
 
     final books = raw
         .map((e) => TafsirBookModel.fromMap(Map<String, dynamic>.from(e)))
-        .where((b) => b.fullPath != DefaultOfflineResources.remoteMuyassarFullPath)
-        .map((b) {
-          final name = b.name.trim();
-          final isMuyassarByName = name == "التفسير الميسر";
-          final isMuyassarByPath = b.fullPath.toLowerCase().contains("muyassar");
-          final isBundled = b.fullPath == DefaultOfflineResources.defaultTafsirMuyassar.fullPath;
-          if ((isMuyassarByName || isMuyassarByPath) && !isBundled) {
-            return DefaultOfflineResources.defaultTafsirMuyassar;
-          }
-          return b;
-        })
         .toList();
 
     // De-duplicate by fullPath after normalization.
