@@ -872,7 +872,7 @@ extension _MushafShareExtension on _MushafViewState {
             );
 
             return DefaultTabController(
-              length: 5,
+              length: 4,
               child: Directionality(
                 textDirection: TextDirection.rtl,
                 child: Container(
@@ -987,7 +987,7 @@ extension _MushafShareExtension on _MushafViewState {
                             ),
                           ),
                         ),
-                        // TabBar
+                        // TabBar (بدون التفسير)
                         Container(
                           margin: const EdgeInsets.symmetric(horizontal: 8),
                           decoration: BoxDecoration(
@@ -1006,14 +1006,15 @@ extension _MushafShareExtension on _MushafViewState {
                               fontWeight: FontWeight.w700,
                             ),
                             indicator: BoxDecoration(
-                              color: themeState.primary,
+                              color: isDark
+                                  ? const Color(0xFF1E1E1E)
+                                  : const Color(0xFFF7F1E6),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             indicatorSize: TabBarIndicatorSize.tab,
                             indicatorPadding: const EdgeInsets.all(4),
                             dividerColor: Colors.transparent,
                             tabs: const [
-                              Tab(text: "تفسير"),
                               Tab(text: "ترجمة"),
                               Tab(text: "إعراب"),
                               Tab(text: "صرف"),
@@ -1022,45 +1023,94 @@ extension _MushafShareExtension on _MushafViewState {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        // TabBarView
+                        // Tabs + Tafsir تحتهم (زي الصورة)
                         Expanded(
-                          child: TabBarView(
-                            children: [
-                              // Tafsir Tab
-                              _TafsirTabContent(
-                                ayahKey: ayahKey,
-                                surahNumber: surahNumber,
-                                card: card,
-                                isDark: isDark,
-                              ),
-                              // Translation Tab
-                              _TranslationTabContent(
-                                ayahKey: ayahKey,
-                                card: card,
-                                isDark: isDark,
-                              ),
-                              // I'rab Tab
-                              _IrabTabContent(
-                                ayahKey: ayahKey,
-                                card: card,
-                                isDark: isDark,
-                                themeState: themeState,
-                              ),
-                              // Sarf Tab
-                              _SarfTabContent(
-                                ayahKey: ayahKey,
-                                card: card,
-                                isDark: isDark,
-                                themeState: themeState,
-                              ),
-                              // Qiraat Tab
-                              _QiraatTabContent(
-                                ayahKey: ayahKey,
-                                card: card,
-                                isDark: isDark,
-                                themeState: themeState,
-                              ),
-                            ],
+                          child: SingleChildScrollView(
+                            padding: EdgeInsets.zero,
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height:
+                                      (MediaQuery.of(sheetContext).size.height * 0.26)
+                                          .clamp(210.0, 320.0),
+                                  child: TabBarView(
+                                    children: [
+                                      // Translation Tab
+                                      _TranslationTabContent(
+                                        ayahKey: ayahKey,
+                                        card: card,
+                                        isDark: isDark,
+                                      ),
+                                      // I'rab Tab
+                                      _IrabTabContent(
+                                        ayahKey: ayahKey,
+                                        card: card,
+                                        isDark: isDark,
+                                        themeState: themeState,
+                                      ),
+                                      // Sarf Tab
+                                      _SarfTabContent(
+                                        ayahKey: ayahKey,
+                                        card: card,
+                                        isDark: isDark,
+                                        themeState: themeState,
+                                      ),
+                                      // Qiraat Tab
+                                      _QiraatTabContent(
+                                        ayahKey: ayahKey,
+                                        card: card,
+                                        isDark: isDark,
+                                        themeState: themeState,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 10),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        "التفسير",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w800,
+                                          color: isDark
+                                              ? Colors.white
+                                              : const Color(0xFF1B1B1B),
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      IconButton(
+                                        onPressed: () async {
+                                          await Share.share(
+                                            _formatAyahTextForSharing(
+                                              ayahKey: ayahKey,
+                                              ayahText: ayahTextRaw,
+                                            ),
+                                          );
+                                        },
+                                        icon:
+                                            const Icon(Icons.share_outlined),
+                                        color: isDark
+                                            ? Colors.white
+                                                .withValues(alpha: 0.70)
+                                            : const Color(0xFF1B1B1B)
+                                                .withValues(alpha: 0.70),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                _TafsirTabContent(
+                                  ayahKey: ayahKey,
+                                  surahNumber: surahNumber,
+                                  card: card,
+                                  isDark: isDark,
+                                  embedded: true,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         // Navigation arrows
@@ -1119,6 +1169,7 @@ extension _MushafShareExtension on _MushafViewState {
     required int surahNumber,
     required Color card,
     required bool isDark,
+    bool embedded = false,
   }) {
     final Map<String, Future<String?>> tafsirFutureByPath = <String, Future<String?>>{};
     List<TafsirBookModel>? cachedSelectedBooks;
@@ -1170,7 +1221,9 @@ extension _MushafShareExtension on _MushafViewState {
         }
 
         return ListView.builder(
-          padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 16),
+          shrinkWrap: embedded,
+          physics: embedded ? const NeverScrollableScrollPhysics() : null,
           itemCount: books.length,
           itemBuilder: (context, index) {
             final book = books[index];
