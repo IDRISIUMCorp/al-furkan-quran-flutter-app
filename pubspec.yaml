@@ -121,18 +121,26 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
-    - assets/img/
+    - assets/img/Quran_Logo_v3.png
+    - assets/img/Quran_Logo_v3.jpg
+    - assets/img/madina.jpeg
+    - assets/img/makkah.jpg
+    - assets/img/gmail.svg
+    - assets/img/sajadah.png
+    - assets/img/kaaba_10171102.png
+    - assets/img/masjid-al-nabawi_16183907.png
+    - assets/img/adjust-horizontal-settings-svgrepo-com.svg
+    - assets/img/empty-folder-svgrepo-com.svg
+    - assets/img/kaaba.svg
     - assets/img/sunrise_forbidden_time.png
-    - assets/
-    - assets/wahy/json/
+    - assets/img/noon_forbidden_time.png
+    - assets/img/sunset_forbidden_time.png
+    - assets/dev/dev image.jpg
     - assets/wahy/json/azkar.json
     - assets/wahy/saadi.json.gz
-    - packages/ar-tafsir-muyassar.json
     - packages/alrab-al-quran-li-da-as.json
-    - assets/dev/
     - assets/quran_script/
     - assets/meta_data/
-    - assets/adhan/
 
   fonts:
     - family: QPC_Hafs

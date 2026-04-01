@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:qcf_quran/qcf_quran.dart';
+import 'package:qcf_quran/src/helpers/qcf_font_ready.dart';
 // ignore: implementation_imports
 
 ///
@@ -61,10 +62,12 @@ class QcfPage extends StatelessWidget {
   final bool showTajweed;
 
   /// Callback to get Tajweed words list for a specific verse.
-  final List<String> Function(int surahNumber, int verseNumber)? tajweedWordsBuilder;
+  final List<String> Function(int surahNumber, int verseNumber)?
+  tajweedWordsBuilder;
 
   /// Callback to get highlights for a specific verse.
-  final List<HighlightRange> Function(int surahNumber, int verseNumber)? highlightsBuilder;
+  final List<HighlightRange> Function(int surahNumber, int verseNumber)?
+  highlightsBuilder;
 
   const QcfPage({
     super.key,
@@ -93,28 +96,37 @@ class QcfPage extends StatelessWidget {
       return Center(child: Text('Invalid page number: $pageNumber'));
     }
 
-    final ranges = getPageData(pageNumber);
-    final pageFont = "QCF_P${pageNumber.toString().padLeft(3, '0')}";
+    return QcfFontReady(
+      pages: <int>{1, pageNumber},
+      placeholder: ColoredBox(color: theme.pageBackgroundColor),
+      builder: (context) {
+        final ranges = getPageData(pageNumber);
+        final pageFont = "QCF_P${pageNumber.toString().padLeft(3, '0')}";
 
-    final size = MediaQuery.sizeOf(context);
-    final isTablet = size.shortestSide >= 600;
+        final size = MediaQuery.sizeOf(context);
+        final isTablet = size.shortestSide >= 600;
 
-    final double baselineWidth = isTablet ? 640 : 470;
-    final double fontScale = isTablet ? 1.30 : 1.18;
-    final double baseFontSize =
-        (fontSize ?? getFontSize(pageNumber, baselineWidth)) * fontScale;
+        final double baselineWidth = isTablet ? 640 : 470;
+        final double fontScale = isTablet ? 1.30 : 1.18;
+        final double baseFontSize =
+            (fontSize ?? getFontSize(pageNumber, baselineWidth)) * fontScale;
 
-    final double minAllPagesFontSize =
-        (size.width * (isTablet ? 0.048 : 0.045)).clamp(18.0, 34.0);
-    final double minFirstPagesFontSize =
-        (size.width * 0.075).clamp(26.0, 36.0);
+        final double minAllPagesFontSize =
+            (size.width * (isTablet ? 0.048 : 0.045)).clamp(18.0, 34.0);
+        final double minFirstPagesFontSize = (size.width * 0.075).clamp(
+          26.0,
+          36.0,
+        );
 
-    final bool isFirstPages = pageNumber == 1 || pageNumber == 2;
-    final double finalFontSize = isFirstPages
-        ? baseFontSize.clamp(minFirstPagesFontSize, 44.0)
-        : baseFontSize.clamp(minAllPagesFontSize, 44.0);
-    final double finalHeight =
-        isFirstPages ? 2.15 : (theme.verseHeight * (isTablet ? 0.93 : 0.96));
+        final bool isFirstPages = pageNumber == 1 || pageNumber == 2;
+        final double finalFontSize =
+            isFirstPages
+                ? baseFontSize.clamp(minFirstPagesFontSize, 44.0)
+                : baseFontSize.clamp(minAllPagesFontSize, 44.0);
+        final double finalHeight =
+            isFirstPages
+                ? 2.15
+                : (theme.verseHeight * (isTablet ? 0.93 : 0.96));
 
         final verseSpans = <InlineSpan>[];
         final firstPagesSpacer =
@@ -164,7 +176,6 @@ class QcfPage extends StatelessWidget {
                         text: " ﱁ  ﱂﱃﱄ\n",
                         style: TextStyle(
                           fontFamily: "QCF_P001",
-                          package: 'qcf_quran',
                           fontSize:
                               getScreenType(context) == ScreenType.large
                                   ? (theme.basmalaFontSizeLarge * sp).sp
@@ -250,7 +261,6 @@ class QcfPage extends StatelessWidget {
                 text: getVerseNumberQCF(surah, v),
                 style: TextStyle(
                   fontFamily: pageFont,
-                  package: 'qcf_quran',
                   color: theme.verseNumberColor,
                   height: (theme.verseNumberHeight * h).h,
                   backgroundColor:
@@ -278,7 +288,9 @@ class QcfPage extends StatelessWidget {
                 final highlights = highlightsBuilder?.call(surah, v);
                 final spans = List<InlineSpan>.generate(words.length, (index) {
                   final hl =
-                      highlights?.where((h) => h.wordIndex == index).firstOrNull;
+                      highlights
+                          ?.where((h) => h.wordIndex == index)
+                          .firstOrNull;
 
                   final tajweedSpan = parseTajweedWord(
                     wordWithTajweed: words[index],
@@ -305,20 +317,22 @@ class QcfPage extends StatelessWidget {
                 final highlights = highlightsBuilder?.call(surah, v);
                 final rawQcf = getVerseQCF(surah, v, verseEndSymbol: false);
                 final isFirstVerseOnPage = (v == ranges[0]["start"]);
-                final String qcfText = isFirstVerseOnPage
-                    ? "${rawQcf.substring(0, 1)}\u200A${rawQcf.substring(1)}"
-                    : rawQcf;
+                final String qcfText =
+                    isFirstVerseOnPage
+                        ? "${rawQcf.substring(0, 1)}\u200A${rawQcf.substring(1)}"
+                        : rawQcf;
 
                 if (highlights != null && highlights.isNotEmpty) {
                   int charIndex = 0;
                   for (int i = 0; i < qcfText.length; i++) {
                     final char = qcfText[i];
                     final isSpacer = isFirstVerseOnPage && i == 1;
-                    final hl = isSpacer
-                        ? null
-                        : highlights
-                            .where((h) => h.wordIndex == charIndex)
-                            .firstOrNull;
+                    final hl =
+                        isSpacer
+                            ? null
+                            : highlights
+                                .where((h) => h.wordIndex == charIndex)
+                                .firstOrNull;
 
                     verseSpans.add(
                       TextSpan(
@@ -326,7 +340,6 @@ class QcfPage extends StatelessWidget {
                         recognizer: recognizer,
                         style: TextStyle(
                           fontFamily: pageFont,
-                          package: 'qcf_quran',
                           fontSize: finalFontSize,
                           color: theme.verseTextColor,
                           height: finalHeight,
@@ -346,7 +359,6 @@ class QcfPage extends StatelessWidget {
                       recognizer: recognizer,
                       style: TextStyle(
                         fontFamily: pageFont,
-                        package: 'qcf_quran',
                         fontSize: finalFontSize,
                         color: theme.verseTextColor,
                         height: finalHeight,
@@ -360,9 +372,10 @@ class QcfPage extends StatelessWidget {
               final highlights = highlightsBuilder?.call(surah, v);
               final rawQcf = getVerseQCF(surah, v, verseEndSymbol: false);
               final isFirstVerseOnPage = (v == ranges[0]['start']);
-              final String qcfText = isFirstVerseOnPage
-                  ? "${rawQcf.substring(0, 1)}\u200A${rawQcf.substring(1)}"
-                  : rawQcf;
+              final String qcfText =
+                  isFirstVerseOnPage
+                      ? "${rawQcf.substring(0, 1)}\u200A${rawQcf.substring(1)}"
+                      : rawQcf;
 
               if (highlights != null && highlights.isNotEmpty) {
                 // Since QCF font maps 1 char to 1 word approximately, we split by characters.
@@ -371,15 +384,19 @@ class QcfPage extends StatelessWidget {
                   final char = qcfText[i];
                   // If it's the zero-width space we added for the first verse, skip highlight indexing
                   final isSpacer = isFirstVerseOnPage && i == 1;
-                  final hl = isSpacer ? null : highlights.where((h) => h.wordIndex == charIndex).firstOrNull;
-                  
+                  final hl =
+                      isSpacer
+                          ? null
+                          : highlights
+                              .where((h) => h.wordIndex == charIndex)
+                              .firstOrNull;
+
                   verseSpans.add(
                     TextSpan(
                       text: char,
                       recognizer: recognizer,
                       style: TextStyle(
                         fontFamily: pageFont,
-                        package: 'qcf_quran',
                         fontSize: finalFontSize,
                         color: theme.verseTextColor,
                         height: finalHeight,
@@ -387,7 +404,7 @@ class QcfPage extends StatelessWidget {
                       ),
                     ),
                   );
-                  
+
                   if (!isSpacer) {
                     charIndex++;
                   }
@@ -398,13 +415,12 @@ class QcfPage extends StatelessWidget {
                     text: qcfText,
                     recognizer: recognizer,
                     style: TextStyle(
-                        fontFamily: pageFont,
-                        package: 'qcf_quran',
-                        fontSize: finalFontSize,
-                        color: theme.verseTextColor,
-                        height: finalHeight,
-                        backgroundColor: verseBgColor,
-                      ),
+                      fontFamily: pageFont,
+                      fontSize: finalFontSize,
+                      color: theme.verseTextColor,
+                      height: finalHeight,
+                      backgroundColor: verseBgColor,
+                    ),
                   ),
                 );
               }
@@ -428,7 +444,7 @@ class QcfPage extends StatelessWidget {
 
         return LayoutBuilder(
           builder: (context, constraints) {
-            // Using a fixed standard width (400) creates a perfect baseline rendering 
+            // Using a fixed standard width (400) creates a perfect baseline rendering
             // that FittedBox will then cleanly scale to any screen (tablet, web, mobile).
             return ColoredBox(
               color: theme.pageBackgroundColor,
@@ -437,7 +453,10 @@ class QcfPage extends StatelessWidget {
                   alignment: Alignment.center,
                   children: [
                     Align(
-                      alignment: const Alignment(0.0, 0.1), // Moves the Ayahs slightly down
+                      alignment: const Alignment(
+                        0.0,
+                        0.1,
+                      ), // Moves the Ayahs slightly down
                       child: FittedBox(
                         fit: BoxFit.fitWidth,
                         alignment: Alignment.center,
@@ -474,7 +493,8 @@ class QcfPage extends StatelessWidget {
                     ),
                     if (pageOverlayTop != null)
                       Positioned(
-                        top: 45.0, // Push Surah/Juz down permanently below notch
+                        top:
+                            45.0, // Push Surah/Juz down permanently below notch
                         left: 0,
                         right: 0,
                         child: pageOverlayTop,
@@ -492,6 +512,8 @@ class QcfPage extends StatelessWidget {
             );
           },
         );
+      },
+    );
   }
 }
 

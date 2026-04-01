@@ -3,6 +3,7 @@ import 'package:qcf_quran/qcf_quran.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 // ignore: implementation_imports
 import 'package:qcf_quran/src/data/page_font_size.dart';
+import 'package:qcf_quran/src/helpers/qcf_font_ready.dart';
 
 /// A widget that renders multiple verses from the Quran in QCF format.
 ///
@@ -90,30 +91,34 @@ class QcfVerses extends StatelessWidget {
       requiredPages.add(getPageNumber(surahNumber, v));
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final double maxWidth =
-            constraints.maxWidth.isFinite
-                ? constraints.maxWidth
-                : MediaQuery.of(context).size.width;
+    return QcfFontReady(
+      pages: requiredPages,
+      builder:
+          (context) => LayoutBuilder(
+            builder: (context, constraints) {
+              final double maxWidth =
+                  constraints.maxWidth.isFinite
+                      ? constraints.maxWidth
+                      : MediaQuery.of(context).size.width;
 
-        final verseSpans = _buildVerseSpans(effectiveTheme, maxWidth);
+              final verseSpans = _buildVerseSpans(effectiveTheme, maxWidth);
 
-        return SelectionArea(
-              child: RichText(
-                textDirection: TextDirection.rtl,
-                textAlign: textAlign,
-                locale: const Locale("ar"),
-                text: TextSpan(
-                  children: verseSpans,
-                  style: TextStyle(color: effectiveTheme.verseTextColor),
-                ),
-              ),
-            )
-            .animate()
-            .fadeIn(duration: 500.ms)
-            .slideY(begin: 0.05, end: 0, curve: Curves.easeOut);
-      },
+              return SelectionArea(
+                    child: RichText(
+                      textDirection: TextDirection.rtl,
+                      textAlign: textAlign,
+                      locale: const Locale("ar"),
+                      text: TextSpan(
+                        children: verseSpans,
+                        style: TextStyle(color: effectiveTheme.verseTextColor),
+                      ),
+                    ),
+                  )
+                  .animate()
+                  .fadeIn(duration: 500.ms)
+                  .slideY(begin: 0.05, end: 0, curve: Curves.easeOut);
+            },
+          ),
     );
   }
 
@@ -190,7 +195,6 @@ class QcfVerses extends StatelessWidget {
                       : effectiveFontSize,
               height: effectiveTheme.verseNumberHeight / h,
               fontFamily: fontFamily,
-              package: 'qcf_quran',
               color: effectiveTheme.verseNumberColor,
               backgroundColor: effectiveTheme.verseNumberBackgroundColor,
             ),
@@ -205,7 +209,6 @@ class QcfVerses extends StatelessWidget {
               fontSize: effectiveFontSize,
               height: effectiveTheme.verseNumberHeight / h,
               fontFamily: fontFamily,
-              package: 'qcf_quran',
               color: effectiveTheme.verseNumberColor,
               backgroundColor: effectiveTheme.verseNumberBackgroundColor,
             ),
@@ -224,7 +227,6 @@ class QcfVerses extends StatelessWidget {
           text: verseTextWithoutNumber,
           style: TextStyle(
             fontFamily: fontFamily,
-            package: 'qcf_quran',
             fontSize: effectiveFontSize,
             height: effectiveTheme.verseHeight / h,
             letterSpacing: effectiveTheme.letterSpacing,

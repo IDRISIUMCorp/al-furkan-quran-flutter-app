@@ -5,6 +5,7 @@ import 'package:qcf_quran/qcf_quran.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 // ignore: implementation_imports
 import 'package:qcf_quran/src/data/page_font_size.dart';
+import 'package:qcf_quran/src/helpers/qcf_font_ready.dart';
 
 class QcfVerse extends StatefulWidget {
   final int surahNumber;
@@ -28,11 +29,11 @@ class QcfVerse extends StatefulWidget {
 
   final VoidCallback? onLongPressCancel;
   final Function(LongPressDownDetails)? onLongPressDown;
-  
+
   /// Whether to render the verse using Tajweed colored text.
   final bool showTajweed;
 
-  /// The list of tajweed words for this verse. If [showTajweed] is true and this is provided, 
+  /// The list of tajweed words for this verse. If [showTajweed] is true and this is provided,
   /// it will render a [TajweedVerse] instead of standard QCF.
   final List<String>? tajweedWords;
 
@@ -75,6 +76,9 @@ class _QcfVerseState extends State<QcfVerse> {
   Widget build(BuildContext context) {
     var pageNumber = getPageNumber(widget.surahNumber, widget.verseNumber);
 
+    return QcfFontReady(
+      pages: <int>{pageNumber},
+      builder: (context) {
         final effectiveTheme = widget.theme ?? const QcfThemeData();
 
         final verseTextColor = widget.theme?.verseTextColor ?? widget.textColor;
@@ -87,7 +91,9 @@ class _QcfVerseState extends State<QcfVerse> {
                 ? widget.backgroundColor
                 : null);
 
-        if (widget.showTajweed && widget.tajweedWords != null && widget.tajweedWords!.isNotEmpty) {
+        if (widget.showTajweed &&
+            widget.tajweedWords != null &&
+            widget.tajweedWords!.isNotEmpty) {
           return TajweedVerse(
             surahNumber: widget.surahNumber,
             verseNumber: widget.verseNumber,
@@ -97,7 +103,9 @@ class _QcfVerseState extends State<QcfVerse> {
             theme: effectiveTheme,
             highlights: widget.highlights,
             textStyle: TextStyle(
-              fontSize: widget.fontSize?.sp ?? getFontSize(pageNumber, MediaQuery.of(context).size.width).sp,
+              fontSize:
+                  widget.fontSize?.sp ??
+                  getFontSize(pageNumber, MediaQuery.of(context).size.width).sp,
               color: verseTextColor,
               height: effectiveTheme.verseHeight.h,
             ),
@@ -116,23 +124,26 @@ class _QcfVerseState extends State<QcfVerse> {
                     : MediaQuery.of(context).size.width;
 
             var pageFontSize = getFontSize(pageNumber, maxWidth);
-            
+
             final rawQcf = getVerseQCF(
               widget.surahNumber,
               widget.verseNumber,
               verseEndSymbol: false,
             );
-            
+
             final List<InlineSpan> verseSpans = [];
             if (widget.highlights != null && widget.highlights!.isNotEmpty) {
               for (int i = 0; i < rawQcf.length; i++) {
-                final hl = widget.highlights!.where((h) => h.wordIndex == i).firstOrNull;
-                verseSpans.add(TextSpan(
-                  text: rawQcf[i],
-                  style: TextStyle(
-                    backgroundColor: hl?.color,
+                final hl =
+                    widget.highlights!
+                        .where((h) => h.wordIndex == i)
+                        .firstOrNull;
+                verseSpans.add(
+                  TextSpan(
+                    text: rawQcf[i],
+                    style: TextStyle(backgroundColor: hl?.color),
                   ),
-                ));
+                );
               }
             } else {
               verseSpans.add(TextSpan(text: rawQcf));
@@ -169,7 +180,6 @@ class _QcfVerseState extends State<QcfVerse> {
                           style: TextStyle(
                             fontFamily:
                                 "QCF_P${pageNumber.toString().padLeft(3, '0')}",
-                          package: 'qcf_quran',
                             color: effectiveTheme.verseNumberColor,
                             height: effectiveTheme.verseNumberHeight.h,
                             backgroundColor:
@@ -185,7 +195,6 @@ class _QcfVerseState extends State<QcfVerse> {
                         wordSpacing: effectiveTheme.wordSpacing,
                         fontFamily:
                             "QCF_P${pageNumber.toString().padLeft(3, '0')}",
-                        package: 'qcf_quran',
                         fontSize: widget.fontSize?.sp ?? pageFontSize.sp,
                         backgroundColor: verseBgColor,
                       ),
@@ -199,5 +208,7 @@ class _QcfVerseState extends State<QcfVerse> {
                 .slideY(begin: 0.05, end: 0, curve: Curves.easeOut);
           },
         );
+      },
+    );
   }
 }

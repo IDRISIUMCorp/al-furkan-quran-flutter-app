@@ -11,16 +11,11 @@ import "package:al_quran_v3/src/screen/quran_bootstrap/quran_bootstrap_page.dart
 import "package:al_quran_v3/src/screen/prayer_time/cubit/prayer_time_state.dart";
 import "package:al_quran_v3/src/screen/quran_script_view/cubit/ayah_to_highlight.dart";
 import "package:al_quran_v3/src/theme/app_theme.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/default_offline_resources.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_irab_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_translation_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/segmented_resources_manager.dart";
 import "package:al_quran_v3/src/utils/quran_resources/word_by_word_function.dart";
 import "package:al_quran_v3/src/resources/translation/language_cubit.dart";
 
-import "package:al_quran_v3/src/resources/quran_resources/meaning_of_surah.dart";
 import "package:al_quran_v3/src/screen/location_handler/cubit/location_data_qibla_data_cubit.dart";
 import "package:al_quran_v3/src/screen/prayer_time/cubit/prayer_time_cubit.dart";
 import "package:al_quran_v3/src/screen/quran_script_view/cubit/ayah_by_ayah_in_scroll_info_cubit.dart";
@@ -32,11 +27,9 @@ import "package:al_quran_v3/src/theme/controller/theme_state.dart";
 import "package:al_quran_v3/src/theme/functions/theme_functions.dart";
 import "package:al_quran_v3/src/core/notifications/khatma_notification_service.dart";
 import "package:al_quran_v3/src/widget/history/cubit/quran_history_cubit.dart";
-import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
 import "package:al_quran_v3/src/widget/quran_script_words/cubit/word_playing_state_cubit.dart";
 import "package:al_quran_v3/src/screen/quran_reader/cubit/reader_ui_cubit.dart";
 import "package:al_quran_v3/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
-import "package:al_quran_v3/src/core/services/ayah_of_the_day_service.dart";
 import "dart:ui";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
@@ -113,29 +106,11 @@ Future<void> main() async {
     await prefs.setBool(firstRunKey, true);
   }
 
-  await DefaultOfflineResources.ensureInstalled();
-
-  await QuranTafsirFunction.init();
-
-  // Initialize I'rab database so library tabs have data
-  await QuranIrabFunction.setDefaultSelected();
-
   MyAppLocalization initialLocale = await LanguageCubit.getInitialLocale();
 
   QuranTranslationFunction.init(locale: initialLocale.locale);
   WordByWordFunction.init();
   SegmentedResourcesManager.init();
-
-  final scriptOnDb = Hive.box("user").get(
-    "selected_quran_script_type",
-    defaultValue: QuranScriptType.values.first.name,
-  );
-
-  await QuranScriptFunction.initQuranScript(
-    QuranScriptType.values.firstWhere((element) => scriptOnDb == element.name),
-  );
-
-  await loadMetaSurah();
 
   await ThemeFunctions.initThemeFunction();
 
@@ -150,11 +125,6 @@ Future<void> main() async {
   LocationQiblaPrayerDataState locationQiblaPrayerDataState =
       await LocationQiblaPrayerDataCubit.getSavedState();
   log(locationQiblaPrayerDataState.madhab.toString(), name: "Madhab");
-
-  if (platformOwn == platform_services.PlatformOwn.isAndroid || 
-      platformOwn == platform_services.PlatformOwn.isIos) {
-    await AyahOfTheDayService.setupBackgroundUpdates();
-  }
 
   runApp(
     MyApp(
@@ -255,14 +225,19 @@ class MyApp extends StatelessWidget {
                       ],
                       supportedLocales: AppLocalizations.supportedLocales,
                       onGenerateTitle: (context) => "الفُرقان",
-                      theme: AppTheme.lightTheme(themeState.flexScheme).copyWith(
-                        pageTransitionsTheme: pageTransitionsTheme,
-                        textTheme: getTextTheme(languageState.locale, false),
-                      ),
-                      darkTheme: AppTheme.darkTheme(themeState.flexScheme).copyWith(
-                        pageTransitionsTheme: pageTransitionsTheme,
-                        textTheme: getTextTheme(languageState.locale, true),
-                      ),
+                      theme: AppTheme.lightTheme(themeState.flexScheme)
+                          .copyWith(
+                            pageTransitionsTheme: pageTransitionsTheme,
+                            textTheme: getTextTheme(
+                              languageState.locale,
+                              false,
+                            ),
+                          ),
+                      darkTheme: AppTheme.darkTheme(themeState.flexScheme)
+                          .copyWith(
+                            pageTransitionsTheme: pageTransitionsTheme,
+                            textTheme: getTextTheme(languageState.locale, true),
+                          ),
                       themeMode: themeState.themeMode,
                       scrollBehavior: AppScrollBehavior(),
                       home: const QuranBootstrapPage(),

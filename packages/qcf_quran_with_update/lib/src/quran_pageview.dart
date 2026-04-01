@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:qcf_quran/qcf_quran.dart';
+import 'package:qcf_quran/src/helpers/dynamic_font_loader.dart';
 
 /// A horizontally swipeable Quran mushaf using internal QCF fonts.
 ///
@@ -56,15 +57,17 @@ class PageviewQuran extends StatefulWidget {
     LongPressStartDetails details,
   )?
   onLongPressDown;
-  
+
   /// Whether to render the page using Tajweed colored text.
   final bool showTajweed;
 
   /// Callback to get Tajweed words list for a specific verse.
-  final List<String> Function(int surahNumber, int verseNumber)? tajweedWordsBuilder;
+  final List<String> Function(int surahNumber, int verseNumber)?
+  tajweedWordsBuilder;
 
   /// Callback to get highlights for a specific verse.
-  final List<HighlightRange> Function(int surahNumber, int verseNumber)? highlightsBuilder;
+  final List<HighlightRange> Function(int surahNumber, int verseNumber)?
+  highlightsBuilder;
 
   /// Callback when a verse is tapped.
   final void Function(int surahNumber, int verseNumber)? onTap;
@@ -175,8 +178,22 @@ class PageviewQuranState extends State<PageviewQuran> {
         initialPage: widget.initialPageNumber - 1,
       );
     }
+    unawaited(_preloadFontsAround(widget.initialPageNumber));
     if (widget.autoScrollEnabled) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _startAutoScroll());
+    }
+  }
+
+  Future<void> _preloadFontsAround(int pageNumber) async {
+    final pages = <int>{
+      1,
+      pageNumber - 1,
+      pageNumber,
+      pageNumber + 1,
+    }.where((page) => page >= 1 && page <= totalPagesCount);
+
+    for (final page in pages) {
+      await DynamicFontLoader.loadFont(page);
     }
   }
 
@@ -209,8 +226,11 @@ class PageviewQuranState extends State<PageviewQuran> {
           controller: _controller,
           reverse: false, // right-to-left paging order
           itemCount: totalPagesCount,
-          onPageChanged:
-              (index) => widget.onPageChanged?.call(index + 1), // 1-based
+          onPageChanged: (index) {
+            final pageNumber = index + 1;
+            unawaited(_preloadFontsAround(pageNumber));
+            widget.onPageChanged?.call(pageNumber);
+          },
           itemBuilder: (context, index) {
             final pageNumber = index + 1; // 1-based page
             return QcfPage(

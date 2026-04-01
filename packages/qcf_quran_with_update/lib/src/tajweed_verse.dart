@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:qcf_quran/qcf_quran.dart';
+import 'package:qcf_quran/src/helpers/qcf_font_ready.dart';
 
 class TajweedVerse extends StatefulWidget {
   final int surahNumber;
@@ -84,38 +85,42 @@ class _TajweedVerseState extends State<TajweedVerse> {
     );
     final pageNumber = getPageNumber(widget.surahNumber, widget.verseNumber);
 
-    return GestureDetector(
-      onLongPress: widget.onLongPress,
-      onLongPressDown: widget.onLongPressDown,
-      onLongPressUp: widget.onLongPressUp,
-      onLongPressCancel: widget.onLongPressCancel,
-      child: SelectionArea(
-        child: Container(
-          color: verseBgColor,
-          child: Text.rich(
-            TextSpan(
-              children: [
-                ...spans,
-                if (verseNumberGlyph.isNotEmpty)
+    return QcfFontReady(
+      pages: <int>{pageNumber},
+      builder:
+          (context) => GestureDetector(
+            onLongPress: widget.onLongPress,
+            onLongPressDown: widget.onLongPressDown,
+            onLongPressUp: widget.onLongPressUp,
+            onLongPressCancel: widget.onLongPressCancel,
+            child: SelectionArea(
+              child: Container(
+                color: verseBgColor,
+                child: Text.rich(
                   TextSpan(
-                    text: "${verseNumberGlyph.trim()} ",
-                    style: TextStyle(
-                      fontFamily:
-                          "QCF_P${pageNumber.toString().padLeft(3, '0')}",
-                      color: effectiveTheme.verseNumberColor,
-                      height: effectiveTheme.verseNumberHeight.h,
-                      backgroundColor:
-                          effectiveTheme.verseNumberBackgroundColor ??
-                          verseBgColor,
-                    ),
+                    children: [
+                      ...spans,
+                      if (verseNumberGlyph.isNotEmpty)
+                        TextSpan(
+                          text: "${verseNumberGlyph.trim()} ",
+                          style: TextStyle(
+                            fontFamily:
+                                "QCF_P${pageNumber.toString().padLeft(3, '0')}",
+                            color: effectiveTheme.verseNumberColor,
+                            height: effectiveTheme.verseNumberHeight.h,
+                            backgroundColor:
+                                effectiveTheme.verseNumberBackgroundColor ??
+                                verseBgColor,
+                          ),
+                        ),
+                    ],
                   ),
-              ],
+                  textAlign: widget.textAlign,
+                  textDirection: widget.textDirection,
+                ),
+              ),
             ),
-            textAlign: widget.textAlign,
-            textDirection: widget.textDirection,
           ),
-        ),
-      ),
     );
   }
 }
