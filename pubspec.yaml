@@ -106,6 +106,10 @@ dev_dependencies:
   msix: ^3.16.12
   change_app_package_name: ^1.5.0
 
+dependency_overrides:
+  flutter_compass_v2:
+    path: packages/flutter_compass_v2_patch
+
 msix_config:
   display_name: "Quran's Tafsir, Audio and Prayer"
   publisher_display_name: "IDRISIUM Corp"
