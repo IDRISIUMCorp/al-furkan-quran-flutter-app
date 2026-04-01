@@ -7,6 +7,9 @@ class ResourcesProgressCubitState {
   bool? onProcess;
   bool? isSuccess;
   String? errorMessage;
+  int? transferredBytes;
+  int? totalBytes;
+  String? activeResourceId;
   TranslationBookModel? translationBookModel;
   TafsirBookModel? tafsirBookModel;
 
@@ -16,6 +19,9 @@ class ResourcesProgressCubitState {
     this.onProcess,
     this.isSuccess,
     this.errorMessage,
+    this.transferredBytes,
+    this.totalBytes,
+    this.activeResourceId,
     this.translationBookModel,
     this.tafsirBookModel,
   });
@@ -26,6 +32,9 @@ class ResourcesProgressCubitState {
     bool? onProcess,
     bool? isSuccess,
     String? errorMessage,
+    int? transferredBytes,
+    int? totalBytes,
+    String? activeResourceId,
     TranslationBookModel? translationBookModel,
     TafsirBookModel? tafsirBookModel,
   }) {
@@ -35,6 +44,9 @@ class ResourcesProgressCubitState {
       onProcess: onProcess ?? this.onProcess,
       isSuccess: isSuccess ?? this.isSuccess,
       errorMessage: errorMessage ?? this.errorMessage,
+      transferredBytes: transferredBytes ?? this.transferredBytes,
+      totalBytes: totalBytes ?? this.totalBytes,
+      activeResourceId: activeResourceId ?? this.activeResourceId,
       translationBookModel: translationBookModel ?? this.translationBookModel,
       tafsirBookModel: tafsirBookModel ?? this.tafsirBookModel,
     );

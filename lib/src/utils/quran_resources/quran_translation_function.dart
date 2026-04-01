@@ -20,6 +20,21 @@ class QuranTranslationFunction {
   static const String selectedTranslationListKey = "selected_translation_list";
   static const String downloadedTranslationBooks =
       "downloaded_translation_books";
+  static final Map<String, int?> _remoteSizeBytesCache = {};
+
+  static List<TranslationBookModel> _dedupeBooks(
+    Iterable<TranslationBookModel> books,
+  ) {
+    final seen = <String>{};
+    final deduped = <TranslationBookModel>[];
+    for (final book in books) {
+      final key = "${book.language}::${book.fullPath}";
+      if (seen.add(key)) {
+        deduped.add(book);
+      }
+    }
+    return deduped;
+  }
 
   static Future<void> init({Locale? locale}) async {
     if (!Hive.isBoxOpen("user")) {
@@ -101,9 +116,10 @@ class QuranTranslationFunction {
       downloadedTranslationBooks,
       defaultValue: [],
     );
-    return downloadedList
+    final books = downloadedList
         .map((e) => TranslationBookModel.fromMap(Map<String, dynamic>.from(e)))
         .toList();
+    return _dedupeBooks(books);
   }
 
   static Future<void> removeFromListAlreadyDownloaded(
@@ -121,12 +137,16 @@ class QuranTranslationFunction {
 
     final boxName = getTranslationBoxName(translationBook: bookToRemove);
     if (await Hive.boxExists(boxName)) {
+      if (Hive.isBoxOpen(boxName)) {
+        await Hive.lazyBox(boxName).close();
+      }
       await Hive.deleteBoxFromDisk(boxName);
       log(
         "Deleted translation box: $boxName",
         name: "removeToListAlreadyDownloaded",
       );
     }
+    await removeTranslationSelection(bookToRemove);
     await Hive.box("user").put(
       downloadedTranslationBooks,
       downloaded.map((e) => e.toMap()).toList(),
@@ -138,15 +158,19 @@ class QuranTranslationFunction {
     final userBox = Hive.box("user");
     List<TranslationBookModel> selectedTranslationList =
         (await getTranslationSelections()) ?? [];
-    selectedTranslationList.add(book);
+    if (!selectedTranslationList.any((b) => b.fullPath == book.fullPath)) {
+      selectedTranslationList.add(book);
+    }
     await userBox.put(
       selectedTranslationListKey,
-      selectedTranslationList.map((e) => e.toMap()).toList(),
+      _dedupeBooks(selectedTranslationList).map((e) => e.toMap()).toList(),
     );
     await init();
   }
 
-  static Future<void> removeTranslationSelection(TranslationBookModel book) async {
+  static Future<void> removeTranslationSelection(
+    TranslationBookModel book,
+  ) async {
     cacheOfAyahKeys.clear();
     final userBox = Hive.box("user");
     List<TranslationBookModel> selectedTranslationList =
@@ -159,34 +183,46 @@ class QuranTranslationFunction {
     await init();
   }
 
+  static Future<void> replaceTranslationSelections(
+    List<TranslationBookModel> books,
+  ) async {
+    cacheOfAyahKeys.clear();
+    final userBox = Hive.box("user");
+    final deduped = _dedupeBooks(books);
+    await userBox.put(
+      selectedTranslationListKey,
+      deduped.map((e) => e.toMap()).toList(),
+    );
+    await init();
+  }
+
   static Future<List<TranslationBookModel>?> getTranslationSelections() async {
     final userBox = Hive.box("user");
-    final Map<String, dynamic>? previousBookMap =
-        userBox.get("selected_translation")?.cast<String, dynamic>();
+    final Map<String, dynamic>? previousBookMap = userBox
+        .get("selected_translation")
+        ?.cast<String, dynamic>();
 
     if (previousBookMap != null) {
       await userBox.put(selectedTranslationListKey, [previousBookMap]);
+      await userBox.delete("selected_translation");
     }
 
     List? booksList = userBox.get(selectedTranslationListKey);
-    List<TranslationBookModel>? bookListModel =
-        booksList
-            ?.map(
-              (e) => TranslationBookModel.fromMap(Map<String, dynamic>.from(e)),
-            )
-            .toList();
-
-    return bookListModel;
+    final bookListModel = booksList
+        ?.map((e) => TranslationBookModel.fromMap(Map<String, dynamic>.from(e)))
+        .toList();
+    return bookListModel == null ? null : _dedupeBooks(bookListModel);
   }
 
   static String getTranslationBoxName({
     required TranslationBookModel translationBook,
   }) {
     // Using fileName for brevity if available and suitable, otherwise fallback to fullPath's last segment
-    String sanitizedBookIdentifier = (translationBook.fileName.isNotEmpty
-            ? translationBook.fileName
-            : translationBook.fullPath.split("/").last)
-        .replaceAll(RegExp(r"[^\w\.-]"), "_");
+    String sanitizedBookIdentifier =
+        (translationBook.fileName.isNotEmpty
+                ? translationBook.fileName
+                : translationBook.fullPath.split("/").last)
+            .replaceAll(RegExp(r"[^\w\.-]"), "_");
 
     return "translation_${translationBook.language}_$sanitizedBookIdentifier";
   }
@@ -202,16 +238,30 @@ class QuranTranslationFunction {
     return null;
   }
 
+  static Future<int?> getRemoteBookSizeBytes(TranslationBookModel book) async {
+    if (_remoteSizeBytesCache.containsKey(book.fullPath)) {
+      return _remoteSizeBytesCache[book.fullPath];
+    }
+    try {
+      final response = await dio.Dio().head<dynamic>(
+        ApisUrls.base + book.fullPath,
+      );
+      final raw = response.headers.value("content-length");
+      final bytes = raw == null ? null : int.tryParse(raw);
+      _remoteSizeBytesCache[book.fullPath] = bytes;
+      return bytes;
+    } catch (_) {
+      _remoteSizeBytesCache[book.fullPath] = null;
+      return null;
+    }
+  }
+
   static Future<bool> downloadResources({
     required BuildContext context,
     required TranslationBookModel translationBook,
     bool isSetupProcess = false,
   }) async {
     final cubit = context.read<ResourcesProgressCubit>();
-    cubit.updateProgress(
-      null,
-      "Downloading Translation: ${translationBook.name}",
-    );
     if (await isAlreadyDownloaded(translationBook)) {
       log(
         "Translation '${translationBook.name}' (path: ${translationBook.fullPath}) for language '${translationBook.language}' is already downloaded.",
@@ -237,6 +287,14 @@ class QuranTranslationFunction {
       return true;
     }
 
+    cubit.onProcess();
+    cubit.changeTranslationBook(translationBook);
+    cubit.updateProgress(
+      0.0,
+      "Downloading Translation: ${translationBook.name}",
+      activeResourceId: translationBook.fullPath,
+    );
+
     final translationBoxName = getTranslationBoxName(
       translationBook: translationBook,
     );
@@ -261,7 +319,7 @@ class QuranTranslationFunction {
           "Failed to open Box '$translationBoxName' even after delete: $e2",
           name: "downloadResources",
         );
-        cubit.updateProgress(null, "Error preparing translation storage");
+        cubit.failure("Error preparing translation storage");
         return false;
       }
     }
@@ -269,7 +327,11 @@ class QuranTranslationFunction {
     try {
       String base = ApisUrls.base;
       // Using fullPath from the model for the download URL
-      cubit.updateProgress(0.0, "Downloading: ${translationBook.name}");
+      cubit.updateProgress(
+        0.0,
+        "Downloading: ${translationBook.name}",
+        activeResourceId: translationBook.fullPath,
+      );
       dio.Response response = await dio.Dio().get(
         base + translationBook.fullPath,
         onReceiveProgress: (received, total) {
@@ -278,12 +340,19 @@ class QuranTranslationFunction {
             cubit.updateProgress(
               progress * 0.5,
               "Downloading: ${translationBook.name}", // Using model's display name
+              transferredBytes: received,
+              totalBytes: total,
+              activeResourceId: translationBook.fullPath,
             );
           }
         },
       );
 
-      cubit.updateProgress(0.5, "Processing: ${translationBook.name}");
+      cubit.updateProgress(
+        0.5,
+        "Processing: ${translationBook.name}",
+        activeResourceId: translationBook.fullPath,
+      );
       Map data = await compute(
         (message) => jsonDecode(decodeBZip2String(message as String)),
         response.data,
@@ -299,6 +368,7 @@ class QuranTranslationFunction {
           cubit.updateProgress(
             0.5 + (processedEntries / totalEntries * 0.5),
             "Processing Translation",
+            activeResourceId: translationBook.fullPath,
           );
         }
       }
@@ -325,14 +395,22 @@ class QuranTranslationFunction {
       }
 
       await init();
-      cubit.updateProgress(1.0, "Downloaded: ${translationBook.name}");
+      cubit.updateProgress(
+        1.0,
+        "Downloaded: ${translationBook.name}",
+        transferredBytes: 1,
+        totalBytes: 1,
+        activeResourceId: translationBook.fullPath,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 220));
+      cubit.success();
       return true;
     } catch (e, s) {
       log(
         "Error downloading or processing Translation '${translationBook.name}' (path: ${translationBook.fullPath}): $e\n$s",
         name: "downloadResources",
       );
-      cubit.updateProgress(null, "Error downloading Translation");
+      cubit.failure("Error downloading Translation");
       if (newTranslationBox.isOpen) {
         await newTranslationBox.close();
       }
@@ -425,10 +503,13 @@ class QuranTranslationFunction {
     return toReturn;
   }
 
-  static Future<List<TranslationOfAyah>> getDownloadedTranslations(String ayahKey) async {
+  static Future<List<TranslationOfAyah>> getDownloadedTranslations(
+    String ayahKey,
+  ) async {
     final List<TranslationOfAyah> toReturn = [];
 
-    List<TranslationBookModel> targetBooks = await getTranslationSelections() ?? [];
+    List<TranslationBookModel> targetBooks =
+        await getTranslationSelections() ?? [];
     if (targetBooks.isEmpty) {
       targetBooks = getDownloadedTranslationBooks();
     }
@@ -441,7 +522,7 @@ class QuranTranslationFunction {
       } else {
         translationBox = Hive.lazyBox(boxName);
       }
-      
+
       final data = await translationBox.get(ayahKey);
       if (data != null) {
         toReturn.add(

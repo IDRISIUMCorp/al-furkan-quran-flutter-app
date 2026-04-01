@@ -6,8 +6,23 @@ import "package:bloc/bloc.dart";
 class ResourcesProgressCubit extends Cubit<ResourcesProgressCubitState> {
   ResourcesProgressCubit() : super(ResourcesProgressCubitState());
 
-  void updateProgress(double? percentage, String processName) {
-    emit(state.copyWith(percentage: percentage, processName: processName));
+  void updateProgress(
+    double? percentage,
+    String processName, {
+    int? transferredBytes,
+    int? totalBytes,
+    String? activeResourceId,
+  }) {
+    emit(
+      state.copyWith(
+        percentage: percentage,
+        processName: processName,
+        onProcess: true,
+        transferredBytes: transferredBytes,
+        totalBytes: totalBytes,
+        activeResourceId: activeResourceId,
+      ),
+    );
   }
 
   void success() {
@@ -15,11 +30,13 @@ class ResourcesProgressCubit extends Cubit<ResourcesProgressCubitState> {
   }
 
   void failure(String errorMessage) {
-    emit(state.copyWith(isSuccess: false, errorMessage: errorMessage));
+    emit(
+      ResourcesProgressCubitState(isSuccess: false, errorMessage: errorMessage),
+    );
   }
 
   void onProcess() {
-    emit(state.copyWith(onProcess: true));
+    emit(state.copyWith(onProcess: true, isSuccess: null, errorMessage: null));
   }
 
   void changeTranslationBook(TranslationBookModel? translationBookModel) {

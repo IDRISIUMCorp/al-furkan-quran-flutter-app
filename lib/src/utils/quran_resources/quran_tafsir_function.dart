@@ -16,6 +16,19 @@ import "../get_tafsir_from_db.dart";
 class QuranTafsirFunction {
   static const String selectedTafsirListKey = "selected_tafsir_list";
   static const String downloadedTafsirBooksKey = "downloaded_tafsir_books";
+  static final Map<String, int?> _remoteSizeBytesCache = {};
+
+  static List<TafsirBookModel> _dedupeBooks(Iterable<TafsirBookModel> books) {
+    final seen = <String>{};
+    final deduped = <TafsirBookModel>[];
+    for (final book in books) {
+      final key = "${book.language}::${book.fullPath}";
+      if (seen.add(key)) {
+        deduped.add(book);
+      }
+    }
+    return deduped;
+  }
 
   static Future<void> init() async {
     if (!Hive.isBoxOpen("user")) {
@@ -67,7 +80,10 @@ class QuranTafsirFunction {
   }) async {
     String currentKey = ayahKey;
     for (int depth = 0; depth <= maxDepth; depth++) {
-      final TafsirOfAyah? tafsir = await getTafsirForBook(tafsirBook, currentKey);
+      final TafsirOfAyah? tafsir = await getTafsirForBook(
+        tafsirBook,
+        currentKey,
+      );
       final Map? map = tafsir?.tafsir;
       final String? text = getStringFromTafsirFromDb(
         map,
@@ -174,7 +190,7 @@ class QuranTafsirFunction {
       selectedTafsirList.add(tafsirBook);
       await userBox.put(
         selectedTafsirListKey,
-        selectedTafsirList.map((e) => e.toMap()).toList(),
+        _dedupeBooks(selectedTafsirList).map((e) => e.toMap()).toList(),
       );
     }
     await init();
@@ -194,10 +210,23 @@ class QuranTafsirFunction {
     await init();
   }
 
+  static Future<void> replaceTafsirSelections(
+    List<TafsirBookModel> books,
+  ) async {
+    final userBox = Hive.box("user");
+    final deduped = _dedupeBooks(books);
+    await userBox.put(
+      selectedTafsirListKey,
+      deduped.map((e) => e.toMap()).toList(),
+    );
+    await init();
+  }
+
   static Future<List<TafsirBookModel>?> getTafsirSelections() async {
     final userBox = Hive.box("user");
-    final Map<String, dynamic>? previousBookMap =
-        userBox.get("selected_tafsir")?.cast<String, dynamic>();
+    final Map<String, dynamic>? previousBookMap = userBox
+        .get("selected_tafsir")
+        ?.cast<String, dynamic>();
 
     if (previousBookMap != null) {
       await userBox.put(selectedTafsirListKey, [previousBookMap]);
@@ -205,12 +234,29 @@ class QuranTafsirFunction {
     }
 
     List? booksList = userBox.get(selectedTafsirListKey);
-    List<TafsirBookModel>? bookListModel =
-        booksList
-            ?.map((e) => TafsirBookModel.fromMap(Map<String, dynamic>.from(e)))
-            .toList();
+    final bookListModel = booksList
+        ?.map((e) => TafsirBookModel.fromMap(Map<String, dynamic>.from(e)))
+        .toList();
 
-    return bookListModel;
+    return bookListModel == null ? null : _dedupeBooks(bookListModel);
+  }
+
+  static Future<int?> getRemoteBookSizeBytes(TafsirBookModel book) async {
+    if (_remoteSizeBytesCache.containsKey(book.fullPath)) {
+      return _remoteSizeBytesCache[book.fullPath];
+    }
+    try {
+      final response = await dio.Dio().head<dynamic>(
+        ApisUrls.base + book.fullPath,
+      );
+      final raw = response.headers.value("content-length");
+      final bytes = raw == null ? null : int.tryParse(raw);
+      _remoteSizeBytesCache[book.fullPath] = bytes;
+      return bytes;
+    } catch (_) {
+      _remoteSizeBytesCache[book.fullPath] = null;
+      return null;
+    }
   }
 
   static Future<bool> downloadResources({
@@ -219,7 +265,6 @@ class QuranTafsirFunction {
     bool isSetupProcess = false,
   }) async {
     final cubit = context.read<ResourcesProgressCubit>();
-    cubit.updateProgress(null, "Downloading Tafsir: ${tafsirBook.name}");
 
     if (await isAlreadyDownloaded(tafsirBook)) {
       log(
@@ -232,6 +277,14 @@ class QuranTafsirFunction {
       await init();
       return true;
     }
+
+    cubit.onProcess();
+    cubit.changeTafsirBook(tafsirBook);
+    cubit.updateProgress(
+      0.0,
+      "Downloading Tafsir: ${tafsirBook.name}",
+      activeResourceId: tafsirBook.fullPath,
+    );
 
     final tafsirBoxName = getTafsirBoxName(tafsirBook: tafsirBook);
 
@@ -256,14 +309,18 @@ class QuranTafsirFunction {
           "Failed to open LazyBox '$tafsirBoxName' even after delete: $e2",
           name: "downloadResources",
         );
-        cubit.updateProgress(null, "Error preparing Tafsir storage");
+        cubit.failure("Error preparing Tafsir storage");
         return false;
       }
     }
 
     try {
       String base = ApisUrls.base;
-      cubit.updateProgress(0.0, "Downloading: ${tafsirBook.name}");
+      cubit.updateProgress(
+        0.0,
+        "Downloading: ${tafsirBook.name}",
+        activeResourceId: tafsirBook.fullPath,
+      );
       dio.Response response = await dio.Dio().get(
         base + tafsirBook.fullPath,
         onReceiveProgress: (received, total) {
@@ -272,12 +329,19 @@ class QuranTafsirFunction {
             cubit.updateProgress(
               progress * 0.5,
               "Downloading: ${tafsirBook.name}",
+              transferredBytes: received,
+              totalBytes: total,
+              activeResourceId: tafsirBook.fullPath,
             );
           }
         },
       );
 
-      cubit.updateProgress(0.5, "Processing: ${tafsirBook.name}");
+      cubit.updateProgress(
+        0.5,
+        "Processing: ${tafsirBook.name}",
+        activeResourceId: tafsirBook.fullPath,
+      );
       Map data = await compute(
         (message) => jsonDecode(decodeBZip2String(message)),
         response.data,
@@ -292,6 +356,7 @@ class QuranTafsirFunction {
           cubit.updateProgress(
             0.5 + (processedEntries / totalEntries * 0.5),
             "Processing Tafsir",
+            activeResourceId: tafsirBook.fullPath,
           );
         }
       }
@@ -308,14 +373,22 @@ class QuranTafsirFunction {
         name: "downloadResources",
       );
       await init();
-      cubit.updateProgress(1.0, "Downloaded: ${tafsirBook.name}");
+      cubit.updateProgress(
+        1.0,
+        "Downloaded: ${tafsirBook.name}",
+        transferredBytes: 1,
+        totalBytes: 1,
+        activeResourceId: tafsirBook.fullPath,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 220));
+      cubit.success();
       return true;
     } catch (e, s) {
       log(
         "Error downloading or processing Tafsir '${tafsirBook.name}': $e\n$s",
         name: "downloadResources",
       );
-      cubit.updateProgress(null, "Error downloading Tafsir");
+      cubit.failure("Error downloading Tafsir");
       if (tafsirBox.isOpen) {
         await tafsirBox.close();
       }
@@ -358,10 +431,10 @@ class QuranTafsirFunction {
     }
 
     for (TafsirBookModel bookModel in targetBooks) {
-       final result = await getTafsirForBook(bookModel, ayahKey);
-       if (result != null) {
-         toReturn.add(result);
-       }
+      final result = await getTafsirForBook(bookModel, ayahKey);
+      if (result != null) {
+        toReturn.add(result);
+      }
     }
 
     return toReturn;

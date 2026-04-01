@@ -2,6 +2,7 @@ import "dart:ui";
 
 import "package:al_quran_v3/src/screen/quran_resources/tafsir_resources_view.dart";
 import "package:al_quran_v3/src/screen/quran_resources/translation_resources_view.dart";
+import "package:al_quran_v3/src/screen/quran_resources/word_by_word_resources_view.dart";
 import "package:al_quran_v3/src/screen/quran_resources/word_info_resources_view.dart";
 import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
 import "package:flutter/material.dart";
@@ -20,13 +21,18 @@ class _QuranResourcesViewState extends State<QuranResourcesView>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
-  static const List<String> pagesName = ["الترجمات", "التفاسير", "معلومات الكلمات"];
+  static const List<String> pagesName = [
+    "الترجمات",
+    "التفاسير",
+    "كلمة بكلمة",
+    "معلومات الكلمات",
+  ];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(
-      initialIndex: widget.initTab.clamp(0, 2),
+      initialIndex: widget.initTab.clamp(0, pagesName.length - 1),
       length: pagesName.length,
       vsync: this,
     );
@@ -45,6 +51,9 @@ class _QuranResourcesViewState extends State<QuranResourcesView>
 
     return Scaffold(
       extendBodyBehindAppBar: true,
+      backgroundColor: isDark
+          ? const Color(0xFF0C0C0C)
+          : const Color(0xFFF7F1E7),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -53,8 +62,16 @@ class _QuranResourcesViewState extends State<QuranResourcesView>
             filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
             child: Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: isDark ? 0.75 : 0.85),
-                border: Border(bottom: BorderSide(color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05))),
+                color: Theme.of(context).scaffoldBackgroundColor.withValues(
+                  alpha: isDark ? 0.75 : 0.85,
+                ),
+                border: Border(
+                  bottom: BorderSide(
+                    color: isDark
+                        ? Colors.white10
+                        : Colors.black.withValues(alpha: 0.05),
+                  ),
+                ),
               ),
             ),
           ),
@@ -67,13 +84,82 @@ class _QuranResourcesViewState extends State<QuranResourcesView>
       ),
       body: Stack(
         children: [
-          TabBarView(
-            controller: _tabController,
-            physics: const BouncingScrollPhysics(),
-            children: const [
-              TranslationResourcesView(),
-              TafsirResourcesView(),
-              WordInfoResourcesView(),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: isDark
+                      ? [const Color(0xFF121212), const Color(0xFF090909)]
+                      : [const Color(0xFFF7F1E7), const Color(0xFFFBF8F1)],
+                ),
+              ),
+            ),
+          ),
+          Column(
+            children: [
+              SizedBox(height: 110.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(18.w),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF171717) : Colors.white,
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(
+                      color: isDark
+                          ? Colors.white10
+                          : themeState.primary.withValues(alpha: 0.08),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: themeState.primary.withValues(alpha: 0.08),
+                        blurRadius: 24,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        "مكتبة الموارد",
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w900,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        "إدارة موحدة للترجمات والتفاسير ومصادر الكلمات، مع اختيار سريع وحذف وتنظيم أنظف.",
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          height: 1.7,
+                          color: isDark ? Colors.white60 : Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 14.h),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  physics: const BouncingScrollPhysics(),
+                  children: const [
+                    TranslationResourcesView(),
+                    TafsirResourcesView(),
+                    WordByWordResourcesView(),
+                    WordInfoResourcesView(),
+                  ],
+                ),
+              ),
             ],
           ),
           SafeArea(
@@ -88,9 +174,13 @@ class _QuranResourcesViewState extends State<QuranResourcesView>
                     child: Container(
                       height: 44.h,
                       decoration: BoxDecoration(
-                        color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.05),
+                        color: (isDark ? Colors.white : Colors.black)
+                            .withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(100),
-                        border: Border.all(color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.05)),
+                        border: Border.all(
+                          color: (isDark ? Colors.white : Colors.black)
+                              .withValues(alpha: 0.05),
+                        ),
                       ),
                       child: TabBar(
                         controller: _tabController,
@@ -107,12 +197,22 @@ class _QuranResourcesViewState extends State<QuranResourcesView>
                         ),
                         indicatorSize: TabBarIndicatorSize.tab,
                         labelColor: Colors.white,
-                        unselectedLabelColor: isDark ? Colors.white54 : Colors.black54,
-                        labelStyle: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w800),
-                        unselectedLabelStyle: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
+                        unselectedLabelColor: isDark
+                            ? Colors.white54
+                            : Colors.black54,
+                        labelStyle: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w800,
+                        ),
+                        unselectedLabelStyle: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
                         tabs: pagesName.map((name) => Tab(text: name)).toList(),
                         dividerColor: Colors.transparent,
                         indicatorPadding: EdgeInsets.all(4.w),
+                        isScrollable: true,
+                        tabAlignment: TabAlignment.center,
                       ),
                     ),
                   ),

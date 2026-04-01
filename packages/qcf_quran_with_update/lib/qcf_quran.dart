@@ -231,6 +231,27 @@ String getVerseQCF(
   return verse;
 }
 
+/// Returns a verse split into tappable QCF glyph chunks.
+///
+/// In the bundled QCF data, each rendered word is represented by a single
+/// grapheme in most verses, so this helper is useful when building interactive
+/// word-based UIs while preserving the mushaf glyph appearance.
+List<String> getVerseQCFWords(
+  int surahNumber,
+  int verseNumber, {
+  bool verseEndSymbol = false,
+}) {
+  final verse = getVerseQCF(
+    surahNumber,
+    verseNumber,
+    verseEndSymbol: verseEndSymbol,
+  );
+  return verse.runes
+      .map(String.fromCharCode)
+      .where((glyph) => glyph.trim().isNotEmpty)
+      .toList();
+}
+
 String getVerseNumberQCF(
   int surahNumber,
   int verseNumber, {

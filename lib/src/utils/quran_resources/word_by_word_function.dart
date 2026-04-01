@@ -16,6 +16,7 @@ import "../encode_decode.dart";
 
 class WordByWordFunction {
   static LazyBox? openedWordByWordBox;
+  static final Map<String, int?> _remoteSizeBytesCache = {};
 
   // User box keys will now store maps, not just language strings
   static const String _userBoxKeyDownloaded = "downloaded_wbw_books";
@@ -68,10 +69,11 @@ class WordByWordFunction {
   static String getWordByWordBoxName(TranslationBookModel book) {
     // Ensure it's a wordByWord type before proceeding (optional assertion)
     // assert(book.type == TranslationResourcesType.wordByWord);
-    String sanitizedIdentifier = (book.fileName.isNotEmpty
-            ? book.fileName
-            : book.fullPath.split("/").last)
-        .replaceAll(RegExp(r"[^\w\.-]"), "_");
+    String sanitizedIdentifier =
+        (book.fileName.isNotEmpty
+                ? book.fileName
+                : book.fullPath.split("/").last)
+            .replaceAll(RegExp(r"[^\w\.-]"), "_");
 
     return "wbw_${book.language}_$sanitizedIdentifier";
   }
@@ -83,13 +85,10 @@ class WordByWordFunction {
       _userBoxKeyDownloaded,
       defaultValue: [],
     );
-    List<TranslationBookModel> downloadedBooks =
-        downloadedList
-            .map(
-              (e) => TranslationBookModel.fromMap(Map<String, dynamic>.from(e)),
-            )
-            .where((b) => b.type == TranslationResourcesType.wordByWord)
-            .toList();
+    List<TranslationBookModel> downloadedBooks = downloadedList
+        .map((e) => TranslationBookModel.fromMap(Map<String, dynamic>.from(e)))
+        .where((b) => b.type == TranslationResourcesType.wordByWord)
+        .toList();
 
     for (TranslationBookModel downloadedBook in downloadedBooks) {
       if (downloadedBook.fullPath == book.fullPath &&
@@ -99,6 +98,24 @@ class WordByWordFunction {
       }
     }
     return false;
+  }
+
+  static Future<int?> getRemoteBookSizeBytes(TranslationBookModel book) async {
+    if (_remoteSizeBytesCache.containsKey(book.fullPath)) {
+      return _remoteSizeBytesCache[book.fullPath];
+    }
+    try {
+      final response = await dio.Dio().head<dynamic>(
+        ApisUrls.base + book.fullPath,
+      );
+      final raw = response.headers.value("content-length");
+      final bytes = raw == null ? null : int.tryParse(raw);
+      _remoteSizeBytesCache[book.fullPath] = bytes;
+      return bytes;
+    } catch (_) {
+      _remoteSizeBytesCache[book.fullPath] = null;
+      return null;
+    }
   }
 
   static Future<void> setBookAsDownloaded(TranslationBookModel book) async {
@@ -190,8 +207,9 @@ class WordByWordFunction {
 
   static TranslationBookModel? getSelectedWordByWordBook() {
     final userBox = Hive.box("user");
-    final Map<String, dynamic>? bookMap =
-        userBox.get(_userBoxKeySelected)?.cast<String, dynamic>();
+    final Map<String, dynamic>? bookMap = userBox
+        .get(_userBoxKeySelected)
+        ?.cast<String, dynamic>();
     if (bookMap != null) {
       final book = TranslationBookModel.fromMap(bookMap);
       // Ensure it is indeed a wordByWord type
@@ -232,7 +250,6 @@ class WordByWordFunction {
     }
 
     final cubit = context.read<ResourcesProgressCubit>();
-    cubit.updateProgress(null, "Downloading WbW: ${book.name}");
 
     if (await isBookDownloaded(book)) {
       log(
@@ -251,6 +268,14 @@ class WordByWordFunction {
       }
       return true;
     }
+
+    cubit.onProcess();
+    cubit.changeTranslationBook(book);
+    cubit.updateProgress(
+      0.0,
+      "Downloading WbW: ${book.name}",
+      activeResourceId: book.fullPath,
+    );
 
     // The 'filePath' now comes from book.fullPath
     // The 'wbwInfo' map ('name', etc.) comes from book.name, book.language etc.
@@ -277,17 +302,18 @@ class WordByWordFunction {
           "Failed to open Hive box '$boxName' even after delete: $e2",
           name: "WbWFunction.downloadResource",
         );
-        cubit.updateProgress(
-          null,
-          "Error preparing WbW storage for ${book.name}",
-        );
+        cubit.failure("Error preparing WbW storage for ${book.name}");
         return false;
       }
     }
 
     try {
       final String downloadUrl = ApisUrls.base + book.fullPath;
-      cubit.updateProgress(0.0, "Downloading WbW: ${book.name}");
+      cubit.updateProgress(
+        0.0,
+        "Downloading WbW: ${book.name}",
+        activeResourceId: book.fullPath,
+      );
 
       dio.Response response = await dio.Dio().get(
         downloadUrl,
@@ -297,12 +323,19 @@ class WordByWordFunction {
             cubit.updateProgress(
               progress * 0.5,
               "Downloading WbW: ${book.name}",
+              transferredBytes: received,
+              totalBytes: total,
+              activeResourceId: book.fullPath,
             );
           }
         },
       );
 
-      cubit.updateProgress(0.5, "Processing WbW: ${book.name}");
+      cubit.updateProgress(
+        0.5,
+        "Processing WbW: ${book.name}",
+        activeResourceId: book.fullPath,
+      );
       Map<String, dynamic> jsonData = await compute(
         (data) =>
             jsonDecode(decodeBZip2String(data as String))
@@ -320,6 +353,7 @@ class WordByWordFunction {
           cubit.updateProgress(
             0.5 + (processedEntries / totalEntries * 0.5),
             "Processing WbW data for ${book.name}",
+            activeResourceId: book.fullPath,
           );
         }
       }
@@ -342,14 +376,22 @@ class WordByWordFunction {
         "WbW for '${book.name}' downloaded and processed successfully.",
         name: "WbWFunction.downloadResource",
       );
-      cubit.updateProgress(1.0, "WbW: ${book.name} Downloaded");
+      cubit.updateProgress(
+        1.0,
+        "WbW: ${book.name} Downloaded",
+        transferredBytes: 1,
+        totalBytes: 1,
+        activeResourceId: book.fullPath,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 220));
+      cubit.success();
       return true;
     } catch (e, s) {
       log(
         "Error downloading/processing WbW for '${book.name}': $e\n$s",
         name: "WbWFunction.downloadResource",
       );
-      cubit.updateProgress(null, "Error downloading WbW for ${book.name}");
+      cubit.failure("Error downloading WbW for ${book.name}");
       if (newBox.isOpen) {
         await newBox.close();
       }
