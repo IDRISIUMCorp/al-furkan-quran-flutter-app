@@ -141,7 +141,7 @@ class AyahOfTheDayService {
     final customSurah = box.get("widget_custom_surah") as int?;
     final customVerse = box.get("widget_custom_verse") as int?;
     final widgetFontSize =
-        box.get("widget_font_size", defaultValue: 28.0) as double;
+        box.get("widget_font_size", defaultValue: 45.0) as double;
     final widgetTheme =
         box.get("widget_theme", defaultValue: "glass_dark") as String;
 

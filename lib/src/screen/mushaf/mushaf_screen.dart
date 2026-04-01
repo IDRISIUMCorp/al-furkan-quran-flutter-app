@@ -59,7 +59,6 @@ import "package:al_quran_v3/src/screen/mushaf/widgets/image_share/ayah_image_gen
 import "package:al_quran_v3/src/screen/mushaf/widgets/khatma_sheet.dart";
 import "package:al_quran_v3/src/screen/smart_khatma/smart_khatma_page.dart";
 import "package:al_quran_v3/src/screen/azkar/azkar_categories_screen.dart";
-import "package:al_quran_v3/src/screen/settings/widgets/ayah_widget_settings_page.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
 import "package:al_quran_v3/src/theme/controller/theme_state.dart";
@@ -113,7 +112,6 @@ class _HeaderIconPill extends StatelessWidget {
     );
   }
 }
-
 
 class _MushafRoot extends StatefulWidget {
   const _MushafRoot();
@@ -553,7 +551,6 @@ class _MushafRootState extends State<_MushafRoot> {
     return out;
   }
 
-
   List<Map<String, dynamic>> _getWahyBookmarks() {
     final box = Hive.box("user");
     final raw = box.get(_kWahyBookmarks, defaultValue: const []) as List?;
@@ -631,6 +628,7 @@ class _MushafRootState extends State<_MushafRoot> {
       ayahPreviewForKey: _ayahPreviewForKey,
     );
   }
+
   Future<void> _openStarredSheet() async {
     await showStarredSheet(
       context: context,
@@ -641,6 +639,7 @@ class _MushafRootState extends State<_MushafRoot> {
       ayahPreviewForKey: _ayahPreviewForKey,
     );
   }
+
   Future<void> _openNotesSheet() async {
     await showNotesSheet(
       context: context,
@@ -665,6 +664,7 @@ class _MushafRootState extends State<_MushafRoot> {
       },
     );
   }
+
   Future<void> _openIndexSheet() async {
     await showModalBottomSheet(
       context: context,
@@ -891,7 +891,9 @@ class _MushafRootState extends State<_MushafRoot> {
         backgroundColor: Colors.transparent,
         builder: (sheetContext) {
           final bg = isDark ? const Color(0xFF000000) : _bg(sheetContext);
-          final card = isDark ? const Color(0xFF111111) : const Color(0xFFFFF9F2);
+          final card = isDark
+              ? const Color(0xFF111111)
+              : const Color(0xFFFFF9F2);
           final fontBase = isDark ? Colors.white : _onBg(sheetContext);
 
           Widget item({
@@ -961,7 +963,9 @@ class _MushafRootState extends State<_MushafRoot> {
                                 width: 44,
                                 height: 4,
                                 decoration: BoxDecoration(
-                                  color: isDark ? Colors.white.withValues(alpha: 0.25) : Colors.black.withValues(alpha: 0.18),
+                                  color: isDark
+                                      ? Colors.white.withValues(alpha: 0.25)
+                                      : Colors.black.withValues(alpha: 0.18),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                               ),
@@ -980,7 +984,9 @@ class _MushafRootState extends State<_MushafRoot> {
                                   color: card,
                                   borderRadius: BorderRadius.circular(18),
                                   border: Border.all(
-                                    color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.08)
+                                        : Colors.black.withValues(alpha: 0.06),
                                   ),
                                 ),
                                 child: Column(
@@ -1111,39 +1117,39 @@ class _MushafRootState extends State<_MushafRoot> {
                 child: Container(
                   color: _bg(context),
                   child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 220),
-                      switchInCurve: Curves.easeOutCubic,
-                      switchOutCurve: Curves.easeOutCubic,
-                      child: _isMushafMode
-                          ? MushafView(
-                              key: const ValueKey("mushaf"),
-                              useDefaultAppBar: false,
-                              initialPageNumber: context
-                                  .watch<AyahKeyCubit>()
-                                  .state
-                                  .lastScrolledPageNumber,
-                              controller: _mushafPageController,
-                              spOverride: mushafScale,
-                              hOverride: mushafScale,
-                              onToggleHeader: () =>
-                                  setState(() => _showHeader = !_showHeader),
-                            )
-                          : QuranScriptView(
-                              key: const ValueKey("ayah_by_ayah"),
-                              startKey: "1:1",
-                              endKey: "114:6",
-                              toScrollKey: context
-                                  .read<AyahKeyCubit>()
-                                  .state
-                                  .current,
-                              embedded: true,
-                              topPaddingOverride: 0,
-                              showAudioController: false,
-                            ),
-                      ),
+                    duration: const Duration(milliseconds: 220),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeOutCubic,
+                    child: _isMushafMode
+                        ? MushafView(
+                            key: const ValueKey("mushaf"),
+                            useDefaultAppBar: false,
+                            initialPageNumber: context
+                                .watch<AyahKeyCubit>()
+                                .state
+                                .lastScrolledPageNumber,
+                            controller: _mushafPageController,
+                            spOverride: mushafScale,
+                            hOverride: mushafScale,
+                            onToggleHeader: () =>
+                                setState(() => _showHeader = !_showHeader),
+                          )
+                        : QuranScriptView(
+                            key: const ValueKey("ayah_by_ayah"),
+                            startKey: "1:1",
+                            endKey: "114:6",
+                            toScrollKey: context
+                                .read<AyahKeyCubit>()
+                                .state
+                                .current,
+                            embedded: true,
+                            topPaddingOverride: 0,
+                            showAudioController: false,
+                          ),
                   ),
                 ),
               ),
+            ),
             // Top header (Beige)
             AnimatedSlide(
               duration: Duration(milliseconds: _showHeader ? 320 : 520),
@@ -1352,7 +1358,9 @@ class _MushafRootState extends State<_MushafRoot> {
   Widget _buildMoreMenu(Color primaryColor, bool isDark) {
     final themeState = context.read<ThemeCubit>().state;
     final primary = themeState.primary;
-    final Color bgColor = isDark ? const Color(0xFF000000) : const Color(0xFFF7F5EC);
+    final Color bgColor = isDark
+        ? const Color(0xFF000000)
+        : const Color(0xFFF7F5EC);
     final Color textColor = isDark ? Colors.white : const Color(0xFF1E1E1E);
 
     PopupMenuItem<int> buildPremiumMenuItem(
@@ -1440,85 +1448,88 @@ class _MushafRootState extends State<_MushafRoot> {
             ),
           ),
           itemBuilder: (context) => [
-            buildPremiumMenuItem(0, Icons.settings_rounded, "الإعدادات"),
-            buildPremiumMenuItem(7, Icons.auto_awesome_rounded, "إعدادات المصحف"),
-            buildPremiumMenuItem(9, Icons.widgets_rounded, "ويدجت آية اليوم"),
-            buildPremiumMenuItem(1, Icons.menu_book_rounded, "التفاسير والترجمات"),
-            const PopupMenuDivider(height: 16),
+            buildPremiumMenuItem(
+              7,
+              Icons.auto_awesome_rounded,
+              "إعدادات المصحف",
+            ),
             buildPremiumMenuItem(8, Icons.auto_stories_rounded, "أذكار المسلم"),
-            buildPremiumMenuItem(5, Icons.access_time_filled_rounded, "مواقيت الصلاة"),
+            buildPremiumMenuItem(
+              5,
+              Icons.access_time_filled_rounded,
+              "مواقيت الصلاة",
+            ),
             buildPremiumMenuItem(6, Icons.explore_rounded, "القبلة"),
+            buildPremiumMenuItem(1, Icons.library_books_rounded, "المكتبة"),
             const PopupMenuDivider(height: 16),
-            buildPremiumMenuItem(3, Icons.bug_report_rounded, "إرسال ملاحظة"),
+            buildPremiumMenuItem(0, Icons.settings_rounded, "الإعدادات"),
             buildPremiumMenuItem(2, Icons.info_outline_rounded, "عن التطبيق"),
+            buildPremiumMenuItem(3, Icons.bug_report_rounded, "إرسال ملاحظة"),
           ],
-        onSelected: (val) {
-        if (val == 0) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const SettingsPage()),
-          );
-        } else if (val == 1) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const QuranResourcesView()),
-          );
-        } else if (val == 2) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AboutAppPage()),
-          );
-        } else if (val == 3) {
-          showGeneralDialog(
-            context: context,
-            barrierDismissible: true,
-            barrierLabel: "إغلاق الملاحظة",
-            transitionDuration: const Duration(milliseconds: 320),
-            pageBuilder: (ctx, anim1, anim2) =>
-                WahyFeedbackDialog(primary: primaryColor),
-            transitionBuilder: (ctx, anim1, anim2, child) {
-              return SlideTransition(
-                position:
-                    Tween<Offset>(
-                      begin: const Offset(0, 0.4),
-                      end: Offset.zero,
-                    ).animate(
-                      CurvedAnimation(
-                        parent: anim1,
-                        curve: Curves.easeOutCubic,
-                      ),
-                    ),
-                child: FadeTransition(opacity: anim1, child: child),
+          onSelected: (val) {
+            if (val == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SettingsPage()),
               );
-            },
-          );
-        } else if (val == 5) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const PrayerTimePage()),
-          );
-        } else if (val == 6) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const QiblaDirection()),
-          );
-        } else if (val == 7) {
-          QuranSettingsBottomSheet.show(context);
-        } else if (val == 8) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AzkarCategoriesScreen()),
-          );
-        } else if (val == 9) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AyahWidgetSettingsPage()),
-          );
-        }
-      },
-    ),
-   ),
-   );
+            } else if (val == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const QuranResourcesView()),
+              );
+            } else if (val == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AboutAppPage()),
+              );
+            } else if (val == 3) {
+              showGeneralDialog(
+                context: context,
+                barrierDismissible: true,
+                barrierLabel: "إغلاق الملاحظة",
+                transitionDuration: const Duration(milliseconds: 320),
+                pageBuilder: (ctx, anim1, anim2) =>
+                    WahyFeedbackDialog(primary: primaryColor),
+                transitionBuilder: (ctx, anim1, anim2, child) {
+                  return SlideTransition(
+                    position:
+                        Tween<Offset>(
+                          begin: const Offset(0, 0.4),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: anim1,
+                            curve: Curves.easeOutCubic,
+                          ),
+                        ),
+                    child: FadeTransition(opacity: anim1, child: child),
+                  );
+                },
+              );
+            } else if (val == 5) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PrayerTimePage()),
+              );
+            } else if (val == 6) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const QiblaDirection()),
+              );
+            } else if (val == 7) {
+              QuranSettingsBottomSheet.show(context);
+            } else if (val == 8) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AzkarCategoriesScreen(),
+                ),
+              );
+            }
+          },
+        ),
+      ),
+    );
   }
 }
 
@@ -1911,7 +1922,6 @@ class _WahyDrawerDivider extends StatelessWidget {
   }
 }
 
-
 class MushafView extends StatefulWidget {
   final bool useDefaultAppBar;
   final int? initialPageNumber;
@@ -1958,7 +1968,8 @@ class _MushafViewState extends State<MushafView> {
   void _animateToPage(int pageNumber) {
     if (!_pageController.hasClients) return;
     final targetIndex = (pageNumber - 1).clamp(0, 603);
-    final currentIndex = (_pageController.page ?? targetIndex.toDouble()).round();
+    final currentIndex = (_pageController.page ?? targetIndex.toDouble())
+        .round();
     if (currentIndex == targetIndex) return;
     _pageController.animateToPage(
       targetIndex,
@@ -2459,17 +2470,16 @@ class _MushafViewState extends State<MushafView> {
     final ThemeState themeState = context.read<ThemeCubit>().state;
     final qSettings = context.watch<QuranSettingsCubit>().state;
 
-    final bool isThemeCompatibleWithMode =
-        isDark
-            ? (qSettings.theme == QuranTheme.oled ||
-                qSettings.theme == QuranTheme.nightBlue ||
-                qSettings.theme == QuranTheme.custom ||
-                qSettings.theme == QuranTheme.graphite ||
-                qSettings.theme == QuranTheme.midnightPurple)
-            : (qSettings.theme == QuranTheme.sepia ||
-                qSettings.theme == QuranTheme.cream ||
-                qSettings.theme == QuranTheme.paperWhite ||
-                qSettings.theme == QuranTheme.sand);
+    final bool isThemeCompatibleWithMode = isDark
+        ? (qSettings.theme == QuranTheme.oled ||
+              qSettings.theme == QuranTheme.nightBlue ||
+              qSettings.theme == QuranTheme.custom ||
+              qSettings.theme == QuranTheme.graphite ||
+              qSettings.theme == QuranTheme.midnightPurple)
+        : (qSettings.theme == QuranTheme.sepia ||
+              qSettings.theme == QuranTheme.cream ||
+              qSettings.theme == QuranTheme.paperWhite ||
+              qSettings.theme == QuranTheme.sand);
 
     if (qSettings.isInitialized && !isThemeCompatibleWithMode) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -2508,11 +2518,13 @@ class _MushafViewState extends State<MushafView> {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: bg,
-        statusBarIconBrightness:
-            bgBrightness == Brightness.dark ? Brightness.light : Brightness.dark,
+        statusBarIconBrightness: bgBrightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark,
         systemNavigationBarColor: bg,
-        systemNavigationBarIconBrightness:
-            bgBrightness == Brightness.dark ? Brightness.light : Brightness.dark,
+        systemNavigationBarIconBrightness: bgBrightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark,
         systemNavigationBarContrastEnforced: false,
         systemStatusBarContrastEnforced: false,
       ),
@@ -2576,7 +2588,8 @@ class _MushafViewState extends State<MushafView> {
 
             final ayahKey = context.read<AyahKeyCubit>().state.current;
 
-            final segments = SegmentedResourcesManager.getAyahSegments(ayahKey) ?? [];
+            final segments =
+                SegmentedResourcesManager.getAyahSegments(ayahKey) ?? [];
             if (segments.isEmpty) {
               if (context.read<WordPlayingStateCubit>().state != null) {
                 context.read<WordPlayingStateCubit>().changeState(null);
@@ -2610,328 +2623,376 @@ class _MushafViewState extends State<MushafView> {
       ],
       child: BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
         builder: (context, qSettings) {
-        // Map unified QuranTheme enum → QcfThemeData factory
-        QcfThemeData buildBaseTheme() {
-          switch (qSettings.theme) {
-            case QuranTheme.oled:
-              return QcfThemeData.oled();
-            case QuranTheme.graphite:
-              return QcfThemeData.graphite();
-            case QuranTheme.midnightPurple:
-              return QcfThemeData.midnightPurple();
-            case QuranTheme.sepia:
-              return QcfThemeData.sepia();
-            case QuranTheme.cream:
-              return QcfThemeData.cream();
-            case QuranTheme.paperWhite:
-              return QcfThemeData.paperWhite();
-            case QuranTheme.sand:
-              return QcfThemeData.sand();
-            case QuranTheme.nightBlue:
-              return QcfThemeData.nightBlue();
-            case QuranTheme.custom:
-              return QcfThemeData.dark();
+          // Map unified QuranTheme enum → QcfThemeData factory
+          QcfThemeData buildBaseTheme() {
+            switch (qSettings.theme) {
+              case QuranTheme.oled:
+                return QcfThemeData.oled();
+              case QuranTheme.graphite:
+                return QcfThemeData.graphite();
+              case QuranTheme.midnightPurple:
+                return QcfThemeData.midnightPurple();
+              case QuranTheme.sepia:
+                return QcfThemeData.sepia();
+              case QuranTheme.cream:
+                return QcfThemeData.cream();
+              case QuranTheme.paperWhite:
+                return QcfThemeData.paperWhite();
+              case QuranTheme.sand:
+                return QcfThemeData.sand();
+              case QuranTheme.nightBlue:
+                return QcfThemeData.nightBlue();
+              case QuranTheme.custom:
+                return QcfThemeData.dark();
+            }
           }
-        }
 
-        final bool qDark =
-            qSettings.theme == QuranTheme.oled ||
-            qSettings.theme == QuranTheme.nightBlue ||
-            qSettings.theme == QuranTheme.custom;
+          final bool qDark =
+              qSettings.theme == QuranTheme.oled ||
+              qSettings.theme == QuranTheme.nightBlue ||
+              qSettings.theme == QuranTheme.custom;
 
-        return BlocBuilder<AyahToHighlight, String?>(
-          buildWhen: (p, c) => p != c,
-          builder: (context, highlightedAyahKey) {
-            return BlocBuilder<WordPlayingStateCubit, String?>(
-              builder: (context, highlightedWordKey) {
-            final baseTheme = buildBaseTheme();
-            final pageBg = baseTheme.pageBackgroundColor;
-            final pageBgBrightness = ThemeData.estimateBrightnessForColor(pageBg);
-            final bool pageBgIsDark = pageBgBrightness == Brightness.dark;
-            final verseNumberColor =
-                pageBgIsDark ? Colors.white70 : const Color(0xFF1B1B1B);
-            final verseNumberHeight = baseTheme.verseNumberHeight;
-            final qcfTheme = baseTheme.copyWith(
-              pageBackgroundColor: baseTheme.pageBackgroundColor,
-              headerBackgroundColor: Colors.transparent,
-              headerTextColor: Colors.black,
-              verseTextColor: baseTheme.verseTextColor,
-              verseNumberColor: verseNumberColor,
-              verseNumberBuilder: (surah, verse, verseNumber) {
-                final key = "$surah:$verse";
-                final hasMarker = _hasAnyWahyMarker(
-                  ayahKey: key,
-                  starred: starredKeys,
-                  notes: notesKeys,
-                  bookmarks: bookmarkKeys,
-                );
+          return BlocBuilder<AyahToHighlight, String?>(
+            buildWhen: (p, c) => p != c,
+            builder: (context, highlightedAyahKey) {
+              return BlocBuilder<WordPlayingStateCubit, String?>(
+                builder: (context, highlightedWordKey) {
+                  final baseTheme = buildBaseTheme();
+                  final pageBg = baseTheme.pageBackgroundColor;
+                  final pageBgBrightness = ThemeData.estimateBrightnessForColor(
+                    pageBg,
+                  );
+                  final bool pageBgIsDark = pageBgBrightness == Brightness.dark;
+                  final verseNumberColor = pageBgIsDark
+                      ? Colors.white70
+                      : const Color(0xFF1B1B1B);
+                  final verseNumberHeight = baseTheme.verseNumberHeight;
+                  final qcfTheme = baseTheme.copyWith(
+                    pageBackgroundColor: baseTheme.pageBackgroundColor,
+                    headerBackgroundColor: Colors.transparent,
+                    headerTextColor: Colors.black,
+                    verseTextColor: baseTheme.verseTextColor,
+                    verseNumberColor: verseNumberColor,
+                    verseNumberBuilder: (surah, verse, verseNumber) {
+                      final key = "$surah:$verse";
+                      final hasMarker = _hasAnyWahyMarker(
+                        ayahKey: key,
+                        starred: starredKeys,
+                        notes: notesKeys,
+                        bookmarks: bookmarkKeys,
+                      );
 
-                final pageNumber = qcf.getPageNumber(surah, verse);
-                final pageFont =
-                    "QCF_P${pageNumber.toString().padLeft(3, '0')}";
+                      final pageNumber = qcf.getPageNumber(surah, verse);
+                      final pageFont =
+                          "QCF_P${pageNumber.toString().padLeft(3, '0')}";
 
-                final base = TextSpan(
-                  text: verseNumber,
-                  style: TextStyle(
-                    fontFamily: pageFont,
-                    package: "qcf_quran",
-                    color: verseNumberColor,
-                    height: verseNumberHeight / (widget.hOverride ?? 0.86),
-                  ),
-                );
-
-                if (!hasMarker) return base;
-
-                Color dotColor;
-                if (starredKeys.contains(key)) {
-                  dotColor = const Color(0xFFF4B400);
-                } else if (bookmarkKeys.contains(key)) {
-                  dotColor = themeState.primary;
-                } else {
-                  dotColor = const Color(0xFF2962FF);
-                }
-
-                return TextSpan(
-                  children: [
-                    base,
-                    WidgetSpan(
-                      alignment: PlaceholderAlignment.middle,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 2),
-                        child: Container(
-                          width: 5,
-                          height: 5,
-                          decoration: BoxDecoration(
-                            color: dotColor,
-                            borderRadius: BorderRadius.circular(99),
-                          ),
+                      final base = TextSpan(
+                        text: verseNumber,
+                        style: TextStyle(
+                          fontFamily: pageFont,
+                          package: "qcf_quran",
+                          color: verseNumberColor,
+                          height:
+                              verseNumberHeight / (widget.hOverride ?? 0.86),
                         ),
+                      );
+
+                      if (!hasMarker) return base;
+
+                      Color dotColor;
+                      if (starredKeys.contains(key)) {
+                        dotColor = const Color(0xFFF4B400);
+                      } else if (bookmarkKeys.contains(key)) {
+                        dotColor = themeState.primary;
+                      } else {
+                        dotColor = const Color(0xFF2962FF);
+                      }
+
+                      return TextSpan(
+                        children: [
+                          base,
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 2),
+                              child: Container(
+                                width: 5,
+                                height: 5,
+                                decoration: BoxDecoration(
+                                  color: dotColor,
+                                  borderRadius: BorderRadius.circular(99),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
+                  return MediaQuery(
+                    data: MediaQuery.of(
+                      context,
+                    ).copyWith(textScaler: const TextScaler.linear(1)),
+                    child: Container(
+                      color: baseTheme.pageBackgroundColor,
+                      child: PageviewQuran(
+                        controller: _pageController,
+                        initialPageNumber: (widget.initialPageNumber ?? 1)
+                            .clamp(1, 604),
+                        sp: widget.spOverride ?? 0.86,
+                        h: widget.hOverride ?? 0.86,
+                        fontSize: qSettings.fontSize,
+                        physics: const ClampingScrollPhysics(),
+                        showTajweed: qSettings.tajweedEnabled,
+                        tajweedWordsBuilder: (surah, verse) {
+                          return QuranScriptFunction.getWordListOfAyah(
+                            QuranScriptType.tajweed,
+                            surah.toString(),
+                            verse.toString(),
+                          );
+                        },
+                        highlightsBuilder: (surah, verse) {
+                          final key = "$surah:$verse";
+
+                          // Support Ayah-level Highlighting
+                          if (key == highlightedAyahKey) {
+                            // Support Word-level Highlighting
+                            if (highlightedWordKey != null &&
+                                highlightedWordKey.startsWith(key)) {
+                              try {
+                                final wordIndex = int.parse(
+                                  highlightedWordKey.split(":").last,
+                                );
+                                return [
+                                  HighlightRange(
+                                    wordIndex: wordIndex,
+                                    color: qSettings.highlightColor.withValues(
+                                      alpha: 0.35,
+                                    ),
+                                  ),
+                                ];
+                              } catch (_) {}
+                            }
+                          }
+                          return [];
+                        },
+                        theme: qcfTheme.copyWith(
+                          headerScale: 1.08,
+                          headerWidthSmall: 410,
+                          headerWidthLarge: 290,
+                          firstPagesTopSpacerFactor: 0.0,
+                          pageTopOverlayBuilder:
+                              (pageNumber, surahNumber, startVerse) {
+                                final juzNumber = getJuzNumber(
+                                  surahNumber,
+                                  startVerse,
+                                );
+                                return IgnorePointer(
+                                  ignoring: true,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0,
+                                      vertical: 8.0,
+                                    ),
+                                    child: DefaultTextStyle(
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w900,
+                                        fontFamily: "Inter",
+                                        color: pageBgIsDark
+                                            ? Colors.white.withValues(
+                                                alpha: 0.90,
+                                              )
+                                            : const Color(
+                                                0xFF111111,
+                                              ).withValues(alpha: 0.88),
+                                      ),
+                                      child: Directionality(
+                                        textDirection: TextDirection.ltr,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              getSurahNameArabic(surahNumber),
+                                              textDirection: TextDirection.rtl,
+                                            ),
+                                            Text(
+                                              "الجزء ${_arabicOrdinalLocal(context, juzNumber)}",
+                                              textDirection: TextDirection.rtl,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                          pageBottomOverlayBuilder:
+                              (pageNumber, surahNumber, startVerse) {
+                                final pageLabel = localizedNumber(
+                                  context,
+                                  pageNumber,
+                                );
+                                final hizbNumber = _hizbNumberFor(
+                                  surahNumber,
+                                  startVerse,
+                                );
+                                final hizbLabel =
+                                    "الحزب ${localizedNumber(context, hizbNumber)}";
+                                final showHizb = _isHizbStart(
+                                  surahNumber,
+                                  startVerse,
+                                );
+
+                                return IgnorePointer(
+                                  ignoring: true,
+                                  child: Directionality(
+                                    textDirection: TextDirection.rtl,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (showHizb) ...[
+                                          Text(
+                                            hizbLabel,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w700,
+                                              color: pageBgIsDark
+                                                  ? Colors.white.withValues(
+                                                      alpha: 0.82,
+                                                    )
+                                                  : const Color(
+                                                      0xFF111111,
+                                                    ).withValues(alpha: 0.78),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                        ],
+                                        Text(
+                                          pageLabel,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w800,
+                                            color: pageBgIsDark
+                                                ? Colors.white.withValues(
+                                                    alpha: 0.90,
+                                                  )
+                                                : const Color(
+                                                    0xFF111111,
+                                                  ).withValues(alpha: 0.88),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                        ),
+                        verseBackgroundColor: (surah, verse) {
+                          final key = "$surah:$verse";
+                          if (highlightedAyahKey != key) return null;
+                          return qSettings.highlightColor.withValues(
+                            alpha: pageBgIsDark ? 0.26 : 0.22,
+                          );
+                        },
+                        onTapDown: (surah, verse, details) {
+                          final key = "$surah:$verse";
+                          context.read<AyahKeyCubit>().changeCurrentAyahKey(
+                            key,
+                          );
+                          context.read<AyahToHighlight>().changeAyah(key);
+                        },
+                        onTap: (surah, verse) {
+                          context.read<AyahToHighlight>().changeAyah(null);
+                          widget.onToggleHeader?.call();
+                        },
+                        onLongPressDown: (surah, verse, details) {
+                          _cancelMenuTimer();
+                          final ayahKey = "$surah:$verse";
+                          context.read<AyahKeyCubit>().changeCurrentAyahKey(
+                            ayahKey,
+                          );
+                          context.read<AyahToHighlight>().changeAyah(ayahKey);
+                        },
+                        onLongPress: (surah, verse) {
+                          _cancelMenuTimer();
+                          HapticFeedback.selectionClick();
+                          _showOptionsSheetForAyah(
+                            context: context,
+                            surah: surah,
+                            verse: verse,
+                          );
+                        },
+                        onLongPressUp: (surah, verse) {
+                          _cancelMenuTimer();
+                          context.read<AyahToHighlight>().changeAyah(null);
+                        },
+                        onLongPressCancel: (surah, verse) {
+                          _cancelMenuTimer();
+                          context.read<AyahToHighlight>().changeAyah(null);
+                        },
+                        onDoubleTap: (surah, verse) async {
+                          final ayahKey = "$surah:$verse";
+                          context.read<AyahKeyCubit>().changeCurrentAyahKey(
+                            ayahKey,
+                          );
+
+                          final wordsKey = List.generate(
+                            QuranScriptFunction.getWordListOfAyah(
+                              context
+                                  .read<QuranViewCubit>()
+                                  .state
+                                  .quranScriptType,
+                              surah.toString(),
+                              verse.toString(),
+                            ).length,
+                            (i) => "$surah:$verse:${i + 1}",
+                          );
+
+                          if (wordsKey.isEmpty) return;
+
+                          showPopupWordFunction(
+                            context: context,
+                            wordKeys: wordsKey,
+                            initWordIndex: 0,
+                            wordByWordList:
+                                await WordByWordFunction.getAyahWordByWordData(
+                                  ayahKey,
+                                ) ??
+                                [],
+                          );
+                        },
+                        onPageChanged: (page) {
+                          _cancelMenuTimer();
+                          context.read<AyahKeyCubit>().changeLastScrolledPage(
+                            page,
+                          );
+
+                          final info =
+                              quranPagesInfo[(page - 1).clamp(
+                                0,
+                                quranPagesInfo.length - 1,
+                              )];
+                          final ayahId = info["s"] ?? 1;
+                          final key = convertAyahNumberToKey(ayahId);
+                          if (key != null) {
+                            context.read<AyahKeyCubit>().changeCurrentAyahKey(
+                              key,
+                            );
+                          }
+                        },
                       ),
                     ),
-                  ],
-                );
-              },
-            );
-
-            return MediaQuery(
-              data: MediaQuery.of(
-                context,
-              ).copyWith(textScaler: const TextScaler.linear(1)),
-              child: Container(
-                color: baseTheme.pageBackgroundColor,
-                child: PageviewQuran(
-                  controller: _pageController,
-                  initialPageNumber: (widget.initialPageNumber ?? 1).clamp(
-                    1,
-                    604,
-                  ),
-                  sp: widget.spOverride ?? 0.86,
-                  h: widget.hOverride ?? 0.86,
-                  fontSize: qSettings.fontSize,
-                  physics: const ClampingScrollPhysics(),
-                  showTajweed: qSettings.tajweedEnabled,
-                  tajweedWordsBuilder: (surah, verse) {
-                    return QuranScriptFunction.getWordListOfAyah(
-                      QuranScriptType.tajweed,
-                      surah.toString(),
-                      verse.toString(),
-                    );
-                  },
-                  highlightsBuilder: (surah, verse) {
-                    final key = "$surah:$verse";
-
-                    // Support Ayah-level Highlighting
-                    if (key == highlightedAyahKey) {
-                      // Support Word-level Highlighting
-                      if (highlightedWordKey != null && highlightedWordKey.startsWith(key)) {
-                        try {
-                          final wordIndex = int.parse(highlightedWordKey.split(":").last);
-                          return [
-                            HighlightRange(
-                              wordIndex: wordIndex,
-                              color: qSettings.highlightColor.withValues(alpha: 0.35),
-                            )
-                          ];
-                        } catch (_) {}
-                      }
-                    }
-                    return [];
-                  },
-                  theme: qcfTheme.copyWith(
-                    headerScale: 1.08,
-                    headerWidthSmall: 410,
-                    headerWidthLarge: 290,
-                    firstPagesTopSpacerFactor: 0.0,
-                    pageTopOverlayBuilder: (pageNumber, surahNumber, startVerse) {
-                      final juzNumber = getJuzNumber(surahNumber, startVerse);
-                      return IgnorePointer(
-                        ignoring: true,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                          child: DefaultTextStyle(
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w900,
-                              fontFamily: "Inter",
-                              color: pageBgIsDark
-                                  ? Colors.white.withValues(alpha: 0.90)
-                                  : const Color(0xFF111111)
-                                      .withValues(alpha: 0.88),
-                            ),
-                            child: Directionality(
-                              textDirection: TextDirection.ltr,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    getSurahNameArabic(surahNumber),
-                                    textDirection: TextDirection.rtl,
-                                  ),
-                                  Text(
-                                    "الجزء ${_arabicOrdinalLocal(context, juzNumber)}",
-                                    textDirection: TextDirection.rtl,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                    pageBottomOverlayBuilder: (pageNumber, surahNumber, startVerse) {
-                      final pageLabel = localizedNumber(context, pageNumber);
-                      final hizbNumber = _hizbNumberFor(surahNumber, startVerse);
-                      final hizbLabel = "الحزب ${localizedNumber(context, hizbNumber)}";
-                      final showHizb = _isHizbStart(surahNumber, startVerse);
-
-                      return IgnorePointer(
-                        ignoring: true,
-                        child: Directionality(
-                          textDirection: TextDirection.rtl,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (showHizb) ...[
-                                Text(
-                                  hizbLabel,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    color: pageBgIsDark
-                                        ? Colors.white.withValues(alpha: 0.82)
-                                        : const Color(0xFF111111)
-                                            .withValues(alpha: 0.78),
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                              ],
-                              Text(
-                                pageLabel,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w800,
-                                  color: pageBgIsDark
-                                      ? Colors.white.withValues(alpha: 0.90)
-                                      : const Color(0xFF111111)
-                                          .withValues(alpha: 0.88),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  verseBackgroundColor: (surah, verse) {
-                    final key = "$surah:$verse";
-                    if (highlightedAyahKey != key) return null;
-                    return qSettings.highlightColor.withValues(
-                      alpha: pageBgIsDark ? 0.26 : 0.22,
-                    );
-                  },
-                  onTapDown: (surah, verse, details) {
-                    final key = "$surah:$verse";
-                    context.read<AyahKeyCubit>().changeCurrentAyahKey(key);
-                    context.read<AyahToHighlight>().changeAyah(key);
-                  },
-                  onTap: (surah, verse) {
-                    context.read<AyahToHighlight>().changeAyah(null);
-                    widget.onToggleHeader?.call();
-                  },
-                  onLongPressDown: (surah, verse, details) {
-                    _cancelMenuTimer();
-                    final ayahKey = "$surah:$verse";
-                    context.read<AyahKeyCubit>().changeCurrentAyahKey(ayahKey);
-                    context.read<AyahToHighlight>().changeAyah(ayahKey);
-                  },
-                  onLongPress: (surah, verse) {
-                    _cancelMenuTimer();
-                    HapticFeedback.selectionClick();
-                    _showOptionsSheetForAyah(
-                      context: context,
-                      surah: surah,
-                      verse: verse,
-                    );
-                  },
-                  onLongPressUp: (surah, verse) {
-                    _cancelMenuTimer();
-                    context.read<AyahToHighlight>().changeAyah(null);
-                  },
-                  onLongPressCancel: (surah, verse) {
-                    _cancelMenuTimer();
-                    context.read<AyahToHighlight>().changeAyah(null);
-                  },
-                  onDoubleTap: (surah, verse) async {
-                    final ayahKey = "$surah:$verse";
-                    context.read<AyahKeyCubit>().changeCurrentAyahKey(ayahKey);
-
-                    final wordsKey = List.generate(
-                      QuranScriptFunction.getWordListOfAyah(
-                        context.read<QuranViewCubit>().state.quranScriptType,
-                        surah.toString(),
-                        verse.toString(),
-                      ).length,
-                      (i) => "$surah:$verse:${i + 1}",
-                    );
-
-                    if (wordsKey.isEmpty) return;
-
-                    showPopupWordFunction(
-                      context: context,
-                      wordKeys: wordsKey,
-                      initWordIndex: 0,
-                      wordByWordList:
-                          await WordByWordFunction.getAyahWordByWordData(
-                            ayahKey,
-                          ) ??
-                          [],
-                    );
-                  },
-                  onPageChanged: (page) {
-                    _cancelMenuTimer();
-                    context.read<AyahKeyCubit>().changeLastScrolledPage(page);
-
-                    final info =
-                        quranPagesInfo[(page - 1).clamp(
-                          0,
-                          quranPagesInfo.length - 1,
-                        )];
-                    final ayahId = info["s"] ?? 1;
-                    final key = convertAyahNumberToKey(ayahId);
-                    if (key != null) {
-                      context.read<AyahKeyCubit>().changeCurrentAyahKey(key);
-                    }
-                  },
-                ),
-              ),
-            );
-          },
-        );
-      },
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
     );
-  },
-),
-);
 
     final decoratedBody = withSystemBarBackground(body);
 
@@ -2945,11 +3006,13 @@ class _MushafViewState extends State<MushafView> {
         scrolledUnderElevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: bg,
-          statusBarIconBrightness:
-              bgBrightness == Brightness.dark ? Brightness.light : Brightness.dark,
+          statusBarIconBrightness: bgBrightness == Brightness.dark
+              ? Brightness.light
+              : Brightness.dark,
           systemNavigationBarColor: bg,
-          systemNavigationBarIconBrightness:
-              bgBrightness == Brightness.dark ? Brightness.light : Brightness.dark,
+          systemNavigationBarIconBrightness: bgBrightness == Brightness.dark
+              ? Brightness.light
+              : Brightness.dark,
           systemNavigationBarContrastEnforced: false,
           systemStatusBarContrastEnforced: false,
         ),

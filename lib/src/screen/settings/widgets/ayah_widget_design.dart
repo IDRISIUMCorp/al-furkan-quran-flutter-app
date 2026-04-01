@@ -1,3 +1,4 @@
+import "package:auto_size_text/auto_size_text.dart";
 import "package:flutter/material.dart";
 
 class AyahWidgetThemePreset {
@@ -24,8 +25,6 @@ class AyahWidgetThemePreset {
   });
 }
 
-/// Ayah Widget Design for Home Screen Widget
-/// Renders the ayah display with customizable styling
 class AyahWidgetDesign extends StatelessWidget {
   final String ayahText;
   final String surahName;
@@ -61,95 +60,104 @@ class AyahWidgetDesign extends StatelessWidget {
       id: "glass_dark",
       name: "زجاجي داكن",
       isDark: true,
-      primaryBackground: Color(0xFF101010),
-      secondaryBackground: Color(0xFF222222),
-      accent: Color(0xFF65C1A8),
-      textColor: Colors.white,
-      surahColor: Color(0xFFBFF4E6),
-      prefersGradient: true,
-    ),
-    AyahWidgetThemePreset(
-      id: "dark_royal",
-      name: "ملكي ذهبي",
-      isDark: true,
-      primaryBackground: Color(0xFF140F08),
-      secondaryBackground: Color(0xFF2A1E11),
-      accent: Color(0xFFE0B15D),
-      textColor: Color(0xFFFFF4DF),
-      surahColor: Color(0xFFF8D89A),
-      prefersGradient: true,
-    ),
-    AyahWidgetThemePreset(
-      id: "midnight_blue",
-      name: "ليل أزرق",
-      isDark: true,
-      primaryBackground: Color(0xFF0C1A28),
-      secondaryBackground: Color(0xFF17324A),
-      accent: Color(0xFF73B8FF),
-      textColor: Color(0xFFF2F8FF),
-      surahColor: Color(0xFFB6D9FF),
-      prefersGradient: true,
-    ),
-    AyahWidgetThemePreset(
-      id: "emerald_gradient",
-      name: "زمردي",
-      isDark: true,
-      primaryBackground: Color(0xFF0D1F18),
-      secondaryBackground: Color(0xFF163429),
-      accent: Color(0xFF58C19B),
-      textColor: Color(0xFFF0FFF9),
-      surahColor: Color(0xFFB8F4DF),
-      prefersGradient: true,
-    ),
-    AyahWidgetThemePreset(
-      id: "sunset",
-      name: "غروب دافئ",
-      isDark: true,
-      primaryBackground: Color(0xFF351722),
-      secondaryBackground: Color(0xFF6A2D30),
-      accent: Color(0xFFFFB067),
-      textColor: Color(0xFFFFF3E6),
-      surahColor: Color(0xFFFFD5AE),
+      primaryBackground: Color(0xFF08090B),
+      secondaryBackground: Color(0xFF1A1D22),
+      accent: Color(0xFF62C5A4),
+      textColor: Color(0xFFF9FAFC),
+      surahColor: Color(0xFFB7C9BE),
       prefersGradient: true,
     ),
     AyahWidgetThemePreset(
       id: "glass_light",
       name: "زجاجي فاتح",
       isDark: false,
-      primaryBackground: Color(0xFFF9F4EC),
-      secondaryBackground: Color(0xFFEFE5D5),
-      accent: Color(0xFF9B7B4E),
-      textColor: Color(0xFF2A2118),
-      surahColor: Color(0xFF7F5E34),
+      primaryBackground: Color(0xFFF6F1E9),
+      secondaryBackground: Color(0xFFE7DECF),
+      accent: Color(0xFF8D7756),
+      textColor: Color(0xFF201A15),
+      surahColor: Color(0xFF6C5A40),
       prefersGradient: true,
     ),
     AyahWidgetThemePreset(
       id: "ocean_night",
-      name: "محيط ليلي",
+      name: "أوبسيديان",
       isDark: true,
-      primaryBackground: Color(0xFF071821),
-      secondaryBackground: Color(0xFF0E3642),
-      accent: Color(0xFF6EE7E7),
-      textColor: Color(0xFFEFFFFF),
-      surahColor: Color(0xFFABF7F7),
+      primaryBackground: Color(0xFF0B0D11),
+      secondaryBackground: Color(0xFF161A20),
+      accent: Color(0xFF7C8CA5),
+      textColor: Color(0xFFF5F7FB),
+      surahColor: Color(0xFF9EAABE),
+      prefersGradient: true,
+    ),
+    AyahWidgetThemePreset(
+      id: "dark_royal",
+      name: "رويال ملكي",
+      isDark: true,
+      primaryBackground: Color(0xFF120E12),
+      secondaryBackground: Color(0xFF2A1826),
+      accent: Color(0xFFC6A26D),
+      textColor: Color(0xFFFFF8EF),
+      surahColor: Color(0xFFE8C58F),
+      prefersGradient: true,
+    ),
+    AyahWidgetThemePreset(
+      id: "midnight_blue",
+      name: "زفير",
+      isDark: true,
+      primaryBackground: Color(0xFF09131F),
+      secondaryBackground: Color(0xFF11314A),
+      accent: Color(0xFF5BAFFF),
+      textColor: Color(0xFFF2F9FF),
+      surahColor: Color(0xFF9FD0FF),
+      prefersGradient: true,
+    ),
+    AyahWidgetThemePreset(
+      id: "sunset",
+      name: "أميثست",
+      isDark: true,
+      primaryBackground: Color(0xFF150C1E),
+      secondaryBackground: Color(0xFF30163B),
+      accent: Color(0xFFC797FF),
+      textColor: Color(0xFFFCF6FF),
+      surahColor: Color(0xFFE2C7FF),
+      prefersGradient: true,
+    ),
+    AyahWidgetThemePreset(
+      id: "emerald_gradient",
+      name: "زمردي",
+      isDark: true,
+      primaryBackground: Color(0xFF081A16),
+      secondaryBackground: Color(0xFF103229),
+      accent: Color(0xFF4CCB9E),
+      textColor: Color(0xFFF3FFFA),
+      surahColor: Color(0xFFAEEED4),
       prefersGradient: true,
     ),
     AyahWidgetThemePreset(
       id: "sand",
-      name: "رملي هادئ",
+      name: "ذهبي",
       isDark: false,
-      primaryBackground: Color(0xFFF5E8D4),
-      secondaryBackground: Color(0xFFEAD8BC),
-      accent: Color(0xFF9C6F3A),
-      textColor: Color(0xFF3C2D1D),
-      surahColor: Color(0xFF7A5529),
+      primaryBackground: Color(0xFFF3E8CF),
+      secondaryBackground: Color(0xFFE1D0A5),
+      accent: Color(0xFFAA8341),
+      textColor: Color(0xFF2A2216),
+      surahColor: Color(0xFF7A5E2B),
       prefersGradient: true,
     ),
   ];
 
   static AyahWidgetThemePreset themeById(String id) {
+    final aliases = <String, String>{
+      "royal": "dark_royal",
+      "obsidian": "ocean_night",
+      "sapphire": "midnight_blue",
+      "amethyst": "sunset",
+      "emerald": "emerald_gradient",
+      "gold": "sand",
+    };
+    final resolvedId = aliases[id] ?? id;
     return availableThemes.firstWhere(
-      (preset) => preset.id == id,
+      (preset) => preset.id == resolvedId,
       orElse: () => availableThemes.first,
     );
   }
@@ -161,38 +169,37 @@ class AyahWidgetDesign extends StatelessWidget {
     final bgColor2 = customBgColor2 ?? preset.secondaryBackground;
     final textColor = customTextColor ?? preset.textColor;
     final surahColor = customSurahColor ?? preset.surahColor;
-    final accent = primaryColor;
+    final accent = preset.accent;
+    final borderColor = preset.isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.08);
     final shouldUseGradient = isGradientBg || preset.prefersGradient;
-    final surface = preset.isDark ? Colors.white : Colors.black;
 
     return Container(
       width: 800,
       height: 400,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(34),
         gradient: shouldUseGradient
             ? LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
                 colors: [bgColor, bgColor2],
               )
             : null,
         color: shouldUseGradient ? null : bgColor,
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(
-          color: surface.withValues(alpha: preset.isDark ? 0.08 : 0.05),
-        ),
+        border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: preset.isDark ? 0.18 : 0.08),
-            blurRadius: 24,
+            color: Colors.black.withValues(alpha: preset.isDark ? 0.18 : 0.10),
+            blurRadius: 28,
             offset: const Offset(0, 10),
           ),
         ],
       ),
       child: Stack(
         children: [
-          _buildDecorations(accent, preset, bgColor2),
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
@@ -200,114 +207,99 @@ class AyahWidgetDesign extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.white.withValues(alpha: preset.isDark ? 0.04 : 0.18),
+                    Colors.white.withValues(alpha: preset.isDark ? 0.05 : 0.20),
                     Colors.transparent,
+                    Colors.black.withValues(alpha: preset.isDark ? 0.18 : 0.04),
                   ],
+                  stops: const [0.0, 0.35, 1.0],
                 ),
               ),
             ),
           ),
           Positioned(
-            top: 18,
-            right: 18,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(
-                  alpha: preset.isDark ? 0.08 : 0.35,
-                ),
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: accent.withValues(alpha: 0.20)),
-              ),
-              child: Text(
-                surahName,
-                style: TextStyle(
-                  color: surahColor,
-                  fontSize: fontSize * 0.42,
-                  fontFamily: fontFamily,
-                  fontWeight: FontWeight.w700,
-                ),
-                textAlign: TextAlign.right,
-              ),
+            top: -50,
+            left: -30,
+            child: _GlowOrb(
+              size: 170,
+              color: accent.withValues(alpha: preset.isDark ? 0.10 : 0.08),
             ),
           ),
           Positioned(
-            bottom: 18,
-            left: 18,
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.16),
-                shape: BoxShape.circle,
-                border: Border.all(color: accent.withValues(alpha: 0.22)),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                _toArabicDigits(ayahNumber.toString()),
-                style: TextStyle(
-                  color: accent,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            bottom: -65,
+            right: -20,
+            child: _GlowOrb(
+              size: 210,
+              color: bgColor2.withValues(alpha: preset.isDark ? 0.25 : 0.12),
             ),
           ),
-          Center(
+          Positioned.fill(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 54),
-              child: Text(
-                ayahText,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: fontSize,
-                  fontFamily: fontFamily,
-                  height: 1.85,
-                  fontWeight: FontWeight.w600,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black.withValues(
-                        alpha: preset.isDark ? 0.12 : 0.06,
-                      ),
-                      blurRadius: 10,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                textAlign: TextAlign.center,
-                textDirection: TextDirection.rtl,
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 18,
-            right: 18,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(
-                  alpha: preset.isDark ? 0.07 : 0.30,
-                ),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
+              padding: const EdgeInsets.fromLTRB(52, 26, 52, 34),
+              child: Column(
                 children: [
-                  Icon(
-                    Icons.auto_stories_rounded,
-                    size: 14,
-                    color: accent.withValues(alpha: 0.72),
-                  ),
-                  const SizedBox(width: 4),
                   Text(
-                    "الفرقان",
+                    surahName,
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: accent.withValues(alpha: 0.72),
-                      fontSize: 11,
+                      color: surahColor,
+                      fontSize: 22,
                       fontWeight: FontWeight.w700,
+                      height: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+                  Expanded(
+                    child: Center(
+                      child: AutoSizeText(
+                        ayahText,
+                        textAlign: TextAlign.center,
+                        textDirection: TextDirection.rtl,
+                        minFontSize: 20,
+                        maxFontSize: fontSize,
+                        maxLines: 4,
+                        stepGranularity: 1,
+                        overflow: TextOverflow.visible,
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: fontSize,
+                          fontFamily: fontFamily,
+                          fontFamilyFallback: const [
+                            "AmiriQuran-Regular",
+                            "KFGQPC-Uthmanic-HAFS-Regular",
+                          ],
+                          height: 1.78,
+                          fontWeight: FontWeight.w600,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black.withValues(
+                                alpha: preset.isDark ? 0.16 : 0.05,
+                              ),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ],
+              ),
+            ),
+          ),
+          Positioned(
+            left: 22,
+            right: 22,
+            bottom: 18,
+            child: Container(
+              height: 1.2,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    accent.withValues(alpha: 0.36),
+                    Colors.transparent,
+                  ],
+                ),
               ),
             ),
           ),
@@ -315,62 +307,25 @@ class AyahWidgetDesign extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildDecorations(
-    Color accent,
-    AyahWidgetThemePreset preset,
-    Color secondary,
-  ) {
-    return Stack(
-      children: [
-        Positioned(
-          top: -32,
-          right: -20,
-          child: _softOrb(size: 150, color: accent.withValues(alpha: 0.14)),
-        ),
-        Positioned(
-          bottom: -56,
-          left: -8,
-          child: _softOrb(
-            size: 180,
-            color: secondary.withValues(alpha: preset.isDark ? 0.36 : 0.44),
-          ),
-        ),
-        Positioned(
-          top: 110,
-          left: 36,
-          right: 36,
-          child: Container(
-            height: 1.2,
-            color: Colors.white.withValues(alpha: preset.isDark ? 0.04 : 0.16),
-          ),
-        ),
-      ],
-    );
-  }
+class _GlowOrb extends StatelessWidget {
+  final double size;
+  final Color color;
 
-  Widget _softOrb({required double size, required Color color}) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(colors: [color, color.withValues(alpha: 0)]),
+  const _GlowOrb({required this.size, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(colors: [color, color.withValues(alpha: 0)]),
+        ),
       ),
     );
-  }
-
-  String _toArabicDigits(String number) {
-    const arabics = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
-    final buffer = StringBuffer();
-    for (final ch in number.split("")) {
-      final digit = int.tryParse(ch);
-      if (digit == null) {
-        buffer.write(ch);
-      } else {
-        buffer.write(arabics[digit]);
-      }
-    }
-    return buffer.toString();
   }
 }
