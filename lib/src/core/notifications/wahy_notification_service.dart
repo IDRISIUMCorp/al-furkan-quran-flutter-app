@@ -1,4 +1,5 @@
 import "package:awesome_notifications/awesome_notifications.dart";
+import "package:al_quran_v3/src/screen/prayer_time/models/prayer_enum.dart";
 import "package:flutter/material.dart";
 import "package:hive_ce_flutter/hive_flutter.dart";
 
@@ -53,6 +54,16 @@ class WahyNotificationService {
   static const String _kEveningAzkarEnabled = "notif_evening_azkar_enabled";
   static const String _kEveningAzkarTime = "notif_evening_azkar_time";
   static const String _kPrayerEnabled = "notif_prayer_enabled";
+  static const String _kPrayerOffsetMinutes = "notif_prayer_offset_minutes";
+  static const String _kPrayerSelectedNames = "notif_prayer_selected_names";
+
+  static const List<Prayer> _supportedPrayerAlerts = [
+    Prayer.fajr,
+    Prayer.dhuhr,
+    Prayer.asr,
+    Prayer.maghrib,
+    Prayer.isha,
+  ];
 
   // ─────────────────────────────────────────────────────────────────────
   // Initialization
@@ -223,7 +234,10 @@ class WahyNotificationService {
         category: NotificationCategory.Reminder,
       ),
       actionButtons: [
-        NotificationActionButton(key: kActionOpenMushaf, label: "📖 افتح المصحف"),
+        NotificationActionButton(
+          key: kActionOpenMushaf,
+          label: "📖 افتح المصحف",
+        ),
         NotificationActionButton(
           key: kActionSnooze,
           label: "⏰ تأجيل ٣٠ دقيقة",
@@ -251,8 +265,8 @@ class WahyNotificationService {
       body += "\nآخر صفحة: $lastPage";
     }
 
-    final String localTimeZone =
-        await AwesomeNotifications().getLocalTimeZoneIdentifier();
+    final String localTimeZone = await AwesomeNotifications()
+        .getLocalTimeZoneIdentifier();
 
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
@@ -274,7 +288,10 @@ class WahyNotificationService {
         preciseAlarm: true,
       ),
       actionButtons: [
-        NotificationActionButton(key: kActionOpenMushaf, label: "📖 ابدأ القراءة"),
+        NotificationActionButton(
+          key: kActionOpenMushaf,
+          label: "📖 ابدأ القراءة",
+        ),
         NotificationActionButton(
           key: kActionMarkRead,
           label: "تم",
@@ -304,8 +321,8 @@ class WahyNotificationService {
   }) async {
     await _ensurePermission();
 
-    final String localTimeZone =
-        await AwesomeNotifications().getLocalTimeZoneIdentifier();
+    final String localTimeZone = await AwesomeNotifications()
+        .getLocalTimeZoneIdentifier();
 
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
@@ -326,7 +343,10 @@ class WahyNotificationService {
         allowWhileIdle: true,
       ),
       actionButtons: [
-        NotificationActionButton(key: kActionOpenMushaf, label: "📖 اقرأ المزيد"),
+        NotificationActionButton(
+          key: kActionOpenMushaf,
+          label: "📖 اقرأ المزيد",
+        ),
       ],
     );
 
@@ -351,8 +371,8 @@ class WahyNotificationService {
   }) async {
     await _ensurePermission();
 
-    final String localTimeZone =
-        await AwesomeNotifications().getLocalTimeZoneIdentifier();
+    final String localTimeZone = await AwesomeNotifications()
+        .getLocalTimeZoneIdentifier();
 
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
@@ -396,8 +416,8 @@ class WahyNotificationService {
   }) async {
     await _ensurePermission();
 
-    final String localTimeZone =
-        await AwesomeNotifications().getLocalTimeZoneIdentifier();
+    final String localTimeZone = await AwesomeNotifications()
+        .getLocalTimeZoneIdentifier();
 
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
@@ -431,6 +451,82 @@ class WahyNotificationService {
     await box.put(_kEveningAzkarEnabled, false);
   }
 
+  Future<void> savePrayerAlertPreferences({
+    required bool enabled,
+    required Set<Prayer> selectedPrayers,
+    required int minutesBefore,
+  }) async {
+    final box = Hive.box(_kBox);
+    await box.put(_kPrayerEnabled, enabled);
+    await box.put(_kPrayerOffsetMinutes, minutesBefore);
+    await box.put(
+      _kPrayerSelectedNames,
+      selectedPrayers.map((prayer) => prayer.name).toList(),
+    );
+  }
+
+  Future<void> schedulePrayerAlerts({
+    required Map<Prayer, DateTime> alertTimes,
+    required Set<Prayer> selectedPrayers,
+    required int minutesBefore,
+    String? locationLabel,
+  }) async {
+    await _ensurePermission();
+    await cancelPrayerAlerts(disable: false);
+
+    for (final prayer in _supportedPrayerAlerts) {
+      if (!selectedPrayers.contains(prayer)) continue;
+
+      final scheduled = alertTimes[prayer];
+      if (scheduled == null) continue;
+
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: _prayerIdForPrayer(prayer),
+          channelKey: kPrayerChannel,
+          title: _prayerTitle(prayer),
+          body: _prayerBody(
+            prayer: prayer,
+            minutesBefore: minutesBefore,
+            locationLabel: locationLabel,
+          ),
+          notificationLayout: NotificationLayout.BigText,
+          wakeUpScreen: true,
+          category: NotificationCategory.Reminder,
+        ),
+        schedule: NotificationCalendar.fromDate(date: scheduled),
+        actionButtons: [
+          NotificationActionButton(
+            key: kActionOpenMushaf,
+            label: "افتح التطبيق",
+          ),
+          NotificationActionButton(
+            key: kActionSnooze,
+            label: "تأجيل 30 دقيقة",
+            actionType: ActionType.SilentBackgroundAction,
+          ),
+        ],
+      );
+    }
+
+    await savePrayerAlertPreferences(
+      enabled: true,
+      selectedPrayers: selectedPrayers,
+      minutesBefore: minutesBefore,
+    );
+  }
+
+  Future<void> cancelPrayerAlerts({bool disable = true}) async {
+    for (final prayer in _supportedPrayerAlerts) {
+      await AwesomeNotifications().cancel(_prayerIdForPrayer(prayer));
+    }
+
+    if (disable) {
+      final box = Hive.box(_kBox);
+      await box.put(_kPrayerEnabled, false);
+    }
+  }
+
   // ─────────────────────────────────────────────────────────────────────
   // Cancel All
   // ─────────────────────────────────────────────────────────────────────
@@ -446,7 +542,7 @@ class WahyNotificationService {
   Future<void> restoreScheduledNotifications() async {
     if (!Hive.isBoxOpen(_kBox)) {
       // Background isolate might hit this
-      return; 
+      return;
     }
 
     final box = Hive.box(_kBox);
@@ -507,6 +603,33 @@ class WahyNotificationService {
   bool isPrayerEnabled() =>
       Hive.box(_kBox).get(_kPrayerEnabled, defaultValue: false) == true;
 
+  int getPrayerOffsetMinutes() =>
+      Hive.box(_kBox).get(_kPrayerOffsetMinutes, defaultValue: 0) as int;
+
+  Set<Prayer> getPrayerSelections() {
+    final raw = Hive.box(_kBox).get(_kPrayerSelectedNames);
+    final values =
+        (raw as List?)
+            ?.map((item) => item?.toString())
+            .whereType<String>()
+            .toList() ??
+        const <String>[];
+
+    if (values.isEmpty) return _supportedPrayerAlerts.toSet();
+
+    final selected = <Prayer>{};
+    for (final name in values) {
+      for (final prayer in _supportedPrayerAlerts) {
+        if (prayer.name == name) {
+          selected.add(prayer);
+          break;
+        }
+      }
+    }
+
+    return selected.isEmpty ? _supportedPrayerAlerts.toSet() : selected;
+  }
+
   // ─────────────────────────────────────────────────────────────────────
   // Internal Helpers
   // ─────────────────────────────────────────────────────────────────────
@@ -524,5 +647,71 @@ class WahyNotificationService {
   Future<void> _ensurePermission() async {
     final allowed = await isPermissionGranted();
     if (!allowed) await requestPermission();
+  }
+
+  int _prayerIdForPrayer(Prayer prayer) {
+    switch (prayer) {
+      case Prayer.fajr:
+        return prayerId(0);
+      case Prayer.dhuhr:
+        return prayerId(1);
+      case Prayer.asr:
+        return prayerId(2);
+      case Prayer.maghrib:
+        return prayerId(3);
+      case Prayer.isha:
+        return prayerId(4);
+      default:
+        return prayerId(0);
+    }
+  }
+
+  String _prayerTitle(Prayer prayer) {
+    switch (prayer) {
+      case Prayer.fajr:
+        return "تنبيه صلاة الفجر";
+      case Prayer.dhuhr:
+        return "تنبيه صلاة الظهر";
+      case Prayer.asr:
+        return "تنبيه صلاة العصر";
+      case Prayer.maghrib:
+        return "تنبيه صلاة المغرب";
+      case Prayer.isha:
+        return "تنبيه صلاة العشاء";
+      default:
+        return "تنبيه الصلاة";
+    }
+  }
+
+  String _prayerBody({
+    required Prayer prayer,
+    required int minutesBefore,
+    String? locationLabel,
+  }) {
+    final suffix = locationLabel == null || locationLabel.trim().isEmpty
+        ? ""
+        : "\nالموقع: $locationLabel";
+    if (minutesBefore <= 0) {
+      return "حان الآن وقت ${_prayerName(prayer)}.$suffix".trim();
+    }
+    return "باقي $minutesBefore دقيقة على ${_prayerName(prayer)}.$suffix"
+        .trim();
+  }
+
+  String _prayerName(Prayer prayer) {
+    switch (prayer) {
+      case Prayer.fajr:
+        return "صلاة الفجر";
+      case Prayer.dhuhr:
+        return "صلاة الظهر";
+      case Prayer.asr:
+        return "صلاة العصر";
+      case Prayer.maghrib:
+        return "صلاة المغرب";
+      case Prayer.isha:
+        return "صلاة العشاء";
+      default:
+        return "الصلاة";
+    }
   }
 }

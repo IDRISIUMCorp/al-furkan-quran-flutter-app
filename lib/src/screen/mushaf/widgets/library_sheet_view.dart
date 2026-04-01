@@ -11,10 +11,13 @@ import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart
 import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/word_info_models.dart";
 import "package:al_quran_v3/src/utils/quran_resources/word_info_repository.dart";
+import "package:al_quran_v3/src/widget/add_collection_popup/add_note_popup.dart";
+import "package:al_quran_v3/src/widget/add_collection_popup/add_to_pinned_popup.dart";
 import "package:flutter/material.dart";
 import "package:flutter_animate/flutter_animate.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:flutter_screenutil/flutter_screenutil.dart";
+import "package:flutter/services.dart";
 import "package:qcf_quran/qcf_quran.dart" as qcf hide getPageNumber;
 import "package:share_plus/share_plus.dart";
 
@@ -248,6 +251,22 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
     });
   }
 
+  Future<void> _copyText(String text, String message) async {
+    if (text.trim().isEmpty) return;
+    await Clipboard.setData(ClipboardData(text: text));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+    );
+  }
+
+  String _selectedWordShareText(BuildContext context) {
+    final word = _selectedWordLabel(context);
+    final ayahText = _getAyahText(context, widget.surahNumber, _currentVerse);
+    if (word.isEmpty) return ayahText;
+    return "الكلمة المختارة: $word\n\n$ayahText\n\n[${getSurahNameArabic(widget.surahNumber)}: $_currentVerse]\nتمت المشاركة من تطبيق الفرقان";
+  }
+
   String _tafsirDedupKey(TafsirBookModel book) {
     final normalizedName = _normalizeWhitespace(book.name).toLowerCase();
     final normalizedLanguage = _normalizeWhitespace(
@@ -367,6 +386,12 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                   themeState: themeState,
                   surfaceColor: surfaceColor,
                 ),
+                _buildMetaStrip(
+                  isDark: isDark,
+                  themeState: themeState,
+                  page: page,
+                  wordsCount: words.length,
+                ),
                 SizedBox(height: 8.h),
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 320),
@@ -393,6 +418,11 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                           ),
                           child: Column(
                             children: [
+                              _buildSelectionActions(
+                                ayahKey: ayahKey,
+                                isDark: isDark,
+                                themeState: themeState,
+                              ),
                               _buildMinimalTabs(
                                 isDark: isDark,
                                 themeState: themeState,
@@ -667,6 +697,138 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
           fontWeight: FontWeight.w600,
           color: isDark ? Colors.white54 : Colors.black45,
           height: 1.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMetaStrip({
+    required bool isDark,
+    required theme.ThemeState themeState,
+    required int page,
+    required int wordsCount,
+  }) {
+    final meaning = getSurahMeaning(context, widget.surahNumber).trim();
+    final items = <String>[
+      "الصفحة: ${_toArabicDigits(page.toString())}",
+      "الكلمات: ${_toArabicDigits(wordsCount.toString())}",
+      if (meaning.isNotEmpty) meaning,
+    ];
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16.w, 6.h, 16.w, 2.h),
+      child: Wrap(
+        alignment: WrapAlignment.end,
+        spacing: 8.w,
+        runSpacing: 8.h,
+        children: items
+            .map(
+              (item) => Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.04)
+                      : themeState.primary.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  item,
+                  style: TextStyle(
+                    fontSize: 11.5.sp,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? Colors.white70 : Colors.black54,
+                  ),
+                ),
+              ),
+            )
+            .toList(),
+      ),
+    );
+  }
+
+  Widget _buildSelectionActions({
+    required String ayahKey,
+    required bool isDark,
+    required theme.ThemeState themeState,
+  }) {
+    final wordLabel = _selectedWordLabel(context);
+    final ayahText = _getAyahText(context, widget.surahNumber, _currentVerse);
+
+    Widget action({
+      required IconData icon,
+      required String label,
+      required VoidCallback onTap,
+    }) {
+      return InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 9.h),
+          decoration: BoxDecoration(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.04)
+                : Colors.black.withValues(alpha: 0.025),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: themeState.primary.withValues(alpha: 0.10),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16.sp, color: themeState.primary),
+              SizedBox(width: 6.w),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11.5.sp,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 8.h),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        reverse: true,
+        child: Row(
+          children: [
+            action(
+              icon: Icons.copy_rounded,
+              label: "نسخ الكلمة",
+              onTap: () => _copyText(wordLabel, "تم نسخ الكلمة المختارة."),
+            ),
+            SizedBox(width: 8.w),
+            action(
+              icon: Icons.notes_rounded,
+              label: "ملاحظة",
+              onTap: () => showAddNotePopup(context, ayahKey),
+            ),
+            SizedBox(width: 8.w),
+            action(
+              icon: Icons.bookmark_add_rounded,
+              label: "حفظ",
+              onTap: () => addAyahToFavoritesPinned(context, ayahKey),
+            ),
+            SizedBox(width: 8.w),
+            action(
+              icon: Icons.share_rounded,
+              label: "مشاركة",
+              onTap: () => Share.share(_selectedWordShareText(context)),
+            ),
+            SizedBox(width: 8.w),
+            action(
+              icon: Icons.short_text_rounded,
+              label: "نسخ الآية",
+              onTap: () => _copyText(ayahText, "تم نسخ نص الآية."),
+            ),
+          ],
         ),
       ),
     );
