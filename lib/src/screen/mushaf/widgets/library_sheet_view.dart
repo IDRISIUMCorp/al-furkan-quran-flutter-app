@@ -1,6 +1,8 @@
 import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
 import "package:al_quran_v3/src/resources/quran_resources/quran_ayah_count.dart";
 import "package:al_quran_v3/src/resources/quran_resources/meaning_of_surah.dart";
+import "package:al_quran_v3/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
+import "package:al_quran_v3/src/core/unified_quran_settings/quran_settings_bottom_sheet.dart";
 import "package:al_quran_v3/src/screen/quran_resources/quran_resources_view.dart";
 import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.dart";
 import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
@@ -189,6 +191,13 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
     }
   }
 
+  String _localizedRevelationPlace(int surahNumber) {
+    final raw = qcf.getPlaceOfRevelation(surahNumber).trim().toLowerCase();
+    if (raw.contains("makk")) return "مكية";
+    if (raw.contains("mad")) return "مدنية";
+    return qcf.getPlaceOfRevelation(surahNumber);
+  }
+
   Future<int?> _getWordInfoSize(WordInfoKind kind) {
     return _wordInfoSizeFutures.putIfAbsent(kind, () async {
       final size = await _wordInfoRepo.getRemoteZipSizeBytes(kind);
@@ -334,6 +343,7 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
   @override
   Widget build(BuildContext context) {
     final themeState = context.watch<ThemeCubit>().state;
+    final quranSettings = context.watch<QuranSettingsCubit>().state;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final totalVerses = quranAyahCount[widget.surahNumber - 1];
 
@@ -391,6 +401,7 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                   themeState: themeState,
                   page: page,
                   wordsCount: words.length,
+                  totalVerses: totalVerses,
                 ),
                 SizedBox(height: 8.h),
                 AnimatedSwitcher(
@@ -410,7 +421,11 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                   child: _selectedWordNumber == null
                       ? Container(
                           key: const ValueKey<String>("library-hint"),
-                          child: _buildSelectionHint(isDark),
+                          child: _buildSelectionHint(
+                            isDark,
+                            page: page,
+                            totalVerses: totalVerses,
+                          ),
                         )
                       : Container(
                           key: ValueKey<String>(
@@ -427,6 +442,7 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                                 isDark: isDark,
                                 themeState: themeState,
                                 surfaceColor: surfaceColor,
+                                quranSettings: quranSettings,
                               ),
                               _buildWordContent(
                                 ayahKey: ayahKey,
@@ -436,6 +452,7 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                                 isDark: isDark,
                                 cardColor: cardColor,
                                 themeState: themeState,
+                                quranSettings: quranSettings,
                               ),
                             ],
                           ),
@@ -460,6 +477,7 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                   isDark: isDark,
                   cardColor: cardColor,
                   themeState: themeState,
+                  quranSettings: quranSettings,
                 ),
                 SizedBox(height: 20.h),
               ],
@@ -684,7 +702,11 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
     );
   }
 
-  Widget _buildSelectionHint(bool isDark) {
+  Widget _buildSelectionHint(
+    bool isDark, {
+    required int page,
+    required int totalVerses,
+  }) {
     return Padding(
       padding: EdgeInsets.fromLTRB(20.w, 4.h, 20.w, 10.h),
       child: Text(
@@ -705,11 +727,14 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
     required theme.ThemeState themeState,
     required int page,
     required int wordsCount,
+    required int totalVerses,
   }) {
     final meaning = getSurahMeaning(context, widget.surahNumber).trim();
     final items = <String>[
       "الصفحة: ${_toArabicDigits(page.toString())}",
       "الكلمات: ${_toArabicDigits(wordsCount.toString())}",
+      _localizedRevelationPlace(widget.surahNumber),
+      "آيات السورة: ${_toArabicDigits(totalVerses.toString())}",
       if (meaning.isNotEmpty) meaning,
     ];
 
@@ -740,6 +765,66 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
               ),
             )
             .toList(),
+      ),
+    );
+  }
+
+  Widget _buildFeaturePrompt({
+    required bool isDark,
+    required theme.ThemeState themeState,
+    required IconData icon,
+    required String title,
+    required String message,
+    required String actionLabel,
+    required VoidCallback onAction,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: themeState.primary.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: themeState.primary.withValues(alpha: 0.14)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: themeState.primary, size: 24.sp),
+          SizedBox(height: 10.h),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w800,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+          ),
+          SizedBox(height: 6.h),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12.sp,
+              height: 1.6,
+              color: isDark ? Colors.white54 : Colors.black54,
+            ),
+          ),
+          SizedBox(height: 12.h),
+          FilledButton.tonal(
+            onPressed: onAction,
+            style: FilledButton.styleFrom(
+              backgroundColor: themeState.primary.withValues(alpha: 0.12),
+              foregroundColor: themeState.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+            ),
+            child: Text(
+              actionLabel,
+              style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w800),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -798,6 +883,12 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
         child: Row(
           children: [
             action(
+              icon: Icons.tune_rounded,
+              label: "الإعدادات",
+              onTap: () => QuranSettingsBottomSheet.show(context),
+            ),
+            SizedBox(width: 8.w),
+            action(
               icon: Icons.copy_rounded,
               label: "نسخ الكلمة",
               onTap: () => _copyText(wordLabel, "تم نسخ الكلمة المختارة."),
@@ -836,6 +927,7 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
     required bool isDark,
     required theme.ThemeState themeState,
     required Color surfaceColor,
+    required QuranSettingsState quranSettings,
   }) {
     return Container(
       margin: EdgeInsets.fromLTRB(16.w, 2.h, 16.w, 6.h),
@@ -869,19 +961,43 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                 ),
               ),
               Row(
-                children: _LibraryWordTab.values
-                    .map(
-                      (tab) => Expanded(
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: () {
-                            setState(() {
-                              _activeTab = tab;
-                            });
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 9.h),
-                            child: AnimatedDefaultTextStyle(
+                children: _LibraryWordTab.values.map((tab) {
+                  final isDisabled =
+                      tab == _LibraryWordTab.eerab && !quranSettings.enableIrab;
+                  return Expanded(
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        if (isDisabled) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "فعّل الإعراب والتحليل أولًا من إعدادات المصحف.",
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                        setState(() {
+                          _activeTab = tab;
+                        });
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 9.h),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (isDisabled) ...[
+                              Icon(
+                                Icons.lock_outline_rounded,
+                                size: 13.sp,
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.45)
+                                    : Colors.black38,
+                              ),
+                              SizedBox(width: 4.w),
+                            ],
+                            AnimatedDefaultTextStyle(
                               duration: const Duration(milliseconds: 220),
                               curve: Curves.easeOutCubic,
                               style: TextStyle(
@@ -889,7 +1005,11 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                                 fontWeight: _activeTab == tab
                                     ? FontWeight.w800
                                     : FontWeight.w600,
-                                color: _activeTab == tab
+                                color: isDisabled
+                                    ? (isDark
+                                          ? Colors.white.withValues(alpha: 0.45)
+                                          : Colors.black38)
+                                    : _activeTab == tab
                                     ? themeState.primary
                                     : (isDark
                                           ? Colors.white60
@@ -900,11 +1020,12 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                                 textAlign: TextAlign.center,
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                    )
-                    .toList(),
+                    ),
+                  );
+                }).toList(),
               ),
             ],
           );
@@ -921,6 +1042,7 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
     required bool isDark,
     required Color cardColor,
     required theme.ThemeState themeState,
+    required QuranSettingsState quranSettings,
   }) {
     return Padding(
       padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 4.h),
@@ -966,6 +1088,18 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                   ayahKey: ayahKey,
                   selectedWord: selectedWord,
                   isDark: isDark,
+                )
+              : _activeTab == _LibraryWordTab.eerab && !quranSettings.enableIrab
+              ? _buildFeaturePrompt(
+                  isDark: isDark,
+                  themeState: themeState,
+                  icon: Icons.lock_outline_rounded,
+                  title: "الإعراب غير مفعل",
+                  message:
+                      "فعّل تبويب الإعراب والتحليل من إعدادات المصحف ليظهر هذا المحتوى مباشرة داخل المكتبة.",
+                  actionLabel: "تفعيل الآن",
+                  onAction: () =>
+                      context.read<QuranSettingsCubit>().toggleIrab(true),
                 )
               : _buildWordInfoTab(
                   kind: _activeTab.infoKind!,
@@ -1362,7 +1496,24 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
     required bool isDark,
     required Color cardColor,
     required theme.ThemeState themeState,
+    required QuranSettingsState quranSettings,
   }) {
+    if (!quranSettings.enableTafsir) {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        child: _buildFeaturePrompt(
+          isDark: isDark,
+          themeState: themeState,
+          icon: Icons.menu_book_outlined,
+          title: "التفسير متوقف",
+          message:
+              "فعّل عرض التفاسير من إعدادات المصحف ليظهر هذا القسم تلقائيًا في المكتبة.",
+          actionLabel: "تفعيل التفسير",
+          onAction: () => context.read<QuranSettingsCubit>().toggleTafsir(true),
+        ),
+      );
+    }
+
     return FutureBuilder<List<_ResolvedTafsirCard>>(
       future: _tafsirFuture(ayahKey),
       builder: (context, snapshot) {

@@ -105,6 +105,7 @@ class QcfPage extends StatelessWidget {
 
         final size = MediaQuery.sizeOf(context);
         final isTablet = size.shortestSide >= 600;
+        final contentScale = theme.contentScale.clamp(0.92, 1.16);
 
         final double baselineWidth = isTablet ? 640 : 470;
         final double fontScale = isTablet ? 1.30 : 1.18;
@@ -127,6 +128,7 @@ class QcfPage extends StatelessWidget {
             isFirstPages
                 ? 2.15
                 : (theme.verseHeight * (isTablet ? 0.93 : 0.96));
+        final adjustedBaselineWidth = baselineWidth / contentScale;
 
         final verseSpans = <InlineSpan>[];
         final firstPagesSpacer =
@@ -461,7 +463,7 @@ class QcfPage extends StatelessWidget {
                         fit: BoxFit.fitWidth,
                         alignment: Alignment.center,
                         child: SizedBox(
-                          width: baselineWidth,
+                          width: adjustedBaselineWidth,
                           child: ColoredBox(
                             color: theme.pageBackgroundColor,
                             child: Padding(

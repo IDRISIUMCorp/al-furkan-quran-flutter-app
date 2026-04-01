@@ -1,4 +1,5 @@
 import "dart:async";
+import "dart:convert";
 import "package:al_quran_v3/src/screen/mushaf/widgets/bookmarks_sheet.dart";
 import "package:al_quran_v3/src/screen/mushaf/widgets/starred_sheet.dart";
 import "package:al_quran_v3/src/screen/mushaf/widgets/notes_sheet.dart";
@@ -7,7 +8,6 @@ import 'package:al_quran_v3/src/screen/mushaf/widgets/wahy_index_sheet.dart';
 import 'widgets/library_sheet.dart';
 import "package:al_quran_v3/src/screen/mushaf/widgets/search_sheet.dart";
 import "package:al_quran_v3/src/screen/mushaf/widgets/listen_range_sheet.dart";
-import "dart:convert";
 import "dart:ui" as ui;
 
 import "package:flutter/material.dart";
@@ -37,6 +37,7 @@ import "package:al_quran_v3/src/screen/search/search_screen.dart";
 import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.dart";
 import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart";
+import "package:al_quran_v3/src/utils/quran_search_engine.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/word_by_word_function.dart";
 import "package:al_quran_v3/src/utils/quran_word/show_popup_word_function.dart";
@@ -135,9 +136,6 @@ class _MushafRootState extends State<_MushafRoot> {
 
   bool _quranScriptReady = false;
   Future<void>? _quranScriptInitFuture;
-
-  Map<String, String>? _uthmaniAssetText;
-  Future<void>? _uthmaniAssetLoadFuture;
 
   static const String _kWahyBookmarks = "wahy_bookmarks";
   static const String _kWahyStarred = "wahy_starred";
@@ -438,12 +436,6 @@ class _MushafRootState extends State<_MushafRoot> {
     await syncWahyNoteToCollection(ayahKey, text);
   }
 
-  String _removeTashkeel(String text) {
-    return text
-        .replaceAll(RegExp(r"[\u064B-\u0652\u0670\u06D6-\u06ED]"), "")
-        .replaceAll("\u0640", "");
-  }
-
   Future<void> _ensureQuranScriptReady() async {
     if (_quranScriptReady) return;
     _quranScriptInitFuture ??= () async {
@@ -453,98 +445,34 @@ class _MushafRootState extends State<_MushafRoot> {
     await _quranScriptInitFuture;
   }
 
-  Future<void> _ensureUthmaniAssetLoaded() async {
-    if (_uthmaniAssetText != null) return;
-    _uthmaniAssetLoadFuture ??= () async {
-      final raw = await rootBundle.loadString(
-        "assets/quran_script/Uthmani.json",
-      );
-      final decoded = jsonDecode(raw) as Map;
-      final out = <String, String>{};
-      for (final entry in decoded.entries) {
-        final surahKey = entry.key.toString();
-        final surahMap = Map<String, dynamic>.from(entry.value as Map);
-        for (final ayahEntry in surahMap.entries) {
-          final words = List<String>.from(ayahEntry.value as List);
-          final joined = words.join(" ");
-          final stripped = joined.replaceAll(RegExp(r"<[^>]+>"), "");
-          out["$surahKey:${ayahEntry.key}"] = stripped
-              .replaceAll(RegExp(r"\s+"), " ")
-              .trim();
-        }
-      }
-      _uthmaniAssetText = out;
-    }();
-    await _uthmaniAssetLoadFuture;
-  }
-
-  Future<String> _getAyahTextForSearch(int surah, int verse) async {
-    final QuranScriptType scriptType = context
-        .read<QuranViewCubit>()
-        .state
-        .quranScriptType;
-
-    List<String> words = QuranScriptFunction.getWordListOfAyah(
-      scriptType,
-      surah.toString(),
-      verse.toString(),
-    );
-    if (words.isEmpty) {
-      words = QuranScriptFunction.getWordListOfAyah(
-        QuranScriptType.uthmani,
-        surah.toString(),
-        verse.toString(),
-      );
-    }
-
-    if (words.isEmpty) {
-      await _ensureUthmaniAssetLoaded();
-      final cached = _uthmaniAssetText?["$surah:$verse"] ?? "";
-      return cached;
-    }
-
-    if (words.isEmpty) return "";
-    final raw = words.join(" ");
-    final stripped = raw.replaceAll(RegExp(r"<[^>]+>"), "");
-    return stripped.replaceAll(RegExp(r"\s+"), " ").trim();
-  }
-
   Future<List<AyahSearchResult>> _searchAllAyahs({
     required String rawQuery,
   }) async {
-    final normalizedQuery = _removeTashkeel(rawQuery).trim();
+    final normalizedQuery = normalizeQuranSearchQuery(rawQuery);
     if (normalizedQuery.length < 2) return const <AyahSearchResult>[];
-
-    // Ensure we can always search even if Hive scripts are not prepared yet.
-    await _ensureUthmaniAssetLoaded();
 
     final cached = _ayahSearchCache[normalizedQuery];
     if (cached != null) return cached;
 
-    final out = <AyahSearchResult>[];
-    for (int s = 1; s <= 114; s++) {
-      final total = getVerseCount(s);
-      for (int v = 1; v <= total; v++) {
-        final t = await _getAyahTextForSearch(s, v);
-        if (t.isEmpty) continue;
-        final normalized = _removeTashkeel(t);
-        if (!normalized.contains(normalizedQuery)) continue;
-
-        final snippet = t.length <= 140 ? t : "${t.substring(0, 140)}…";
-        out.add(
-          AyahSearchResult(
-            surah: s,
-            verse: v,
-            ayahKey: "$s:$v",
-            snippet: snippet,
+    final rawResults = await searchQuranAyahs(
+      rawQuery,
+      limit: _kSearchMaxResults,
+    );
+    final out = rawResults
+        .map(
+          (match) => AyahSearchResult(
+            surah: (match["surah_number"] as num).toInt(),
+            verse: (match["verse_number"] as num).toInt(),
+            ayahKey:
+                match["ayah_key"]?.toString() ??
+                "${match["surah_number"]}:${match["verse_number"]}",
+            snippet:
+                (match["snippet"] as String?) ??
+                (match["content"] as String?) ??
+                "",
           ),
-        );
-        if (out.length >= _kSearchMaxResults) {
-          _ayahSearchCache[normalizedQuery] = out;
-          return out;
-        }
-      }
-    }
+        )
+        .toList(growable: false);
 
     _ayahSearchCache[normalizedQuery] = out;
     return out;
@@ -2673,6 +2601,10 @@ class _MushafViewState extends State<MushafView> {
                     verseTextColor: baseTheme.verseTextColor,
                     verseNumberColor: verseNumberColor,
                     verseNumberBuilder: (surah, verse, verseNumber) {
+                      if (!qSettings.showVerseNumbers) {
+                        return const TextSpan(text: "");
+                      }
+
                       final key = "$surah:$verse";
                       final hasMarker = _hasAnyWahyMarker(
                         ayahKey: key,
@@ -2776,12 +2708,21 @@ class _MushafViewState extends State<MushafView> {
                           return [];
                         },
                         theme: qcfTheme.copyWith(
+                          showBasmala: qSettings.showBasmala,
+                          showHeader: qSettings.showSurahHeader,
+                          contentScale: qSettings.contentScale,
+                          verseHeight:
+                              baseTheme.verseHeight *
+                              qSettings.verseHeightScale,
                           headerScale: 1.08,
                           headerWidthSmall: 410,
                           headerWidthLarge: 290,
                           firstPagesTopSpacerFactor: 0.0,
                           pageTopOverlayBuilder:
                               (pageNumber, surahNumber, startVerse) {
+                                if (!qSettings.showPageInfo) {
+                                  return const SizedBox.shrink();
+                                }
                                 final juzNumber = getJuzNumber(
                                   surahNumber,
                                   startVerse,
@@ -2829,6 +2770,9 @@ class _MushafViewState extends State<MushafView> {
                               },
                           pageBottomOverlayBuilder:
                               (pageNumber, surahNumber, startVerse) {
+                                if (!qSettings.showPageInfo) {
+                                  return const SizedBox.shrink();
+                                }
                                 final pageLabel = localizedNumber(
                                   context,
                                   pageNumber,

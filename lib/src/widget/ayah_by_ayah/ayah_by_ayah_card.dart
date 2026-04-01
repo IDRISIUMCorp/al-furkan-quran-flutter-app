@@ -121,7 +121,9 @@ Future<void> _showWahyBookmarkColorSheet({
                     width: 44,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: isDark ? Colors.white24 : Colors.black.withValues(alpha: 0.18),
+                      color: isDark
+                          ? Colors.white24
+                          : Colors.black.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -131,7 +133,9 @@ Future<void> _showWahyBookmarkColorSheet({
                       color: card,
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(
-                        color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.06),
+                        color: isDark
+                            ? Colors.white10
+                            : Colors.black.withValues(alpha: 0.06),
                       ),
                     ),
                     child: Column(
@@ -146,7 +150,10 @@ Future<void> _showWahyBookmarkColorSheet({
                           },
                           title: Text(
                             entry.value.name,
-                            style: TextStyle(fontWeight: FontWeight.w900, color: isDark ? Colors.white : null),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              color: isDark ? Colors.white : null,
+                            ),
                           ),
                           trailing: Icon(
                             Icons.bookmark_rounded,
@@ -231,17 +238,23 @@ Future<void> _showWahyAddNoteSheet({
                       decoration: InputDecoration(
                         hintText: "اكتب ملاحظتك هنا…",
                         filled: true,
-                        fillColor: isDark ? const Color(0xFF252525) : const Color(0xFFFFF9F2),
+                        fillColor: isDark
+                            ? const Color(0xFF252525)
+                            : const Color(0xFFFFF9F2),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide(
-                            color: isDark ? Colors.white12 : Colors.black.withValues(alpha: 0.08),
+                            color: isDark
+                                ? Colors.white12
+                                : Colors.black.withValues(alpha: 0.08),
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide(
-                            color: isDark ? Colors.white12 : Colors.black.withValues(alpha: 0.08),
+                            color: isDark
+                                ? Colors.white12
+                                : Colors.black.withValues(alpha: 0.08),
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
@@ -303,7 +316,8 @@ Future<void> _showWahyAddNoteSheet({
   await box.put(_kWahyNotes, list);
 }
 
-final Map<String, Future<String?>> _defaultTafsirFutureCache = <String, Future<String?>>{};
+final Map<String, Future<String?>> _defaultTafsirFutureCache =
+    <String, Future<String?>>{};
 final Map<String, String?> _defaultTafsirTextCache = <String, String?>{};
 final Map<String, String> _defaultTafsirBookNameCache = <String, String>{};
 
@@ -359,7 +373,10 @@ Widget getAyahByAyahTafsirCard({
       book ??= selected.first;
 
       _defaultTafsirBookNameCache[key] = book.name;
-      final t = await QuranTafsirFunction.getResolvedTafsirTextForBook(book, key);
+      final t = await QuranTafsirFunction.getResolvedTafsirTextForBook(
+        book,
+        key,
+      );
       final sanitized = sanitizeTafsirTextLocal(t);
       _defaultTafsirTextCache[key] = sanitized;
       return sanitized;
@@ -373,7 +390,9 @@ Widget getAyahByAyahTafsirCard({
         builder: (context, quranViewState) {
           final isDark = Theme.of(context).brightness == Brightness.dark;
           final bg = isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF7F1E6);
-          final card = isDark ? const Color(0xFF252525) : const Color(0xFFEFE3D2);
+          final card = isDark
+              ? const Color(0xFF252525)
+              : const Color(0xFFEFE3D2);
           final onBg = isDark ? Colors.white : const Color(0xFF1B1B1B);
 
           final qcfTheme = qcf.QcfThemeData.sepia().copyWith(
@@ -399,10 +418,14 @@ Widget getAyahByAyahTafsirCard({
             child: Container(
               width: MediaQuery.of(context).size.width,
               key: key,
-              margin:
-                  keepMargin
-                      ? const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 12)
-                      : null,
+              margin: keepMargin
+                  ? const EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      top: 12,
+                      bottom: 12,
+                    )
+                  : null,
               decoration: BoxDecoration(
                 color: bg,
                 borderRadius: BorderRadius.circular(18),
@@ -438,7 +461,10 @@ Widget getAyahByAyahTafsirCard({
                           skipWordTap: false,
                           textAlign: TextAlign.center,
                           textStyle: TextStyle(
-                            fontSize: (quranViewState.fontSize - 2).clamp(18, 32),
+                            fontSize: (quranViewState.fontSize - 2).clamp(
+                              18,
+                              32,
+                            ),
                             height: 2.05,
                             color: onBg,
                           ),
@@ -463,7 +489,10 @@ Widget getAyahByAyahTafsirCard({
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
                         decoration: BoxDecoration(
                           color: card,
                           borderRadius: BorderRadius.circular(18),
@@ -529,20 +558,18 @@ Widget getAyahByAyahCard({
 
   int surahNumber = int.parse(ayahKey.toString().split(":")[0]);
   int ayahNumber = int.parse(ayahKey.toString().split(":")[1]);
-  List<TranslationBookModel?> translationBookInfoList =
-      translationListWithInfo
-          .map<TranslationBookModel?>((e) => e.bookInfo)
-          .toList();
-  List<String> translationList =
-      translationListWithInfo
-          .map<String>((e) => e.translation?["t"] ?? "Translation Not Found")
-          .toList();
-  translationList =
-      translationList.map((e) => e.replaceAll(">", "> ")).toList();
-  List<Map> footNoteList =
-      translationListWithInfo
-          .map<Map>((e) => e.translation?["f"] ?? {})
-          .toList();
+  List<TranslationBookModel?> translationBookInfoList = translationListWithInfo
+      .map<TranslationBookModel?>((e) => e.bookInfo)
+      .toList();
+  List<String> translationList = translationListWithInfo
+      .map<String>((e) => e.translation?["t"] ?? "Translation Not Found")
+      .toList();
+  translationList = translationList
+      .map((e) => e.replaceAll(">", "> "))
+      .toList();
+  List<Map> footNoteList = translationListWithInfo
+      .map<Map>((e) => e.translation?["f"] ?? {})
+      .toList();
   List<Map<int, String>> footNoteAsStringMap = [];
   for (int index = 0; index < footNoteList.length; index++) {
     Map footNote = footNoteList[index];
@@ -612,170 +639,219 @@ Widget getAyahByAyahCard({
               },
               builder: (context, ayahToHighlightState) {
                 final bool isHighlighted = ayahToHighlightState == ayahKey;
-                  return Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(20),
-                      onLongPress: () {
-                        final words = QuranScriptFunction.getWordListOfAyah(
-                          quranViewState.quranScriptType,
-                          surahNumber.toString(),
-                          ayahNumber.toString(),
-                        );
-                        final stripped = words.join(" ").replaceAll(RegExp(r"<[^>]+>"), "").replaceAll(RegExp(r"\s+"), " ").trim();
-                        final overlayContext = Navigator.of(context).overlay?.context ?? context;
-                        AyahOptionsSheet.show(
-                          context: overlayContext,
-                          ayahKey: ayahKey,
-                          ayahText: stripped,
-                          // Optional hooks can be added here
-                        );
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        key: key,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.of(context).size.width < 360 ? 14 : 24,
-                          vertical: MediaQuery.of(context).size.width < 360 ? 16 : 24,
-                ),
-                margin: EdgeInsets.only(
-                  left: MediaQuery.of(context).size.width < 360 ? 10 : 20,
-                  right: MediaQuery.of(context).size.width < 360 ? 10 : 20,
-                  bottom: 24,
-                ),
-                decoration: BoxDecoration(
-                  color: isHighlighted
-                      ? const Color(0x1A147b6a) // Subtle Green Highlight (AppColors.ayahHighlightDark)
-                      : Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xFF1E2121) // AppColors.darkSurface
-                          : Colors.white,
-                  borderRadius: BorderRadius.circular(20), // Premium rounding
-                  boxShadow: [
-                    if (!isHighlighted)
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+                return Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onLongPress: () {
+                      final words = QuranScriptFunction.getWordListOfAyah(
+                        quranViewState.quranScriptType,
+                        surahNumber.toString(),
+                        ayahNumber.toString(),
+                      );
+                      final stripped = words
+                          .join(" ")
+                          .replaceAll(RegExp(r"<[^>]+>"), "")
+                          .replaceAll(RegExp(r"\s+"), " ")
+                          .trim();
+                      final overlayContext =
+                          Navigator.of(context).overlay?.context ?? context;
+                      AyahOptionsSheet.show(
+                        context: overlayContext,
+                        ayahKey: ayahKey,
+                        ayahText: stripped,
+                        // Optional hooks can be added here
+                      );
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      key: key,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width < 360
+                            ? 14
+                            : 24,
+                        vertical: MediaQuery.of(context).size.width < 360
+                            ? 16
+                            : 24,
                       ),
-                  ],  ),
-                  child: Column(
-                    children: [
-                      if (!(showTopOptions == false) &&
-                          !quranViewState.hideToolbar)
-                        getToolbarWidget(
-                          showFullKey,
-                          surahInfoModel,
-                          ayahKey,
-                          ayahNumber,
-                          context,
-                          surahNumber,
-                          translationList,
-                          footNoteAsStringMap,
-                          translationBookInfoList,
-                          themeState,
-                        ),
-                      if (!quranViewState.hideQuranAyah) const Gap(10),
-                      if (!quranViewState.hideQuranAyah)
-                        quranAyahWidget(
-                          surahNumber,
-                          ayahNumber,
-                          quranViewState,
-                          themeState,
-                        ),
-                      if (!showOnlyAyah && !quranViewState.hideTranslation)
-                        const Gap(5),
-                      if (isSajdaAyah)
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.red),
-                            borderRadius: BorderRadius.circular(roundedRadius),
-                          ),
-                          height: 35,
-
-                          alignment: Alignment.center,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image(
-                                height: 25,
-                                width: 25,
-                                image: const AssetImage(
-                                  "assets/img/sajadah.png",
-                                ),
-                                color:
+                      margin: EdgeInsets.only(
+                        left: MediaQuery.of(context).size.width < 360 ? 10 : 20,
+                        right: MediaQuery.of(context).size.width < 360
+                            ? 10
+                            : 20,
+                        bottom: 24,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isHighlighted
+                            ? themeState.primary.withValues(
+                                alpha:
                                     Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? 0.14
+                                    : 0.08,
+                              )
+                            : Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF1E2121)
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: isHighlighted
+                              ? themeState.primary.withValues(alpha: 0.22)
+                              : Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white.withValues(alpha: 0.08)
+                              : Colors.black.withValues(alpha: 0.05),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(
+                              alpha: isHighlighted ? 0.04 : 0.05,
+                            ),
+                            blurRadius: 14,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          if (!(showTopOptions == false) &&
+                              !quranViewState.hideToolbar)
+                            getToolbarWidget(
+                              showFullKey,
+                              surahInfoModel,
+                              ayahKey,
+                              ayahNumber,
+                              context,
+                              surahNumber,
+                              translationList,
+                              footNoteAsStringMap,
+                              translationBookInfoList,
+                              themeState,
+                            ),
+                          if (!quranViewState.hideQuranAyah) const Gap(10),
+                          if (!quranViewState.hideQuranAyah)
+                            quranAyahWidget(
+                              surahNumber,
+                              ayahNumber,
+                              quranViewState,
+                              themeState,
+                            ),
+                          if (!showOnlyAyah && !quranViewState.hideTranslation)
+                            const Gap(5),
+                          if (isSajdaAyah)
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.red),
+                                borderRadius: BorderRadius.circular(
+                                  roundedRadius,
+                                ),
+                              ),
+                              height: 35,
+
+                              alignment: Alignment.center,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image(
+                                    height: 25,
+                                    width: 25,
+                                    image: const AssetImage(
+                                      "assets/img/sajadah.png",
+                                    ),
+                                    color:
+                                        Theme.of(context).brightness ==
                                             Brightness.light
                                         ? Colors.grey.shade900
                                         : Colors.white,
-                                colorBlendMode: BlendMode.srcIn,
+                                    colorBlendMode: BlendMode.srcIn,
+                                  ),
+                                  const Gap(10),
+                                  Text(
+                                    l10n.sajdaAyah,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const Gap(8),
+                                  const Text("-"),
+                                  const Gap(8),
+                                  Text(
+                                    isSajdaRequired
+                                        ? l10n.required
+                                        : l10n.optional,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const Gap(10),
-                              Text(
-                                l10n.sajdaAyah,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const Gap(8),
-                              const Text("-"),
-                              const Gap(8),
-                              Text(
-                                isSajdaRequired ? l10n.required : l10n.optional,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      if (isSajdaAyah) const Gap(5),
-
-                      if (!showOnlyAyah && !quranViewState.hideTranslation)
-                        const Gap(5),
-                      if (!showOnlyAyah && !quranViewState.hideTranslation)
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            l10n.translationTitle,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade500,
                             ),
-                          ),
-                        ),
-                      if (!showOnlyAyah && !quranViewState.hideTranslation)
-                        const Gap(5),
-                      if (!showOnlyAyah && !quranViewState.hideTranslation)
-                        getTranslationWithFootNoteWidget(
-                          context,
-                          translationList,
-                          footNoteAsStringMap,
-                          translationBookInfoList,
-                          quranViewState,
-                          showOnlyAyah,
-                          l10n,
-                        ),
+                          if (isSajdaAyah) const Gap(5),
 
-                      if (supportsWordByWord &&
-                          !quranViewState.alwaysOpenWordByWord &&
-                          !quranViewState.hideWordByWord)
-                        getWordByWordExpandCloseWidget(context, ayahKey),
-                      if (supportsWordByWord && !quranViewState.hideWordByWord)
-                        const Gap(5),
-                      if (supportsWordByWord && !quranViewState.hideWordByWord)
-                        getWordByWordWidget(
-                          context,
-                          ayahKey,
-                          quranViewState,
-                          wordByWord,
-                          surahNumber,
-                          ayahNumber,
-                        ),
-                    ],
+                          if (!showOnlyAyah && !quranViewState.hideTranslation)
+                            const Gap(5),
+                          if (!showOnlyAyah && !quranViewState.hideTranslation)
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: themeState.primary.withValues(
+                                    alpha: 0.08,
+                                  ),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Text(
+                                  l10n.translationTitle,
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: themeState.primary,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (!showOnlyAyah && !quranViewState.hideTranslation)
+                            const Gap(5),
+                          if (!showOnlyAyah && !quranViewState.hideTranslation)
+                            getTranslationWithFootNoteWidget(
+                              context,
+                              translationList,
+                              footNoteAsStringMap,
+                              translationBookInfoList,
+                              quranViewState,
+                              showOnlyAyah,
+                              l10n,
+                            ),
+
+                          if (supportsWordByWord &&
+                              !quranViewState.alwaysOpenWordByWord &&
+                              !quranViewState.hideWordByWord)
+                            getWordByWordExpandCloseWidget(
+                              context,
+                              ayahKey,
+                              wordByWord.length,
+                            ),
+                          if (supportsWordByWord &&
+                              !quranViewState.hideWordByWord)
+                            const Gap(5),
+                          if (supportsWordByWord &&
+                              !quranViewState.hideWordByWord)
+                            getWordByWordWidget(
+                              context,
+                              ayahKey,
+                              quranViewState,
+                              wordByWord,
+                              surahNumber,
+                              ayahNumber,
+                            ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-               ),
-                  );
+                );
               },
             ),
           );
@@ -789,7 +865,10 @@ class _AyahStatusIndicators extends StatelessWidget {
   final String ayahKey;
   final ThemeState themeState;
 
-  const _AyahStatusIndicators({required this.ayahKey, required this.themeState});
+  const _AyahStatusIndicators({
+    required this.ayahKey,
+    required this.themeState,
+  });
 
   bool _isAyahBookmarked(List<Map<String, dynamic>> list) {
     return list.any((e) => (e["ayahKey"] as String?) == ayahKey);
@@ -812,8 +891,10 @@ class _AyahStatusIndicators extends StatelessWidget {
       builder: (context, _, __) {
         final rawBookmarks =
             userBox.get(_kWahyBookmarks, defaultValue: const []) as List?;
-        final rawNotes = userBox.get(_kWahyNotes, defaultValue: const []) as List?;
-        final rawStarred = userBox.get("wahy_starred", defaultValue: const []) as List?;
+        final rawNotes =
+            userBox.get(_kWahyNotes, defaultValue: const []) as List?;
+        final rawStarred =
+            userBox.get("wahy_starred", defaultValue: const []) as List?;
 
         final bookmarks = (rawBookmarks ?? const [])
             .map((e) => Map<String, dynamic>.from(e as Map))
@@ -881,8 +962,10 @@ Align getWordByWordWidget(
           builder: (context, ayahScrollState) {
             return BlocBuilder<PlayerPositionCubit, AudioPlayerPositionModel>(
               buildWhen: (previous, current) {
-                String? currentAyahKey =
-                    context.read<AyahKeyCubit>().state.current;
+                String? currentAyahKey = context
+                    .read<AyahKeyCubit>()
+                    .state
+                    .current;
                 if (currentAyahKey == ayahKey) {
                   if (segments != null) {
                     for (List word in segments) {
@@ -930,7 +1013,7 @@ Align getWordByWordWidget(
   );
 }
 
-SizedBox getAyahWordByWord(
+Widget getAyahWordByWord(
   AyahByAyahInScrollInfoState ayahScrollState,
   String ayahKey,
   QuranViewState quranViewState,
@@ -941,27 +1024,37 @@ SizedBox getAyahWordByWord(
   ThemeState themeState,
   String? highlightingWordIndex,
 ) {
-  return SizedBox(
-    height:
-        (ayahScrollState.expandedForWordByWord?.contains(ayahKey) == true ||
-                quranViewState.alwaysOpenWordByWord)
-            ? null
-            : 0,
+  final isExpanded =
+      ayahScrollState.expandedForWordByWord?.contains(ayahKey) == true ||
+      quranViewState.alwaysOpenWordByWord;
 
-    child:
-        (ayahScrollState.expandedForWordByWord?.contains(ayahKey) == true ||
-                quranViewState.alwaysOpenWordByWord)
-            ? Wrap(
-              spacing: 5,
-              runSpacing: 5,
+  return AnimatedSize(
+    duration: const Duration(milliseconds: 220),
+    curve: Curves.easeOutCubic,
+    alignment: Alignment.topCenter,
+    child: !isExpanded
+        ? const SizedBox.shrink()
+        : Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: themeState.primary.withValues(alpha: 0.035),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: themeState.primary.withValues(alpha: 0.10),
+              ),
+            ),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
               textDirection: TextDirection.rtl,
               children: List.generate(wordByWord.length, (index) {
-                String currentWordKey = "$surahNumber:$ayahNumber:${index + 1}";
+                final currentWordKey = "$surahNumber:$ayahNumber:${index + 1}";
 
                 return InkWell(
-                  borderRadius: BorderRadius.circular(roundedRadius),
+                  borderRadius: BorderRadius.circular(16),
                   onTap: () async {
-                    List<String> wordsKey = List.generate(
+                    final wordsKey = List<String>.generate(
                       wordByWord.length,
                       (i) => "$surahNumber:$ayahNumber:${i + 1}",
                     );
@@ -976,17 +1069,32 @@ SizedBox getAyahWordByWord(
                           [],
                     );
                   },
-                  child: Container(
-                    padding: const EdgeInsets.all(3),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    curve: Curves.easeOutCubic,
+                    constraints: const BoxConstraints(minWidth: 78),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
-                      color: themeState.primary.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(roundedRadius),
-                      border:
-                          highlightingWordIndex == currentWordKey
-                              ? Border.all(color: themeState.primary, width: 2)
-                              : null,
+                      color: themeState.primary.withValues(
+                        alpha: highlightingWordIndex == currentWordKey
+                            ? 0.12
+                            : 0.06,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: highlightingWordIndex == currentWordKey
+                            ? themeState.primary
+                            : themeState.primary.withValues(alpha: 0.10),
+                        width: highlightingWordIndex == currentWordKey
+                            ? 1.7
+                            : 1,
+                      ),
                     ),
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         BlocBuilder<QuranViewCubit, QuranViewState>(
                           builder: (context, quranViewState) {
@@ -1005,11 +1113,13 @@ SizedBox getAyahWordByWord(
                             );
                           },
                         ),
-                        const Gap(5),
+                        const Gap(6),
                         Text(
-                          wordByWord[index],
+                          wordByWord[index].toString(),
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: quranViewState.translationFontSize,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
@@ -1017,64 +1127,102 @@ SizedBox getAyahWordByWord(
                   ),
                 );
               }),
-            )
-            : null,
+            ),
+          ),
   );
 }
 
-GestureDetector getWordByWordExpandCloseWidget(
+Widget getWordByWordExpandCloseWidget(
   BuildContext context,
   String ayahKey,
+  int wordCount,
 ) {
-  ThemeState themeState = context.read<ThemeCubit>().state;
-  AppLocalizations l10n = AppLocalizations.of(context);
-  return GestureDetector(
-    onTap: () {
-      List<String> expandedForWordByWord =
-          context
-              .read<AyahByAyahInScrollInfoCubit>()
-              .state
-              .expandedForWordByWord
-              ?.toList() ??
-          [];
+  final themeState = context.read<ThemeCubit>().state;
+  final l10n = AppLocalizations.of(context);
 
-      expandedForWordByWord.contains(ayahKey)
-          ? expandedForWordByWord.remove(ayahKey)
-          : expandedForWordByWord.add(ayahKey);
-      context.read<AyahByAyahInScrollInfoCubit>().setData(
-        expandedForWordByWord: expandedForWordByWord,
+  return BlocBuilder<AyahByAyahInScrollInfoCubit, AyahByAyahInScrollInfoState>(
+    builder: (context, scrollState) {
+      final expanded =
+          scrollState.expandedForWordByWord?.contains(ayahKey) == true;
+
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            final expandedForWordByWord =
+                scrollState.expandedForWordByWord?.toList() ?? <String>[];
+
+            if (expandedForWordByWord.contains(ayahKey)) {
+              expandedForWordByWord.remove(ayahKey);
+            } else {
+              expandedForWordByWord.add(ayahKey);
+            }
+
+            context.read<AyahByAyahInScrollInfoCubit>().setData(
+              expandedForWordByWord: expandedForWordByWord,
+            );
+          },
+          borderRadius: BorderRadius.circular(18),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: themeState.primary.withValues(
+                alpha: expanded ? 0.10 : 0.05,
+              ),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: themeState.primary.withValues(
+                  alpha: expanded ? 0.18 : 0.10,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  FluentIcons.text_bullet_list_square_24_regular,
+                  size: 18,
+                  color: themeState.primary,
+                ),
+                const Gap(8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.wordByWordTranslation,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: themeState.primary,
+                        ),
+                      ),
+                      const Gap(2),
+                      Text(
+                        "${localizedNumber(context, wordCount)} كلمة",
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                AnimatedRotation(
+                  turns: expanded ? 0.5 : 0,
+                  duration: const Duration(milliseconds: 180),
+                  child: Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       );
     },
-    behavior: HitTestBehavior.translucent,
-    child: Container(
-      decoration: BoxDecoration(
-        color: themeState.primary.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(roundedRadius),
-      ),
-      padding: const EdgeInsets.only(left: 5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            l10n.wordByWordTranslation,
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-          ),
-
-          BlocBuilder<AyahByAyahInScrollInfoCubit, AyahByAyahInScrollInfoState>(
-            builder:
-                (context, quranViewState) => Icon(
-                  quranViewState.expandedForWordByWord?.contains(ayahKey) ==
-                          true
-                      ? Icons.arrow_drop_up
-                      : Icons.arrow_right,
-                  size: 24,
-                  color: Colors.grey.shade500,
-                ),
-          ),
-        ],
-      ),
-    ),
   );
 }
 
@@ -1226,7 +1374,7 @@ Align quranAyahWidget(
   );
 }
 
-Row getToolbarWidget(
+Widget getToolbarWidget(
   bool? showFullKey,
   SurahInfoModel surahInfoModel,
   String ayahKey,
@@ -1238,188 +1386,222 @@ Row getToolbarWidget(
   List<TranslationBookModel?> translationBookInfoList,
   ThemeState themeState,
 ) {
-  AppLocalizations l10n = AppLocalizations.of(context);
-  final double btnSize = MediaQuery.of(context).size.width < 360 ? 26 : 30;
-  return Row(
-    crossAxisAlignment: CrossAxisAlignment.center,
-
-    children: [
-      Container(
-        decoration: BoxDecoration(
-          color: themeState.primaryShade300,
-          borderRadius: BorderRadius.circular(roundedRadius - 4),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Text(
-          showFullKey == true
-              ? "${getSurahName(context, surahInfoModel.id)}\nAyah: ${localizedNumber(context, ayahKey.split(":").first.toInt())}:${localizedNumber(context, ayahNumber)}"
-              : localizedNumber(context, ayahNumber),
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.w700,
-            fontSize: 13,
-          ),
-        ),
-      ),
-      const Gap(6),
-      _AyahStatusIndicators(ayahKey: ayahKey, themeState: themeState),
-      const Spacer(),
-      SizedBox(
-        height: 30,
-        child: OutlinedButton(
-          style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
-          onPressed: () {
-            HapticFeedback.lightImpact();
-            Navigator.push(
-              context,
-              WahyPageRoute(page: TafsirView(ayahKey: ayahKey)),
-            );
-          },
-          child: Text(l10n.tafsirButton),
-        ),
-      ),
-      const Gap(4),
-      SizedBox(
-        height: btnSize,
-        width: btnSize,
-        child: BlocBuilder<QuranViewCubit, QuranViewState>(
-          builder: (context, quranViewState) {
-            return IconButton(
-              style: IconButton.styleFrom(
-                padding: EdgeInsets.zero,
-                foregroundColor: themeState.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100),
-                  side: BorderSide(color: themeState.primary),
+  final l10n = AppLocalizations.of(context);
+  final btnSize = MediaQuery.of(context).size.width < 360 ? 24.0 : 28.0;
+  return Container(
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: themeState.primary.withValues(alpha: 0.05),
+      borderRadius: BorderRadius.circular(18),
+      border: Border.all(color: themeState.primary.withValues(alpha: 0.10)),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: themeState.primaryShade300,
+                borderRadius: BorderRadius.circular(roundedRadius - 4),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Text(
+                showFullKey == true
+                    ? "${getSurahName(context, surahInfoModel.id)}\nالآية ${localizedNumber(context, ayahNumber)}"
+                    : localizedNumber(context, ayahNumber),
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
                 ),
               ),
-              onPressed: () {
-                showShareBottomDialog(
-                  context,
-                  ayahKey,
-                  surahInfoModel,
-                  quranViewState.quranScriptType,
-                  translation,
-                  footNoteAsStringMap.map((e) => e.values.firstOrNull).whereType<String>().map((s) => <String, dynamic>{}).toList(),
-                  translationBookInfoList,
-                );
-              },
-              tooltip: l10n.shareButton,
-              icon: Icon(FluentIcons.share_24_filled, size: btnSize * 0.6),
-            );
-          },
-        ),
-      ),
-      const Gap(4),
-      SizedBox(
-        height: btnSize,
-        width: btnSize,
-        child: IconButton(
-          style: IconButton.styleFrom(
-            padding: EdgeInsets.zero,
-            foregroundColor: themeState.primary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(100),
-              side: BorderSide(color: themeState.primary),
             ),
-          ),
-          onPressed: () async {
-            await showAddNotePopup(context, ayahKey);
-          },
-          tooltip: l10n.addNoteButton,
-          icon: Icon(FluentIcons.note_add_24_filled, size: btnSize * 0.6),
-        ),
-      ),
-      const Gap(4),
-      SizedBox(
-        height: btnSize,
-        width: btnSize,
-        child: IconButton(
-          style: IconButton.styleFrom(
-            padding: EdgeInsets.zero,
-            foregroundColor: themeState.primary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(100),
-              side: BorderSide(color: themeState.primary),
+            const Gap(6),
+            _AyahStatusIndicators(ayahKey: ayahKey, themeState: themeState),
+            const Spacer(),
+            SizedBox(
+              height: 30,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  Navigator.push(
+                    context,
+                    WahyPageRoute(page: TafsirView(ayahKey: ayahKey)),
+                  );
+                },
+                child: Text(l10n.tafsirButton),
+              ),
             ),
-          ),
-          onPressed: () {
-            _showWahyBookmarkColorSheet(
-              context: context,
-              themeState: themeState,
-              ayahKey: ayahKey,
-            );
-          },
-          tooltip: l10n.pinToCollectionButton,
-          icon: Icon(FluentIcons.pin_24_filled, size: btnSize * 0.6),
-        ),
-      ),
-      const Gap(4),
-      SizedBox(
-        height: btnSize,
-        width: btnSize,
-        child: ValueListenableBuilder(
-          valueListenable: Hive.box("user").listenable(keys: ["wahy_starred"]),
-          builder: (context, box, _) {
-            final starred = List<String>.from(
-                box.get("wahy_starred", defaultValue: const []) as List? ?? []);
-            final isStarred = starred.contains(ayahKey);
-
-            return IconButton(
-              style: IconButton.styleFrom(
-                padding: EdgeInsets.zero,
-                foregroundColor: isStarred ? const Color(0xFFF4B400) : themeState.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100),
-                  side: BorderSide(color: isStarred ? const Color(0xFFF4B400) : themeState.primary),
+            const Gap(4),
+            SizedBox(
+              height: btnSize,
+              width: btnSize,
+              child: BlocBuilder<QuranViewCubit, QuranViewState>(
+                builder: (context, quranViewState) {
+                  return IconButton(
+                    style: IconButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      foregroundColor: themeState.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100),
+                        side: BorderSide(color: themeState.primary),
+                      ),
+                    ),
+                    onPressed: () {
+                      showShareBottomDialog(
+                        context,
+                        ayahKey,
+                        surahInfoModel,
+                        quranViewState.quranScriptType,
+                        translation,
+                        footNoteAsStringMap
+                            .map((e) => e.values.firstOrNull)
+                            .whereType<String>()
+                            .map((s) => <String, dynamic>{})
+                            .toList(),
+                        translationBookInfoList,
+                      );
+                    },
+                    tooltip: l10n.shareButton,
+                    icon: Icon(
+                      FluentIcons.share_24_filled,
+                      size: btnSize * 0.6,
+                    ),
+                  );
+                },
+              ),
+            ),
+            const Gap(4),
+            SizedBox(
+              height: btnSize,
+              width: btnSize,
+              child: IconButton(
+                style: IconButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  foregroundColor: themeState.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100),
+                    side: BorderSide(color: themeState.primary),
+                  ),
                 ),
+                onPressed: () async {
+                  await showAddNotePopup(context, ayahKey);
+                },
+                tooltip: l10n.addNoteButton,
+                icon: Icon(FluentIcons.note_add_24_filled, size: btnSize * 0.6),
               ),
-              onPressed: () async {
-                final list = List<String>.from(starred);
-                if (isStarred) {
-                  list.remove(ayahKey);
-                } else {
-                  list.add(ayahKey);
-                }
-                await box.put("wahy_starred", list);
-              },
-              tooltip: isStarred ? "إزالة من المفضلة" : "إضافة للمفضلة",
-              icon: Icon(
-                isStarred ? FluentIcons.star_24_filled : FluentIcons.star_24_regular,
-                size: btnSize * 0.6,
+            ),
+            const Gap(4),
+            SizedBox(
+              height: btnSize,
+              width: btnSize,
+              child: IconButton(
+                style: IconButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  foregroundColor: themeState.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100),
+                    side: BorderSide(color: themeState.primary),
+                  ),
+                ),
+                onPressed: () {
+                  _showWahyBookmarkColorSheet(
+                    context: context,
+                    themeState: themeState,
+                    ayahKey: ayahKey,
+                  );
+                },
+                tooltip: l10n.pinToCollectionButton,
+                icon: Icon(FluentIcons.pin_24_filled, size: btnSize * 0.6),
               ),
-            );
-          },
-        ),
-      ),
-      const Gap(4),
-      SizedBox(
-        height: btnSize,
-        width: btnSize,
-        child: BlocBuilder<PlayerStateCubit, PlayerState>(
-          builder: (context, playerState) {
-            return BlocBuilder<AyahKeyCubit, AyahKeyManagement>(
-              builder: (context, ayahKeyManagement) {
-                bool isPlaying = playerState.isPlaying;
-                bool isCurrent =
-                    ayahKeyManagement.current == ayahKey &&
-                    context.read<AudioUiCubit>().state.isInsideQuranPlayer ==
-                        true;
+            ),
+            const Gap(4),
+            SizedBox(
+              height: btnSize,
+              width: btnSize,
+              child: ValueListenableBuilder(
+                valueListenable: Hive.box(
+                  "user",
+                ).listenable(keys: ["wahy_starred"]),
+                builder: (context, box, _) {
+                  final starred = List<String>.from(
+                    box.get("wahy_starred", defaultValue: const []) as List? ??
+                        [],
+                  );
+                  final isStarred = starred.contains(ayahKey);
 
-                return getPlayButtonWidget(
-                  context,
-                  ayahKey,
-                  isCurrent,
-                  isPlaying,
-                  ayahKeyManagement,
-                  playerState,
-                );
-              },
-            );
-          },
+                  return IconButton(
+                    style: IconButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      foregroundColor: isStarred
+                          ? const Color(0xFFF4B400)
+                          : themeState.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100),
+                        side: BorderSide(
+                          color: isStarred
+                              ? const Color(0xFFF4B400)
+                              : themeState.primary,
+                        ),
+                      ),
+                    ),
+                    onPressed: () async {
+                      final list = List<String>.from(starred);
+                      if (isStarred) {
+                        list.remove(ayahKey);
+                      } else {
+                        list.add(ayahKey);
+                      }
+                      await box.put("wahy_starred", list);
+                    },
+                    tooltip: isStarred ? "إزالة من المفضلة" : "إضافة للمفضلة",
+                    icon: Icon(
+                      isStarred
+                          ? FluentIcons.star_24_filled
+                          : FluentIcons.star_24_regular,
+                      size: btnSize * 0.6,
+                    ),
+                  );
+                },
+              ),
+            ),
+            const Gap(4),
+            SizedBox(
+              height: btnSize,
+              width: btnSize,
+              child: BlocBuilder<PlayerStateCubit, PlayerState>(
+                builder: (context, playerState) {
+                  return BlocBuilder<AyahKeyCubit, AyahKeyManagement>(
+                    builder: (context, ayahKeyManagement) {
+                      bool isPlaying = playerState.isPlaying;
+                      bool isCurrent =
+                          ayahKeyManagement.current == ayahKey &&
+                          context
+                                  .read<AudioUiCubit>()
+                                  .state
+                                  .isInsideQuranPlayer ==
+                              true;
+
+                      return getPlayButtonWidget(
+                        context,
+                        ayahKey,
+                        isCurrent,
+                        isPlaying,
+                        ayahKeyManagement,
+                        playerState,
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
         ),
-      ),
-    ],
+      ],
+    ),
   );
 }
 
@@ -1474,21 +1656,19 @@ IconButton getPlayButtonWidget(
         }
       }
     },
-    icon:
-        (isCurrent && playerState.state == just_audio.ProcessingState.loading)
-            ? Padding(
-              padding: const EdgeInsets.all(3.0),
-              child: CircularProgressIndicator(
-                strokeWidth: 3,
-                backgroundColor:
-                    context.read<ThemeCubit>().state.primaryShade100,
-              ),
-            )
-            : Icon(
-              isPlaying && isCurrent
-                  ? Icons.pause_rounded
-                  : Icons.play_arrow_rounded,
-              size: 18,
+    icon: (isCurrent && playerState.state == just_audio.ProcessingState.loading)
+        ? Padding(
+            padding: const EdgeInsets.all(3.0),
+            child: CircularProgressIndicator(
+              strokeWidth: 3,
+              backgroundColor: context.read<ThemeCubit>().state.primaryShade100,
             ),
+          )
+        : Icon(
+            isPlaying && isCurrent
+                ? Icons.pause_rounded
+                : Icons.play_arrow_rounded,
+            size: 18,
+          ),
   );
 }

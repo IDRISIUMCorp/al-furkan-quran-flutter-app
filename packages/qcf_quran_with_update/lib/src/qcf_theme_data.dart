@@ -85,6 +85,11 @@ class QcfThemeData {
   /// Default: `1.35`
   final double verseNumberHeight;
 
+  /// Uniform scaling applied to the rendered mushaf block.
+  /// Values greater than `1.0` make the page feel larger in both width and
+  /// height after fitting, while lower values make it denser.
+  final double contentScale;
+
   /// Letter spacing for verse text.
   /// Default: `0.0`
   final double letterSpacing;
@@ -190,6 +195,7 @@ class QcfThemeData {
     this.verticalPadding = 12.0,
     this.verseHeight = 2.2,
     this.verseNumberHeight = 1.35,
+    this.contentScale = 1.0,
     this.letterSpacing = 0.0,
     this.wordSpacing = 0.0,
 
@@ -233,6 +239,7 @@ class QcfThemeData {
     double? verticalPadding,
     double? verseHeight,
     double? verseNumberHeight,
+    double? contentScale,
     double? letterSpacing,
     double? wordSpacing,
     double? fontSize,
@@ -273,6 +280,7 @@ class QcfThemeData {
       verticalPadding: verticalPadding ?? this.verticalPadding,
       verseHeight: verseHeight ?? this.verseHeight,
       verseNumberHeight: verseNumberHeight ?? this.verseNumberHeight,
+      contentScale: contentScale ?? this.contentScale,
       letterSpacing: letterSpacing ?? this.letterSpacing,
       wordSpacing: wordSpacing ?? this.wordSpacing,
       fontSize: fontSize ?? this.fontSize,

@@ -1,7 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:qcf_quran/qcf_quran.dart';
+import "dart:async";
+import "dart:math" as math;
 
-import 'package:al_quran_v3/src/utils/number_localization.dart';
+import "package:al_quran_v3/src/utils/number_localization.dart";
+import "package:flutter/material.dart";
+import "package:flutter_animate/flutter_animate.dart";
+import "package:qcf_quran/qcf_quran.dart";
 
 class AyahSearchResult {
   final int surah;
@@ -38,15 +41,18 @@ class SearchSheet extends StatefulWidget {
 class SearchSheetState extends State<SearchSheet> {
   String _lastQuery = "";
   Future<List<AyahSearchResult>>? _future;
+  Timer? _debounce;
 
-  void _updateSearch() {
-    final q = widget.controller.text;
-    if (q == _lastQuery) return;
-    _lastQuery = q;
-    setState(() {
-      _future = widget.search(q);
-    });
-  }
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+  Color get _surfaceColor =>
+      _isDark ? const Color(0xFF141414) : const Color(0xFFF7F1E6);
+  Color get _cardColor =>
+      _isDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFFFFBF5);
+  Color get _borderColor => _isDark
+      ? Colors.white.withValues(alpha: 0.08)
+      : Colors.black.withValues(alpha: 0.06);
+  Color get _textColor => _isDark ? Colors.white : const Color(0xFF1B1B1B);
+  Color get _mutedColor => _isDark ? Colors.white54 : const Color(0xFF8F8F8F);
 
   @override
   void initState() {
@@ -57,13 +63,28 @@ class SearchSheetState extends State<SearchSheet> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     widget.controller.removeListener(_updateSearch);
     super.dispose();
   }
 
+  void _updateSearch() {
+    final query = widget.controller.text;
+    if (query == _lastQuery) return;
+    _lastQuery = query;
+
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 160), () {
+      if (!mounted) return;
+      setState(() {
+        _future = widget.search(query);
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final q = widget.controller.text.trim();
+    final query = widget.controller.text.trim();
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -73,10 +94,10 @@ class SearchSheetState extends State<SearchSheet> {
         ),
         child: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF141414) : const Color(0xFFF7F1E6),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(22),
-              topRight: Radius.circular(22),
+            color: _surfaceColor,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
             ),
           ),
           child: SafeArea(
@@ -86,43 +107,65 @@ class SearchSheetState extends State<SearchSheet> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  Container(
+                    width: 42,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: _isDark ? Colors.white24 : Colors.black12,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       IconButton(
                         onPressed: () => Navigator.pop(context),
                         icon: const Icon(Icons.close_rounded),
+                        color: _isDark ? Colors.white70 : Colors.black87,
                       ),
                       Expanded(
-                        child: Text(
-                          "بحث في الآيات",
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF1B1B1B),
-                          ),
+                        child: Column(
+                          children: [
+                            Text(
+                              "بحث داخل المصحف",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w900,
+                                color: _textColor,
+                              ),
+                            ),
+                            Text(
+                              "ابحث عن أي مقطع ثم انتقل مباشرة إلى الآية",
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                                color: _mutedColor,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(width: 44),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 14,
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFF9F2),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: Colors.black.withValues(alpha: 0.06),
-                      ),
+                      color: _cardColor,
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(color: _borderColor),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 16,
-                          offset: const Offset(0, 8),
+                          color: Colors.black.withValues(
+                            alpha: _isDark ? 0.16 : 0.05,
+                          ),
+                          blurRadius: 18,
+                          offset: const Offset(0, 10),
                         ),
                       ],
                     ),
@@ -134,33 +177,68 @@ class SearchSheetState extends State<SearchSheet> {
                           child: TextField(
                             controller: widget.controller,
                             textDirection: TextDirection.rtl,
-                            decoration: const InputDecoration(
-                              hintText: "اكتب كلمة من الآية…",
+                            style: TextStyle(
+                              color: _textColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: "اكتب كلمة أو جزءًا من الآية...",
+                              hintStyle: TextStyle(color: _mutedColor),
                               border: InputBorder.none,
                             ),
                           ),
                         ),
-                        if (q.isNotEmpty)
+                        if (query.isNotEmpty)
                           IconButton(
-                            onPressed: () {
-                              widget.controller.clear();
-                            },
+                            onPressed: widget.controller.clear,
                             icon: const Icon(Icons.close_rounded),
-                            color: const Color(0xFF8F8F8F),
+                            color: _mutedColor,
                             splashRadius: 18,
                           ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 12),
-                  if (q.length < 2)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 26),
+                  if (query.isNotEmpty && query.length < 2)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 24, bottom: 16),
                       child: Text(
-                        "اكتب حرفين أو أكثر",
+                        "اكتب حرفين أو أكثر لعرض النتائج",
                         style: TextStyle(
                           fontWeight: FontWeight.w800,
-                          color: Color(0xFF9C9C9C),
+                          color: _mutedColor,
+                        ),
+                      ),
+                    )
+                  else if (query.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12, bottom: 8),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: _cardColor,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: _borderColor),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.auto_awesome_rounded,
+                              color: widget.primary,
+                              size: 28,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              "ابحث باسم كلمة أو بجزء من النص، وستظهر لك أقرب النتائج فورًا.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: _textColor,
+                                fontWeight: FontWeight.w700,
+                                height: 1.5,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     )
@@ -180,58 +258,174 @@ class SearchSheetState extends State<SearchSheet> {
                               ),
                             );
                           }
+
                           final results =
                               snapshot.data ?? const <AyahSearchResult>[];
                           if (results.isEmpty) {
-                            return const Padding(
-                              padding: EdgeInsets.only(top: 26),
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 26),
                               child: Center(
                                 child: Text(
-                                  "مفيش نتائج",
+                                  "لا توجد نتائج مطابقة الآن",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w800,
-                                    color: Color(0xFF9C9C9C),
+                                    color: _mutedColor,
                                   ),
                                 ),
                               ),
                             );
                           }
 
-                          return ListView.separated(
-                            shrinkWrap: true,
-                            padding: const EdgeInsets.only(bottom: 10),
-                            itemCount: results.length,
-                            separatorBuilder: (_, __) => Divider(
-                              height: 10,
-                              color: Colors.black.withValues(alpha: 0.06),
-                            ),
-                            itemBuilder: (context, index) {
-                              final r = results[index];
-                              return ListTile(
-                                onTap: () => widget.onResultTap(r.ayahKey),
-                                title: Text(
-                                  "${getSurahNameArabic(r.surah)}: ${localizedNumber(context, r.verse)}",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    color: Color(0xFF1B1B1B),
+                          return Column(
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                margin: const EdgeInsets.only(bottom: 10),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: widget.primary.withValues(alpha: 0.08),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: widget.primary.withValues(
+                                      alpha: 0.12,
+                                    ),
                                   ),
                                 ),
-                                subtitle: Text(
-                                  r.snippet,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.55,
-                                    color: Color(0xFF8F8F8F),
+                                child: Text(
+                                  "تم العثور على ${localizedNumber(context, results.length)} نتيجة",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    color: widget.primary,
                                   ),
                                 ),
-                                trailing: Icon(
-                                  Icons.chevron_left_rounded,
-                                  color: widget.primary,
+                              ),
+                              Expanded(
+                                child: ListView.separated(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  itemCount: results.length,
+                                  separatorBuilder: (_, __) =>
+                                      const SizedBox(height: 10),
+                                  itemBuilder: (context, index) {
+                                    final result = results[index];
+                                    return Material(
+                                          color: Colors.transparent,
+                                          child: InkWell(
+                                            onTap: () => widget.onResultTap(
+                                              result.ayahKey,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              22,
+                                            ),
+                                            child: Container(
+                                              padding: const EdgeInsets.all(14),
+                                              decoration: BoxDecoration(
+                                                color: _cardColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(22),
+                                                border: Border.all(
+                                                  color: _borderColor,
+                                                ),
+                                              ),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.stretch,
+                                                children: [
+                                                  Wrap(
+                                                    spacing: 8,
+                                                    runSpacing: 8,
+                                                    alignment: WrapAlignment
+                                                        .spaceBetween,
+                                                    children: [
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                              horizontal: 10,
+                                                              vertical: 5,
+                                                            ),
+                                                        decoration: BoxDecoration(
+                                                          color: widget.primary
+                                                              .withValues(
+                                                                alpha: 0.1,
+                                                              ),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                10,
+                                                              ),
+                                                        ),
+                                                        child: Text(
+                                                          getSurahNameArabic(
+                                                            result.surah,
+                                                          ),
+                                                          style: TextStyle(
+                                                            color:
+                                                                widget.primary,
+                                                            fontWeight:
+                                                                FontWeight.w800,
+                                                            fontSize: 12,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                              horizontal: 10,
+                                                              vertical: 5,
+                                                            ),
+                                                        decoration: BoxDecoration(
+                                                          color: _mutedColor
+                                                              .withValues(
+                                                                alpha: 0.08,
+                                                              ),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                10,
+                                                              ),
+                                                        ),
+                                                        child: Text(
+                                                          "الآية ${localizedNumber(context, result.verse)}",
+                                                          style: TextStyle(
+                                                            color: _mutedColor,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                            fontSize: 11.5,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 12),
+                                                  Text(
+                                                    result.snippet,
+                                                    maxLines: 3,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontFamily: "QPC_Hafs",
+                                                      fontSize: 22,
+                                                      height: 1.65,
+                                                      color: _textColor,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                        .animate()
+                                        .fadeIn(
+                                          duration: 250.ms,
+                                          delay: (math.min(index, 6) * 35).ms,
+                                        )
+                                        .slideY(begin: 0.05, end: 0);
+                                  },
                                 ),
-                              );
-                            },
+                              ),
+                            ],
                           );
                         },
                       ),

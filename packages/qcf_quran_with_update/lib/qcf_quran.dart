@@ -20,6 +20,7 @@ export 'src/tajweed_verse.dart';
 export 'src/qcf_verse.dart';
 export 'src/qcf_verses.dart';
 export 'src/data/page_font_size.dart';
+export 'src/data/quran_text.dart';
 export 'src/data/quarters.dart';
 export 'src/helpers/convert_to_arabic_number.dart';
 export 'src/quran_pageview.dart';
