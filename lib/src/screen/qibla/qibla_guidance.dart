@@ -1,4 +1,4 @@
-import "dart:math" as math;
+import "package:adhan_dart/adhan_dart.dart";
 
 const double kaabaLatDegrees = 21.422487;
 const double kaabaLonDegrees = 39.826206;
@@ -59,18 +59,7 @@ double calculateQiblaAngle(double userLat, double userLon) {
     return -1.0;
   }
 
-  final double userLatRad = userLat * math.pi / 180.0;
-  final double userLonRad = userLon * math.pi / 180.0;
-  final double kaabaLatRad = kaabaLatDegrees * math.pi / 180.0;
-  final double kaabaLonRad = kaabaLonDegrees * math.pi / 180.0;
-
-  final deltaLon = kaabaLonRad - userLonRad;
-  final y = math.sin(deltaLon) * math.cos(kaabaLatRad);
-  final x =
-      math.cos(userLatRad) * math.sin(kaabaLatRad) -
-      math.sin(userLatRad) * math.cos(kaabaLatRad) * math.cos(deltaLon);
-
-  final bearing = math.atan2(y, x) * 180.0 / math.pi;
+  final bearing = Qibla.qibla(Coordinates(userLat, userLon));
   return normalizeDegrees(bearing);
 }
 

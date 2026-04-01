@@ -24,7 +24,7 @@ dependencies:
   bloc: ^9.0.0
   dio: ^5.8.0+1
   scrollable_positioned_list: ^0.3.8
-  flutter_compass: ^0.8.1
+  flutter_qiblah: ^3.1.0
   permission_handler: ^12.0.0+1
   geolocator: ^14.0.0
   vector_math: ^2.1.4

@@ -2,35 +2,47 @@ import "package:adhan_dart/adhan_dart.dart" hide Prayer;
 import "package:al_quran_v3/src/screen/prayer_time/models/prayer_enum.dart";
 
 extension PrayerTimesExtensions on PrayerTimes {
-  DateTime get dhuha => sunrise.add(const Duration(minutes: 20));
+  DateTime _toLocalTime(DateTime value) =>
+      value.isUtc ? value.toLocal() : value;
 
-  DateTime get noon => dhuhr;
+  DateTime get fajrLocal => _toLocalTime(fajr);
 
-  DateTime get sunset => maghrib;
+  DateTime get sunriseLocal => _toLocalTime(sunrise);
 
-  DateTime get tahajjud {
-    final fajrTomorrow = fajr.isAfter(maghrib)
-        ? fajr
-        : fajr.add(const Duration(days: 1));
-    final nightDuration = fajrTomorrow.difference(maghrib);
-    final seconds = (nightDuration.inSeconds * (2 / 3)).round();
-    return maghrib.add(Duration(seconds: seconds));
-  }
+  DateTime get dhuhrLocal => _toLocalTime(dhuhr);
+
+  DateTime get asrLocal => _toLocalTime(asr);
+
+  DateTime get maghribLocal => _toLocalTime(maghrib);
+
+  DateTime get ishaLocal => _toLocalTime(isha);
+
+  DateTime get ishaBeforeLocal => _toLocalTime(ishaBefore);
+
+  DateTime get fajrAfterLocal => _toLocalTime(fajrAfter);
+
+  DateTime get dhuha => sunriseLocal.add(const Duration(minutes: 20));
+
+  DateTime get noon => dhuhrLocal;
+
+  DateTime get sunset => maghribLocal;
+
+  DateTime get tahajjud => _toLocalTime(SunnahTimes(this).lastThirdOfTheNight);
 
   DateTime? timeForCustomPrayer(Prayer prayer) {
     switch (prayer) {
       case Prayer.fajr:
-        return fajr;
+        return fajrLocal;
       case Prayer.sunrise:
-        return sunrise;
+        return sunriseLocal;
       case Prayer.dhuhr:
-        return dhuhr;
+        return dhuhrLocal;
       case Prayer.asr:
-        return asr;
+        return asrLocal;
       case Prayer.maghrib:
-        return maghrib;
+        return maghribLocal;
       case Prayer.isha:
-        return isha;
+        return ishaLocal;
       case Prayer.dhuha:
         return dhuha;
       case Prayer.noon:
@@ -45,18 +57,19 @@ extension PrayerTimesExtensions on PrayerTimes {
   }
 
   bool isInsideForbiddenTime(DateTime time) {
-    if (time.isAfter(sunrise) &&
-        time.isBefore(sunrise.add(const Duration(minutes: 15)))) {
+    final localTime = time.isUtc ? time.toLocal() : time;
+    if (localTime.isAfter(sunriseLocal) &&
+        localTime.isBefore(sunriseLocal.add(const Duration(minutes: 15)))) {
       return true;
     }
 
-    if (time.isAfter(dhuhr.subtract(const Duration(minutes: 10))) &&
-        time.isBefore(dhuhr)) {
+    if (localTime.isAfter(dhuhrLocal.subtract(const Duration(minutes: 10))) &&
+        localTime.isBefore(dhuhrLocal)) {
       return true;
     }
 
-    if (time.isAfter(maghrib.subtract(const Duration(minutes: 15))) &&
-        time.isBefore(maghrib)) {
+    if (localTime.isAfter(maghribLocal.subtract(const Duration(minutes: 15))) &&
+        localTime.isBefore(maghribLocal)) {
       return true;
     }
 
@@ -64,23 +77,25 @@ extension PrayerTimesExtensions on PrayerTimes {
   }
 
   DateTime nextPrayerDateTime({required DateTime now}) {
-    if (now.isBefore(fajr)) return fajr;
-    if (now.isBefore(sunrise)) return sunrise;
-    if (now.isBefore(dhuhr)) return dhuhr;
-    if (now.isBefore(asr)) return asr;
-    if (now.isBefore(maghrib)) return maghrib;
-    if (now.isBefore(isha)) return isha;
-    return fajr.add(const Duration(days: 1));
+    final localNow = now.isUtc ? now.toLocal() : now;
+    if (localNow.isBefore(fajrLocal)) return fajrLocal;
+    if (localNow.isBefore(sunriseLocal)) return sunriseLocal;
+    if (localNow.isBefore(dhuhrLocal)) return dhuhrLocal;
+    if (localNow.isBefore(asrLocal)) return asrLocal;
+    if (localNow.isBefore(maghribLocal)) return maghribLocal;
+    if (localNow.isBefore(ishaLocal)) return ishaLocal;
+    return fajrAfterLocal;
   }
 
   DateTime currentPrayerDateTime({required DateTime now}) {
-    if (now.isBefore(fajr)) return isha.subtract(const Duration(days: 1));
-    if (now.isBefore(sunrise)) return fajr;
-    if (now.isBefore(dhuhr)) return sunrise;
-    if (now.isBefore(asr)) return dhuhr;
-    if (now.isBefore(maghrib)) return asr;
-    if (now.isBefore(isha)) return maghrib;
-    return isha;
+    final localNow = now.isUtc ? now.toLocal() : now;
+    if (localNow.isBefore(fajrLocal)) return ishaBeforeLocal;
+    if (localNow.isBefore(sunriseLocal)) return fajrLocal;
+    if (localNow.isBefore(dhuhrLocal)) return sunriseLocal;
+    if (localNow.isBefore(asrLocal)) return dhuhrLocal;
+    if (localNow.isBefore(maghribLocal)) return asrLocal;
+    if (localNow.isBefore(ishaLocal)) return maghribLocal;
+    return ishaLocal;
   }
 
   double percentageOfTimeLeftUntilNextPrayer({required DateTime now}) {
@@ -100,22 +115,24 @@ extension PrayerTimesExtensions on PrayerTimes {
   }
 
   Prayer nextPrayerExtension({required DateTime date}) {
-    if (date.isBefore(fajr)) return Prayer.fajr;
-    if (date.isBefore(sunrise)) return Prayer.sunrise;
-    if (date.isBefore(dhuhr)) return Prayer.dhuhr;
-    if (date.isBefore(asr)) return Prayer.asr;
-    if (date.isBefore(maghrib)) return Prayer.maghrib;
-    if (date.isBefore(isha)) return Prayer.isha;
+    final localDate = date.isUtc ? date.toLocal() : date;
+    if (localDate.isBefore(fajrLocal)) return Prayer.fajr;
+    if (localDate.isBefore(sunriseLocal)) return Prayer.sunrise;
+    if (localDate.isBefore(dhuhrLocal)) return Prayer.dhuhr;
+    if (localDate.isBefore(asrLocal)) return Prayer.asr;
+    if (localDate.isBefore(maghribLocal)) return Prayer.maghrib;
+    if (localDate.isBefore(ishaLocal)) return Prayer.isha;
     return Prayer.fajr;
   }
 
   Prayer currentPrayerExtension({required DateTime date}) {
-    if (date.isBefore(fajr)) return Prayer.isha;
-    if (date.isBefore(sunrise)) return Prayer.fajr;
-    if (date.isBefore(dhuhr)) return Prayer.sunrise;
-    if (date.isBefore(asr)) return Prayer.dhuhr;
-    if (date.isBefore(maghrib)) return Prayer.asr;
-    if (date.isBefore(isha)) return Prayer.maghrib;
+    final localDate = date.isUtc ? date.toLocal() : date;
+    if (localDate.isBefore(fajrLocal)) return Prayer.isha;
+    if (localDate.isBefore(sunriseLocal)) return Prayer.fajr;
+    if (localDate.isBefore(dhuhrLocal)) return Prayer.sunrise;
+    if (localDate.isBefore(asrLocal)) return Prayer.dhuhr;
+    if (localDate.isBefore(maghribLocal)) return Prayer.asr;
+    if (localDate.isBefore(ishaLocal)) return Prayer.maghrib;
     return Prayer.isha;
   }
 }

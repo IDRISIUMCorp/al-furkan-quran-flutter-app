@@ -613,7 +613,6 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                     ayahNumberWord,
                     style: TextStyle(
                       fontFamily: pageFont,
-                      package: "qcf_quran",
                       fontSize: 22.sp,
                       color: isDark ? Colors.white54 : Colors.black45,
                     ),
@@ -673,7 +672,6 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
             word,
             style: TextStyle(
               fontFamily: font,
-              package: "qcf_quran",
               fontSize: 25.5.sp,
               height: 1.1,
               color: isSelected

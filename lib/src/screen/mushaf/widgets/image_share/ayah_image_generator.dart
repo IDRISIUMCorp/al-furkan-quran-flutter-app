@@ -23,7 +23,8 @@ class AyahImageGenerator {
     if (surahNumber == null || verseNumber == null) {
       await SharePlus.instance.share(
         ShareParams(
-          text: "$ayahKey\n\n${_formatAyahTextForSharing(ayahKey: ayahKey, ayahText: ayahText)}",
+          text:
+              "$ayahKey\n\n${_formatAyahTextForSharing(ayahKey: ayahKey, ayahText: ayahText)}",
         ),
       );
       return;
@@ -35,7 +36,7 @@ class AyahImageGenerator {
 
     const double paddingH = 40;
     final double headerWidth = canvasWidth - (paddingH * 2);
-    final double bannerWidth = headerWidth * 0.82; 
+    final double bannerWidth = headerWidth * 0.82;
 
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -73,7 +74,10 @@ class AyahImageGenerator {
         key: cardKey,
         child: Container(
           width: canvasWidth,
-          padding: const EdgeInsets.symmetric(horizontal: paddingH, vertical: 22),
+          padding: const EdgeInsets.symmetric(
+            horizontal: paddingH,
+            vertical: 22,
+          ),
           decoration: BoxDecoration(
             color: cardBgColor,
             borderRadius: BorderRadius.circular(36),
@@ -96,7 +100,10 @@ class AyahImageGenerator {
                     width: bannerWidth,
                     child: Transform.scale(
                       scale: 1.22,
-                      child: HeaderWidget(suraNumber: surahNumber, theme: qcfTheme),
+                      child: HeaderWidget(
+                        suraNumber: surahNumber,
+                        theme: qcfTheme,
+                      ),
                     ),
                   ),
                 ),
@@ -106,13 +113,18 @@ class AyahImageGenerator {
                   child: Text.rich(
                     TextSpan(
                       children: [
-                        TextSpan(text: getVerseQCF(surahNumber, verseNumber, verseEndSymbol: false)),
+                        TextSpan(
+                          text: getVerseQCF(
+                            surahNumber,
+                            verseNumber,
+                            verseEndSymbol: false,
+                          ),
+                        ),
                         const TextSpan(text: "\u200A"),
                         TextSpan(
                           text: getVerseNumberQCF(surahNumber, verseNumber),
                           style: TextStyle(
                             fontFamily: pageFont,
-                            package: "qcf_quran",
                             color: qcfTheme.verseNumberColor,
                             height: qcfTheme.verseNumberHeight,
                           ),
@@ -124,7 +136,6 @@ class AyahImageGenerator {
                     textDirection: TextDirection.rtl,
                     style: TextStyle(
                       fontFamily: pageFont,
-                      package: "qcf_quran",
                       fontSize: 75,
                       height: 2.1,
                       color: qcfTheme.verseTextColor,
@@ -142,7 +153,10 @@ class AyahImageGenerator {
     final overlay = Overlay.maybeOf(context);
     if (overlay == null) {
       await SharePlus.instance.share(
-        ShareParams(text: "$ayahKey\n\n${_formatAyahTextForSharing(ayahKey: ayahKey, ayahText: ayahText)}"),
+        ShareParams(
+          text:
+              "$ayahKey\n\n${_formatAyahTextForSharing(ayahKey: ayahKey, ayahText: ayahText)}",
+        ),
       );
       return;
     }
@@ -158,7 +172,10 @@ class AyahImageGenerator {
     if (ctx == null) {
       overlayEntry.remove();
       await SharePlus.instance.share(
-        ShareParams(text: "$ayahKey\n\n${_formatAyahTextForSharing(ayahKey: ayahKey, ayahText: ayahText)}"),
+        ShareParams(
+          text:
+              "$ayahKey\n\n${_formatAyahTextForSharing(ayahKey: ayahKey, ayahText: ayahText)}",
+        ),
       );
       return;
     }
@@ -169,7 +186,10 @@ class AyahImageGenerator {
     if (byteData == null) {
       overlayEntry.remove();
       await SharePlus.instance.share(
-        ShareParams(text: "$ayahKey\n\n${_formatAyahTextForSharing(ayahKey: ayahKey, ayahText: ayahText)}"),
+        ShareParams(
+          text:
+              "$ayahKey\n\n${_formatAyahTextForSharing(ayahKey: ayahKey, ayahText: ayahText)}",
+        ),
       );
       return;
     }
@@ -235,12 +255,17 @@ class AyahImageGenerator {
           );
 
     final Color cardBgColor = isDark ? Colors.black : const Color(0xFFF7F1E6);
-    final Color tafsirBgColor = isDark ? const Color(0xFF111111) : const Color(0xFFEFE3D2);
+    final Color tafsirBgColor = isDark
+        ? const Color(0xFF111111)
+        : const Color(0xFFEFE3D2);
     final Color textColor = isDark ? Colors.white : const Color(0xFF1B1B1B);
 
     final String? tafsirText = _sanitizeTafsirText(tafsirTextRaw);
 
-    final double titleFontSize = (44 - (tafsirTitle.length * 0.35)).clamp(36, 44);
+    final double titleFontSize = (44 - (tafsirTitle.length * 0.35)).clamp(
+      36,
+      44,
+    );
     final TextStyle titleStyle = TextStyle(
       fontSize: titleFontSize,
       fontWeight: FontWeight.w800,
@@ -266,7 +291,10 @@ class AyahImageGenerator {
         key: cardKey,
         child: Container(
           width: canvasWidth,
-          padding: const EdgeInsets.symmetric(horizontal: paddingH, vertical: 22),
+          padding: const EdgeInsets.symmetric(
+            horizontal: paddingH,
+            vertical: 22,
+          ),
           decoration: BoxDecoration(
             color: cardBgColor,
             borderRadius: BorderRadius.circular(36),
@@ -289,7 +317,10 @@ class AyahImageGenerator {
                     width: bannerWidth,
                     child: Transform.scale(
                       scale: 1.22,
-                      child: HeaderWidget(suraNumber: surahNumber, theme: qcfTheme),
+                      child: HeaderWidget(
+                        suraNumber: surahNumber,
+                        theme: qcfTheme,
+                      ),
                     ),
                   ),
                 ),
@@ -299,13 +330,18 @@ class AyahImageGenerator {
                   child: Text.rich(
                     TextSpan(
                       children: [
-                        TextSpan(text: getVerseQCF(surahNumber, verseNumber, verseEndSymbol: false)),
+                        TextSpan(
+                          text: getVerseQCF(
+                            surahNumber,
+                            verseNumber,
+                            verseEndSymbol: false,
+                          ),
+                        ),
                         const TextSpan(text: "\u200A"),
                         TextSpan(
                           text: getVerseNumberQCF(surahNumber, verseNumber),
                           style: TextStyle(
                             fontFamily: pageFont,
-                            package: "qcf_quran",
                             color: qcfTheme.verseNumberColor,
                             height: qcfTheme.verseNumberHeight,
                           ),
@@ -318,7 +354,6 @@ class AyahImageGenerator {
                     textDirection: TextDirection.rtl,
                     style: TextStyle(
                       fontFamily: pageFont,
-                      package: "qcf_quran",
                       fontSize: 75,
                       height: 2.1,
                       color: qcfTheme.verseTextColor,
@@ -343,7 +378,10 @@ class AyahImageGenerator {
                 const SizedBox(height: 14),
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 18),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 26,
+                    vertical: 18,
+                  ),
                   decoration: BoxDecoration(
                     color: tafsirBgColor,
                     borderRadius: BorderRadius.circular(18),
@@ -373,7 +411,7 @@ class AyahImageGenerator {
     overlay.insert(overlayEntry);
 
     await Future.delayed(const Duration(milliseconds: 300));
-    
+
     final ctx = cardKey.currentContext;
     if (ctx == null) return;
     final boundary = ctx.findRenderObject() as RenderRepaintBoundary;
@@ -394,7 +432,10 @@ class AyahImageGenerator {
   }
 
   // Helpers
-  static String _formatAyahTextForSharing({required String ayahKey, required String ayahText}) {
+  static String _formatAyahTextForSharing({
+    required String ayahKey,
+    required String ayahText,
+  }) {
     final parts = ayahKey.split(":");
     final verse = parts.length == 2 ? parts[1].trim() : "";
     final verseInBrackets = verse.isEmpty ? "" : "﴿${_toArabicDigits(verse)}﴾";

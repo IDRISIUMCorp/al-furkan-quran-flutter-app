@@ -106,6 +106,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
       date: date,
       coordinates: Coordinates(state.latLon!.latitude, state.latLon!.longitude),
       calculationParameters: _params(state),
+      precision: true,
     );
   }
 
@@ -143,40 +144,8 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
     );
   }
 
-  Prayer _currentPrayer(PrayerTimes t) {
-    if (_now.isBefore(t.fajr)) return Prayer.isha;
-    if (_now.isBefore(t.dhuhr)) return Prayer.fajr;
-    if (_now.isBefore(t.asr)) return Prayer.dhuhr;
-    if (_now.isBefore(t.maghrib)) return Prayer.asr;
-    if (_now.isBefore(t.isha)) return Prayer.maghrib;
-    return Prayer.isha;
-  }
-
-  Prayer _nextPrayer(PrayerTimes t) {
-    if (_now.isBefore(t.fajr)) return Prayer.fajr;
-    if (_now.isBefore(t.dhuhr)) return Prayer.dhuhr;
-    if (_now.isBefore(t.asr)) return Prayer.asr;
-    if (_now.isBefore(t.maghrib)) return Prayer.maghrib;
-    if (_now.isBefore(t.isha)) return Prayer.isha;
-    return Prayer.fajr;
-  }
-
   DateTime _timeOf(PrayerTimes t, Prayer prayer) {
-    return t.timeForCustomPrayer(prayer) ?? DateTime.now();
-  }
-
-  DateTime _currentPrayerTime(PrayerTimes t) {
-    final current = _currentPrayer(t);
-    if (current == Prayer.isha && _now.isBefore(t.fajr)) {
-      return t.isha.subtract(const Duration(days: 1));
-    }
-    return _timeOf(t, current);
-  }
-
-  DateTime _nextPrayerTime(PrayerTimes today, PrayerTimes tomorrow) {
-    final next = _nextPrayer(today);
-    if (next == Prayer.fajr && !_now.isBefore(today.fajr)) return tomorrow.fajr;
-    return _timeOf(today, next);
+    return t.timeForCustomPrayer(prayer) ?? _now;
   }
 
   double _progress(DateTime start, DateTime end) {
@@ -275,10 +244,10 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
     required bool isDark,
     required AppLocalizations l10n,
   }) {
-    final current = _currentPrayer(today);
-    final next = _nextPrayer(today);
-    final currentTime = _currentPrayerTime(today);
-    final nextTime = _nextPrayerTime(today, tomorrow);
+    final current = today.currentPrayerExtension(date: _now);
+    final next = today.nextPrayerExtension(date: _now);
+    final currentTime = today.currentPrayerDateTime(now: _now);
+    final nextTime = today.nextPrayerDateTime(now: _now);
     final progress = _progress(currentTime, nextTime);
     final locationHint =
         "${state.latLon!.latitude.toStringAsFixed(2)}, ${state.latLon!.longitude.toStringAsFixed(2)}";

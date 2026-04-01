@@ -11,7 +11,7 @@ import "package:al_quran_v3/src/theme/controller/theme_state.dart";
 import "package:camera/camera.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
-import "package:flutter_compass/flutter_compass.dart";
+import "package:flutter_qiblah/flutter_qiblah.dart" as fq;
 import "package:flutter_svg/flutter_svg.dart";
 import "package:gap/gap.dart";
 import "package:vibration/vibration.dart";
@@ -30,10 +30,12 @@ class _ARQiblaScreenState extends State<ARQiblaScreen> {
   bool _alignedLatch = false;
   bool _hasVibrator = false;
   bool _hasAmplitudeSupport = false;
+  late final Future<bool?> _sensorSupportFuture;
 
   @override
   void initState() {
     super.initState();
+    _sensorSupportFuture = fq.FlutterQiblah.androidDeviceSensorSupport();
     _initCamera();
     _initVibration();
   }
@@ -166,38 +168,62 @@ class _ARQiblaScreenState extends State<ARQiblaScreen> {
                       );
                     }
 
-                    return StreamBuilder<CompassEvent>(
-                      stream: FlutterCompass.events,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          return _buildUnavailableOverlay(
-                            title: "تعذر قراءة البوصلة",
-                            subtitle: l10n.unableToGetCompassData,
+                    return FutureBuilder<bool?>(
+                      future: _sensorSupportFuture,
+                      builder: (context, supportSnapshot) {
+                        if (supportSnapshot.connectionState !=
+                            ConnectionState.done) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: themeState.primary,
+                            ),
                           );
                         }
 
-                        final rawHeading = snapshot.data?.heading;
-                        if (rawHeading == null) {
+                        if (supportSnapshot.data == false) {
                           return _buildUnavailableOverlay(
-                            title: "الحساسات غير متاحة",
-                            subtitle: l10n.deviceDoesNotHaveSensors,
+                            title: "حساسات القبلة غير مدعومة",
+                            subtitle:
+                                "هذا الجهاز لا يوفّر حساس اتجاه مناسب لقراءة قبلة دقيقة.",
                           );
                         }
 
-                        _smoothedHeading = smoothHeading(
-                          previousDegrees: _smoothedHeading,
-                          nextDegrees: rawHeading,
-                        );
+                        return StreamBuilder<fq.QiblahDirection>(
+                          stream: fq.FlutterQiblah.qiblahStream,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return _buildUnavailableOverlay(
+                                title: "تعذر قراءة البوصلة",
+                                subtitle: l10n.unableToGetCompassData,
+                              );
+                            }
 
-                        final guidance = resolveQiblaGuidance(
-                          headingDegrees: _smoothedHeading!,
-                          qiblaDegrees: state.kaabaAngle!,
-                        );
-                        _handleAlignment(guidance);
+                            final rawHeading = snapshot.data?.direction;
+                            if (rawHeading == null || !rawHeading.isFinite) {
+                              return _buildUnavailableOverlay(
+                                title: "الحساسات غير متاحة",
+                                subtitle: l10n.deviceDoesNotHaveSensors,
+                              );
+                            }
 
-                        return _buildArOverlay(
-                          guidance: guidance,
-                          themeState: themeState,
+                            _smoothedHeading = smoothHeading(
+                              previousDegrees: _smoothedHeading,
+                              nextDegrees: rawHeading,
+                              factor: 0.24,
+                              jitterThreshold: 0.35,
+                            );
+
+                            final guidance = resolveQiblaGuidance(
+                              headingDegrees: _smoothedHeading!,
+                              qiblaDegrees: state.kaabaAngle!,
+                            );
+                            _handleAlignment(guidance);
+
+                            return _buildArOverlay(
+                              guidance: guidance,
+                              themeState: themeState,
+                            );
+                          },
                         );
                       },
                     );

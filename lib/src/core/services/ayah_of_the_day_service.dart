@@ -256,7 +256,7 @@ class AyahOfTheDayService {
 
       await HomeWidget.renderFlutterWidget(
         widgetPreview,
-        logicalSize: const Size(800, 400),
+        logicalSize: AyahWidgetDesign.canvasSize,
         key: 'ayah_image',
       );
     } catch (e) {

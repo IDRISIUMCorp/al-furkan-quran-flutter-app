@@ -11,7 +11,7 @@ import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
 import "package:al_quran_v3/src/theme/controller/theme_state.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
-import "package:flutter_compass/flutter_compass.dart";
+import "package:flutter_qiblah/flutter_qiblah.dart" as fq;
 import "package:flutter_svg/flutter_svg.dart";
 import "package:gap/gap.dart";
 import "package:vibration/vibration.dart";
@@ -30,10 +30,12 @@ class _QiblaDirectionState extends State<QiblaDirection> {
   bool _alignedLatch = false;
   bool _hasVibrator = false;
   bool _hasAmplitudeSupport = false;
+  late final Future<bool?> _sensorSupportFuture;
 
   @override
   void initState() {
     super.initState();
+    _sensorSupportFuture = fq.FlutterQiblah.androidDeviceSensorSupport();
     _initVibration();
   }
 
@@ -111,16 +113,24 @@ class _QiblaDirectionState extends State<QiblaDirection> {
           const Gap(4),
         ],
       ),
-      body:
-          BlocBuilder<
-            LocationQiblaPrayerDataCubit,
-            LocationQiblaPrayerDataState
-          >(
-            builder: (context, state) {
-              if (state.latLon == null) {
-                return const LocationAcquire();
-              }
-              if (state.kaabaAngle == null) {
+      body: BlocBuilder<LocationQiblaPrayerDataCubit, LocationQiblaPrayerDataState>(
+        builder: (context, state) {
+          if (state.latLon == null) {
+            return const LocationAcquire();
+          }
+          if (state.kaabaAngle == null) {
+            return Center(
+              child: CircularProgressIndicator(
+                color: themeState.primary,
+                backgroundColor: themeState.primaryShade100,
+              ),
+            );
+          }
+
+          return FutureBuilder<bool?>(
+            future: _sensorSupportFuture,
+            builder: (context, supportSnapshot) {
+              if (supportSnapshot.connectionState != ConnectionState.done) {
                 return Center(
                   child: CircularProgressIndicator(
                     color: themeState.primary,
@@ -129,8 +139,17 @@ class _QiblaDirectionState extends State<QiblaDirection> {
                 );
               }
 
-              return StreamBuilder<CompassEvent>(
-                stream: FlutterCompass.events,
+              if (supportSnapshot.data == false) {
+                return _buildUnavailableState(
+                  icon: Icons.sensors_off_rounded,
+                  title: "حساسات القبلة غير مدعومة",
+                  subtitle:
+                      "هذا الجهاز لا يوفّر حساس اتجاه مناسب لقراءة قبلة دقيقة.",
+                );
+              }
+
+              return StreamBuilder<fq.QiblahDirection>(
+                stream: fq.FlutterQiblah.qiblahStream,
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return _buildUnavailableState(
@@ -140,8 +159,8 @@ class _QiblaDirectionState extends State<QiblaDirection> {
                     );
                   }
 
-                  final rawHeading = snapshot.data?.heading;
-                  if (rawHeading == null) {
+                  final rawHeading = snapshot.data?.direction;
+                  if (rawHeading == null || !rawHeading.isFinite) {
                     return _buildUnavailableState(
                       icon: Icons.sensors_off_rounded,
                       title: "الحساسات غير متاحة",
@@ -152,6 +171,8 @@ class _QiblaDirectionState extends State<QiblaDirection> {
                   _smoothedHeading = smoothHeading(
                     previousDegrees: _smoothedHeading,
                     nextDegrees: rawHeading,
+                    factor: 0.24,
+                    jitterThreshold: 0.35,
                   );
 
                   final guidance = resolveQiblaGuidance(
@@ -169,7 +190,9 @@ class _QiblaDirectionState extends State<QiblaDirection> {
                 },
               );
             },
-          ),
+          );
+        },
+      ),
     );
   }
 

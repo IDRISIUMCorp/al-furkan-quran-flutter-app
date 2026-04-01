@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:al_quran_v3/src/model/ayah_image_settings.dart';
 import 'package:al_quran_v3/src/resources/quran_resources/quran_pages_info.dart';
@@ -162,8 +162,12 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
       _pageMaxVerse = _totalVerses;
       return;
     }
-    _pageMinVerse = surahAyahs.map((e) => e.value).reduce((a, b) => a < b ? a : b);
-    _pageMaxVerse = surahAyahs.map((e) => e.value).reduce((a, b) => a > b ? a : b);
+    _pageMinVerse = surahAyahs
+        .map((e) => e.value)
+        .reduce((a, b) => a < b ? a : b);
+    _pageMaxVerse = surahAyahs
+        .map((e) => e.value)
+        .reduce((a, b) => a > b ? a : b);
   }
 
   void _updateTotalVerses() {
@@ -189,7 +193,8 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
     // Smart height estimation: block tafsir if image would exceed 2x canvas width (2800px)
     final int totalTextLength = _calculateRawTextLength();
     final int verseCount = _toVerse - _fromVerse + 1;
-    final int estimatedHeight = (verseCount * 180) + (totalTextLength ~/ 3) + 400;
+    final int estimatedHeight =
+        (verseCount * 180) + (totalTextLength ~/ 3) + 400;
 
     if (estimatedHeight > 2800) {
       if (mounted) {
@@ -199,7 +204,10 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("╪º┘ä┘å╪╡ ╪╖┘ê┘è┘ä ╪¼╪»╪º┘ï ┘ä╪Ñ╪╢╪º┘ü╪⌐ ╪¬┘ü╪│┘è╪▒ ΓÇö ╪º┘ä╪╡┘ê╪▒╪⌐ ┘ç╪¬┘â┘ê┘å ╪ú┘â╪¿╪▒ ┘à┘å ╪º┘ä┘à╪│┘à┘ê╪¡", textDirection: TextDirection.rtl),
+            content: Text(
+              "╪º┘ä┘å╪╡ ╪╖┘ê┘è┘ä ╪¼╪»╪º┘ï ┘ä╪Ñ╪╢╪º┘ü╪⌐ ╪¬┘ü╪│┘è╪▒ ΓÇö ╪º┘ä╪╡┘ê╪▒╪⌐ ┘ç╪¬┘â┘ê┘å ╪ú┘â╪¿╪▒ ┘à┘å ╪º┘ä┘à╪│┘à┘ê╪¡",
+              textDirection: TextDirection.rtl,
+            ),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -208,7 +216,7 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
     }
 
     setState(() => _isLoadingTafsir = true);
-    
+
     final buffer = StringBuffer();
     for (int v = _fromVerse; v <= _toVerse; v++) {
       final String? t = await QuranTafsirFunction.getResolvedTafsirTextForBook(
@@ -225,7 +233,9 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
 
     if (mounted) {
       setState(() {
-        _resolvedTafsirText = buffer.toString().trim().isEmpty ? null : buffer.toString().trim();
+        _resolvedTafsirText = buffer.toString().trim().isEmpty
+            ? null
+            : buffer.toString().trim();
         _isLoadingTafsir = false;
       });
     }
@@ -240,7 +250,18 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
   }
 
   String _toArabicDigits(String number) {
-    const arabics = ['┘á', '┘í', '┘ó', '┘ú', '┘ñ', '┘Ñ', '┘ª', '┘º', '┘¿', '┘⌐'];
+    const arabics = [
+      '┘á',
+      '┘í',
+      '┘ó',
+      '┘ú',
+      '┘ñ',
+      '┘Ñ',
+      '┘ª',
+      '┘º',
+      '┘¿',
+      '┘⌐',
+    ];
     final buffer = StringBuffer();
     for (final ch in number.split('')) {
       final digit = int.tryParse(ch);
@@ -255,16 +276,16 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
 
   String _cleanAyahText(String originalText) {
     if (originalText.contains(":") && !originalText.contains(" ")) {
-       // Likely a reference key like "2:10" that survived the fallback
-       return ""; 
+      // Likely a reference key like "2:10" that survived the fallback
+      return "";
     }
     var t = originalText.trimRight();
     t = t.replaceAll(RegExp(r"[\s\u06DD█¥]+$"), "");
     t = t.replaceAll(RegExp(r"[\s0-9\u0660-\u0669]+$"), "");
-    
+
     // If we stripped too much, return original
     if (t.trim().isEmpty && originalText.isNotEmpty) return originalText;
-    
+
     return t.trimRight();
   }
 
@@ -309,7 +330,9 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
 
       if (_showBranding) {
         buffer.writeln();
-        buffer.writeln("╪¬┘à╪¬ ╪º┘ä┘à╪┤╪º╪▒┘â╪⌐ ┘à┘å ╪¬╪╖╪¿┘è┘é ╪º┘ä┘ü╪▒┘é╪º┘å");
+        buffer.writeln(
+          "╪¬┘à╪¬ ╪º┘ä┘à╪┤╪º╪▒┘â╪⌐ ┘à┘å ╪¬╪╖╪¿┘è┘é ╪º┘ä┘ü╪▒┘é╪º┘å",
+        );
         buffer.writeln("github.com/IDRISIUMCorp/al-furkan-quran-flutter-app");
       }
 
@@ -322,7 +345,9 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final themeState = context.read<ThemeCubit>().state;
     final bgColor = isDark ? const Color(0xFF0B0B0C) : const Color(0xFFF7F1E6);
-    final cardColor = isDark ? const Color(0xFF1B1B1B) : const Color(0xFFFFF9F2);
+    final cardColor = isDark
+        ? const Color(0xFF1B1B1B)
+        : const Color(0xFFFFF9F2);
     final primary = themeState.primary;
 
     return Container(
@@ -371,13 +396,29 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.05)
+                      : Colors.black.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                   children: [
-                    _buildTab(1, "┘å╪╡", Icons.text_snippet_rounded, primary, cardColor, isDark),
-                    _buildTab(0, "╪╡┘ê╪▒╪⌐", Icons.image_rounded, primary, cardColor, isDark),
+                    _buildTab(
+                      1,
+                      "┘å╪╡",
+                      Icons.text_snippet_rounded,
+                      primary,
+                      cardColor,
+                      isDark,
+                    ),
+                    _buildTab(
+                      0,
+                      "╪╡┘ê╪▒╪⌐",
+                      Icons.image_rounded,
+                      primary,
+                      cardColor,
+                      isDark,
+                    ),
                   ],
                 ),
               ),
@@ -396,7 +437,10 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                     : Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                           decoration: BoxDecoration(
                             color: cardColor,
                             borderRadius: BorderRadius.circular(16),
@@ -416,15 +460,26 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                                 Expanded(
                                   flex: 3,
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      const Text("╪│┘ê╪▒╪⌐", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                                      const Text(
+                                        "╪│┘ê╪▒╪⌐",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 13,
+                                        ),
+                                      ),
                                       const SizedBox(height: 6),
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                        ),
                                         decoration: BoxDecoration(
                                           color: bgColor,
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
                                         ),
                                         child: DropdownButtonHideUnderline(
                                           child: DropdownButton<int>(
@@ -436,8 +491,12 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                                                 value: i + 1,
                                                 child: Text(
                                                   "${i + 1}. ${getSurahNameArabic(i + 1)}",
-                                                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-                                                  overflow: TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 14,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
                                               ),
                                             ),
@@ -462,15 +521,26 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                                 Expanded(
                                   flex: 2,
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      const Text("┘à┘å", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                                      const Text(
+                                        "┘à┘å",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 13,
+                                        ),
+                                      ),
                                       const SizedBox(height: 6),
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                        ),
                                         decoration: BoxDecoration(
                                           color: bgColor,
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
                                         ),
                                         child: DropdownButtonHideUnderline(
                                           child: DropdownButton<int>(
@@ -481,8 +551,14 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                                               (i) => DropdownMenuItem(
                                                 value: _pageMinVerse + i,
                                                 child: Text(
-                                                  _toArabicDigits((_pageMinVerse + i).toString()),
-                                                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                                  _toArabicDigits(
+                                                    (_pageMinVerse + i)
+                                                        .toString(),
+                                                  ),
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 14,
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -490,7 +566,9 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                                               if (v != null) {
                                                 setState(() {
                                                   _fromVerse = v;
-                                                  if (_toVerse < _fromVerse) _toVerse = _fromVerse;
+                                                  if (_toVerse < _fromVerse) {
+                                                    _toVerse = _fromVerse;
+                                                  }
                                                   _updateTotalVerses();
                                                 });
                                               }
@@ -506,15 +584,26 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                                 Expanded(
                                   flex: 2,
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      const Text("╪Ñ┘ä┘ë", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                                      const Text(
+                                        "╪Ñ┘ä┘ë",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 13,
+                                        ),
+                                      ),
                                       const SizedBox(height: 6),
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                        ),
                                         decoration: BoxDecoration(
                                           color: bgColor,
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
                                         ),
                                         child: DropdownButtonHideUnderline(
                                           child: DropdownButton<int>(
@@ -525,8 +614,13 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                                               (i) => DropdownMenuItem(
                                                 value: _fromVerse + i,
                                                 child: Text(
-                                                  _toArabicDigits((_fromVerse + i).toString()),
-                                                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                                  _toArabicDigits(
+                                                    (_fromVerse + i).toString(),
+                                                  ),
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 14,
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -580,7 +674,11 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                         if (_shareMode == 0)
                           IconButton(
                             icon: Icon(
-                              _shareFullPage ? FluentIcons.document_page_bottom_center_24_filled : FluentIcons.document_page_bottom_center_24_regular,
+                              _shareFullPage
+                                  ? FluentIcons
+                                        .document_page_bottom_center_24_filled
+                                  : FluentIcons
+                                        .document_page_bottom_center_24_regular,
                               color: _shareFullPage ? primary : null,
                             ),
                             tooltip: '┘à╪┤╪º╪▒┘â╪⌐ ╪º┘ä╪╡┘ü╪¡╪⌐ ┘â╪º┘à┘ä╪⌐',
@@ -598,40 +696,52 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                         if (_shareMode == 0)
                           IconButton(
                             icon: Icon(
-                              _forceDarkMode ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+                              _forceDarkMode
+                                  ? Icons.dark_mode_rounded
+                                  : Icons.light_mode_rounded,
                               color: _forceDarkMode ? primary : null,
                             ),
-                            onPressed: () => setState(() => _forceDarkMode = !_forceDarkMode),
+                            onPressed: () => setState(
+                              () => _forceDarkMode = !_forceDarkMode,
+                            ),
                           ),
 
                         IconButton(
                           icon: Icon(
-                            _showBranding ? FluentIcons.person_board_24_filled : FluentIcons.person_board_24_regular,
+                            _showBranding
+                                ? FluentIcons.person_board_24_filled
+                                : FluentIcons.person_board_24_regular,
                             color: _showBranding ? primary : null,
                           ),
                           tooltip: '╪Ñ╪╕┘ç╪º╪▒ ╪º┘ä┘ç┘ê┘è╪⌐',
-                          onPressed: () => setState(() => _showBranding = !_showBranding),
+                          onPressed: () =>
+                              setState(() => _showBranding = !_showBranding),
                         ),
 
                         // Alignment Toggle
                         if (_shareMode == 0)
                           IconButton(
                             icon: Icon(
-                              _settings.ayahTextAlign == AyahImageTextAlign.center
+                              _settings.ayahTextAlign ==
+                                      AyahImageTextAlign.center
                                   ? Icons.format_align_center_rounded
-                                  : _settings.ayahTextAlign == AyahImageTextAlign.right
-                                      ? Icons.format_align_right_rounded
-                                      : Icons.format_align_justify_rounded,
+                                  : _settings.ayahTextAlign ==
+                                        AyahImageTextAlign.right
+                                  ? Icons.format_align_right_rounded
+                                  : Icons.format_align_justify_rounded,
                             ),
                             onPressed: () {
                               setState(() {
                                 final current = _settings.ayahTextAlign;
-                                final next = current == AyahImageTextAlign.center
+                                final next =
+                                    current == AyahImageTextAlign.center
                                     ? AyahImageTextAlign.right
                                     : current == AyahImageTextAlign.right
-                                        ? AyahImageTextAlign.justify
-                                        : AyahImageTextAlign.center;
-                                _settings = _settings.copyWith(ayahTextAlign: next);
+                                    ? AyahImageTextAlign.justify
+                                    : AyahImageTextAlign.center;
+                                _settings = _settings.copyWith(
+                                  ayahTextAlign: next,
+                                );
                               });
                             },
                           ),
@@ -641,7 +751,9 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                           IconButton(
                             icon: Icon(
                               Icons.font_download_rounded,
-                              color: _shareFontFamily != 'default' ? primary : null,
+                              color: _shareFontFamily != 'default'
+                                  ? primary
+                                  : null,
                             ),
                             tooltip: '╪º╪«╪¬┘è╪º╪▒ ╪º┘ä╪«╪╖',
                             onPressed: _showFontGalleryModal,
@@ -668,13 +780,20 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                         const SizedBox(width: 4),
                         TextButton.icon(
                           style: TextButton.styleFrom(
-                            foregroundColor: _selectedTafsirBook != null ? primary : (isDark ? Colors.white : Colors.black),
+                            foregroundColor: _selectedTafsirBook != null
+                                ? primary
+                                : (isDark ? Colors.white : Colors.black),
                           ),
                           onPressed: _showTafsirSelector,
                           icon: const Icon(FluentIcons.book_open_24_regular),
                           label: Text(
-                            _selectedTafsirBook != null ? _selectedTafsirBook!.name : "╪¬┘ü╪│┘è╪▒",
-                            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 11),
+                            _selectedTafsirBook != null
+                                ? _selectedTafsirBook!.name
+                                : "╪¬┘ü╪│┘è╪▒",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 11,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -693,10 +812,15 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
             Expanded(
               child: Container(
                 width: double.infinity,
-                color: isDark ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.03),
+                color: isDark
+                    ? Colors.black.withValues(alpha: 0.2)
+                    : Colors.black.withValues(alpha: 0.03),
                 child: Center(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 20,
+                      horizontal: 16,
+                    ),
                     child: _shareMode == 0
                         ? Screenshot(
                             controller: _screenshotController,
@@ -725,11 +849,21 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                   ),
                   onPressed: _isSharing ? null : _share,
                   icon: _isSharing
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : const Icon(Icons.share_rounded),
                   label: Text(
                     _isSharing ? "╪¼╪º╪▒┘è ╪º┘ä╪¬╪¼┘ç┘è╪▓..." : "┘à╪┤╪º╪▒┘â╪⌐",
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
               ),
@@ -740,7 +874,14 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
     );
   }
 
-  Widget _buildTab(int mode, String label, IconData icon, Color primary, Color cardColor, bool isDark) {
+  Widget _buildTab(
+    int mode,
+    String label,
+    IconData icon,
+    Color primary,
+    Color cardColor,
+    bool isDark,
+  ) {
     final isSelected = _shareMode == mode;
     return Expanded(
       child: GestureDetector(
@@ -758,7 +899,9 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
               Icon(
                 icon,
                 size: 20,
-                color: isSelected ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                color: isSelected
+                    ? Colors.white
+                    : (isDark ? Colors.white70 : Colors.black87),
               ),
               const SizedBox(width: 8),
               Text(
@@ -766,7 +909,9 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                  color: isSelected ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                  color: isSelected
+                      ? Colors.white
+                      : (isDark ? Colors.white70 : Colors.black87),
                 ),
               ),
             ],
@@ -781,23 +926,39 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? const Color(0xFF0B0B0C) : const Color(0xFFF7F1E6);
     final cardColor = isDark ? const Color(0xFF1B1B1B) : Colors.white;
-    final List<String> googleFonts = ['Amiri', 'Cairo', 'Tajawal', 'Lalezar', 'Almarai', 'Changa', 'El Messiri'];
-    
+    final List<String> googleFonts = [
+      'Amiri',
+      'Cairo',
+      'Tajawal',
+      'Lalezar',
+      'Almarai',
+      'Changa',
+      'El Messiri',
+    ];
+
     // Get preview text from actual content
-    final String ayahPreview = _cleanAyahText(widget.getAyahText(_selectedSurah, _fromVerse));
-    final String shortAyah = ayahPreview.length > 60 ? '${ayahPreview.substring(0, 60)}...' : ayahPreview;
-    final String tafsirPreview = _resolvedTafsirText != null 
-        ? (_resolvedTafsirText!.length > 80 ? '${_resolvedTafsirText!.substring(0, 80)}...' : _resolvedTafsirText!)
+    final String ayahPreview = _cleanAyahText(
+      widget.getAyahText(_selectedSurah, _fromVerse),
+    );
+    final String shortAyah = ayahPreview.length > 60
+        ? '${ayahPreview.substring(0, 60)}...'
+        : ayahPreview;
+    final String tafsirPreview = _resolvedTafsirText != null
+        ? (_resolvedTafsirText!.length > 80
+              ? '${_resolvedTafsirText!.substring(0, 80)}...'
+              : _resolvedTafsirText!)
         : '┘à╪╣╪º┘è┘å╪⌐ ┘å╪╡ ╪º┘ä╪¬┘ü╪│┘è╪▒';
-    
+
     // Auto-select Tafsir tab if tafsir is active
     final int initialTab = _resolvedTafsirText != null ? 1 : 0;
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: bgColor,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (ctx) {
         return DraggableScrollableSheet(
           initialChildSize: 0.8,
@@ -813,14 +974,30 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                 child: Column(
                   children: [
                     const SizedBox(height: 12),
-                    Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(2))),
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       child: Row(
                         children: [
                           Icon(Icons.font_download_rounded, color: primary),
                           const SizedBox(width: 8),
-                          const Text("╪º╪«╪¬╪▒ ┘å┘ê╪╣ ╪º┘ä╪«╪╖", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+                          const Text(
+                            "╪º╪«╪¬╪▒ ┘å┘ê╪╣ ╪º┘ä╪«╪╖",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -829,10 +1006,19 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                       unselectedLabelColor: Colors.grey,
                       indicatorColor: primary,
                       tabs: [
-                        const Tab(text: "╪«╪╖ ╪º┘ä╪ó┘è╪⌐", icon: Icon(Icons.menu_book_rounded, size: 18)),
+                        const Tab(
+                          text: "╪«╪╖ ╪º┘ä╪ó┘è╪⌐",
+                          icon: Icon(Icons.menu_book_rounded, size: 18),
+                        ),
                         Tab(
                           text: "╪«╪╖ ╪º┘ä╪¬┘ü╪│┘è╪▒",
-                          icon: Icon(Icons.auto_stories_rounded, size: 18, color: _resolvedTafsirText == null ? Colors.grey.withValues(alpha: 0.3) : null),
+                          icon: Icon(
+                            Icons.auto_stories_rounded,
+                            size: 18,
+                            color: _resolvedTafsirText == null
+                                ? Colors.grey.withValues(alpha: 0.3)
+                                : null,
+                          ),
                         ),
                       ],
                     ),
@@ -850,50 +1036,73 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                             isSelectedGoogle: _isShareFontGoogle,
                             defaultLabel: '╪«╪╖ ╪º┘ä┘à╪╡╪¡┘ü (QCF)',
                             onSelect: (fontId, isGoogle) {
-                              setState(() { _shareFontFamily = fontId; _isShareFontGoogle = isGoogle; });
+                              setState(() {
+                                _shareFontFamily = fontId;
+                                _isShareFontGoogle = isGoogle;
+                              });
                               Navigator.pop(ctx);
                             },
                             onReset: () {
-                              setState(() { _shareFontFamily = 'default'; _isShareFontGoogle = false; });
+                              setState(() {
+                                _shareFontFamily = 'default';
+                                _isShareFontGoogle = false;
+                              });
                               Navigator.pop(ctx);
                             },
                           ),
                           // Tab 2: Tafsir Font (only active if tafsir is selected)
                           _resolvedTafsirText != null
-                            ? _buildFontGrid(
-                            scrollController: scrollController,
-                            cardColor: cardColor,
-                            primary: primary,
-                            googleFonts: googleFonts,
-                            previewText: tafsirPreview,
-                            selectedFont: _tafsirFontFamily,
-                            isSelectedGoogle: _isTafsirFontGoogle,
-                            defaultLabel: '╪º┘ä╪«╪╖ ╪º┘ä╪º┘ü╪¬╪▒╪º╪╢┘è',
-                            onSelect: (fontId, isGoogle) {
-                              setState(() { _tafsirFontFamily = fontId; _isTafsirFontGoogle = isGoogle; });
-                              Navigator.pop(ctx);
-                            },
-                            onReset: () {
-                              setState(() { _tafsirFontFamily = 'default'; _isTafsirFontGoogle = false; });
-                              Navigator.pop(ctx);
-                            },
-                          )
-                            : Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(32),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.auto_stories_rounded, size: 48, color: Colors.grey.withValues(alpha: 0.3)),
-                                      const SizedBox(height: 16),
-                                      Text(
-                                        "\u0627\u062e\u062a\u0631 \u062a\u0641\u0633\u064a\u0631 \u0623\u0648\u0644\u0627\u064b \u0645\u0646 \u0627\u0644\u0623\u062f\u0648\u0627\u062a",
-                                        style: TextStyle(color: Colors.grey.withValues(alpha: 0.5), fontSize: 16),
-                                      ),
-                                    ],
+                              ? _buildFontGrid(
+                                  scrollController: scrollController,
+                                  cardColor: cardColor,
+                                  primary: primary,
+                                  googleFonts: googleFonts,
+                                  previewText: tafsirPreview,
+                                  selectedFont: _tafsirFontFamily,
+                                  isSelectedGoogle: _isTafsirFontGoogle,
+                                  defaultLabel: '╪º┘ä╪«╪╖ ╪º┘ä╪º┘ü╪¬╪▒╪º╪╢┘è',
+                                  onSelect: (fontId, isGoogle) {
+                                    setState(() {
+                                      _tafsirFontFamily = fontId;
+                                      _isTafsirFontGoogle = isGoogle;
+                                    });
+                                    Navigator.pop(ctx);
+                                  },
+                                  onReset: () {
+                                    setState(() {
+                                      _tafsirFontFamily = 'default';
+                                      _isTafsirFontGoogle = false;
+                                    });
+                                    Navigator.pop(ctx);
+                                  },
+                                )
+                              : Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(32),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.auto_stories_rounded,
+                                          size: 48,
+                                          color: Colors.grey.withValues(
+                                            alpha: 0.3,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          "\u0627\u062e\u062a\u0631 \u062a\u0641\u0633\u064a\u0631 \u0623\u0648\u0644\u0627\u064b \u0645\u0646 \u0627\u0644\u0623\u062f\u0648\u0627\u062a",
+                                          style: TextStyle(
+                                            color: Colors.grey.withValues(
+                                              alpha: 0.5,
+                                            ),
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
                         ],
                       ),
                     ),
@@ -927,7 +1136,10 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
             child: TextButton.icon(
               onPressed: onReset,
               icon: Icon(Icons.restart_alt_rounded, color: primary, size: 18),
-              label: Text("╪Ñ╪╣╪º╪»╪⌐ ╪º┘ä╪¬╪╣┘è┘è┘å ╪Ñ┘ä┘ë ╪º┘ä╪º┘ü╪¬╪▒╪º╪╢┘è", style: TextStyle(color: primary)),
+              label: Text(
+                "╪Ñ╪╣╪º╪»╪⌐ ╪º┘ä╪¬╪╣┘è┘è┘å ╪Ñ┘ä┘ë ╪º┘ä╪º┘ü╪¬╪▒╪º╪╢┘è",
+                style: TextStyle(color: primary),
+              ),
             ),
           ),
         Expanded(
@@ -943,10 +1155,11 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
             itemCount: 1 + AppFonts.customFonts.length + googleFonts.length,
             itemBuilder: (ctx, index) {
               final bool isDefault = index == 0;
-              final bool isGoogle = !isDefault && index > AppFonts.customFonts.length;
+              final bool isGoogle =
+                  !isDefault && index > AppFonts.customFonts.length;
               final String fontId;
               final String displayName;
-              
+
               if (isDefault) {
                 fontId = 'default';
                 displayName = defaultLabel;
@@ -957,21 +1170,34 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                 fontId = AppFonts.customFonts[index - 1];
                 displayName = fontId.replaceAll('-', ' ');
               }
-              
-              final isSelected = selectedFont == fontId && isSelectedGoogle == (isGoogle && !isDefault);
-              
+
+              final isSelected =
+                  selectedFont == fontId &&
+                  isSelectedGoogle == (isGoogle && !isDefault);
+
               return GestureDetector(
                 onTap: () => onSelect(fontId, isGoogle && !isDefault),
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: isSelected ? primary.withValues(alpha: 0.1) : cardColor,
+                    color: isSelected
+                        ? primary.withValues(alpha: 0.1)
+                        : cardColor,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: isSelected ? primary : Colors.grey.withValues(alpha: 0.12),
+                      color: isSelected
+                          ? primary
+                          : Colors.grey.withValues(alpha: 0.12),
                       width: isSelected ? 2 : 1,
                     ),
-                    boxShadow: isSelected ? [BoxShadow(color: primary.withValues(alpha: 0.1), blurRadius: 8)] : null,
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: primary.withValues(alpha: 0.1),
+                              blurRadius: 8,
+                            ),
+                          ]
+                        : null,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -984,11 +1210,25 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
                             textDirection: TextDirection.rtl,
-                            style: isDefault 
-                              ? TextStyle(fontSize: 16, color: isSelected ? primary : null, fontWeight: FontWeight.bold)
-                              : (isGoogle 
-                                  ? GoogleFonts.getFont(fontId, fontSize: 16, color: isSelected ? primary : null, height: 1.6) 
-                                  : TextStyle(fontFamily: fontId, fontSize: 16, color: isSelected ? primary : null, height: 1.6)),
+                            style: isDefault
+                                ? TextStyle(
+                                    fontSize: 16,
+                                    color: isSelected ? primary : null,
+                                    fontWeight: FontWeight.bold,
+                                  )
+                                : (isGoogle
+                                      ? GoogleFonts.getFont(
+                                          fontId,
+                                          fontSize: 16,
+                                          color: isSelected ? primary : null,
+                                          height: 1.6,
+                                        )
+                                      : TextStyle(
+                                          fontFamily: fontId,
+                                          fontSize: 16,
+                                          color: isSelected ? primary : null,
+                                          height: 1.6,
+                                        )),
                           ),
                         ),
                       ),
@@ -998,7 +1238,15 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 10, color: isSelected ? primary : Colors.grey.withValues(alpha: 0.6), fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: isSelected
+                              ? primary
+                              : Colors.grey.withValues(alpha: 0.6),
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
                       ),
                     ],
                   ),
@@ -1014,10 +1262,15 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
   void _showTafsirSelector() {
     final books = QuranTafsirFunction.getDownloadedTafsirBooks();
     if (!mounted) return;
-    
+
     if (books.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("┘ä╪º ╪¬┘ê╪¼╪» ╪¬┘ü╪º╪│┘è╪▒ ┘à╪¡┘à┘ä╪⌐.", textDirection: TextDirection.rtl)),
+        const SnackBar(
+          content: Text(
+            "┘ä╪º ╪¬┘ê╪¼╪» ╪¬┘ü╪º╪│┘è╪▒ ┘à╪¡┘à┘ä╪⌐.",
+            textDirection: TextDirection.rtl,
+          ),
+        ),
       );
       return;
     }
@@ -1026,7 +1279,9 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
       context: context,
       useRootNavigator: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+      ),
       builder: (ctx) {
         return Directionality(
           textDirection: TextDirection.rtl,
@@ -1036,26 +1291,35 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
               children: [
                 const Padding(
                   padding: EdgeInsets.all(16),
-                  child: Text("╪º╪«╪¬╪▒ ╪º┘ä╪¬┘ü╪│┘è╪▒", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+                  child: Text(
+                    "╪º╪«╪¬╪▒ ╪º┘ä╪¬┘ü╪│┘è╪▒",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                  ),
                 ),
                 ListTile(
                   title: const Text("╪¿╪»┘ê┘å ╪¬┘ü╪│┘è╪▒"),
-                  trailing: _selectedTafsirBook == null ? const Icon(Icons.check_circle, color: Colors.green) : null,
+                  trailing: _selectedTafsirBook == null
+                      ? const Icon(Icons.check_circle, color: Colors.green)
+                      : null,
                   onTap: () {
                     setState(() => _selectedTafsirBook = null);
                     _fetchTafsirIfSelected();
                     Navigator.pop(ctx);
                   },
                 ),
-                ...books.map((b) => ListTile(
-                  title: Text(b.name),
-                  trailing: _selectedTafsirBook?.fullPath == b.fullPath ? const Icon(Icons.check_circle, color: Colors.green) : null,
-                  onTap: () {
-                    setState(() => _selectedTafsirBook = b);
-                    _fetchTafsirIfSelected();
-                    Navigator.pop(ctx);
-                  },
-                )),
+                ...books.map(
+                  (b) => ListTile(
+                    title: Text(b.name),
+                    trailing: _selectedTafsirBook?.fullPath == b.fullPath
+                        ? const Icon(Icons.check_circle, color: Colors.green)
+                        : null,
+                    onTap: () {
+                      setState(() => _selectedTafsirBook = b);
+                      _fetchTafsirIfSelected();
+                      Navigator.pop(ctx);
+                    },
+                  ),
+                ),
               ],
             ),
           ),
@@ -1086,17 +1350,23 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                 child: Text.rich(
                   TextSpan(
                     children: [
-                      TextSpan(text: "${_cleanAyahText(widget.getAyahText(_selectedSurah, v))} "),
+                      TextSpan(
+                        text:
+                            "${_cleanAyahText(widget.getAyahText(_selectedSurah, v))} ",
+                      ),
                       TextSpan(
                         text: "∩┤┐${_toArabicDigits(v.toString())}∩┤╛",
-                        style: TextStyle(color: primary, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: primary,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
                   style: const TextStyle(fontSize: 20, height: 1.7),
                 ),
               ),
-            
+
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -1106,7 +1376,11 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
               ),
               child: Text(
                 "${getSurahNameArabic(_selectedSurah)} : ${_fromVerse == _toVerse ? _toArabicDigits(_fromVerse.toString()) : "${_toArabicDigits(_fromVerse.toString())} - ${_toArabicDigits(_toVerse.toString())}"}",
-                style: TextStyle(color: primary, fontWeight: FontWeight.w800, fontSize: 13),
+                style: TextStyle(
+                  color: primary,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 13,
+                ),
               ),
             ),
 
@@ -1170,7 +1444,9 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
           );
 
     final Color cardBgColor = isDark ? Colors.black : const Color(0xFFF7F1E6);
-    final Color tafsirBgColor = isDark ? const Color(0xFF111111) : const Color(0xFFEFE3D2);
+    final Color tafsirBgColor = isDark
+        ? const Color(0xFF111111)
+        : const Color(0xFFEFE3D2);
     final Color textColor = isDark ? Colors.white : const Color(0xFF1B1B1B);
 
     // Build multi-surah-aware content: group verses by surah for individual banners
@@ -1186,7 +1462,9 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
       for (final a in allAyahs) {
         if (a.key != currentSurah) {
           if (currentSurah != null && currentVerses.isNotEmpty) {
-            surahGroups.add(_SurahVerseGroup(currentSurah, List.of(currentVerses)));
+            surahGroups.add(
+              _SurahVerseGroup(currentSurah, List.of(currentVerses)),
+            );
           }
           currentSurah = a.key;
           currentVerses = [a.value];
@@ -1199,18 +1477,22 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
       }
     } else if (pageInfo != null) {
       // Normal mode: only selected range within single surah
-      surahGroups.add(_SurahVerseGroup(
-        _selectedSurah,
-        List.generate(_toVerse - _fromVerse + 1, (i) => _fromVerse + i),
-      ));
+      surahGroups.add(
+        _SurahVerseGroup(
+          _selectedSurah,
+          List.generate(_toVerse - _fromVerse + 1, (i) => _fromVerse + i),
+        ),
+      );
     }
 
     // Fallback: single surah group if page detection didn't work
     if (surahGroups.isEmpty) {
-      surahGroups.add(_SurahVerseGroup(
-        _selectedSurah,
-        List.generate(_toVerse - _fromVerse + 1, (i) => _fromVerse + i),
-      ));
+      surahGroups.add(
+        _SurahVerseGroup(
+          _selectedSurah,
+          List.generate(_toVerse - _fromVerse + 1, (i) => _fromVerse + i),
+        ),
+      );
     }
 
     // Build the content widgets for each surah group
@@ -1240,12 +1522,13 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
       for (final v in group.verses) {
         final int pageNumber = getPageNumber("${group.surahNumber}:$v") ?? 1;
         final String pageFont = "QCF_P${pageNumber.toString().padLeft(3, '0')}";
-        
+
         // Use custom font if user selected one, otherwise use QCF page font
         final bool useCustomFont = _shareFontFamily != 'default';
-        final String? customFontPackage = useCustomFont ? null : 'qcf_quran';
-        final String effectiveFont = useCustomFont ? _shareFontFamily : pageFont;
-        final String effectiveText = useCustomFont 
+        final String effectiveFont = useCustomFont
+            ? _shareFontFamily
+            : pageFont;
+        final String effectiveText = useCustomFont
             ? getVerse(group.surahNumber, v, verseEndSymbol: false)
             : getVerseQCF(group.surahNumber, v, verseEndSymbol: false);
         final String effectiveNumber = useCustomFont
@@ -1257,17 +1540,24 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
             text: effectiveText,
             style: useCustomFont
                 ? (_isShareFontGoogle
-                    ? GoogleFonts.getFont(effectiveFont, fontSize: _customFontSize, color: qcfTheme.verseTextColor, height: 2.1)
-                    : TextStyle(
-                        fontFamily: effectiveFont,
-                        fontSize: _customFontSize,
-                        color: qcfTheme.verseTextColor,
-                        height: 2.1,
-                        fontFamilyFallback: const ['Amiri-Regular', 'KFGQPC-Uthmanic-HAFS-Regular'],
-                      ))
+                      ? GoogleFonts.getFont(
+                          effectiveFont,
+                          fontSize: _customFontSize,
+                          color: qcfTheme.verseTextColor,
+                          height: 2.1,
+                        )
+                      : TextStyle(
+                          fontFamily: effectiveFont,
+                          fontSize: _customFontSize,
+                          color: qcfTheme.verseTextColor,
+                          height: 2.1,
+                          fontFamilyFallback: const [
+                            'Amiri-Regular',
+                            'KFGQPC-Uthmanic-HAFS-Regular',
+                          ],
+                        ))
                 : TextStyle(
                     fontFamily: effectiveFont,
-                    package: customFontPackage,
                     fontSize: _customFontSize,
                     color: qcfTheme.verseTextColor,
                     height: 2.1,
@@ -1286,7 +1576,6 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                   )
                 : TextStyle(
                     fontFamily: pageFont,
-                    package: 'qcf_quran',
                     fontSize: _customFontSize,
                     color: qcfTheme.verseNumberColor,
                     height: qcfTheme.verseNumberHeight,
@@ -1316,7 +1605,10 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
 
     // Tafsir title styling (matches AyahImageGenerator)
     final String tafsirTitle = _selectedTafsirBook?.name ?? "╪º┘ä╪¬┘ü╪│┘è╪▒";
-    final double titleFontSize = (44 - (tafsirTitle.length * 0.35)).clamp(36, 44);
+    final double titleFontSize = (44 - (tafsirTitle.length * 0.35)).clamp(
+      36,
+      44,
+    );
 
     final Widget contentColumn = Directionality(
       textDirection: TextDirection.rtl,
@@ -1369,13 +1661,21 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                   textAlign: TextAlign.right,
                   textDirection: TextDirection.rtl,
                   style: _tafsirFontFamily != 'default' && _isTafsirFontGoogle
-                      ? GoogleFonts.getFont(_tafsirFontFamily, fontSize: _tafsirFontSize, height: 2.2, fontWeight: FontWeight.w600, color: textColor)
+                      ? GoogleFonts.getFont(
+                          _tafsirFontFamily,
+                          fontSize: _tafsirFontSize,
+                          height: 2.2,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
+                        )
                       : TextStyle(
                           fontSize: _tafsirFontSize,
                           height: 2.2,
                           fontWeight: FontWeight.w600,
                           color: textColor,
-                          fontFamily: _tafsirFontFamily != 'default' ? _tafsirFontFamily : null,
+                          fontFamily: _tafsirFontFamily != 'default'
+                              ? _tafsirFontFamily
+                              : null,
                         ),
                 ),
               ),
@@ -1403,7 +1703,9 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.w900,
-                          color: isDark ? const Color(0xFFC09B5A) : const Color(0xFF33B18E),
+                          color: isDark
+                              ? const Color(0xFFC09B5A)
+                              : const Color(0xFF33B18E),
                         ),
                       ),
                       Text(
@@ -1453,72 +1755,75 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
     );
 
     // FittedBox scales the 1400px card down to fit the preview area
-    return FittedBox(
-      fit: BoxFit.fitWidth,
-      child: card,
-    );
+    return FittedBox(fit: BoxFit.fitWidth, child: card);
   }
 
   Widget _buildFontSizeButton(BuildContext context, Color primary) {
-     return IconButton(
-       icon: const Icon(Icons.format_size_rounded),
-       onPressed: () {
-         showDialog(
-           context: context,
-           builder: (context) => StatefulBuilder(
-             builder: (context, setDialogState) => AlertDialog(
-               title: const Text("╪¡╪¼┘à ╪º┘ä╪«╪╖", textAlign: TextAlign.right),
-               content: Column(
-                 mainAxisSize: MainAxisSize.min,
-                 children: [
-                   const Gap(16),
-                   const Text("╪¡╪¼┘à ╪º╪│┘à ╪º┘ä╪│┘ê╪▒╪⌐", textAlign: TextAlign.right),
-                   Slider(
-                     value: _surahNameScale,
-                     min: 0.5,
-                     max: 2.5,
-                     divisions: 20,
-                     label: _surahNameScale.toStringAsFixed(1),
-                     onChanged: (v) {
-                       setDialogState(() => _surahNameScale = v);
-                       setState(() => _surahNameScale = v);
-                     },
-                   ),
-                   const Gap(16),
-                   const Text("╪¡╪¼┘à ╪º┘ä╪¿╪º┘å╪▒", textAlign: TextAlign.right),
-                   Slider(
-                     value: _bannerScale,
-                     min: 0.5,
-                     max: 2.5,
-                     divisions: 20,
-                     label: _bannerScale.toStringAsFixed(1),
-                     onChanged: (v) {
-                       setDialogState(() => _bannerScale = v);
-                       setState(() => _bannerScale = v);
-                     },
-                   ),
-                   if (_selectedTafsirBook != null) ...[
-                     const Gap(16),
-                     const Text("╪¡╪¼┘à ╪º┘ä╪¬┘ü╪│┘è╪▒", textAlign: TextAlign.right),
-                     Slider(
-                       value: _tafsirFontSize,
-                       min: 24,
-                       max: 100,
-                       divisions: 38,
-                       label: _tafsirFontSize.round().toString(),
-                       onChanged: (v) {
-                         setDialogState(() => _tafsirFontSize = v);
-                         setState(() => _tafsirFontSize = v);
-                       },
-                     ),
-                   ],
-                 ],
-               ),
-             ),
-           ),
-         );
-       },
-     );
+    return IconButton(
+      icon: const Icon(Icons.format_size_rounded),
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (context) => StatefulBuilder(
+            builder: (context, setDialogState) => AlertDialog(
+              title: const Text("╪¡╪¼┘à ╪º┘ä╪«╪╖", textAlign: TextAlign.right),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Gap(16),
+                  const Text(
+                    "╪¡╪¼┘à ╪º╪│┘à ╪º┘ä╪│┘ê╪▒╪⌐",
+                    textAlign: TextAlign.right,
+                  ),
+                  Slider(
+                    value: _surahNameScale,
+                    min: 0.5,
+                    max: 2.5,
+                    divisions: 20,
+                    label: _surahNameScale.toStringAsFixed(1),
+                    onChanged: (v) {
+                      setDialogState(() => _surahNameScale = v);
+                      setState(() => _surahNameScale = v);
+                    },
+                  ),
+                  const Gap(16),
+                  const Text("╪¡╪¼┘à ╪º┘ä╪¿╪º┘å╪▒", textAlign: TextAlign.right),
+                  Slider(
+                    value: _bannerScale,
+                    min: 0.5,
+                    max: 2.5,
+                    divisions: 20,
+                    label: _bannerScale.toStringAsFixed(1),
+                    onChanged: (v) {
+                      setDialogState(() => _bannerScale = v);
+                      setState(() => _bannerScale = v);
+                    },
+                  ),
+                  if (_selectedTafsirBook != null) ...[
+                    const Gap(16),
+                    const Text(
+                      "╪¡╪¼┘à ╪º┘ä╪¬┘ü╪│┘è╪▒",
+                      textAlign: TextAlign.right,
+                    ),
+                    Slider(
+                      value: _tafsirFontSize,
+                      min: 24,
+                      max: 100,
+                      divisions: 38,
+                      label: _tafsirFontSize.round().toString(),
+                      onChanged: (v) {
+                        setDialogState(() => _tafsirFontSize = v);
+                        setState(() => _tafsirFontSize = v);
+                      },
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 

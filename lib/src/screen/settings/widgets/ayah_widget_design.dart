@@ -26,6 +26,8 @@ class AyahWidgetThemePreset {
 }
 
 class AyahWidgetDesign extends StatelessWidget {
+  static const Size canvasSize = Size(960, 420);
+
   final String ayahText;
   final String surahName;
   final Color primaryColor;
@@ -176,11 +178,11 @@ class AyahWidgetDesign extends StatelessWidget {
     final shouldUseGradient = isGradientBg || preset.prefersGradient;
 
     return Container(
-      width: 800,
-      height: 400,
+      width: canvasSize.width,
+      height: canvasSize.height,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(34),
+        borderRadius: BorderRadius.circular(38),
         gradient: shouldUseGradient
             ? LinearGradient(
                 begin: Alignment.topCenter,

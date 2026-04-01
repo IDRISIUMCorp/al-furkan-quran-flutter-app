@@ -63,7 +63,6 @@ class NonTajweedScriptView extends StatelessWidget {
         textAlign: scriptInfo.textAlign ?? TextAlign.center,
         style: TextStyle(
           fontFamily: pageFont,
-          package: "qcf_quran",
           fontSize: (quranStyle.fontSize ?? 24).clamp(22, 34),
           height: quranStyle.height ?? 2.0,
           color: quranStyle.color,

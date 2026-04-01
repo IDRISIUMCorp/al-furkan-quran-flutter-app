@@ -414,8 +414,8 @@ class _AyahWidgetSettingsViewState extends State<AyahWidgetSettingsView> {
                               _previewVerse,
                             ].join("_"),
                           ),
-                          width: 800,
-                          height: 400,
+                          width: AyahWidgetDesign.canvasSize.width,
+                          height: AyahWidgetDesign.canvasSize.height,
                           child: AyahWidgetDesign(
                             ayahText: _previewAyahText,
                             surahName: _previewSurahName,

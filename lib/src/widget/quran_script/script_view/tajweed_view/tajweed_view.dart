@@ -59,7 +59,6 @@ class TajweedView extends StatelessWidget {
         textAlign: scriptInfo.textAlign ?? TextAlign.center,
         style: TextStyle(
           fontFamily: pageFont,
-          package: "qcf_quran",
           fontSize: (quranStyle.fontSize ?? 24).clamp(22, 34),
           height: quranStyle.height ?? 2.0,
           color: quranStyle.color,
@@ -164,7 +163,14 @@ class TajweedView extends StatelessWidget {
                     ),
                     isLight: Theme.of(context).brightness == Brightness.light,
                     enableTajweed: true,
-                    highlights: (enableWordByWordHighlight && willHighLight) ? [qcf.HighlightRange(wordIndex: index, color: themeState.primaryShade200)] : null,
+                    highlights: (enableWordByWordHighlight && willHighLight)
+                        ? [
+                            qcf.HighlightRange(
+                              wordIndex: index,
+                              color: themeState.primaryShade200,
+                            ),
+                          ]
+                        : null,
                   );
                 }),
               ),

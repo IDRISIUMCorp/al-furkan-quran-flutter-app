@@ -38,7 +38,6 @@ import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.da
 import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_sarf_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/word_by_word_function.dart";
 import "package:al_quran_v3/src/utils/quran_word/show_popup_word_function.dart";
 import "package:hive_ce_flutter/hive_flutter.dart";
@@ -2690,7 +2689,6 @@ class _MushafViewState extends State<MushafView> {
                         text: verseNumber,
                         style: TextStyle(
                           fontFamily: pageFont,
-                          package: "qcf_quran",
                           color: verseNumberColor,
                           height:
                               verseNumberHeight / (widget.hOverride ?? 0.86),

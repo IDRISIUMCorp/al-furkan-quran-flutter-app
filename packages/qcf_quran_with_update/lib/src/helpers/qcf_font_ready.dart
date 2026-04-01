@@ -20,6 +20,7 @@ class QcfFontReady extends StatefulWidget {
 
 class _QcfFontReadyState extends State<QcfFontReady> {
   late Future<void> _loadFuture;
+  int _retryCount = 0;
 
   @override
   void initState() {
@@ -31,6 +32,7 @@ class _QcfFontReadyState extends State<QcfFontReady> {
   void didUpdateWidget(covariant QcfFontReady oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!setEquals(oldWidget.pages, widget.pages)) {
+      _retryCount = 0;
       _loadFuture = _loadFonts(widget.pages);
     }
   }
@@ -48,6 +50,18 @@ class _QcfFontReadyState extends State<QcfFontReady> {
     return FutureBuilder<void>(
       future: _loadFuture,
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          if (_retryCount < 1) {
+            _retryCount++;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              setState(() {
+                _loadFuture = _loadFonts(widget.pages);
+              });
+            });
+          }
+          return widget.placeholder ?? const SizedBox.shrink();
+        }
         if (snapshot.connectionState != ConnectionState.done) {
           return widget.placeholder ?? const SizedBox.shrink();
         }

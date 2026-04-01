@@ -20,10 +20,6 @@ class AyahWidgetProvider : AppWidgetProvider() {
       val views = RemoteViews(context.packageName, R.layout.ayah_widget)
 
       val imagePath = HomeWidgetPlugin.getData(context).getString("ayah_image", null)
-      val surahName = HomeWidgetPlugin.getData(context).getString("surah_name", "") ?: ""
-
-      views.setTextViewText(R.id.surah_name, surahName)
-
       if (!imagePath.isNullOrBlank()) {
         val normalizedPath = imagePath.removePrefix("file://")
         val bitmap = BitmapFactory.decodeFile(normalizedPath)
