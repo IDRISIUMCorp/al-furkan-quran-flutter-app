@@ -4,7 +4,6 @@ import "package:al_quran_v3/l10n/app_localizations.dart";
 import "package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
 import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
 import "package:al_quran_v3/src/core/audio/model/recitation_info_model.dart";
-import "package:al_quran_v3/src/core/audio/player/audio_player_manager.dart";
 import "package:al_quran_v3/src/core/audio/services/audio_playback_service_access.dart";
 import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
 import "package:al_quran_v3/src/theme/values/values.dart";
@@ -137,8 +136,8 @@ class QuranScriptSettings extends StatelessWidget {
               Fluttertoast.showToast(msg: l10n.success);
             }
 
-            if (AudioPlayerManager.audioPlayer.playing) {
-              if (AudioPlayerManager.audioPlayer.audioSources.length > 1) {
+            if (audioPlaybackService.isPlaying) {
+              if (audioPlaybackService.sourceCount > 1) {
                 await audioPlaybackService.playPlaylist(
                   startAyahKey: ayahState.start,
                   endAyahKey: ayahState.end,

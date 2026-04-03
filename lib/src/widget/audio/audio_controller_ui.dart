@@ -7,7 +7,6 @@ import "package:al_quran_v3/src/core/audio/model/audio_controller_ui.dart";
 import "package:al_quran_v3/src/core/audio/model/audio_player_position_model.dart";
 import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
 import "package:al_quran_v3/src/core/audio/model/recitation_info_model.dart";
-import "package:al_quran_v3/src/core/audio/player/audio_player_manager.dart";
 import "package:al_quran_v3/src/core/audio/services/audio_playback_service_access.dart";
 import "package:al_quran_v3/src/utils/quran_ayahs_function/gen_ayahs_key.dart";
 import "package:al_quran_v3/src/resources/quran_resources/quran_ayah_count.dart";
@@ -187,8 +186,7 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
                                                                 children: [
                                                                   Flexible(
                                                                     child: Text(
-                                                                      reciter
-                                                                          .name,
+                                                                      reciter.name,
                                                                       style: TextStyle(
                                                                         fontWeight:
                                                                             FontWeight.w800,
@@ -253,8 +251,7 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
                                                   IconButton(
                                                     onPressed: isPlaylist
                                                         ? () {
-                                                            AudioPlayerManager
-                                                                .audioPlayer
+                                                            audioPlaybackService
                                                                 .seekToPrevious();
                                                           }
                                                         : null,
@@ -268,23 +265,22 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
                                                     onPressed: () async {
                                                       if (isLoading) return;
 
-                                                      final player =
-                                                          AudioPlayerManager
-                                                              .audioPlayer;
                                                       final hasSource =
-                                                          player.audioSource !=
-                                                          null;
+                                                          audioPlaybackService
+                                                              .hasSource;
                                                       final isIdle =
-                                                          player
+                                                          audioPlaybackService
                                                               .processingState ==
                                                           just_audio
                                                               .ProcessingState
                                                               .idle;
                                                       final noDuration =
-                                                          player.duration ==
+                                                          audioPlaybackService
+                                                              .totalDuration ==
                                                           null;
 
-                                                      if (!player.playing &&
+                                                      if (!audioPlaybackService
+                                                              .isPlaying &&
                                                           (!hasSource ||
                                                               isIdle ||
                                                               noDuration)) {
@@ -311,9 +307,14 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
                                                         return;
                                                       }
 
-                                                      player.playing
-                                                          ? player.pause()
-                                                          : player.play();
+                                                      if (audioPlaybackService
+                                                          .isPlaying) {
+                                                        await audioPlaybackService
+                                                            .pause();
+                                                      } else {
+                                                        await audioPlaybackService
+                                                            .resume();
+                                                      }
                                                     },
                                                     iconSize: 34,
                                                     icon: AnimatedSwitcher(
@@ -358,8 +359,7 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
                                                   IconButton(
                                                     onPressed: isPlaylist
                                                         ? () {
-                                                            AudioPlayerManager
-                                                                .audioPlayer
+                                                            audioPlaybackService
                                                                 .seekToNext();
                                                           }
                                                         : null,
@@ -456,7 +456,7 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
               barHeight: 6,
               timeLabelLocation: TimeLabelLocation.sides,
               onSeek: (duration) {
-                AudioPlayerManager.audioPlayer.seek(duration);
+                audioPlaybackService.seek(duration);
               },
             );
           },
@@ -506,7 +506,7 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
                                     isInsideQuran: true,
                                   );
                                 }
-                                AudioPlayerManager.audioPlayer.seek(
+                                audioPlaybackService.seek(
                                   Duration.zero,
                                   index: value.toInt(),
                                 );
@@ -573,7 +573,7 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
                             );
                           }
                         } else {
-                          AudioPlayerManager.audioPlayer.seekToPrevious();
+                          audioPlaybackService.seekToPrevious();
                         }
                       }
                     : null,
@@ -584,12 +584,10 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
               ),
               IconButton(
                 onPressed: () {
-                  Duration duration = AudioPlayerManager.audioPlayer.position;
+                  Duration duration = audioPlaybackService.currentPosition;
                   int inMilSec = duration.inMilliseconds - 5000;
                   if (inMilSec < 0) inMilSec = 0;
-                  AudioPlayerManager.audioPlayer.seek(
-                    Duration(milliseconds: inMilSec),
-                  );
+                  audioPlaybackService.seek(Duration(milliseconds: inMilSec));
                 },
                 tooltip: l10n.rewind,
                 style: IconButton.styleFrom(padding: EdgeInsets.zero),
@@ -604,14 +602,14 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
                     onPressed: () async {
                       if (isLoading) return;
 
-                      final player = AudioPlayerManager.audioPlayer;
-                      final hasSource = player.audioSource != null;
+                      final hasSource = audioPlaybackService.hasSource;
                       final isIdle =
-                          player.processingState ==
+                          audioPlaybackService.processingState ==
                           just_audio.ProcessingState.idle;
-                      final noDuration = player.duration == null;
+                      final noDuration =
+                          audioPlaybackService.totalDuration == null;
 
-                      if (!player.playing &&
+                      if (!audioPlaybackService.isPlaying &&
                           (!hasSource || isIdle || noDuration)) {
                         final ayahKey = context
                             .read<AyahKeyCubit>()
@@ -629,7 +627,11 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
                         return;
                       }
 
-                      player.playing ? player.pause() : player.play();
+                      if (audioPlaybackService.isPlaying) {
+                        await audioPlaybackService.pause();
+                      } else {
+                        await audioPlaybackService.resume();
+                      }
                     },
                     tooltip: state.isPlaying ? l10n.pause : l10n.play,
                     iconSize: 40,
@@ -662,21 +664,17 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
 
               IconButton(
                 onPressed: () {
-                  Duration? position = AudioPlayerManager.audioPlayer.position;
+                  Duration position = audioPlaybackService.currentPosition;
 
-                  Duration? maxDuration =
-                      AudioPlayerManager.audioPlayer.duration;
+                  Duration? maxDuration = audioPlaybackService.totalDuration;
 
-                  AudioPlayerManager.audioPlayer.duration;
                   int inMilSec = position.inMilliseconds + 5000;
                   if ((maxDuration?.inMilliseconds ??
                           MediaQuery.of(context).size.width) <
                       inMilSec) {
                     inMilSec = maxDuration?.inMilliseconds ?? 0;
                   }
-                  AudioPlayerManager.audioPlayer.seek(
-                    Duration(milliseconds: inMilSec),
-                  );
+                  audioPlaybackService.seek(Duration(milliseconds: inMilSec));
                 },
                 tooltip: l10n.fastForward,
                 style: IconButton.styleFrom(padding: EdgeInsets.zero),
@@ -719,7 +717,7 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
                             );
                           }
                         } else {
-                          AudioPlayerManager.audioPlayer.seekToNext();
+                          audioPlaybackService.seekToNext();
                         }
                       }
                     : null,
@@ -731,25 +729,19 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
               if (ayahList.length != 1)
                 IconButton(
                   onPressed: () {
-                    if (AudioPlayerManager.audioPlayer.loopMode ==
+                    if (audioPlaybackService.loopMode ==
                         just_audio.LoopMode.one) {
-                      AudioPlayerManager.audioPlayer.setLoopMode(
-                        just_audio.LoopMode.all,
-                      );
-                    } else if (AudioPlayerManager.audioPlayer.loopMode ==
+                      audioPlaybackService.setLoopMode(just_audio.LoopMode.all);
+                    } else if (audioPlaybackService.loopMode ==
                         just_audio.LoopMode.all) {
-                      AudioPlayerManager.audioPlayer.setLoopMode(
-                        just_audio.LoopMode.off,
-                      );
+                      audioPlaybackService.setLoopMode(just_audio.LoopMode.off);
                     } else {
-                      AudioPlayerManager.audioPlayer.setLoopMode(
-                        just_audio.LoopMode.one,
-                      );
+                      audioPlaybackService.setLoopMode(just_audio.LoopMode.one);
                     }
                   },
                   tooltip: l10n.repeat,
                   style: IconButton.styleFrom(padding: EdgeInsets.zero),
-                  icon: switch (AudioPlayerManager.audioPlayer.loopMode) {
+                  icon: switch (audioPlaybackService.loopMode) {
                     just_audio.LoopMode.one => const Icon(
                       Icons.repeat_one_rounded,
                     ),
@@ -783,7 +775,7 @@ class _AudioControllerUiState extends State<AudioControllerUi> {
                           .read<SegmentedQuranReciterCubit>()
                           .state,
                       initialIndex: currentAyahNumber - 1,
-                      instantPlay: AudioPlayerManager.audioPlayer.playing,
+                      instantPlay: audioPlaybackService.isPlaying,
                       isInsideQuran: true,
                     );
                   },

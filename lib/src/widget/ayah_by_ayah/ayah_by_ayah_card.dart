@@ -12,7 +12,6 @@ import "package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.d
 import "package:al_quran_v3/src/core/audio/model/audio_player_position_model.dart";
 import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
 import "package:al_quran_v3/src/core/audio/model/recitation_info_model.dart";
-import "package:al_quran_v3/src/core/audio/player/audio_player_manager.dart";
 import "package:al_quran_v3/src/core/audio/services/audio_playback_service_access.dart";
 import "package:al_quran_v3/src/resources/quran_resources/language_resources.dart";
 import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
@@ -1633,20 +1632,20 @@ IconButton getPlayButtonWidget(
           isInsideQuran: true,
         );
       } else if (isCurrent && isPlaying) {
-        AudioPlayerManager.audioPlayer.pause();
+        audioPlaybackService.pause();
       } else if (isCurrent) {
-        AudioPlayerManager.audioPlayer.play();
+        audioPlaybackService.resume();
       } else {
         log("Current Ayah: $ayahKey");
         bool isPlayList = context.read<AudioUiCubit>().state.isPlayList;
         if (isPlayList &&
             ayahKeyManagement.current.split(":").first ==
                 ayahKey.split(":").first) {
-          await AudioPlayerManager.audioPlayer.seek(
+          await audioPlaybackService.seek(
             Duration.zero,
             index: ayahKeyManagement.ayahList.indexOf(ayahKey),
           );
-          AudioPlayerManager.audioPlayer.play();
+          await audioPlaybackService.resume();
         } else {
           audioPlaybackService.playSingleAyah(
             ayahKey: ayahKey,

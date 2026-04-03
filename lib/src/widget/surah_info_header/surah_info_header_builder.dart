@@ -4,7 +4,6 @@ import "package:al_quran_v3/src/core/audio/cubit/ayah_key_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/player_state_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
 import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
-import "package:al_quran_v3/src/core/audio/player/audio_player_manager.dart";
 import "package:al_quran_v3/src/core/audio/services/audio_playback_service_access.dart";
 import "package:al_quran_v3/src/resources/translation/language_cubit.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_translation_function.dart";
@@ -212,11 +211,11 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
                               } else if (isCurrentPlaying &&
                                   isPlayList &&
                                   !isCompleted) {
-                                AudioPlayerManager.audioPlayer.pause();
+                                audioPlaybackService.pause();
                               } else if (isCurrentSurah &&
                                   isPlayList &&
                                   !isCompleted) {
-                                AudioPlayerManager.audioPlayer.play();
+                                audioPlaybackService.resume();
                               } else {
                                 String startAyahKey =
                                     headerInfoModel.startAyahKey;
