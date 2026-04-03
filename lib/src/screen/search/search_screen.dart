@@ -24,18 +24,18 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  static const String _kHistoryKey = "search_history";
-  static const int _maxHistory = 8;
-
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
-  final ValueNotifier<List<AyahSearchResult>> _resultsVN =
-      ValueNotifier<List<AyahSearchResult>>(const []);
+  final ValueNotifier<List<Map<String, dynamic>>> _resultsVN =
+      ValueNotifier<List<Map<String, dynamic>>>(const []);
   final ValueNotifier<bool> _hasSearchedVN = ValueNotifier<bool>(false);
   final ValueNotifier<bool> _isSearchingVN = ValueNotifier<bool>(false);
 
   Timer? _debounce;
   List<String> _searchHistory = <String>[];
+
+  static const String _kHistoryKey = "search_history";
+  static const int _maxHistory = 8;
 
   bool get _isDark => Theme.of(context).brightness == Brightness.dark;
   Color get _pageBg =>
@@ -75,7 +75,8 @@ class _SearchScreenState extends State<SearchScreen> {
     final normalizedQuery = normalizeQuranSearchQuery(rawQuery);
 
     if (rawQuery.isEmpty || normalizedQuery.length < 2) {
-      _resultsVN.value = const <AyahSearchResult>[];
+      if (!mounted) return;
+      _resultsVN.value = const <Map<String, dynamic>>[];
       _hasSearchedVN.value = false;
       _isSearchingVN.value = false;
       return;
@@ -103,7 +104,8 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _loadHistory() {
-    final raw = Hive.box("user").get(_kHistoryKey);
+    final box = Hive.box("user");
+    final raw = box.get(_kHistoryKey);
     if (raw is List) {
       _searchHistory = raw.cast<String>().toList();
     }
@@ -137,29 +139,28 @@ class _SearchScreenState extends State<SearchScreen> {
     _performSearch(value);
   }
 
-  void _navigateToAyah(BuildContext context, AyahSearchResult result) {
+  void _navigateToAyah(BuildContext context, int surah, int ayah) {
     HapticFeedback.lightImpact();
-    final page = qcf.getPageNumber(result.surahNumber, result.verseNumber);
+    final key = "$surah:$ayah";
+    final page = qcf.getPageNumber(surah, ayah);
 
     context.read<AyahKeyCubit>().changeLastScrolledPage(page);
-    context.read<AyahKeyCubit>().changeCurrentAyahKey(result.ayahKey);
-    context.read<AyahToHighlight>().changeAyah(result.ayahKey);
+    context.read<AyahKeyCubit>().changeCurrentAyahKey(key);
+    context.read<AyahToHighlight>().changeAyah(key);
 
     Future<void>.delayed(const Duration(seconds: 2), () {
       if (!context.mounted) return;
-      if (context.read<AyahToHighlight>().state == result.ayahKey) {
+      if (context.read<AyahToHighlight>().state == key) {
         context.read<AyahToHighlight>().changeAyah(null);
       }
     });
 
-    Navigator.of(
-      context,
-    ).pop(<String, dynamic>{"page": page, "key": result.ayahKey});
+    Navigator.of(context).pop(<String, dynamic>{"page": page, "key": key});
   }
 
   @override
   Widget build(BuildContext context) {
-    final themeState = context.watch<ThemeCubit>().state;
+    final ThemeState themeState = context.watch<ThemeCubit>().state;
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -199,7 +200,7 @@ class _SearchScreenState extends State<SearchScreen> {
         return ValueListenableBuilder<bool>(
           valueListenable: _isSearchingVN,
           builder: (context, isSearching, __) {
-            return ValueListenableBuilder<List<AyahSearchResult>>(
+            return ValueListenableBuilder<List<Map<String, dynamic>>>(
               valueListenable: _resultsVN,
               builder: (context, results, ___) {
                 final topPadding = MediaQuery.of(context).padding.top + 112;
@@ -208,6 +209,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 final query = _searchController.text.trim();
 
                 late final Widget child;
+
                 if (query.isNotEmpty &&
                     normalizeQuranSearchQuery(query).length < 2) {
                   child = _buildShortQueryState();
@@ -418,7 +420,7 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               const Gap(8),
               Text(
-                "اكتب كلمتين أو أكثر، وسنعرض لك أفضل النتائج مباشرة مع سبب ظهور كل نتيجة وتظليل الجزء المطابق.",
+                "اكتب كلمتين أو أكثر، وسنعرض لك أفضل النتائج مباشرة مع السورة والآية.",
                 style: TextStyle(color: _textMuted, fontSize: 14, height: 1.6),
               ),
             ],
@@ -569,7 +571,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _buildResultsState(
     ThemeState themeState,
-    List<AyahSearchResult> results,
+    List<Map<String, dynamic>> results,
   ) {
     return Column(
       children: [
@@ -602,18 +604,33 @@ class _SearchScreenState extends State<SearchScreen> {
             separatorBuilder: (_, __) => const Gap(10),
             itemBuilder: (context, index) {
               final result = results[index];
+              final surahNumber = (result["surah_number"] as num?)?.toInt();
+              final ayahNumber = (result["verse_number"] as num?)?.toInt();
+              if (surahNumber == null || ayahNumber == null) {
+                return const SizedBox.shrink();
+              }
+
+              final surahName =
+                  (result["surah_name"] as String?) ??
+                  qcf.getSurahNameArabic(surahNumber);
+              final content =
+                  (result["snippet"] as String?) ??
+                  (result["content"] as String?) ??
+                  "";
+              final pageNumber = qcf.getPageNumber(surahNumber, ayahNumber);
+
               return _SearchResultCard(
-                    result: result,
-                    pageNumber: qcf.getPageNumber(
-                      result.surahNumber,
-                      result.verseNumber,
-                    ),
+                    surahName: surahName,
+                    ayahNumber: ayahNumber,
+                    pageNumber: pageNumber,
+                    content: content,
                     primary: themeState.primary,
                     surface: _cardBg,
                     border: _cardBorder,
                     textColor: _textPrimary,
                     mutedColor: _textMuted,
-                    onTap: () => _navigateToAyah(context, result),
+                    onTap: () =>
+                        _navigateToAyah(context, surahNumber, ayahNumber),
                   )
                   .animate()
                   .fadeIn(duration: 260.ms, delay: (index.clamp(0, 6) * 40).ms)
@@ -662,8 +679,10 @@ class _SuggestionChip extends StatelessWidget {
 }
 
 class _SearchResultCard extends StatelessWidget {
-  final AyahSearchResult result;
+  final String surahName;
+  final int ayahNumber;
   final int pageNumber;
+  final String content;
   final Color primary;
   final Color surface;
   final Color border;
@@ -672,8 +691,10 @@ class _SearchResultCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const _SearchResultCard({
-    required this.result,
+    required this.surahName,
+    required this.ayahNumber,
     required this.pageNumber,
+    required this.content,
     required this.primary,
     required this.surface,
     required this.border,
@@ -684,13 +705,6 @@ class _SearchResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final reasonColor = switch (result.matchType) {
-      SearchMatchType.exact => primary,
-      SearchMatchType.normalized => const Color(0xFF1D7AFC),
-      SearchMatchType.prefix => const Color(0xFF0F9D58),
-      SearchMatchType.fuzzy => const Color(0xFFD97706),
-    };
-
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -722,7 +736,7 @@ class _SearchResultCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      result.surahName,
+                      surahName,
                       style: TextStyle(
                         color: primary,
                         fontWeight: FontWeight.w800,
@@ -734,13 +748,8 @@ class _SearchResultCard extends StatelessWidget {
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      _MatchReasonChip(
-                        label: result.reasonLabel,
-                        color: reasonColor,
-                      ),
                       _MetaChip(
-                        label:
-                            "الآية ${localizedNumber(context, result.verseNumber)}",
+                        label: "الآية ${localizedNumber(context, ayahNumber)}",
                         color: mutedColor,
                       ),
                       _MetaChip(
@@ -752,41 +761,20 @@ class _SearchResultCard extends StatelessWidget {
                 ],
               ),
               const Gap(14),
-              _HighlightedSnippetText(
-                text: result.snippet,
-                highlightSpans: result.highlightSpans,
-                primary: primary,
-                textColor: textColor,
+              Text(
+                content,
+                textAlign: TextAlign.center,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontFamily: "QPC_Hafs",
+                  fontSize: 23,
+                  height: 1.65,
+                  color: textColor,
+                ),
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MatchReasonChip extends StatelessWidget {
-  final String label;
-  final Color color;
-
-  const _MatchReasonChip({required this.label, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withValues(alpha: 0.18)),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 11.5,
-          fontWeight: FontWeight.w800,
         ),
       ),
     );
@@ -815,77 +803,6 @@ class _MetaChip extends StatelessWidget {
           fontWeight: FontWeight.w700,
         ),
       ),
-    );
-  }
-}
-
-class _HighlightedSnippetText extends StatelessWidget {
-  final String text;
-  final List<SearchMatchSpan> highlightSpans;
-  final Color primary;
-  final Color textColor;
-
-  const _HighlightedSnippetText({
-    required this.text,
-    required this.highlightSpans,
-    required this.primary,
-    required this.textColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final baseStyle = TextStyle(
-      fontFamily: "QPC_Hafs",
-      fontSize: 23,
-      height: 1.65,
-      color: textColor,
-    );
-
-    if (highlightSpans.isEmpty) {
-      return Text(
-        text,
-        textAlign: TextAlign.center,
-        maxLines: 4,
-        overflow: TextOverflow.ellipsis,
-        style: baseStyle,
-      );
-    }
-
-    final spans = <TextSpan>[];
-    var cursor = 0;
-    final sorted = highlightSpans.toList()
-      ..sort((a, b) => a.start.compareTo(b.start));
-
-    for (final range in sorted) {
-      final safeStart = range.start.clamp(0, text.length);
-      final safeEnd = range.end.clamp(safeStart, text.length);
-      if (safeStart > cursor) {
-        spans.add(TextSpan(text: text.substring(cursor, safeStart)));
-      }
-      if (safeEnd > safeStart) {
-        spans.add(
-          TextSpan(
-            text: text.substring(safeStart, safeEnd),
-            style: TextStyle(
-              color: primary,
-              fontWeight: FontWeight.w800,
-              backgroundColor: primary.withValues(alpha: 0.14),
-            ),
-          ),
-        );
-      }
-      cursor = safeEnd;
-    }
-
-    if (cursor < text.length) {
-      spans.add(TextSpan(text: text.substring(cursor)));
-    }
-
-    return RichText(
-      textAlign: TextAlign.center,
-      maxLines: 4,
-      overflow: TextOverflow.ellipsis,
-      text: TextSpan(style: baseStyle, children: spans),
     );
   }
 }
