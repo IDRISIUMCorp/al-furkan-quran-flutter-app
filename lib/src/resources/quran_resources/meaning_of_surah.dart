@@ -1,6 +1,5 @@
 import "dart:convert";
 
-import "package:al_quran_v3/main.dart";
 import "package:al_quran_v3/src/resources/translation/language_cubit.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
@@ -27,8 +26,7 @@ Future<void> loadMetaSurah() async {
   }
 }
 
-String getSurahName(BuildContext? context, int index) {
-  context ??= navigatorKey.currentContext!;
+String getSurahName(BuildContext context, int index) {
   if (surahNameLocalization.isEmpty) return "سورة $index";
   Locale locale = context.read<LanguageCubit>().state.locale;
   final data =
@@ -50,8 +48,7 @@ String getSurahNameArabic(int index) {
   return list[index - 1];
 }
 
-String getSurahMeaning(BuildContext? context, int index) {
-  context ??= navigatorKey.currentContext!;
+String getSurahMeaning(BuildContext context, int index) {
   if (surahMeaningLocalization.isEmpty) return "";
   Locale locale = context.read<LanguageCubit>().state.locale;
   final data =

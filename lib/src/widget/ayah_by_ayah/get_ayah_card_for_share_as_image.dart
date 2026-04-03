@@ -29,9 +29,9 @@ Widget getAyahCardForShareAsImage(
   List<TranslationBookModel?> booksInfo,
   TextStyle scriptTextStyle,
   Brightness brightness,
-  ThemeState themeState,
-  {bool showTranslationSection = true}
-) {
+  ThemeState themeState, {
+  bool showTranslationSection = true,
+}) {
   AppLocalizations l10n = AppLocalizations.of(context);
 
   bool keepFootNote = Hive.box(
@@ -85,7 +85,7 @@ Widget getAyahCardForShareAsImage(
           ),
         if (showMacOsWindowLikeIcon) const Gap(10),
         Text(
-          "${getSurahName(null, surahInfoModel.id)} - ${getAyahLocalized(context, ayahKey)}",
+          "${getSurahName(context, surahInfoModel.id)} - ${getAyahLocalized(context, ayahKey)}",
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
         ),
         const Gap(20),
