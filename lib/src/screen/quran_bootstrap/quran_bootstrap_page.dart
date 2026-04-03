@@ -4,6 +4,7 @@ import "dart:developer";
 import "package:al_quran_v3/src/core/bootstrap/app_bootstrap_coordinator.dart";
 import "package:al_quran_v3/src/core/di/service_locator.dart";
 import "package:al_quran_v3/src/screen/mushaf/mushaf_screen.dart";
+import "package:al_quran_v3/src/screen/onboarding/premium_onboarding_screen.dart";
 import "package:flutter/material.dart";
 
 class QuranBootstrapPage extends StatefulWidget {
@@ -33,13 +34,18 @@ class _QuranBootstrapPageState extends State<QuranBootstrapPage> {
   Future<void> _bootstrap() async {
     try {
       final coordinator = getIt<AppBootstrapCoordinator>();
-      await coordinator.prepareLaunch();
+      final launchDestination = await coordinator.prepareLaunch();
 
       if (!mounted) {
         return;
       }
 
       _startDeferredWarmup(coordinator);
+
+      if (launchDestination.showOnboarding) {
+        _openOnboarding();
+        return;
+      }
 
       _openMushaf();
     } catch (error, stackTrace) {
@@ -64,10 +70,16 @@ class _QuranBootstrapPageState extends State<QuranBootstrapPage> {
     );
   }
 
+  void _openOnboarding() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PremiumOnboardingScreen(onComplete: _openMushaf),
+      ),
+    );
+  }
+
   void _openMushaf() {
-    if (!mounted) {
-      return;
-    }
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const MushafScreen()),
