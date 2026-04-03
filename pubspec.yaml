@@ -15,6 +15,7 @@ dependencies:
   flutter_bloc: ^9.1.0
   shared_preferences: ^2.5.3
   gap: ^3.0.1
+  get_it: ^8.0.3
   fluentui_system_icons: ^1.1.273
   intl: ^0.20.2
   html: ^0.15.5

@@ -1,37 +1,38 @@
 import "dart:developer";
+import "dart:ui";
+
 import "package:al_quran_v3/l10n/app_localizations.dart";
 import "package:al_quran_v3/src/core/audio/cubit/audio_ui_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/ayah_key_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/player_position_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/player_state_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
+import "package:al_quran_v3/src/core/bootstrap/app_bootstrap_coordinator.dart";
+import "package:al_quran_v3/src/core/di/service_locator.dart";
+import "package:al_quran_v3/src/core/reader_session/reader_session_repository.dart";
+import "package:al_quran_v3/src/core/settings/settings_repository.dart";
+import "package:al_quran_v3/src/core/storage/app_boxes.dart";
+import "package:al_quran_v3/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
 import "package:al_quran_v3/src/platform_services.dart" as platform_services;
-import "package:al_quran_v3/src/resources/translation/languages.dart";
-import "package:al_quran_v3/src/screen/quran_bootstrap/quran_bootstrap_page.dart";
-import "package:al_quran_v3/src/screen/prayer_time/cubit/prayer_time_state.dart";
-import "package:al_quran_v3/src/screen/quran_script_view/cubit/ayah_to_highlight.dart";
-import "package:al_quran_v3/src/theme/app_theme.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_translation_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/segmented_resources_manager.dart";
-import "package:al_quran_v3/src/utils/quran_resources/word_by_word_function.dart";
 import "package:al_quran_v3/src/resources/translation/language_cubit.dart";
-
+import "package:al_quran_v3/src/resources/translation/languages.dart";
 import "package:al_quran_v3/src/screen/location_handler/cubit/location_data_qibla_data_cubit.dart";
+import "package:al_quran_v3/src/screen/location_handler/model/location_data_qibla_data_state.dart";
 import "package:al_quran_v3/src/screen/prayer_time/cubit/prayer_time_cubit.dart";
+import "package:al_quran_v3/src/screen/quran_bootstrap/quran_bootstrap_page.dart";
+import "package:al_quran_v3/src/screen/quran_reader/cubit/reader_ui_cubit.dart";
 import "package:al_quran_v3/src/screen/quran_script_view/cubit/ayah_by_ayah_in_scroll_info_cubit.dart";
+import "package:al_quran_v3/src/screen/quran_script_view/cubit/ayah_to_highlight.dart";
 import "package:al_quran_v3/src/screen/quran_script_view/cubit/landscape_scroll_effect.dart";
 import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.dart";
 import "package:al_quran_v3/src/screen/setup/cubit/resources_progress_cubit_cubit.dart";
+import "package:al_quran_v3/src/theme/app_theme.dart";
 import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
 import "package:al_quran_v3/src/theme/controller/theme_state.dart";
-import "package:al_quran_v3/src/theme/functions/theme_functions.dart";
-import "package:al_quran_v3/src/core/notifications/khatma_notification_service.dart";
 import "package:al_quran_v3/src/widget/history/cubit/quran_history_cubit.dart";
 import "package:al_quran_v3/src/widget/quran_script_words/cubit/word_playing_state_cubit.dart";
-import "package:al_quran_v3/src/screen/quran_reader/cubit/reader_ui_cubit.dart";
-import "package:al_quran_v3/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
-import "dart:ui";
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:flutter_localizations/flutter_localizations.dart";
 import "package:flutter_native_splash/flutter_native_splash.dart";
@@ -41,23 +42,17 @@ import "package:hive_ce_flutter/hive_flutter.dart";
 import "package:just_audio_background/just_audio_background.dart";
 import "package:just_audio_media_kit/just_audio_media_kit.dart";
 import "package:shared_preferences/shared_preferences.dart";
-import "package:flutter/services.dart";
-
-import "src/screen/location_handler/model/location_data_qibla_data_state.dart";
 
 String? applicationDataPath;
 platform_services.PlatformOwn platformOwn = platform_services.getPlatform();
 
 Future<void> main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  platform_services.initializePlatform();
+  await platform_services.initializePlatform();
 
   GoogleFonts.config.allowRuntimeFetching = false;
-
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-
-  await KhatmaNotificationService.instance.init();
 
   applicationDataPath = await platform_services.getApplicationDataPath();
 
@@ -68,25 +63,21 @@ Future<void> main() async {
     await Hive.initFlutter();
   }
 
-  await Hive.openBox("user");
-  await Hive.openBox("pinned");
-  await Hive.openBox("notes");
+  await Hive.openBox(AppBoxes.user);
+  await Hive.openBox(AppBoxes.pinned);
+  await Hive.openBox(AppBoxes.notes);
 
-  // Init Awesome Notification right after Hive so its restore logic works
   if (platformOwn != platform_services.PlatformOwn.isLinux &&
       platformOwn != platform_services.PlatformOwn.isWindows) {
-    platform_services.initAwesomeNotification();
-
-    JustAudioBackground.init(
+    await JustAudioBackground.init(
       androidNotificationChannelId: "com.ryanheise.bg_demo.channel.audio",
       androidNotificationChannelName: "Audio playback",
       androidNotificationOngoing: true,
     );
   } else {
-    // by default, windows and linux are enabled
     try {
       JustAudioMediaKit.ensureInitialized();
-      JustAudioMediaKit.bufferSize = 8 * 1024 * 1024; // 8 MB
+      JustAudioMediaKit.bufferSize = 8 * 1024 * 1024;
       JustAudioMediaKit.title = "Al Quran Audio";
     } catch (e) {
       log("Unable To Config JustAudioMediaKit with error: $e");
@@ -94,43 +85,18 @@ Future<void> main() async {
   }
 
   final prefs = await SharedPreferences.getInstance();
-  const firstRunKey = "idrisium_first_run_defaults_applied";
-  final firstRunApplied = prefs.getBool(firstRunKey) ?? false;
-  if (!firstRunApplied) {
-    if (prefs.getString("selectedLanguageCode") == null) {
-      await prefs.setString("selectedLanguageCode", "ar");
-    }
-    if (prefs.getString("app_theme_mode") == null) {
-      await prefs.setString("app_theme_mode", ThemeMode.light.toString());
-    }
-    await prefs.setBool(firstRunKey, true);
-  }
+  await configureDependencies(preferences: prefs);
 
-  MyAppLocalization initialLocale = await LanguageCubit.getInitialLocale();
-
-  QuranTranslationFunction.init(locale: initialLocale.locale);
-  WordByWordFunction.init();
-  SegmentedResourcesManager.init();
-
-  await ThemeFunctions.initThemeFunction();
-
-  PrayerReminderState prayerReminderState = PrayerReminderState(
-    prayerToRemember: [],
-    previousReminderModes: {},
-    reminderTimeAdjustment: {},
-    enforceAlarmSound: false,
-    soundVolume: 1.0,
+  final bootstrapSnapshot = await getIt<AppBootstrapCoordinator>().prepareApp(
+    loadLocationState: LocationQiblaPrayerDataCubit.getSavedState,
   );
 
-  LocationQiblaPrayerDataState locationQiblaPrayerDataState =
-      await LocationQiblaPrayerDataCubit.getSavedState();
-  log(locationQiblaPrayerDataState.madhab.toString(), name: "Madhab");
+  log(bootstrapSnapshot.locationState.madhab.toString(), name: "Madhab");
 
   runApp(
     MyApp(
-      initialLocale: initialLocale,
-      prayerReminderState: prayerReminderState,
-      locationQiblaPrayerDataState: locationQiblaPrayerDataState,
+      initialLocale: bootstrapSnapshot.initialLocale,
+      locationQiblaPrayerDataState: bootstrapSnapshot.locationState,
     ),
   );
   platform_services.hideLoadingIndicator();
@@ -142,68 +108,65 @@ TextTheme getTextTheme(Locale locale, bool isDarkMode) {
   final textTheme = isDarkMode
       ? ThemeData.dark().textTheme
       : ThemeData.light().textTheme;
-  // Avoid GoogleFonts dynamic loaders (can crash offline).
-  // Use base Material text theme and set a bundled fallback family.
   return textTheme.apply(fontFamily: "NotoSans");
 }
 
 class MyApp extends StatelessWidget {
-  final MyAppLocalization initialLocale;
-  final PrayerReminderState prayerReminderState;
-  final LocationQiblaPrayerDataState locationQiblaPrayerDataState;
-
   const MyApp({
     super.key,
     required this.initialLocale,
-    required this.prayerReminderState,
     required this.locationQiblaPrayerDataState,
   });
+
+  final MyAppLocalization initialLocale;
+  final LocationQiblaPrayerDataState locationQiblaPrayerDataState;
 
   @override
   Widget build(BuildContext context) {
     FlutterNativeSplash.remove();
-    final PageTransitionsTheme pageTransitionsTheme =
-        const PageTransitionsTheme(
-          builders: <TargetPlatform, PageTransitionsBuilder>{
-            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-            TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
-            TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
-            TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
-          },
-        );
+
+    const pageTransitionsTheme = PageTransitionsTheme(
+      builders: <TargetPlatform, PageTransitionsBuilder>{
+        TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
+      },
+    );
+
     return _UsageTimeTracker(
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (context) => ResourcesProgressCubit()),
-          BlocProvider(create: (context) => ThemeCubit()),
-          BlocProvider(create: (context) => AudioUiCubit()),
-          BlocProvider(create: (context) => PlayerPositionCubit()),
-          BlocProvider(create: (context) => AyahKeyCubit()),
-          BlocProvider(create: (context) => AyahByAyahInScrollInfoCubit()),
+          BlocProvider(create: (_) => ResourcesProgressCubit()),
+          BlocProvider(create: (_) => ThemeCubit()),
+          BlocProvider(create: (_) => AudioUiCubit()),
+          BlocProvider(create: (_) => PlayerPositionCubit()),
+          BlocProvider(create: (_) => AyahKeyCubit()),
+          BlocProvider(create: (_) => AyahByAyahInScrollInfoCubit()),
           BlocProvider(
-            create: (context) => LocationQiblaPrayerDataCubit(
+            create: (_) => LocationQiblaPrayerDataCubit(
               initState: locationQiblaPrayerDataState,
             ),
           ),
-          BlocProvider(create: (context) => SegmentedQuranReciterCubit()),
-          BlocProvider(create: (context) => PlayerStateCubit(PlayerState())),
-          BlocProvider(create: (context) => WordPlayingStateCubit()),
-          BlocProvider(create: (context) => AyahByAyahInScrollInfoCubit()),
-          BlocProvider(create: (context) => QuranViewCubit()),
+          BlocProvider(create: (_) => SegmentedQuranReciterCubit()),
+          BlocProvider(create: (_) => PlayerStateCubit(PlayerState())),
+          BlocProvider(create: (_) => WordPlayingStateCubit()),
           BlocProvider(
-            create: (context) =>
-                PrayerReminderCubit(initState: prayerReminderState),
+            create: (_) => QuranViewCubit(getIt<SettingsRepository>()),
           ),
-
-          BlocProvider(create: (context) => LanguageCubit(initialLocale)),
-          BlocProvider(create: (context) => LandscapeScrollEffect()),
-          BlocProvider(create: (context) => QuranHistoryCubit()),
-          BlocProvider(create: (context) => AyahToHighlight(null)),
-          BlocProvider(create: (context) => ReaderUICubit()),
-          BlocProvider(create: (context) => QuranSettingsCubit()),
+          BlocProvider(
+            create: (_) => PrayerReminderCubit(getIt<SettingsRepository>()),
+          ),
+          BlocProvider(create: (_) => LanguageCubit(initialLocale)),
+          BlocProvider(create: (_) => LandscapeScrollEffect()),
+          BlocProvider(create: (_) => QuranHistoryCubit()),
+          BlocProvider(create: (_) => AyahToHighlight(null)),
+          BlocProvider(
+            create: (_) => ReaderUICubit(getIt<ReaderSessionRepository>()),
+          ),
+          BlocProvider(create: (_) => QuranSettingsCubit()),
         ],
-
         child: BlocBuilder<LanguageCubit, MyAppLocalization>(
           builder: (context, languageState) {
             return BlocBuilder<ThemeCubit, ThemeState>(
@@ -224,7 +187,7 @@ class MyApp extends StatelessWidget {
                         GlobalCupertinoLocalizations.delegate,
                       ],
                       supportedLocales: AppLocalizations.supportedLocales,
-                      onGenerateTitle: (context) => "الفُرقان",
+                      onGenerateTitle: (_) => "الفُرقان",
                       theme: AppTheme.lightTheme(themeState.flexScheme)
                           .copyWith(
                             pageTransitionsTheme: pageTransitionsTheme,
@@ -254,8 +217,9 @@ class MyApp extends StatelessWidget {
 }
 
 class _UsageTimeTracker extends StatefulWidget {
-  final Widget child;
   const _UsageTimeTracker({required this.child});
+
+  final Widget child;
 
   @override
   State<_UsageTimeTracker> createState() => _UsageTimeTrackerState();
@@ -296,15 +260,22 @@ class _UsageTimeTrackerState extends State<_UsageTimeTracker>
 
   void _flush() {
     final start = _sessionStart;
-    if (start == null) return;
+    if (start == null) {
+      return;
+    }
+
     final seconds = DateTime.now().difference(start).inSeconds;
     _sessionStart = null;
 
-    if (seconds <= 0) return;
+    if (seconds <= 0) {
+      return;
+    }
+
     try {
-      final box = Hive.box("user");
-      final prev = (box.get(_kUsageSeconds, defaultValue: 0) as int?) ?? 0;
-      box.put(_kUsageSeconds, prev + seconds);
+      final box = Hive.box<dynamic>(AppBoxes.user);
+      final previousValue =
+          (box.get(_kUsageSeconds, defaultValue: 0) as int?) ?? 0;
+      box.put(_kUsageSeconds, previousValue + seconds);
     } catch (_) {}
   }
 

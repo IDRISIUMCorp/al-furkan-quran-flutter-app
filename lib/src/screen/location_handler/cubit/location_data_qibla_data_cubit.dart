@@ -34,16 +34,14 @@ class LocationQiblaPrayerDataCubit extends Cubit<LocationQiblaPrayerDataState> {
   Future<void> saveLocationData(LatLon latLon, {bool save = true}) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     if (save) {
-      sharedPreferences.setString("user_location", latLon.toJson());
+      await sharedPreferences.setString("user_location", latLon.toJson());
     }
-    LocationQiblaPrayerDataState newState = state.copyWith();
-    newState.latLon = latLon;
-    newState.kaabaAngle = calculateQiblaAngle(
-      latLon.latitude,
-      latLon.longitude,
+    emit(
+      state.copyWith(
+        latLon: latLon,
+        kaabaAngle: calculateQiblaAngle(latLon.latitude, latLon.longitude),
+      ),
     );
-
-    emit(newState);
   }
 
   Future<void> saveCalculationMethod(
@@ -75,7 +73,6 @@ class LocationQiblaPrayerDataCubit extends Cubit<LocationQiblaPrayerDataState> {
   }
 
   static Future<LocationQiblaPrayerDataState> getSavedState() async {
-    LocationQiblaPrayerDataState data = LocationQiblaPrayerDataState();
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String? jsonLocation = sharedPreferences.getString("user_location");
     if (jsonLocation == null) {
@@ -86,37 +83,31 @@ class LocationQiblaPrayerDataCubit extends Cubit<LocationQiblaPrayerDataState> {
     }
 
     if (jsonLocation == null) {
-      data.latLon = null;
-      data.kaabaAngle = null;
-    } else {
-      var latLong = LatLon.fromJson(jsonLocation);
-      data.latLon = latLong;
-      data.kaabaAngle = calculateQiblaAngle(
-        data.latLon!.latitude,
-        data.latLon!.longitude,
-      );
-      String? calculationMethodJason = sharedPreferences.getString(
-        "selected_calculation_method",
-      );
-      if (calculationMethodJason != null) {
-        data.calculationMethod = getCalculationParameters(
-          CalculationMethodEnum.values.firstWhere(
-            (element) => element.name == calculationMethodJason,
-          ),
-        );
-      } else {
-        data.calculationMethod = getCalculationParameters(
-          CalculationMethodEnum.egyptian,
-        );
-      }
-      String? madhab = sharedPreferences.getString("selected_madhab");
-      if (madhab != null) {
-        data.madhab = Madhab.values.firstWhere(
-          (element) => element.name == madhab,
-        );
-      }
-      data.madhab ??= Madhab.shafi;
+      return const LocationQiblaPrayerDataState();
     }
-    return data;
+
+    final latLong = LatLon.fromJson(jsonLocation);
+    final calculationMethodJson = sharedPreferences.getString(
+      "selected_calculation_method",
+    );
+    final calculationMethod = calculationMethodJson != null
+        ? getCalculationParameters(
+            CalculationMethodEnum.values.firstWhere(
+              (element) => element.name == calculationMethodJson,
+            ),
+          )
+        : getCalculationParameters(CalculationMethodEnum.egyptian);
+
+    final madhabJson = sharedPreferences.getString("selected_madhab");
+    final madhab = madhabJson != null
+        ? Madhab.values.firstWhere((element) => element.name == madhabJson)
+        : Madhab.shafi;
+
+    return LocationQiblaPrayerDataState(
+      latLon: latLong,
+      kaabaAngle: calculateQiblaAngle(latLong.latitude, latLong.longitude),
+      calculationMethod: calculationMethod,
+      madhab: madhab,
+    );
   }
 }

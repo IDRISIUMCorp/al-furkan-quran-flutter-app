@@ -1,22 +1,24 @@
+import "package:flutter/foundation.dart";
 import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
 
+@immutable
 class QuranViewState {
-  String ayahKey;
-  double fontSize;
-  double lineHeight;
-  QuranScriptType quranScriptType;
-  double translationFontSize;
-  bool hideFootnote;
-  bool hideWordByWord;
-  bool hideTranslation;
-  bool hideToolbar;
-  bool hideQuranAyah;
-  bool alwaysOpenWordByWord;
-  bool enableWordByWordHighlight;
-  bool scrollWithRecitation;
-  bool useAudioStream;
-  double playbackSpeed;
-  QuranViewState({
+  final String ayahKey;
+  final double fontSize;
+  final double lineHeight;
+  final QuranScriptType quranScriptType;
+  final double translationFontSize;
+  final bool hideFootnote;
+  final bool hideWordByWord;
+  final bool hideTranslation;
+  final bool hideToolbar;
+  final bool hideQuranAyah;
+  final bool alwaysOpenWordByWord;
+  final bool enableWordByWordHighlight;
+  final bool scrollWithRecitation;
+  final bool useAudioStream;
+  final double playbackSpeed;
+  const QuranViewState({
     required this.ayahKey,
     required this.fontSize,
     required this.lineHeight,

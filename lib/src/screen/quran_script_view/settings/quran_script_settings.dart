@@ -56,10 +56,16 @@ class QuranScriptSettings extends StatelessWidget {
                   }),
 
                   value: quranViewState.scrollWithRecitation,
-                  onChanged: (value) {
-                    context.read<QuranViewCubit>().setViewOptions(
-                      scrollWithRecitation: value,
-                    );
+                  onChanged: (value) async {
+                    final didUpdate = await context
+                        .read<QuranViewCubit>()
+                        .setViewOptions(scrollWithRecitation: value);
+                    if (!didUpdate && context.mounted) {
+                      Fluttertoast.showToast(
+                        msg:
+                            appLocalizations.quranTranslationAyahOneMustEnabled,
+                      );
+                    }
                   },
                 );
               },
@@ -72,35 +78,35 @@ class QuranScriptSettings extends StatelessWidget {
 
     return asPage
         ? Scaffold(
-          extendBodyBehindAppBar: true,
-          appBar: AppBar(
-            flexibleSpace: ClipRRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: context.read<ThemeCubit>().state.mutedGray,
+            extendBodyBehindAppBar: true,
+            appBar: AppBar(
+              flexibleSpace: ClipRRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: context.read<ThemeCubit>().state.mutedGray,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
+              title: Text(appLocalizations.quranScriptSettings),
+              actions: [themeIconButton(context)],
             ),
-            title: Text(appLocalizations.quranScriptSettings),
-            actions: [themeIconButton(context)],
-          ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.only(
-              left: 10,
-              right: 10,
-              top: 10,
-              bottom: 60,
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.only(
+                left: 10,
+                right: 10,
+                top: 10,
+                bottom: 60,
+              ),
+              child: SafeArea(child: bodyWidget),
             ),
-            child: SafeArea(child: bodyWidget),
-          ),
-        )
+          )
         : bodyWidget;
   }
 

@@ -1,15 +1,18 @@
+import "package:al_quran_v3/src/core/reader_session/reader_session_repository.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
-import "package:shared_preferences/shared_preferences.dart";
 
 import "reader_ui_state.dart";
 
 class ReaderUICubit extends Cubit<ReaderUIState> {
-  ReaderUICubit() : super(const ReaderUIState()) {
-    _loadLastReadPosition();
-  }
+  ReaderUICubit(this._readerSessionRepository)
+    : super(
+        ReaderUIState(
+          lastReadPage: _readerSessionRepository.loadLastReadPage(),
+          lastReadAyahKey: _readerSessionRepository.loadLastReadAyahKey(),
+        ),
+      );
 
-  static const String _keyLastReadPage = "last_read_page";
-  static const String _keyLastReadAyahKey = "last_read_ayah_key";
+  final ReaderSessionRepository _readerSessionRepository;
 
   /// Toggle UI visibility (AppBar + BottomBar)
   void toggleUIVisibility() {
@@ -40,31 +43,17 @@ class ReaderUICubit extends Cubit<ReaderUIState> {
     required int pageNumber,
     required String ayahKey,
   }) async {
-    emit(state.copyWith(
-      lastReadPage: pageNumber,
-      lastReadAyahKey: ayahKey,
-    ));
-    
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_keyLastReadPage, pageNumber);
-    await prefs.setString(_keyLastReadAyahKey, ayahKey);
-  }
+    emit(state.copyWith(lastReadPage: pageNumber, lastReadAyahKey: ayahKey));
 
-  /// Load last read position from storage
-  Future<void> _loadLastReadPosition() async {
-    final prefs = await SharedPreferences.getInstance();
-    final page = prefs.getInt(_keyLastReadPage) ?? 1;
-    final ayahKey = prefs.getString(_keyLastReadAyahKey);
-    
-    emit(state.copyWith(
-      lastReadPage: page,
-      lastReadAyahKey: ayahKey,
-    ));
+    await _readerSessionRepository.saveLastReadPosition(
+      pageNumber: pageNumber,
+      ayahKey: ayahKey,
+    );
   }
 
   /// Get last read ayah key for navigation
   String? get lastReadAyahKey => state.lastReadAyahKey;
-  
+
   /// Get last read page number
   int get lastReadPage => state.lastReadPage;
 }

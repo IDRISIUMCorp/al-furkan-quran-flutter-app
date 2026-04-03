@@ -1,12 +1,9 @@
 import "dart:io";
 
-// import "package:alarm/alarm.dart";
-// import "package:background_fetch/background_fetch.dart";
+import "package:al_quran_v3/src/core/notifications/wahy_notification_service.dart";
 import "package:flutter/material.dart";
 import "package:path_provider/path_provider.dart";
 import "package:window_manager/window_manager.dart";
-
-import "package:al_quran_v3/src/core/notifications/wahy_notification_service.dart";
 
 void hideLoadingIndicator() {
   // no-op
@@ -20,7 +17,7 @@ Future<void> initAwesomeNotification() async {
 Future<void> initializePlatform() async {
   if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
     await windowManager.ensureInitialized();
-    WindowOptions windowOptions = const WindowOptions(
+    const windowOptions = WindowOptions(
       title: "الفُرقان",
       minimumSize: Size(400, 600),
       center: true,
@@ -33,21 +30,18 @@ Future<void> initializePlatform() async {
       await windowManager.focus();
     });
   }
-
-  // Future enhancement: Implement notifications functionality here also for "Alarm"
 }
 
 Future<String?> getApplicationDataPath() async {
-  Directory? dir;
+  Directory? directory;
   if (Platform.isAndroid) {
-    dir = await getExternalStorageDirectory();
+    directory = await getExternalStorageDirectory();
   } else if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-    dir = await getDownloadsDirectory();
+    directory = await getDownloadsDirectory();
   } else {
-    // Fallback for other platforms like iOS
-    dir = await getApplicationDocumentsDirectory();
+    directory = await getApplicationDocumentsDirectory();
   }
-  return dir?.path;
+  return directory?.path;
 }
 
 enum PlatformOwn {
@@ -75,8 +69,6 @@ PlatformOwn getPlatform() {
     return PlatformOwn.isWindows;
   } else if (Platform.isFuchsia) {
     return PlatformOwn.isFuchsia;
-  } else if (Platform.isAndroid) {
-    return PlatformOwn.isAndroid;
   } else {
     return PlatformOwn.unknown;
   }
