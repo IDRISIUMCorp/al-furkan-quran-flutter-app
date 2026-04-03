@@ -44,7 +44,6 @@ import "package:hive_ce_flutter/hive_flutter.dart";
 import "package:al_quran_v3/src/utils/number_localization.dart";
 import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
 import "package:al_quran_v3/src/widget/quran_script_words/cubit/word_playing_state_cubit.dart";
-import "package:al_quran_v3/src/screen/settings/app_language_settings.dart";
 import "package:al_quran_v3/src/screen/settings/settings_page.dart";
 import "package:al_quran_v3/src/core/unified_quran_settings/quran_settings_bottom_sheet.dart";
 import "package:al_quran_v3/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
@@ -77,37 +76,6 @@ class MushafScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const _MushafRoot();
-  }
-}
-
-class _HeaderIconPill extends StatelessWidget {
-  final String tooltip;
-  final IconData icon;
-  final Color primary;
-  final VoidCallback onTap;
-
-  const _HeaderIconPill({
-    required this.tooltip,
-    required this.icon,
-    required this.primary,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        splashColor: primary.withValues(alpha: 0.1),
-        highlightColor: primary.withValues(alpha: 0.05),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-          child: Icon(icon, color: primary, size: 26),
-        ),
-      ),
-    );
   }
 }
 
@@ -707,6 +675,47 @@ class _MushafRootState extends State<_MushafRoot> {
     }
   }
 
+  void _openIndexOverlay(Color backgroundColor) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "إغلاق الفهرس",
+      barrierColor: Colors.black.withValues(alpha: 0.4),
+      transitionDuration: const Duration(milliseconds: 380),
+      pageBuilder: (ctx, anim1, anim2) => Align(
+        alignment: Alignment.centerRight,
+        child: SizedBox(
+          width: 340,
+          child: Material(
+            color: backgroundColor,
+            child: AyaIndexPage(
+              isEmbedded: true,
+              onOpenLocation: (page, ayahKey) {
+                Navigator.of(
+                  context,
+                  rootNavigator: true,
+                ).popUntil((route) => route.isFirst);
+                context.read<AyahKeyCubit>().changeLastScrolledPage(page);
+                context.read<AyahKeyCubit>().changeCurrentAyahKey(ayahKey);
+                context.read<AyahToHighlight>().changeAyah(ayahKey);
+                _navigateToMushafPage(page - 1);
+              },
+            ),
+          ),
+        ),
+      ),
+      transitionBuilder: (ctx, anim1, anim2, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(1, 0),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(parent: anim1, curve: Curves.easeOutCubic)),
+          child: child,
+        );
+      },
+    );
+  }
+
   Future<void> _openSearchScreen() async {
     final result = await Navigator.push(
       context,
@@ -806,203 +815,6 @@ class _MushafRootState extends State<_MushafRoot> {
     final availableRatio = safeH / screenH;
     final mushafScale = (availableRatio + 0.12).clamp(0.84, 0.92);
 
-    Future<void> openOverflowMenu() async {
-      await showModalBottomSheet(
-        context: context,
-        useRootNavigator: true,
-        backgroundColor: Colors.transparent,
-        builder: (sheetContext) {
-          final bg = isDark ? const Color(0xFF000000) : _bg(sheetContext);
-          final card = isDark
-              ? const Color(0xFF111111)
-              : const Color(0xFFFFF9F2);
-          final fontBase = isDark ? Colors.white : _onBg(sheetContext);
-
-          Widget item({
-            required IconData icon,
-            required String title,
-            required String subtitle,
-            required VoidCallback onTap,
-          }) {
-            return ListTile(
-              onTap: () {
-                Navigator.pop(sheetContext);
-                onTap();
-              },
-              leading: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: themeState.primary.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: themeState.primary),
-              ),
-              title: Text(
-                title,
-                style: TextStyle(fontWeight: FontWeight.w900, color: fontBase),
-              ),
-              subtitle: Text(
-                subtitle,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF8F8F8F),
-                ),
-              ),
-              trailing: Icon(
-                Icons.chevron_left_rounded,
-                color: themeState.primary.withValues(alpha: 0.85),
-              ),
-            );
-          }
-
-          return Directionality(
-            textDirection: TextDirection.rtl,
-            child: Container(
-              decoration: BoxDecoration(
-                color: bg,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(22),
-                  topRight: Radius.circular(22),
-                ),
-              ),
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 18),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxHeight: constraints.maxHeight,
-                        ),
-                        child: SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 44,
-                                height: 4,
-                                decoration: BoxDecoration(
-                                  color: isDark
-                                      ? Colors.white.withValues(alpha: 0.25)
-                                      : Colors.black.withValues(alpha: 0.18),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                "خيارات",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w900,
-                                  color: fontBase,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: card,
-                                  borderRadius: BorderRadius.circular(18),
-                                  border: Border.all(
-                                    color: isDark
-                                        ? Colors.white.withValues(alpha: 0.08)
-                                        : Colors.black.withValues(alpha: 0.06),
-                                  ),
-                                ),
-                                child: Column(
-                                  children: [
-                                    item(
-                                      icon: Icons.settings_rounded,
-                                      title: "الإعدادات",
-                                      subtitle: "تخصيص التطبيق",
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const SettingsPage(),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    const _WahyDrawerDivider(),
-                                    item(
-                                      icon: Icons.library_books_rounded,
-                                      title: "الموارد",
-                                      subtitle: "التفاسير والترجمات",
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const QuranResourcesView(),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    const _WahyDrawerDivider(),
-                                    item(
-                                      icon: Icons.language_rounded,
-                                      title: "اللغة",
-                                      subtitle: "تغيير لغة التطبيق",
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const AppLanguageSettings(),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    const _WahyDrawerDivider(),
-                                    item(
-                                      icon: Icons.info_outline_rounded,
-                                      title: "عن التطبيق",
-                                      subtitle: "معلومات وإصدار",
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const AboutAppPage(),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    const _WahyDrawerDivider(),
-                                    item(
-                                      icon: Icons.bug_report_rounded,
-                                      title: "بلاغ / اقتراح",
-                                      subtitle: "ابعت مشكلة أو فكرة تطوير",
-                                      onTap: () async {
-                                        await showDialog(
-                                          context: context,
-                                          builder: (ctx) => WahyFeedbackDialog(
-                                            primary: themeState.primary,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      );
-    }
-
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: bgColor,
@@ -1073,153 +885,29 @@ class _MushafRootState extends State<_MushafRoot> {
               ),
             ),
             // Top header (Beige)
-            AnimatedSlide(
-              duration: Duration(milliseconds: _showHeader ? 320 : 520),
-              curve: Curves.easeInOutCubic,
-              offset: _showHeader ? Offset.zero : const Offset(0, -1.15),
-              child: AnimatedOpacity(
-                duration: Duration(milliseconds: _showHeader ? 240 : 420),
-                opacity: _showHeader ? 1 : 0,
-                child: AnimatedScale(
-                  duration: Duration(milliseconds: _showHeader ? 320 : 520),
-                  curve: Curves.easeInOutCubic,
-                  scale: _showHeader ? 1.0 : 0.985,
-                  child: Container(
-                    // Dynamic height to account for status bar
-                    height: _headerHeight + MediaQuery.of(context).padding.top,
-                    decoration: BoxDecoration(color: Colors.transparent),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.zero,
-                      child: BackdropFilter(
-                        filter: ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                        child: Container(
-                          padding: EdgeInsets.only(
-                            top: MediaQuery.of(context).padding.top,
-                            left: 10,
-                            right: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: topBarColor,
-                            border: Border(
-                              bottom: BorderSide(
-                                color: topBarBorderColor,
-                                width: 1.0,
-                              ),
-                            ),
-                          ),
-                          child: Directionality(
-                            textDirection: TextDirection.rtl,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                _HeaderIconPill(
-                                  tooltip: "الفهرس",
-                                  icon: Icons
-                                      .notes_rounded, // Hamburger-like icon
-                                  primary: AppColors.ayaPrimary,
-                                  onTap: () {
-                                    showGeneralDialog(
-                                      context: context,
-                                      barrierDismissible: true,
-                                      barrierLabel: "إغلاق الفهرس",
-                                      barrierColor: Colors.black.withValues(
-                                        alpha: 0.4,
-                                      ),
-                                      transitionDuration: const Duration(
-                                        milliseconds: 380,
-                                      ),
-                                      pageBuilder: (ctx, anim1, anim2) => Align(
-                                        alignment: Alignment.centerRight,
-                                        child: SizedBox(
-                                          width: 340,
-                                          child: Material(
-                                            color: bgColor,
-                                            child: AyaIndexPage(
-                                              isEmbedded: true,
-                                              onOpenLocation: (page, ayahKey) {
-                                                Navigator.of(
-                                                  context,
-                                                  rootNavigator: true,
-                                                ).popUntil(
-                                                  (route) => route.isFirst,
-                                                );
-                                                context
-                                                    .read<AyahKeyCubit>()
-                                                    .changeLastScrolledPage(
-                                                      page,
-                                                    );
-                                                context
-                                                    .read<AyahKeyCubit>()
-                                                    .changeCurrentAyahKey(
-                                                      ayahKey,
-                                                    );
-                                                context
-                                                    .read<AyahToHighlight>()
-                                                    .changeAyah(ayahKey);
-                                                _navigateToMushafPage(page - 1);
-                                              },
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      transitionBuilder:
-                                          (ctx, anim1, anim2, child) {
-                                            return SlideTransition(
-                                              position:
-                                                  Tween<Offset>(
-                                                    begin: const Offset(1, 0),
-                                                    end: Offset.zero,
-                                                  ).animate(
-                                                    CurvedAnimation(
-                                                      parent: anim1,
-                                                      curve:
-                                                          Curves.easeOutCubic,
-                                                    ),
-                                                  ),
-                                              child: child,
-                                            );
-                                          },
-                                    );
-                                  },
-                                ),
-                                _HeaderIconPill(
-                                  tooltip: "البحث",
-                                  icon: Icons.search_rounded,
-                                  primary: AppColors.ayaPrimary,
-                                  onTap: _openSearchScreen,
-                                ),
-                                _HeaderIconPill(
-                                  tooltip: "طريقة العرض",
-                                  icon: _isMushafMode
-                                      ? Icons.chrome_reader_mode_outlined
-                                      : Icons.menu_book_rounded,
-                                  primary: AppColors.ayaPrimary,
-                                  onTap: () {
-                                    setState(
-                                      () => _isMushafMode = !_isMushafMode,
-                                    );
-                                  },
-                                ),
-                                _HeaderIconPill(
-                                  tooltip: "الختمة",
-                                  icon: Icons.bookmark_border_rounded,
-                                  primary: AppColors.ayaPrimary,
-                                  onTap: () async => showKhatmaSheet(
-                                    context: context,
-                                    bg: _bg(context),
-                                    onBg: _onBg(context),
-                                  ),
-                                ),
-                                _buildMoreMenu(themeState.primary, isDark),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+            WahyMushafTopHeader(
+              showHeader: _showHeader,
+              headerHeight: _headerHeight,
+              topInset: MediaQuery.of(context).padding.top,
+              topBarColor: topBarColor,
+              topBarBorderColor: topBarBorderColor,
+              isMushafMode: _isMushafMode,
+              iconPrimaryColor: AppColors.ayaPrimary,
+              menuPrimaryColor: themeState.primary,
+              isDark: isDark,
+              onOpenIndex: () => _openIndexOverlay(bgColor),
+              onOpenSearch: _openSearchScreen,
+              onToggleViewMode: () {
+                setState(() => _isMushafMode = !_isMushafMode);
+              },
+              onOpenKhatma: () {
+                showKhatmaSheet(
+                  context: context,
+                  bg: _bg(context),
+                  onBg: _onBg(context),
+                );
+              },
+              onMenuSelected: _handleTopMenuSelection,
             ),
 
             // Bottom mini audio controller (overlay)
@@ -1259,190 +947,6 @@ class _MushafRootState extends State<_MushafRoot> {
         ),
       ),
     );
-  }
-
-  Widget _buildMoreMenu(Color primaryColor, bool isDark) {
-    return WahyMushafMoreMenuButton(
-      primaryColor: primaryColor,
-      isDark: isDark,
-      onSelected: _handleTopMenuSelection,
-    );
-    /*
-    final themeState = context.read<ThemeCubit>().state;
-    final primary = themeState.primary;
-    final Color bgColor = isDark
-        ? const Color(0xFF000000)
-        : const Color(0xFFF7F5EC);
-    final Color textColor = isDark ? Colors.white : const Color(0xFF1E1E1E);
-
-    PopupMenuItem<int> buildPremiumMenuItem(
-      int value,
-      IconData icon,
-      String title,
-    ) {
-      return PopupMenuItem<int>(
-        value: value,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-        child: Directionality(
-          textDirection: TextDirection.rtl,
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF2A2A2A)
-                      : primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.08)
-                        : Colors.transparent,
-                  ),
-                ),
-                child: Icon(
-                  icon,
-                  color: isDark ? Colors.white.withValues(alpha: 0.9) : primary,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 14),
-              Text(
-                title,
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 15,
-                  color: textColor,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return Theme(
-      data: Theme.of(context).copyWith(
-        popupMenuTheme: PopupMenuThemeData(
-          color: bgColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-            side: BorderSide(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.1)
-                  : const Color(0xFFE5E0CF),
-              width: 1,
-            ),
-          ),
-          elevation: isDark ? 16 : 30,
-        ),
-      ),
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: PopupMenuButton<int>(
-          offset: const Offset(0, 50),
-          icon: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? const Color(0xFF222222)
-                  : primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.12)
-                    : Colors.transparent,
-              ),
-            ),
-            child: Icon(
-              Icons.more_horiz_rounded,
-              color: isDark ? Colors.white : primary,
-            ),
-          ),
-          itemBuilder: (context) => [
-            buildPremiumMenuItem(
-              7,
-              Icons.auto_awesome_rounded,
-              "إعدادات المصحف",
-            ),
-            buildPremiumMenuItem(8, Icons.auto_stories_rounded, "أذكار المسلم"),
-            buildPremiumMenuItem(
-              5,
-              Icons.access_time_filled_rounded,
-              "مواقيت الصلاة",
-            ),
-            buildPremiumMenuItem(6, Icons.explore_rounded, "القبلة"),
-            buildPremiumMenuItem(1, Icons.library_books_rounded, "المكتبة"),
-            const PopupMenuDivider(height: 16),
-            buildPremiumMenuItem(0, Icons.settings_rounded, "الإعدادات"),
-            buildPremiumMenuItem(2, Icons.info_outline_rounded, "عن التطبيق"),
-            buildPremiumMenuItem(3, Icons.bug_report_rounded, "إرسال ملاحظة"),
-          ],
-          onSelected: (val) {
-            if (val == 0) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SettingsPage()),
-              );
-            } else if (val == 1) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const QuranResourcesView()),
-              );
-            } else if (val == 2) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const AboutAppPage()),
-              );
-            } else if (val == 3) {
-              showGeneralDialog(
-                context: context,
-                barrierDismissible: true,
-                barrierLabel: "إغلاق الملاحظة",
-                transitionDuration: const Duration(milliseconds: 320),
-                pageBuilder: (ctx, anim1, anim2) =>
-                    WahyFeedbackDialog(primary: primaryColor),
-                transitionBuilder: (ctx, anim1, anim2, child) {
-                  return SlideTransition(
-                    position:
-                        Tween<Offset>(
-                          begin: const Offset(0, 0.4),
-                          end: Offset.zero,
-                        ).animate(
-                          CurvedAnimation(
-                            parent: anim1,
-                            curve: Curves.easeOutCubic,
-                          ),
-                        ),
-                    child: FadeTransition(opacity: anim1, child: child),
-                  );
-                },
-              );
-            } else if (val == 5) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const PrayerTimePage()),
-              );
-            } else if (val == 6) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const QiblaDirection()),
-              );
-            } else if (val == 7) {
-              QuranSettingsBottomSheet.show(context);
-            } else if (val == 8) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const AzkarCategoriesScreen(),
-                ),
-              );
-            }
-          },
-        ),
-      ),
-    );
-    */
   }
 }
 
