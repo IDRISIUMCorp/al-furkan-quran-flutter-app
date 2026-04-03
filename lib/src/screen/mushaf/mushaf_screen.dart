@@ -4,6 +4,7 @@ import "package:al_quran_v3/src/screen/mushaf/widgets/bookmarks_sheet.dart";
 import "package:al_quran_v3/src/screen/mushaf/widgets/starred_sheet.dart";
 import "package:al_quran_v3/src/screen/mushaf/widgets/notes_sheet.dart";
 import 'package:al_quran_v3/src/screen/mushaf/widgets/wahy_feedback_dialog.dart';
+import "package:al_quran_v3/src/screen/mushaf/widgets/wahy_mushaf_top_header.dart";
 import 'package:al_quran_v3/src/screen/mushaf/widgets/wahy_index_sheet.dart';
 import 'widgets/library_sheet.dart';
 import "package:al_quran_v3/src/screen/mushaf/widgets/listen_range_sheet.dart";
@@ -103,7 +104,6 @@ class _HeaderIconPill extends StatelessWidget {
         highlightColor: primary.withValues(alpha: 0.05),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-          // Aya uses primary green icons on the transparent bar without background pills
           child: Icon(icon, color: primary, size: 26),
         ),
       ),
@@ -707,6 +707,87 @@ class _MushafRootState extends State<_MushafRoot> {
     }
   }
 
+  Future<void> _openSearchScreen() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const SearchScreen()),
+    );
+    if (result is! Map) return;
+    if (!_isMushafMode || !_mushafPageController.hasClients) return;
+
+    final page = result["page"] as int?;
+    if (page != null) {
+      _navigateToMushafPage(page - 1);
+    }
+  }
+
+  void _handleTopMenuSelection(WahyMushafMenuAction action) {
+    final primaryColor = context.read<ThemeCubit>().state.primary;
+    switch (action) {
+      case WahyMushafMenuAction.quranSettings:
+        QuranSettingsBottomSheet.show(context);
+        return;
+      case WahyMushafMenuAction.azkar:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const AzkarCategoriesScreen()),
+        );
+        return;
+      case WahyMushafMenuAction.prayerTimes:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const PrayerTimePage()),
+        );
+        return;
+      case WahyMushafMenuAction.qibla:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const QiblaDirection()),
+        );
+        return;
+      case WahyMushafMenuAction.library:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const QuranResourcesView()),
+        );
+        return;
+      case WahyMushafMenuAction.settings:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const SettingsPage()),
+        );
+        return;
+      case WahyMushafMenuAction.about:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const AboutAppPage()),
+        );
+        return;
+      case WahyMushafMenuAction.feedback:
+        showGeneralDialog(
+          context: context,
+          barrierDismissible: true,
+          barrierLabel: "إغلاق الملاحظة",
+          transitionDuration: const Duration(milliseconds: 320),
+          pageBuilder: (ctx, anim1, anim2) =>
+              WahyFeedbackDialog(primary: primaryColor),
+          transitionBuilder: (ctx, anim1, anim2, child) {
+            return SlideTransition(
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(0, 0.4),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(parent: anim1, curve: Curves.easeOutCubic),
+                  ),
+              child: FadeTransition(opacity: anim1, child: child),
+            );
+          },
+        );
+        return;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeState = context.read<ThemeCubit>().state;
@@ -1105,23 +1186,7 @@ class _MushafRootState extends State<_MushafRoot> {
                                   tooltip: "البحث",
                                   icon: Icons.search_rounded,
                                   primary: AppColors.ayaPrimary,
-                                  onTap: () async {
-                                    final result = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => const SearchScreen(),
-                                      ),
-                                    );
-                                    if (result != null && result is Map) {
-                                      if (_isMushafMode &&
-                                          _mushafPageController.hasClients) {
-                                        final page = result["page"] as int?;
-                                        if (page != null) {
-                                          _navigateToMushafPage(page - 1);
-                                        }
-                                      }
-                                    }
-                                  },
+                                  onTap: _openSearchScreen,
                                 ),
                                 _HeaderIconPill(
                                   tooltip: "طريقة العرض",
@@ -1197,6 +1262,12 @@ class _MushafRootState extends State<_MushafRoot> {
   }
 
   Widget _buildMoreMenu(Color primaryColor, bool isDark) {
+    return WahyMushafMoreMenuButton(
+      primaryColor: primaryColor,
+      isDark: isDark,
+      onSelected: _handleTopMenuSelection,
+    );
+    /*
     final themeState = context.read<ThemeCubit>().state;
     final primary = themeState.primary;
     final Color bgColor = isDark
@@ -1371,6 +1442,7 @@ class _MushafRootState extends State<_MushafRoot> {
         ),
       ),
     );
+    */
   }
 }
 
