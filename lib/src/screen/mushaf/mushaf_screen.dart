@@ -6,7 +6,6 @@ import "package:al_quran_v3/src/screen/mushaf/widgets/notes_sheet.dart";
 import 'package:al_quran_v3/src/screen/mushaf/widgets/wahy_feedback_dialog.dart';
 import 'package:al_quran_v3/src/screen/mushaf/widgets/wahy_index_sheet.dart';
 import 'widgets/library_sheet.dart';
-import "package:al_quran_v3/src/screen/mushaf/widgets/search_sheet.dart";
 import "package:al_quran_v3/src/screen/mushaf/widgets/listen_range_sheet.dart";
 import "dart:ui" as ui;
 
@@ -37,7 +36,6 @@ import "package:al_quran_v3/src/screen/search/search_screen.dart";
 import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.dart";
 import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart";
-import "package:al_quran_v3/src/utils/quran_search_engine.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/word_by_word_function.dart";
 import "package:al_quran_v3/src/utils/quran_word/show_popup_word_function.dart";
@@ -150,21 +148,6 @@ class _MushafRootState extends State<_MushafRoot> {
       ? Colors.white
       : Color(0xFF1B1B1B);
   static const _headerHeight = 56.0;
-
-  static const int _kSearchMaxResults = 120;
-  final Map<String, List<AyahSearchResult>> _ayahSearchCache =
-      <String, List<AyahSearchResult>>{};
-
-  Future<void> _flashAyahHighlight(String ayahKey) async {
-    if (!mounted) return;
-    final highlighter = context.read<AyahToHighlight>();
-    highlighter.changeAyah(ayahKey);
-    await Future<void>.delayed(const Duration(milliseconds: 2000));
-    if (!mounted) return;
-    if (highlighter.state == ayahKey) {
-      highlighter.changeAyah(null);
-    }
-  }
 
   String _ayahPreviewForKey(String ayahKey) {
     final parts = ayahKey.split(":");
@@ -443,39 +426,6 @@ class _MushafRootState extends State<_MushafRoot> {
       _quranScriptReady = true;
     }();
     await _quranScriptInitFuture;
-  }
-
-  Future<List<AyahSearchResult>> _searchAllAyahs({
-    required String rawQuery,
-  }) async {
-    final normalizedQuery = normalizeQuranSearchQuery(rawQuery);
-    if (normalizedQuery.length < 2) return const <AyahSearchResult>[];
-
-    final cached = _ayahSearchCache[normalizedQuery];
-    if (cached != null) return cached;
-
-    final rawResults = await searchQuranAyahs(
-      rawQuery,
-      limit: _kSearchMaxResults,
-    );
-    final out = rawResults
-        .map(
-          (match) => AyahSearchResult(
-            surah: (match["surah_number"] as num).toInt(),
-            verse: (match["verse_number"] as num).toInt(),
-            ayahKey:
-                match["ayah_key"]?.toString() ??
-                "${match["surah_number"]}:${match["verse_number"]}",
-            snippet:
-                (match["snippet"] as String?) ??
-                (match["content"] as String?) ??
-                "",
-          ),
-        )
-        .toList(growable: false);
-
-    _ayahSearchCache[normalizedQuery] = out;
-    return out;
   }
 
   List<Map<String, dynamic>> _getWahyBookmarks() {
@@ -774,42 +724,6 @@ class _MushafRootState extends State<_MushafRoot> {
     final safeH = (screenH - _headerHeight).clamp(1.0, screenH);
     final availableRatio = safeH / screenH;
     final mushafScale = (availableRatio + 0.12).clamp(0.84, 0.92);
-
-    Future<void> openKeywordSearch() async {
-      final controller = TextEditingController();
-
-      await showModalBottomSheet(
-        context: context,
-        useRootNavigator: true,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (sheetContext) {
-          return SearchSheet(
-            controller: controller,
-            primary: themeState.primary,
-            search: (q) => _searchAllAyahs(rawQuery: q),
-            onResultTap: (key) {
-              final page = getPageNumber(key) ?? 1;
-              context.read<AyahKeyCubit>().changeLastScrolledPage(page);
-              context.read<AyahKeyCubit>().changeCurrentAyahKey(key);
-              _flashAyahHighlight(key);
-              Navigator.of(
-                context,
-                rootNavigator: true,
-              ).popUntil((route) => route.isFirst);
-
-              if (_isMushafMode && _mushafPageController.hasClients) {
-                _mushafPageController.animateToPage(
-                  page - 1,
-                  duration: const Duration(milliseconds: 520),
-                  curve: Curves.easeOutCubic,
-                );
-              }
-            },
-          );
-        },
-      );
-    }
 
     Future<void> openOverflowMenu() async {
       await showModalBottomSheet(
