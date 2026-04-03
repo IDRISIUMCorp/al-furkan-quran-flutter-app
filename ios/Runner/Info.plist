@@ -40,7 +40,7 @@
 		<key>NSAppTransportSecurity</key>
 		<dict>
 			<key>NSAllowsArbitraryLoads</key>
-			<true/>
+			<false/>
 		</dict>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>This app needs access to location for find out Qibla direction and Calculate Prayers times based on user location.</string>
