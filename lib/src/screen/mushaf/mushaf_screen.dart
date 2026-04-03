@@ -6,6 +6,7 @@ import "package:al_quran_v3/src/screen/mushaf/widgets/notes_sheet.dart";
 import 'package:al_quran_v3/src/screen/mushaf/widgets/wahy_feedback_dialog.dart';
 import "package:al_quran_v3/src/screen/mushaf/widgets/wahy_mushaf_top_header.dart";
 import 'package:al_quran_v3/src/screen/mushaf/widgets/wahy_index_sheet.dart';
+import "package:al_quran_v3/src/screen/mushaf/wahy_library_store.dart";
 import 'widgets/library_sheet.dart';
 import "package:al_quran_v3/src/screen/mushaf/widgets/listen_range_sheet.dart";
 
@@ -64,7 +65,6 @@ import "package:al_quran_v3/src/utils/quran_ayahs_function/get_page_number.dart"
 import "package:al_quran_v3/src/resources/quran_resources/quran_pages_info.dart";
 import "package:al_quran_v3/src/utils/basic_functions.dart";
 import "package:al_quran_v3/src/theme/app_colors.dart";
-import "package:al_quran_v3/src/screen/collections/common_function.dart";
 part 'mushaf_share_extension.dart';
 part 'mushaf_pronunciation_extension.dart';
 
@@ -100,10 +100,6 @@ class _MushafRootState extends State<_MushafRoot> {
   bool _quranScriptReady = false;
   Future<void>? _quranScriptInitFuture;
 
-  static const String _kWahyBookmarks = "wahy_bookmarks";
-  static const String _kWahyStarred = "wahy_starred";
-  static const String _kWahyNotes = "wahy_notes";
-
   static Color _bg(BuildContext ctx) =>
       Theme.of(ctx).brightness == Brightness.dark
       ? Color(0xFF141414)
@@ -135,19 +131,6 @@ class _MushafRootState extends State<_MushafRoot> {
     return stripped.replaceAll(RegExp(r"\s+"), " ").trim();
   }
 
-  Widget _bookmarkColorRow(
-    BuildContext context, {
-    required String title,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return ListTile(
-      onTap: onTap,
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w900)),
-      trailing: Icon(Icons.bookmark_rounded, color: color),
-    );
-  }
-
   ({int surah, int verse})? _parseKey(String ayahKey) {
     final parts = ayahKey.split(":");
     if (parts.length != 2) return null;
@@ -158,10 +141,7 @@ class _MushafRootState extends State<_MushafRoot> {
   }
 
   Future<void> _removeBookmark(String ayahKey) async {
-    final box = Hive.box("user");
-    final list = _getWahyBookmarks();
-    list.removeWhere((e) => (e["ayahKey"] as String?) == ayahKey);
-    await box.put(_kWahyBookmarks, list);
+    await WahyLibraryStore.removeBookmark(ayahKey);
   }
 
   Future<void> _pickBookmarkColorForAyahKey(String ayahKey) async {
@@ -215,10 +195,7 @@ class _MushafRootState extends State<_MushafRoot> {
                       ),
                       child: Column(
                         children: colors.entries.map((entry) {
-                          return _bookmarkColorRow(
-                            sheet,
-                            title: entry.value.name,
-                            color: entry.value.color,
+                          return ListTile(
                             onTap: () async {
                               Navigator.pop(sheet);
                               await _setBookmarkColorForAyahKey(
@@ -226,6 +203,16 @@ class _MushafRootState extends State<_MushafRoot> {
                                 entry.key,
                               );
                             },
+                            title: Text(
+                              entry.value.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            trailing: Icon(
+                              Icons.bookmark_rounded,
+                              color: entry.value.color,
+                            ),
                           );
                         }).toList(),
                       ),
@@ -241,11 +228,7 @@ class _MushafRootState extends State<_MushafRoot> {
   }
 
   Future<void> _removeNoteAt(int index) async {
-    final box = Hive.box("user");
-    final list = _getWahyNotes();
-    if (index < 0 || index >= list.length) return;
-    list.removeAt(index);
-    await box.put(_kWahyNotes, list);
+    await WahyLibraryStore.removeNoteAt(index);
   }
 
   Future<void> _addNoteForCurrentAyah() async {
@@ -373,15 +356,7 @@ class _MushafRootState extends State<_MushafRoot> {
 
     final text = (result ?? "").trim();
     if (text.isEmpty) return;
-    final box = Hive.box("user");
-    final list = _getWahyNotes();
-    list.insert(0, {
-      "ayahKey": ayahKey,
-      "text": text,
-      "createdAt": DateTime.now().toIso8601String(),
-    });
-    await box.put(_kWahyNotes, list);
-    await syncWahyNoteToCollection(ayahKey, text);
+    await WahyLibraryStore.addNote(ayahKey, text);
   }
 
   Future<void> _ensureQuranScriptReady() async {
@@ -394,25 +369,15 @@ class _MushafRootState extends State<_MushafRoot> {
   }
 
   List<Map<String, dynamic>> _getWahyBookmarks() {
-    final box = Hive.box("user");
-    final raw = box.get(_kWahyBookmarks, defaultValue: const []) as List?;
-    return (raw ?? const [])
-        .map((e) => Map<String, dynamic>.from(e as Map))
-        .toList();
+    return WahyLibraryStore.loadBookmarks();
   }
 
   List<String> _getWahyStarred() {
-    final box = Hive.box("user");
-    final raw = box.get(_kWahyStarred, defaultValue: const []) as List?;
-    return List<String>.from(raw ?? const []);
+    return WahyLibraryStore.loadStarred();
   }
 
   List<Map<String, dynamic>> _getWahyNotes() {
-    final box = Hive.box("user");
-    final raw = box.get(_kWahyNotes, defaultValue: const []) as List?;
-    return (raw ?? const [])
-        .map((e) => Map<String, dynamic>.from(e as Map))
-        .toList();
+    return WahyLibraryStore.loadNotes();
   }
 
   Future<void> _setBookmarkColorForCurrentAyah(String colorId) async {
@@ -425,37 +390,13 @@ class _MushafRootState extends State<_MushafRoot> {
     String ayahKey,
     String colorId,
   ) async {
-    final box = Hive.box("user");
-
-    final list = _getWahyBookmarks();
-    final now = DateTime.now().toIso8601String();
-    final idx = list.indexWhere((e) => (e["ayahKey"] as String?) == ayahKey);
-    final entry = <String, dynamic>{
-      "ayahKey": ayahKey,
-      "color": colorId,
-      "updatedAt": now,
-      "createdAt": idx == -1 ? now : (list[idx]["createdAt"] ?? now),
-    };
-    if (idx == -1) {
-      list.insert(0, entry);
-    } else {
-      list[idx] = entry;
-    }
-
-    await box.put(_kWahyBookmarks, list);
+    await WahyLibraryStore.upsertBookmarkColor(ayahKey, colorId);
   }
 
   Future<void> _toggleStarForCurrentAyah() async {
-    final box = Hive.box("user");
     final key = context.read<AyahKeyCubit>().state.current;
     if (key.isEmpty) return;
-    final list = _getWahyStarred();
-    if (list.contains(key)) {
-      list.remove(key);
-    } else {
-      list.insert(0, key);
-    }
-    await box.put(_kWahyStarred, list);
+    await WahyLibraryStore.toggleStar(key);
   }
 
   Future<void> _openBookmarksSheet() async {
@@ -973,9 +914,6 @@ class _MushafViewState extends State<MushafView> {
       ? Color(0xFF000000)
       : Color(0xFFF7F1E6);
 
-  static const String _kWahyBookmarks = "wahy_bookmarks";
-  static const String _kWahyNotes = "wahy_notes";
-
   /// Word Info Repository instance for Qiraat/Sarf/Irab
 
   Timer? _menuTimer;
@@ -1110,43 +1048,14 @@ class _MushafViewState extends State<MushafView> {
 
     final text = (result ?? "").trim();
     if (text.isEmpty) return;
-    final box = Hive.box("user");
-    final raw = box.get(_kWahyNotes, defaultValue: const []) as List?;
-    final list = (raw ?? const [])
-        .map((e) => Map<String, dynamic>.from(e as Map))
-        .toList();
-    list.insert(0, {
-      "ayahKey": ayahKey,
-      "text": text,
-      "createdAt": DateTime.now().toIso8601String(),
-    });
-    await box.put(_kWahyNotes, list);
-    await syncWahyNoteToCollection(ayahKey, text);
+    await WahyLibraryStore.addNote(ayahKey, text);
   }
 
   Future<void> _setBookmarkColorForAyahKey(
     String ayahKey,
     String colorId,
   ) async {
-    final box = Hive.box("user");
-    final raw = box.get(_kWahyBookmarks, defaultValue: const []) as List?;
-    final list = (raw ?? const [])
-        .map((e) => Map<String, dynamic>.from(e as Map))
-        .toList();
-    final now = DateTime.now().toIso8601String();
-    final idx = list.indexWhere((e) => (e["ayahKey"] as String?) == ayahKey);
-    final entry = <String, dynamic>{
-      "ayahKey": ayahKey,
-      "color": colorId,
-      "updatedAt": now,
-      "createdAt": idx == -1 ? now : (list[idx]["createdAt"] ?? now),
-    };
-    if (idx == -1) {
-      list.insert(0, entry);
-    } else {
-      list[idx] = entry;
-    }
-    await box.put(_kWahyBookmarks, list);
+    await WahyLibraryStore.upsertBookmarkColor(ayahKey, colorId);
   }
 
   Future<void> _pickBookmarkColorForAyahKey(String ayahKey) async {
@@ -1433,13 +1342,7 @@ class _MushafViewState extends State<MushafView> {
         await _setBookmarkColorForAyahKey(ayahKey, colorId);
       },
       onRemoveBookmark: () async {
-        final box = Hive.box("user");
-        final raw = box.get(_kWahyBookmarks, defaultValue: const []) as List?;
-        final list = (raw ?? const [])
-            .map((e) => Map<String, dynamic>.from(e as Map))
-            .toList();
-        list.removeWhere((e) => (e["ayahKey"] as String?) == ayahKey);
-        await box.put(_kWahyBookmarks, list);
+        await WahyLibraryStore.removeBookmark(ayahKey);
       },
       onShareAsText: () {
         _openTafsirStyleShareOptions(
@@ -1580,29 +1483,18 @@ class _MushafViewState extends State<MushafView> {
       );
     }
 
-    const starredHiveKey = "wahy_starred";
-
-    final userBox = Hive.box("user");
-    final rawBookmarks =
-        userBox.get(_kWahyBookmarks, defaultValue: const []) as List?;
-    final bookmarksList = (rawBookmarks ?? const [])
-        .map((e) => Map<String, dynamic>.from(e as Map))
-        .toList();
+    final bookmarksList = WahyLibraryStore.loadBookmarks();
     final bookmarkKeys = bookmarksList
         .map((e) => (e["ayahKey"] as String?) ?? "")
         .where((k) => k.isNotEmpty)
         .toSet();
 
-    final rawNotes = userBox.get(_kWahyNotes, defaultValue: const []) as List?;
-    final notesKeys = (rawNotes ?? const [])
-        .map((e) => Map<String, dynamic>.from(e as Map))
+    final notesKeys = WahyLibraryStore.loadNotes()
         .map((e) => (e["ayahKey"] as String?) ?? "")
         .where((k) => k.isNotEmpty)
         .toSet();
 
-    final rawStarred =
-        userBox.get(starredHiveKey, defaultValue: const []) as List?;
-    final starredKeys = List<String>.from(rawStarred ?? const []).toSet();
+    final starredKeys = WahyLibraryStore.loadStarred().toSet();
 
     final body = MultiBlocListener(
       listeners: [
