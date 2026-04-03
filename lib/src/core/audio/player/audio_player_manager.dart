@@ -2,24 +2,15 @@ import "dart:async";
 import "dart:developer";
 import "dart:io";
 
-import "package:al_quran_v3/l10n/app_localizations.dart";
 import "package:al_quran_v3/main.dart";
-import "package:al_quran_v3/src/resources/quran_resources/meta/meta_data_surah.dart";
-import "package:al_quran_v3/src/core/audio/cubit/audio_ui_cubit.dart";
-import "package:al_quran_v3/src/core/audio/cubit/ayah_key_cubit.dart";
-import "package:al_quran_v3/src/core/audio/cubit/player_position_cubit.dart";
-import "package:al_quran_v3/src/core/audio/cubit/player_state_cubit.dart";
 import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
 import "package:al_quran_v3/src/core/audio/model/recitation_info_model.dart";
+import "package:al_quran_v3/src/core/audio/services/audio_player_ui_bridge.dart";
 import "package:al_quran_v3/src/platform_services.dart";
-import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.dart";
-import "package:al_quran_v3/src/utils/quran_ayahs_function/gen_ayahs_key.dart";
-import "package:al_quran_v3/src/resources/quran_resources/meaning_of_surah.dart";
+import "package:al_quran_v3/src/resources/quran_resources/meta/meta_data_surah.dart";
 import "package:al_quran_v3/src/screen/surah_list_view/model/surah_info_model.dart";
-import "package:al_quran_v3/src/widget/quran_script_words/cubit/word_playing_state_cubit.dart";
+import "package:al_quran_v3/src/utils/quran_ayahs_function/gen_ayahs_key.dart";
 import "package:dio/dio.dart";
-import "package:flutter/material.dart";
-import "package:flutter_bloc/flutter_bloc.dart";
 import "package:just_audio/just_audio.dart";
 import "package:just_audio_background/just_audio_background.dart";
 import "package:path/path.dart";
@@ -32,123 +23,123 @@ class AudioPlayerManager {
   static AudioPlayer audioPlayer = AudioPlayer();
   static CancelToken? _downloadCancelToken;
 
-  static StreamSubscription? positionStream;
-  static StreamSubscription? errorStream;
-  static StreamSubscription? playerEventStream;
-  static StreamSubscription? processingStateStream;
-  static StreamSubscription? durationStream;
-  static StreamSubscription? bufferedPositionStream;
-  static StreamSubscription? currentIndexStream;
+  static StreamSubscription<Duration>? positionStream;
+  static StreamSubscription<PlayerException>? errorStream;
+  static StreamSubscription<PlayerEvent>? playerEventStream;
+  static StreamSubscription<ProcessingState>? processingStateStream;
+  static StreamSubscription<Duration?>? durationStream;
+  static StreamSubscription<Duration>? bufferedPositionStream;
+  static StreamSubscription<int?>? currentIndexStream;
+  static StreamSubscription<PlayerState>? _wordCompletionStream;
+
+  static AudioPlayerUiBridge? _uiBridge;
+
+  static void bindUiBridge(AudioPlayerUiBridge? bridge) {
+    _uiBridge = bridge;
+  }
 
   static void startListeningAudioPlayerState() {
-    if (isListening) return;
+    if (isListening) {
+      return;
+    }
+
     isListening = true;
-    final context = navigatorKey.currentContext!;
-    final playerPositionCubit = context.read<PlayerPositionCubit>();
+    final bridge = _uiBridge;
 
     positionStream = audioPlayer.positionStream.listen((event) {
-      if (durationToDecSec(playerPositionCubit.state.currentDuration) !=
+      if (durationToDecSec(bridge?.currentPosition) !=
           durationToDecSec(event)) {
-        playerPositionCubit.changeCurrentPosition(event);
+        bridge?.setCurrentPosition(event);
       }
     });
 
     errorStream = audioPlayer.errorStream.listen((event) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text("Audio Player Error"),
-            content: Text(event.message ?? "Something went wrong"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text("Ok"),
-              ),
-            ],
-          );
-        },
+      unawaited(
+        bridge?.showPlayerError(event.message ?? "Something went wrong") ??
+            Future<void>.value(),
       );
     });
 
     playerEventStream = audioPlayer.playerEventStream.listen((event) {
-      context.read<PlayerStateCubit>().changeState(isPlaying: event.playing);
+      bridge?.setPlayerState(isPlaying: event.playing);
     });
+
     processingStateStream = audioPlayer.processingStateStream.listen((
       event,
     ) async {
       if (event == ProcessingState.completed) {
         await audioPlayer.pause();
         await audioPlayer.seek(Duration.zero, index: 0);
-        context.read<AudioUiCubit>().expand(false);
+        bridge?.setExpanded(false);
       }
-      context.read<PlayerStateCubit>().changeState(processingState: event);
-      if (ProcessingState.completed == event) {
-        playerPositionCubit.changeCurrentPosition(Duration.zero);
-        context.read<PlayerStateCubit>().changeState(isPlaying: false);
+
+      bridge?.setPlayerState(processingState: event);
+      if (event == ProcessingState.completed) {
+        bridge?.setCurrentPosition(Duration.zero);
+        bridge?.setPlayerState(isPlaying: false);
       }
     });
 
     durationStream = audioPlayer.durationStream.listen((event) {
-      if (durationToDecSec(playerPositionCubit.state.totalDuration) !=
-          durationToDecSec(event)) {
-        playerPositionCubit.changeTotalDuration(event);
+      if (durationToDecSec(bridge?.totalDuration) != durationToDecSec(event)) {
+        bridge?.setTotalDuration(event);
       }
     });
 
     bufferedPositionStream = audioPlayer.bufferedPositionStream.listen((event) {
-      if (durationToDecSec(playerPositionCubit.state.bufferDuration) !=
+      if (durationToDecSec(bridge?.bufferedPosition) !=
           durationToDecSec(event)) {
-        playerPositionCubit.changeBufferPosition(event);
+        bridge?.setBufferPosition(event);
       }
     });
 
     currentIndexStream = audioPlayer.currentIndexStream.listen((event) {
-      if (event == null) return;
-      final ayahKeyCubit = context.read<AyahKeyCubit>();
-      try {
-        final tag = audioPlayer.sequenceState.sequence[event].tag;
-        if (tag is MediaItem && tag.id.isNotEmpty) {
-          ayahKeyCubit.changeCurrentAyahKey(tag.id);
-          return;
-        }
-      } catch (_) {
-        // Fallback to previous behavior if sequence/tag not available
+      if (event == null) {
+        return;
       }
 
-      if (event >= 0 && event < ayahKeyCubit.state.ayahList.length) {
-        ayahKeyCubit.changeCurrentAyahKey(ayahKeyCubit.state.ayahList[event]);
+      try {
+        final sequence = audioPlayer.sequenceState.sequence;
+        final tag = event >= 0 && event < sequence.length
+            ? sequence[event].tag
+            : null;
+        if (tag is MediaItem && tag.id.isNotEmpty) {
+          bridge?.setCurrentAyahKey(tag.id);
+          return;
+        }
+      } catch (_) {}
+
+      final ayahList = bridge?.ayahList ?? const <String>[];
+      if (event >= 0 && event < ayahList.length) {
+        bridge?.setCurrentAyahKey(ayahList[event]);
       }
     });
   }
 
   static Future<void> stopListeningAudioPlayerState() async {
     log(isListening.toString());
-    if (!isListening) return;
-    isListening = false;
-    positionStream?.cancel();
-    errorStream?.cancel();
-    playerEventStream?.cancel();
-    processingStateStream?.cancel();
-    durationStream?.cancel();
-    bufferedPositionStream?.cancel();
-    currentIndexStream?.cancel();
-    final audioUICubit = navigatorKey.currentContext!.read<AudioUiCubit>();
-    audioUICubit.expand(false);
-    audioUICubit.showUI(false);
-    audioUICubit.isPlayList(false);
-    audioUICubit.changeIsInsideQuran(false);
+    if (!isListening) {
+      return;
+    }
 
-    final playerPositionCubit = navigatorKey.currentContext!
-        .read<PlayerPositionCubit>();
-    playerPositionCubit.changeCurrentPosition(Duration.zero);
-    playerPositionCubit.changeBufferPosition(Duration.zero);
-    playerPositionCubit.changeTotalDuration(Duration.zero);
-    navigatorKey.currentContext!.read<PlayerStateCubit>().changeState(
-      isPlaying: false,
-    );
+    isListening = false;
+    await positionStream?.cancel();
+    await errorStream?.cancel();
+    await playerEventStream?.cancel();
+    await processingStateStream?.cancel();
+    await durationStream?.cancel();
+    await bufferedPositionStream?.cancel();
+    await currentIndexStream?.cancel();
+
+    _uiBridge?.setExpanded(false);
+    _uiBridge?.setShowUi(false);
+    _uiBridge?.setIsPlayList(false);
+    _uiBridge?.setIsInsideQuran(false);
+    _uiBridge?.setCurrentPosition(Duration.zero);
+    _uiBridge?.setBufferPosition(Duration.zero);
+    _uiBridge?.setTotalDuration(Duration.zero);
+    _uiBridge?.setPlayerState(isPlaying: false);
+
     await audioPlayer.stop();
     await audioPlayer.clearAudioSources();
     await audioPlayer.dispose();
@@ -156,16 +147,15 @@ class AudioPlayerManager {
   }
 
   static Future<void> stopPlaybackKeepUi() async {
-    final context = navigatorKey.currentContext;
-    try {
-      positionStream?.cancel();
-      errorStream?.cancel();
-      playerEventStream?.cancel();
-      processingStateStream?.cancel();
-      durationStream?.cancel();
-      bufferedPositionStream?.cancel();
-      currentIndexStream?.cancel();
-    } catch (_) {}
+    await positionStream?.cancel();
+    await errorStream?.cancel();
+    await playerEventStream?.cancel();
+    await processingStateStream?.cancel();
+    await durationStream?.cancel();
+    await bufferedPositionStream?.cancel();
+    await currentIndexStream?.cancel();
+    await _wordCompletionStream?.cancel();
+    _wordCompletionStream = null;
 
     isListening = false;
 
@@ -174,17 +164,11 @@ class AudioPlayerManager {
       await audioPlayer.clearAudioSources();
     } catch (_) {}
 
-    if (context != null) {
-      try {
-        context.read<PlayerPositionCubit>().changeCurrentPosition(
-          Duration.zero,
-        );
-        context.read<PlayerPositionCubit>().changeBufferPosition(Duration.zero);
-        context.read<PlayerPositionCubit>().changeTotalDuration(Duration.zero);
-        context.read<PlayerStateCubit>().changeState(isPlaying: false);
-        context.read<AudioUiCubit>().expand(false);
-      } catch (_) {}
-    }
+    _uiBridge?.setCurrentPosition(Duration.zero);
+    _uiBridge?.setBufferPosition(Duration.zero);
+    _uiBridge?.setTotalDuration(Duration.zero);
+    _uiBridge?.setPlayerState(isPlaying: false);
+    _uiBridge?.setExpanded(false);
 
     try {
       await audioPlayer.dispose();
@@ -196,10 +180,10 @@ class AudioPlayerManager {
     List<String> wordKeys, {
     void Function(int index, String wordKey)? onWordStart,
   }) async {
-    if (wordKeys.isEmpty) return;
-    if (isWordPlaying) return;
+    if (wordKeys.isEmpty || isWordPlaying) {
+      return;
+    }
 
-    final context = navigatorKey.currentContext!;
     isWordPlaying = true;
 
     try {
@@ -207,33 +191,33 @@ class AudioPlayerManager {
       isListening = false;
 
       for (int i = 0; i < wordKeys.length; i++) {
-        final k = wordKeys[i];
-        onWordStart?.call(i, k);
-        context.read<WordPlayingStateCubit>().changeState(k);
+        final wordKey = wordKeys[i];
+        onWordStart?.call(i, wordKey);
+        _uiBridge?.setWordPlaying(wordKey);
 
         final url =
-            "https://audio.qurancdn.com/wbw/${wordKeyToAudioOfWordID(k)}.mp3";
-        final AudioSource source =
+            "https://audio.qurancdn.com/wbw/${wordKeyToAudioOfWordID(wordKey)}.mp3";
+        final audioSource =
             !(platformOwn == PlatformOwn.isIos ||
                 platformOwn == PlatformOwn.isAndroid ||
                 platformOwn == PlatformOwn.isMac)
             ? AudioSource.uri(Uri.parse(url))
             : LockCachingAudioSource(
                 Uri.parse(url),
-                tag: MediaItem(id: k, title: k),
+                tag: MediaItem(id: wordKey, title: wordKey),
               );
 
-        await audioPlayer.setAudioSource(source);
+        await audioPlayer.setAudioSource(audioSource);
         await audioPlayer.play();
         await audioPlayer.processingStateStream.firstWhere(
-          (s) => s == ProcessingState.completed,
+          (state) => state == ProcessingState.completed,
         );
         await audioPlayer.stop();
         await audioPlayer.seek(Duration.zero);
       }
-    } catch (e, s) {
+    } catch (error, stackTrace) {
       log(
-        "playWordsSequence failed: $e\n$s",
+        "playWordsSequence failed: $error\n$stackTrace",
         name: "AudioPlayerManager.playWordsSequence",
       );
       try {
@@ -241,9 +225,7 @@ class AudioPlayerManager {
       } catch (_) {}
     } finally {
       isWordPlaying = false;
-      try {
-        context.read<WordPlayingStateCubit>().changeState(null);
-      } catch (_) {}
+      _uiBridge?.setWordPlaying(null);
     }
   }
 
@@ -255,28 +237,25 @@ class AudioPlayerManager {
     required SurahInfoModel surahInfoModel,
     required ReciterInfoModel reciterInfoModel,
     required dynamic audioDownloadCubit,
-  }) async {
-    // Disabled functionality
-    // Removed download functionality
-  }
+  }) async {}
 
   static Future<int> getFilesCount(
     ReciterInfoModel reciter,
     SurahInfoModel surah,
   ) async {
-    String? path = AudioPlayerManager.getExpectedSurahDirectoryLocation(
+    final path = getExpectedSurahDirectoryLocation(
       surahInfoModel: surah,
       reciterInfoModel: reciter,
     );
     if (path == null) {
       return 0;
     }
+
     final dir = Directory(path);
     if (await dir.exists()) {
       return dir.listSync().length;
-    } else {
-      return 0;
     }
+    return 0;
   }
 
   static String? getExpectedAudioFileLocation({
@@ -316,16 +295,15 @@ class AudioPlayerManager {
     required int ayahNumber,
     required ReciterInfoModel reciterInfoModel,
   }) async {
-    String? expectedPath = getExpectedAudioFileLocation(
+    final expectedPath = getExpectedAudioFileLocation(
       surahInfoModel: surahInfoModel,
       ayahNumber: ayahNumber,
       reciterInfoModel: reciterInfoModel,
     );
     if (expectedPath != null && await File(expectedPath).exists()) {
       return expectedPath;
-    } else {
-      return null;
     }
+    return null;
   }
 
   static Future<void> playSingleAyah({
@@ -343,23 +321,15 @@ class AudioPlayerManager {
       await audioPlayer.clearAudioSources();
     }
 
-    final BuildContext context = navigatorKey.currentContext!;
-
-    if (await shouldContinuePlaying(context, reciterInfoModel, ayahKey) ==
-        false) {
+    if (await shouldContinuePlaying(reciterInfoModel, ayahKey) == false) {
       return;
     }
-    final audioUICubit = context.read<AudioUiCubit>();
-    final ayahKeyCubit = context.read<AyahKeyCubit>();
 
-    double playbackSpeed = context.read<QuranViewCubit>().state.playbackSpeed;
-
-    SurahInfoModel surahInfoModel = SurahInfoModel.fromMap(
+    final playbackSpeed = _uiBridge?.playbackSpeed ?? 1.0;
+    final surahInfoModel = SurahInfoModel.fromMap(
       metaDataSurah[ayahKey.split(":").first]!,
     );
-
     final audioSource = await getAudioSourceFromAyahKey(
-      context,
       ayahKey,
       surahInfoModel,
       reciterInfoModel,
@@ -368,12 +338,11 @@ class AudioPlayerManager {
     await audioPlayer.stop();
     await audioPlayer.clearAudioSources();
 
-    audioUICubit.expand(true);
-    audioUICubit.showUI(true);
-    audioUICubit.isPlayList(false);
-    audioUICubit.changeIsInsideQuran(isInsideQuran);
-
-    ayahKeyCubit.changeData(
+    _uiBridge?.setExpanded(true);
+    _uiBridge?.setShowUi(true);
+    _uiBridge?.setIsPlayList(false);
+    _uiBridge?.setIsInsideQuran(isInsideQuran);
+    _uiBridge?.setAyahData(
       AyahKeyManagement(
         start: ayahKey,
         end: ayahKey,
@@ -381,64 +350,43 @@ class AudioPlayerManager {
         ayahList: [ayahKey],
       ),
     );
+
     await audioPlayer.setAudioSource(audioSource, initialIndex: 0);
     await audioPlayer.setSpeed(playbackSpeed);
-    if (instantPlay) await audioPlayer.play();
+    if (instantPlay) {
+      await audioPlayer.play();
+    }
   }
 
   static Future<bool> shouldContinuePlaying(
-    BuildContext context,
     ReciterInfoModel reciterInfoModel,
     String startAyahKey,
   ) async {
     log("Checking existing Download");
-    bool useAudioStream = context.read<QuranViewCubit>().state.useAudioStream;
-    if (useAudioStream == false) {
-      SurahInfoModel surahInfoModel = SurahInfoModel.fromMap(
-        Map<String, dynamic>.from(
-          metaDataSurah[startAyahKey.split(":").first]!,
-        ),
-      );
-      int count = await getFilesCount(reciterInfoModel, surahInfoModel);
-      if (count >= surahInfoModel.versesCount) {
-        log(
-          "Already $count/${surahInfoModel.versesCount} ayahs downloaded",
-          name: "Audio",
-        );
-        return true;
-      } else {
-        log("Need to download some ayahs");
-
-        await showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              insetPadding: const EdgeInsets.all(10),
-              title: Text(
-                AppLocalizations.of(context).audioDownloadAlert(
-                  surahInfoModel.versesCount - count,
-                  surahInfoModel.versesCount,
-                ),
-              ),
-              actions: [
-                TextButton.icon(
-                  style: TextButton.styleFrom(foregroundColor: Colors.red),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(Icons.close),
-                  label: Text(AppLocalizations.of(context).cancel),
-                ),
-                /* TextButton Download removed */
-              ],
-            );
-          },
-        );
-        return false;
-      }
-    } else {
+    final useAudioStream = _uiBridge?.useAudioStream ?? true;
+    if (useAudioStream) {
       return true;
     }
+
+    final surahInfoModel = SurahInfoModel.fromMap(
+      Map<String, dynamic>.from(metaDataSurah[startAyahKey.split(":").first]!),
+    );
+    final count = await getFilesCount(reciterInfoModel, surahInfoModel);
+    if (count >= surahInfoModel.versesCount) {
+      log(
+        "Already $count/${surahInfoModel.versesCount} ayahs downloaded",
+        name: "Audio",
+      );
+      return true;
+    }
+
+    log("Need to download some ayahs");
+    await (_uiBridge?.showOfflineAudioAlert(
+          missingCount: surahInfoModel.versesCount - count,
+          totalCount: surahInfoModel.versesCount,
+        ) ??
+        Future<void>.value());
+    return false;
   }
 
   static Future<void> playMultipleAyahAsPlaylist({
@@ -458,18 +406,11 @@ class AudioPlayerManager {
       await audioPlayer.clearAudioSources();
     }
 
-    // check usr preference : Use Audio Stream
-
-    final BuildContext context = navigatorKey.currentContext!;
-    if (await shouldContinuePlaying(context, reciterInfoModel, startAyahKey) ==
-        false) {
+    if (await shouldContinuePlaying(reciterInfoModel, startAyahKey) == false) {
       return;
     }
-    final audioUICubit = context.read<AudioUiCubit>();
-    final ayahKeyCubit = context.read<AyahKeyCubit>();
 
-    double playbackSpeed = context.read<QuranViewCubit>().state.playbackSpeed;
-
+    final playbackSpeed = _uiBridge?.playbackSpeed ?? 1.0;
     List ayahList = getListOfAyahKey(
       startAyahKey: startAyahKey,
       endAyahKey: endAyahKey,
@@ -478,14 +419,13 @@ class AudioPlayerManager {
     ayahList.removeWhere((element) => element.runtimeType == int);
     ayahList = List<String>.from(ayahList);
 
-    List<AudioSource> listOfAudioSource = [];
-    for (String ayahKey in ayahList) {
-      SurahInfoModel surahInfoModel = SurahInfoModel.fromMap(
+    final listOfAudioSource = <AudioSource>[];
+    for (final ayahKey in ayahList) {
+      final surahInfoModel = SurahInfoModel.fromMap(
         metaDataSurah[ayahKey.split(":").first]!,
       );
       listOfAudioSource.add(
         await getAudioSourceFromAyahKey(
-          context,
           ayahKey,
           surahInfoModel,
           reciterInfoModel,
@@ -496,17 +436,16 @@ class AudioPlayerManager {
     await audioPlayer.stop();
     await audioPlayer.clearAudioSources();
 
-    audioUICubit.showUI(true);
-    audioUICubit.expand(true);
-    audioUICubit.isPlayList(true);
-    audioUICubit.changeIsInsideQuran(isInsideQuran);
-
-    ayahKeyCubit.changeData(
+    _uiBridge?.setShowUi(true);
+    _uiBridge?.setExpanded(true);
+    _uiBridge?.setIsPlayList(true);
+    _uiBridge?.setIsInsideQuran(isInsideQuran);
+    _uiBridge?.setAyahData(
       AyahKeyManagement(
         start: ayahList.first,
         end: ayahList.last,
         current: ayahList[initialIndex],
-        ayahList: ayahList as List<String>,
+        ayahList: ayahList.cast<String>(),
       ),
     );
 
@@ -517,25 +456,29 @@ class AudioPlayerManager {
     );
 
     await audioPlayer.setSpeed(playbackSpeed);
-    if (instantPlay) await audioPlayer.play();
+    if (instantPlay) {
+      await audioPlayer.play();
+    }
   }
 
   static Future<void> playWord(String wordKey) async {
-    if (isWordPlaying) return;
+    if (isWordPlaying) {
+      return;
+    }
+
     if (platformOwn == PlatformOwn.isIos ||
         platformOwn == PlatformOwn.isAndroid) {
       Permission.notification.request();
     }
+
     isWordPlaying = true;
-    final context = navigatorKey.currentContext!;
 
     try {
-      context.read<WordPlayingStateCubit>().changeState(wordKey);
+      _uiBridge?.setWordPlaying(wordKey);
 
       final url =
           "https://audio.qurancdn.com/wbw/${wordKeyToAudioOfWordID(wordKey)}.mp3";
-
-      final AudioSource audioSource =
+      final audioSource =
           !(platformOwn == PlatformOwn.isIos ||
               platformOwn == PlatformOwn.isAndroid ||
               platformOwn == PlatformOwn.isMac)
@@ -548,11 +491,13 @@ class AudioPlayerManager {
       await stopListeningAudioPlayerState();
       isListening = false;
 
+      await _wordCompletionStream?.cancel();
       await audioPlayer.setAudioSource(audioSource);
       await audioPlayer.play();
 
-      // Ensure we always reset when finished.
-      audioPlayer.playerStateStream.listen((event) async {
+      _wordCompletionStream = audioPlayer.playerStateStream.listen((
+        event,
+      ) async {
         if (event.processingState == ProcessingState.completed) {
           try {
             await audioPlayer.stop();
@@ -561,16 +506,21 @@ class AudioPlayerManager {
           } catch (_) {}
           audioPlayer = AudioPlayer();
           isWordPlaying = false;
-          context.read<WordPlayingStateCubit>().changeState(null);
+          _uiBridge?.setWordPlaying(null);
+          await _wordCompletionStream?.cancel();
+          _wordCompletionStream = null;
           await stopListeningAudioPlayerState();
         }
       });
-    } catch (e, s) {
-      log("playWord failed: $e\n$s", name: "AudioPlayerManager.playWord");
+    } catch (error, stackTrace) {
+      log(
+        "playWord failed: $error\n$stackTrace",
+        name: "AudioPlayerManager.playWord",
+      );
       isWordPlaying = false;
-      try {
-        context.read<WordPlayingStateCubit>().changeState(null);
-      } catch (_) {}
+      _uiBridge?.setWordPlaying(null);
+      await _wordCompletionStream?.cancel();
+      _wordCompletionStream = null;
       try {
         await audioPlayer.stop();
       } catch (_) {}
@@ -578,24 +528,27 @@ class AudioPlayerManager {
   }
 
   static String wordKeyToAudioOfWordID(String wordKey) {
-    List<String> splitString = wordKey.split(":");
-    String surahNumber = splitString[0];
-    String ayahNumber = splitString[1];
-    String wordNumber = splitString[2];
+    final splitString = wordKey.split(":");
+    final surahNumber = splitString[0];
+    final ayahNumber = splitString[1];
+    final wordNumber = splitString[2];
     return "${surahNumber.padLeft(3, "0")}_${ayahNumber.padLeft(3, "0")}_${wordNumber.padLeft(3, "0")}";
   }
 
   static Future<AudioSource> getAudioSourceFromAyahKey(
-    BuildContext context,
     String ayahKey,
     SurahInfoModel surahInfoModel,
     ReciterInfoModel reciter,
   ) async {
-    String? audioFilePath = await getDownloadedPathOfSurah(
+    final audioFilePath = await getDownloadedPathOfSurah(
       surahInfoModel: surahInfoModel,
       ayahNumber: int.parse(ayahKey.split(":").last),
       reciterInfoModel: reciter,
     );
+    final surahTitle =
+        _uiBridge?.localizedSurahName(surahInfoModel.id) ??
+        "Surah ${surahInfoModel.id}";
+
     if (audioFilePath != null) {
       return (platformOwn == PlatformOwn.isLinux ||
               platformOwn == PlatformOwn.isWindows)
@@ -605,25 +558,21 @@ class AudioPlayerManager {
               tag: MediaItem(
                 id: ayahKey,
                 album: reciter.name,
-                title: getSurahName(context, surahInfoModel.id),
+                title: surahTitle,
               ),
-            );
-    } else {
-      return (platformOwn == PlatformOwn.isIos ||
-              platformOwn == PlatformOwn.isAndroid ||
-              platformOwn == PlatformOwn.isMac)
-          ? LockCachingAudioSource(
-              Uri.parse(getUrlOfAudioFromAyahKey(ayahKey, reciter)),
-              tag: MediaItem(
-                id: ayahKey,
-                album: reciter.name,
-                title: getSurahName(context, surahInfoModel.id),
-              ),
-            )
-          : AudioSource.uri(
-              Uri.parse(getUrlOfAudioFromAyahKey(ayahKey, reciter)),
             );
     }
+
+    return (platformOwn == PlatformOwn.isIos ||
+            platformOwn == PlatformOwn.isAndroid ||
+            platformOwn == PlatformOwn.isMac)
+        ? LockCachingAudioSource(
+            Uri.parse(getUrlOfAudioFromAyahKey(ayahKey, reciter)),
+            tag: MediaItem(id: ayahKey, album: reciter.name, title: surahTitle),
+          )
+        : AudioSource.uri(
+            Uri.parse(getUrlOfAudioFromAyahKey(ayahKey, reciter)),
+          );
   }
 
   static String getUrlOfAudioFromAyahKey(
@@ -634,15 +583,14 @@ class AudioPlayerManager {
   }
 
   static String ayahKeyToAudioAyahID(String ayahKey) {
-    List<String> sections = ayahKey.split(":");
+    final sections = ayahKey.split(":");
     return "${sections[0].padLeft(3, '0')}${sections[1].padLeft(3, '0')}";
   }
 
   static int? durationToDecSec(Duration? duration) {
     if (duration == null) {
       return null;
-    } else {
-      return duration.inMilliseconds ~/ 100;
     }
+    return duration.inMilliseconds ~/ 100;
   }
 }

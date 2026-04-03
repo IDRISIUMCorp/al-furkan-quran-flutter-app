@@ -7,6 +7,8 @@ import "package:al_quran_v3/src/core/audio/cubit/ayah_key_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/player_position_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/player_state_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
+import "package:al_quran_v3/src/core/audio/player/audio_player_manager.dart";
+import "package:al_quran_v3/src/core/audio/services/audio_player_ui_bridge.dart";
 import "package:al_quran_v3/src/core/bootstrap/app_bootstrap_coordinator.dart";
 import "package:al_quran_v3/src/core/di/service_locator.dart";
 import "package:al_quran_v3/src/core/reader_session/reader_session_repository.dart";
@@ -202,6 +204,11 @@ class MyApp extends StatelessWidget {
                             textTheme: getTextTheme(languageState.locale, true),
                           ),
                       themeMode: themeState.themeMode,
+                      builder: (context, child) {
+                        return _AudioPlayerBridgeBinder(
+                          child: child ?? const SizedBox.shrink(),
+                        );
+                      },
                       scrollBehavior: AppScrollBehavior(),
                       home: const QuranBootstrapPage(),
                     );
@@ -291,4 +298,41 @@ class AppScrollBehavior extends MaterialScrollBehavior {
     PointerDeviceKind.trackpad,
     PointerDeviceKind.stylus,
   };
+}
+
+class _AudioPlayerBridgeBinder extends StatefulWidget {
+  const _AudioPlayerBridgeBinder({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_AudioPlayerBridgeBinder> createState() =>
+      _AudioPlayerBridgeBinderState();
+}
+
+class _AudioPlayerBridgeBinderState extends State<_AudioPlayerBridgeBinder> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    AudioPlayerManager.bindUiBridge(
+      BlocAudioPlayerUiBridge(
+        context: context,
+        audioUiCubit: context.read<AudioUiCubit>(),
+        playerPositionCubit: context.read<PlayerPositionCubit>(),
+        playerStateCubit: context.read<PlayerStateCubit>(),
+        ayahKeyCubit: context.read<AyahKeyCubit>(),
+        quranViewCubit: context.read<QuranViewCubit>(),
+        wordPlayingStateCubit: context.read<WordPlayingStateCubit>(),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    AudioPlayerManager.bindUiBridge(null);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
