@@ -65,6 +65,7 @@ class _QuranScriptViewState extends State<QuranScriptView> {
   int _currentHorizontalIndex = 0;
 
   StreamSubscription? _ayahKeyCubitSubscription;
+  StreamSubscription? _ayahByAyahScrollInfoSubscription;
   String? scrolledAyahOnAudioPlay;
 
   late List<String> ayahsList;
@@ -73,9 +74,9 @@ class _QuranScriptViewState extends State<QuranScriptView> {
     final page = getPageNumber(ayahKey);
     if (page == null) return;
     await context.read<ReaderUICubit>().saveLastReadPosition(
-          pageNumber: page,
-          ayahKey: ayahKey,
-        );
+      pageNumber: page,
+      ayahKey: ayahKey,
+    );
   }
 
   Future<void> scrollToAyah(String key) async {
@@ -107,6 +108,7 @@ class _QuranScriptViewState extends State<QuranScriptView> {
   @override
   void dispose() {
     _ayahKeyCubitSubscription?.cancel();
+    _ayahByAyahScrollInfoSubscription?.cancel();
     _ayahByAyahPageController?.dispose();
     super.dispose();
   }
@@ -119,12 +121,14 @@ class _QuranScriptViewState extends State<QuranScriptView> {
     );
 
     final String? savedAyahKey = context.read<ReaderUICubit>().lastReadAyahKey;
-    final String initialAyahKey = widget.toScrollKey ??
+    final String initialAyahKey =
+        widget.toScrollKey ??
         (savedAyahKey != null && ayahsList.contains(savedAyahKey)
             ? savedAyahKey
             : context.read<AyahKeyCubit>().state.current);
-    final int initialPageIndex =
-        ayahsList.contains(initialAyahKey) ? ayahsList.indexOf(initialAyahKey) : 0;
+    final int initialPageIndex = ayahsList.contains(initialAyahKey)
+        ? ayahsList.indexOf(initialAyahKey)
+        : 0;
     _lastAyahByAyahPageIndex = initialPageIndex;
     _currentHorizontalIndex = initialPageIndex;
     _ayahByAyahPageController = PageController(initialPage: initialPageIndex);
@@ -133,29 +137,32 @@ class _QuranScriptViewState extends State<QuranScriptView> {
       if (safeKey != null) _persistLastRead(safeKey);
     });
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      context.read<AyahByAyahInScrollInfoCubit>().stream.listen((event) {
-        if (!isLandScape) return;
-        if (previousDropdownAyahKey != event.dropdownAyahKey) {
-          final dynamic dropdownAyahKey = event.dropdownAyahKey;
-          if (dropdownAyahKey != null && dropdownAyahKey is String) {
-            final index = ayahsList.indexOf(dropdownAyahKey);
-            if (index != -1) {
-              bool isVisible = isItemVisible(
-                itemPositionsListenerAyahList,
-                index,
-              );
-              if (!isVisible && itemScrollControllerAyahList.isAttached) {
-                itemScrollControllerAyahList.scrollTo(
-                  index: index,
-                  duration: const Duration(milliseconds: 200),
-                  alignment: 0.5,
-                );
+      _ayahByAyahScrollInfoSubscription = context
+          .read<AyahByAyahInScrollInfoCubit>()
+          .stream
+          .listen((event) {
+            if (!isLandScape) return;
+            if (previousDropdownAyahKey != event.dropdownAyahKey) {
+              final dynamic dropdownAyahKey = event.dropdownAyahKey;
+              if (dropdownAyahKey != null && dropdownAyahKey is String) {
+                final index = ayahsList.indexOf(dropdownAyahKey);
+                if (index != -1) {
+                  bool isVisible = isItemVisible(
+                    itemPositionsListenerAyahList,
+                    index,
+                  );
+                  if (!isVisible && itemScrollControllerAyahList.isAttached) {
+                    itemScrollControllerAyahList.scrollTo(
+                      index: index,
+                      duration: const Duration(milliseconds: 200),
+                      alignment: 0.5,
+                    );
+                  }
+                }
               }
             }
-          }
-        }
-        previousDropdownAyahKey = event.dropdownAyahKey;
-      });
+            previousDropdownAyahKey = event.dropdownAyahKey;
+          });
     });
 
     _ayahKeyCubitSubscription = context.read<AyahKeyCubit>().stream.listen((
@@ -168,8 +175,10 @@ class _QuranScriptViewState extends State<QuranScriptView> {
           event.current == scrolledAyahOnAudioPlay) {
         return;
       }
-      final isHorizontal =
-          context.read<AyahByAyahInScrollInfoCubit>().state.isAyahByAyahHorizontal;
+      final isHorizontal = context
+          .read<AyahByAyahInScrollInfoCubit>()
+          .state
+          .isAyahByAyahHorizontal;
       if (isHorizontal) {
         _animateToAyahPage(event.current);
       } else {
@@ -201,50 +210,51 @@ class _QuranScriptViewState extends State<QuranScriptView> {
 
     final Widget content = _isMushafMode
         ? MushafView(
-          useDefaultAppBar: false,
-          initialPageNumber:
-              getPageNumber(context.read<AyahKeyCubit>().state.current),
-        )
+            useDefaultAppBar: false,
+            initialPageNumber: getPageNumber(
+              context.read<AyahKeyCubit>().state.current,
+            ),
+          )
         : quranScriptWidget(l10n);
 
     final body = isLandScape
         ? Row(
-          children: [
-            SafeArea(
-              right: false,
-              bottom: false,
-              top: true,
-              left: true,
-              child: sideBarOfSurahAndAyah(themeState, context),
-            ),
-            Expanded(
-              child: Stack(
-                children: [
-                  content,
-                  if (widget.showAudioController)
-                    const SafeArea(
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: AudioControllerUi(),
-                      ),
-                    ),
-                ],
+            children: [
+              SafeArea(
+                right: false,
+                bottom: false,
+                top: true,
+                left: true,
+                child: sideBarOfSurahAndAyah(themeState, context),
               ),
-            ),
-          ],
-        )
-        : Stack(
-          children: [
-            content,
-            if (widget.showAudioController)
-              const SafeArea(
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: AudioControllerUi(),
+              Expanded(
+                child: Stack(
+                  children: [
+                    content,
+                    if (widget.showAudioController)
+                      const SafeArea(
+                        child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: AudioControllerUi(),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-          ],
-        );
+            ],
+          )
+        : Stack(
+            children: [
+              content,
+              if (widget.showAudioController)
+                const SafeArea(
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: AudioControllerUi(),
+                  ),
+                ),
+            ],
+          );
 
     if (widget.embedded) {
       return body;
@@ -255,13 +265,13 @@ class _QuranScriptViewState extends State<QuranScriptView> {
       appBar: isLandScape
           ? null
           : AppBar(
-            title: appBarTitle(),
-            actions: [
-              getAyahsDropDown(themeState),
-              getMushafButton(themeState, context),
-              getSettingsButton(themeState, context),
-            ],
-          ),
+              title: appBarTitle(),
+              actions: [
+                getAyahsDropDown(themeState),
+                getMushafButton(themeState, context),
+                getSettingsButton(themeState, context),
+              ],
+            ),
       body: body,
     );
   }
@@ -302,64 +312,63 @@ class _QuranScriptViewState extends State<QuranScriptView> {
                   border: Border.all(color: themeState.primaryShade200),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: BlocBuilder<
-                  AyahByAyahInScrollInfoCubit,
-                  AyahByAyahInScrollInfoState
-                >(
-                  builder: (context, ayahState) {
-                    return ScrollablePositionedList.builder(
-                      itemScrollController: itemScrollControllerSurahList,
-                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                      itemCount: 114,
-                      itemBuilder: (context, index) {
-                        bool isCurrent =
-                            (index + 1) == ayahState.surahInfoModel?.id;
-                        return OutlinedButton(
-                          style: outlineButtonDesignSidebar(
-                            isCurrent,
-                            themeState,
-                          ),
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => QuranScriptView(
+                child:
+                    BlocBuilder<
+                      AyahByAyahInScrollInfoCubit,
+                      AyahByAyahInScrollInfoState
+                    >(
+                      builder: (context, ayahState) {
+                        return ScrollablePositionedList.builder(
+                          itemScrollController: itemScrollControllerSurahList,
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          itemCount: 114,
+                          itemBuilder: (context, index) {
+                            bool isCurrent =
+                                (index + 1) == ayahState.surahInfoModel?.id;
+                            return OutlinedButton(
+                              style: outlineButtonDesignSidebar(
+                                isCurrent,
+                                themeState,
+                              ),
+                              onPressed: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => QuranScriptView(
                                       startKey: "${index + 1}:1",
                                       endKey: getEndAyahKeyFromSurahNumber(
                                         index + 1,
                                       ),
                                     ),
+                                  ),
+                                );
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    getSurahName(context, index + 1),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: isCurrent
+                                          ? themeState.primary
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                  if (isCurrent) const Gap(5),
+                                  if (isCurrent)
+                                    const Icon(
+                                      Icons.radio_button_checked,
+                                      size: 12,
+                                    ),
+                                ],
                               ),
                             );
                           },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                getSurahName(context, index + 1),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color:
-                                      isCurrent
-                                          ? themeState.primary
-                                          : Colors.grey,
-                                ),
-                              ),
-                              if (isCurrent) const Gap(5),
-                              if (isCurrent)
-                                const Icon(
-                                  Icons.radio_button_checked,
-                                  size: 12,
-                                ),
-                            ],
-                          ),
                         );
                       },
-                    );
-                  },
-                ),
+                    ),
               ),
 
               Container(
@@ -369,56 +378,59 @@ class _QuranScriptViewState extends State<QuranScriptView> {
                   border: Border.all(color: themeState.primaryShade200),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: BlocBuilder<
-                  AyahByAyahInScrollInfoCubit,
-                  AyahByAyahInScrollInfoState
-                >(
-                  builder: (context, ayahState) {
-                    return ScrollablePositionedList.builder(
-                      itemScrollController: itemScrollControllerAyahList,
-                      itemPositionsListener: itemPositionsListenerAyahList,
-                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                      itemCount: ayahsList.length,
-                      itemBuilder: (context, index) {
-                        bool isCurrent =
-                            ayahState.dropdownAyahKey == ayahsList[index];
+                child:
+                    BlocBuilder<
+                      AyahByAyahInScrollInfoCubit,
+                      AyahByAyahInScrollInfoState
+                    >(
+                      builder: (context, ayahState) {
+                        return ScrollablePositionedList.builder(
+                          itemScrollController: itemScrollControllerAyahList,
+                          itemPositionsListener: itemPositionsListenerAyahList,
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          itemCount: ayahsList.length,
+                          itemBuilder: (context, index) {
+                            bool isCurrent =
+                                ayahState.dropdownAyahKey == ayahsList[index];
 
-                        return OutlinedButton(
-                          style: outlineButtonDesignSidebar(
-                            isCurrent,
-                            themeState,
-                          ),
-                          onPressed: () {
-                            scrollToAyah(ayahsList[index]);
-                            WidgetsBinding.instance.addPostFrameCallback((
-                              _,
-                            ) async {
-                              context
-                                  .read<AyahByAyahInScrollInfoCubit>()
-                                  .setData(dropdownAyahKey: ayahsList[index]);
-                            });
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-
-                            children: [
-                              Text(
-                                "${localizedNumber(context, ayahsList[index].split(":").first.toInt())}:${localizedNumber(context, ayahsList[index].split(":").last.toInt())}",
+                            return OutlinedButton(
+                              style: outlineButtonDesignSidebar(
+                                isCurrent,
+                                themeState,
                               ),
-                              if (isCurrent) const Gap(5),
-                              if (isCurrent)
-                                const Icon(
-                                  Icons.radio_button_checked,
-                                  size: 12,
-                                ),
-                            ],
-                          ),
+                              onPressed: () {
+                                scrollToAyah(ayahsList[index]);
+                                WidgetsBinding.instance.addPostFrameCallback((
+                                  _,
+                                ) async {
+                                  context
+                                      .read<AyahByAyahInScrollInfoCubit>()
+                                      .setData(
+                                        dropdownAyahKey: ayahsList[index],
+                                      );
+                                });
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+
+                                children: [
+                                  Text(
+                                    "${localizedNumber(context, ayahsList[index].split(":").first.toInt())}:${localizedNumber(context, ayahsList[index].split(":").last.toInt())}",
+                                  ),
+                                  if (isCurrent) const Gap(5),
+                                  if (isCurrent)
+                                    const Icon(
+                                      Icons.radio_button_checked,
+                                      size: 12,
+                                    ),
+                                ],
+                              ),
+                            );
+                          },
                         );
                       },
-                    );
-                  },
-                ),
+                    ),
               ),
             ],
           ),
@@ -467,15 +479,13 @@ class _QuranScriptViewState extends State<QuranScriptView> {
           int ayahNumber = ayahKeySplit.last.toInt();
           String surahEndAyahKey =
               surahNumber == ayahsList.last.split(":").last.toInt()
-                  ? ayahsList.last
-                  : getEndAyahKeyFromSurahNumber(surahNumber);
+              ? ayahsList.last
+              : getEndAyahKeyFromSurahNumber(surahNumber);
           bool isSurahHeadingIncluded = ayahNumber == 1;
           int pageNumber = getPageNumber(ayahKey) ?? 0;
           PageInfoModel? pageInfo;
           try {
-            pageInfo = PageInfoModel.fromMap(
-              quranPagesInfo[pageNumber - 1],
-            );
+            pageInfo = PageInfoModel.fromMap(quranPagesInfo[pageNumber - 1]);
           } catch (_) {}
 
           bool isPageStart = pageInfo?.start == ayahNumber || index == 0;
@@ -491,10 +501,7 @@ class _QuranScriptViewState extends State<QuranScriptView> {
                   ),
                 ),
               if (isPageStart) pageLabelOfQuran(context, l10n, pageNumber),
-              getAyahByAyahTafsirCard(
-                ayahKey: ayahKey,
-                context: context,
-              ),
+              getAyahByAyahTafsirCard(ayahKey: ayahKey, context: context),
             ],
           );
         }
@@ -510,8 +517,9 @@ class _QuranScriptViewState extends State<QuranScriptView> {
             final double progress = (ayahsList.isEmpty)
                 ? 0
                 : (_currentHorizontalIndex + 1) / ayahsList.length;
-            final Color surface =
-                isDark ? const Color(0xFF141414) : const Color(0xFFF3EDE2);
+            final Color surface = isDark
+                ? const Color(0xFF141414)
+                : const Color(0xFFF3EDE2);
             final Color onSurface = isDark ? Colors.white : Colors.black87;
 
             return AnimatedContainer(
@@ -523,9 +531,7 @@ class _QuranScriptViewState extends State<QuranScriptView> {
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(
-                      alpha: isDark ? 0.22 : 0.12,
-                    ),
+                    color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.12),
                     blurRadius: 14,
                     offset: const Offset(0, 6),
                   ),
@@ -555,8 +561,9 @@ class _QuranScriptViewState extends State<QuranScriptView> {
                       value: progress.clamp(0, 1),
                       minHeight: 3,
                       backgroundColor: onSurface.withValues(alpha: 0.12),
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(themeState.primary),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        themeState.primary,
+                      ),
                     ),
                   ),
                 ],
@@ -628,8 +635,8 @@ class _QuranScriptViewState extends State<QuranScriptView> {
           state.surahInfoModel == null
               ? ""
               : AppLocalizations.of(
-                context,
-              ).surahName(getSurahName(context, state.surahInfoModel!.id)),
+                  context,
+                ).surahName(getSurahName(context, state.surahInfoModel!.id)),
           style: const TextStyle(fontSize: 18),
         );
       },
@@ -645,29 +652,24 @@ class _QuranScriptViewState extends State<QuranScriptView> {
         color: themeState.primaryShade100,
         borderRadius: BorderRadius.circular(100),
       ),
-      child: BlocBuilder<
-        AyahByAyahInScrollInfoCubit,
-        AyahByAyahInScrollInfoState
-      >(
+      child: BlocBuilder<AyahByAyahInScrollInfoCubit, AyahByAyahInScrollInfoState>(
         builder: (context, ayahScrollInfoState) {
-          List<DropdownMenuItem> dropdownItems =
-              List.generate(ayahsList.length, (index) {
-                List<String> ayahData = ayahsList[index].toString().split(
-                  ":",
-                );
-                return DropdownMenuItem(
-                  value: ayahsList[index],
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: Text(
-                      "${localizedNumber(context, ayahData.first.toInt())}:${localizedNumber(context, ayahData.last.toInt())}",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                );
-              });
+          List<DropdownMenuItem>
+          dropdownItems = List.generate(ayahsList.length, (index) {
+            List<String> ayahData = ayahsList[index].toString().split(":");
+            return DropdownMenuItem(
+              value: ayahsList[index],
+              child: SizedBox(
+                width: double.infinity,
+                child: Text(
+                  "${localizedNumber(context, ayahData.first.toInt())}:${localizedNumber(context, ayahData.last.toInt())}",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          });
           final value = ayahScrollInfoState.dropdownAyahKey;
           final isValidValue = dropdownItems.any((item) => item.value == value);
           return DropdownButtonHideUnderline(

@@ -5,6 +5,7 @@ import "package:al_quran_v3/src/core/audio/cubit/player_state_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
 import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
 import "package:al_quran_v3/src/core/audio/player/audio_player_manager.dart";
+import "package:al_quran_v3/src/core/audio/services/audio_playback_service_access.dart";
 import "package:al_quran_v3/src/resources/translation/language_cubit.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_translation_function.dart";
 import "package:al_quran_v3/src/resources/quran_resources/meaning_of_surah.dart";
@@ -73,7 +74,11 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
                                 "${headerInfoModel.surahInfoModel.id}. ${getSurahName(context, headerInfoModel.surahInfoModel.id)}  - ",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black,
                             ),
                           ),
                           TextSpan(
@@ -82,7 +87,11 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 18,
                               fontFamily: "surah-name-v1",
-                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black,
                             ),
                           ),
                         ],
@@ -95,7 +104,10 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
                           headerInfoModel.surahInfoModel.versesCount.toString(),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black,
                           ),
                         ),
                       ],
@@ -119,12 +131,11 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder:
-                                    (context) => SurahInfoView(
-                                      html: surahInfo,
-                                      surahInfoModel:
-                                          headerInfoModel.surahInfoModel,
-                                    ),
+                                builder: (context) => SurahInfoView(
+                                  html: surahInfo,
+                                  surahInfoModel:
+                                      headerInfoModel.surahInfoModel,
+                                ),
                               ),
                             );
                           },
@@ -166,83 +177,82 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
                       children: [
                         if (!kIsWeb)
                           /* Download Icon Button removed */
-                        IconButton(
-                          style: IconButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            backgroundColor: themeState.primary,
-                            foregroundColor: Colors.white,
-                          ),
-                          onPressed: () {
-                            bool isPlayList =
-                                context.read<AudioUiCubit>().state.isPlayList;
-                            bool isCompleted =
-                                playerState.state ==
-                                just_audio.ProcessingState.completed;
+                          IconButton(
+                            style: IconButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              backgroundColor: themeState.primary,
+                              foregroundColor: Colors.white,
+                            ),
+                            onPressed: () {
+                              bool isPlayList = context
+                                  .read<AudioUiCubit>()
+                                  .state
+                                  .isPlayList;
+                              bool isCompleted =
+                                  playerState.state ==
+                                  just_audio.ProcessingState.completed;
 
-                            if (context
-                                    .read<AudioUiCubit>()
-                                    .state
-                                    .isInsideQuranPlayer ==
-                                false) {
-                              String startAyahKey =
-                                  headerInfoModel.startAyahKey;
-                              String endAyahKey = headerInfoModel.endAyahKey;
+                              if (context
+                                      .read<AudioUiCubit>()
+                                      .state
+                                      .isInsideQuranPlayer ==
+                                  false) {
+                                String startAyahKey =
+                                    headerInfoModel.startAyahKey;
+                                String endAyahKey = headerInfoModel.endAyahKey;
 
-                              AudioPlayerManager.playMultipleAyahAsPlaylist(
-                                startAyahKey: startAyahKey,
-                                endAyahKey: endAyahKey,
-                                reciterInfoModel:
-                                    context
-                                        .read<SegmentedQuranReciterCubit>()
-                                        .state,
-                                isInsideQuran: true,
-                              );
-                            } else if (isCurrentPlaying &&
-                                isPlayList &&
-                                !isCompleted) {
-                              AudioPlayerManager.audioPlayer.pause();
-                            } else if (isCurrentSurah &&
-                                isPlayList &&
-                                !isCompleted) {
-                              AudioPlayerManager.audioPlayer.play();
-                            } else {
-                              String startAyahKey =
-                                  headerInfoModel.startAyahKey;
-                              String endAyahKey = headerInfoModel.endAyahKey;
+                                audioPlaybackService.playPlaylist(
+                                  startAyahKey: startAyahKey,
+                                  endAyahKey: endAyahKey,
+                                  reciterInfoModel: context
+                                      .read<SegmentedQuranReciterCubit>()
+                                      .state,
+                                  isInsideQuran: true,
+                                );
+                              } else if (isCurrentPlaying &&
+                                  isPlayList &&
+                                  !isCompleted) {
+                                AudioPlayerManager.audioPlayer.pause();
+                              } else if (isCurrentSurah &&
+                                  isPlayList &&
+                                  !isCompleted) {
+                                AudioPlayerManager.audioPlayer.play();
+                              } else {
+                                String startAyahKey =
+                                    headerInfoModel.startAyahKey;
+                                String endAyahKey = headerInfoModel.endAyahKey;
 
-                              AudioPlayerManager.playMultipleAyahAsPlaylist(
-                                startAyahKey: startAyahKey,
-                                endAyahKey: endAyahKey,
-                                reciterInfoModel:
-                                    context
-                                        .read<SegmentedQuranReciterCubit>()
-                                        .state,
-                                isInsideQuran: true,
-                              );
-                            }
-                          },
-                          icon:
-                              (playerState.state ==
-                                          just_audio.ProcessingState.loading &&
-                                      isCurrentSurah)
-                                  ? Padding(
+                                audioPlaybackService.playPlaylist(
+                                  startAyahKey: startAyahKey,
+                                  endAyahKey: endAyahKey,
+                                  reciterInfoModel: context
+                                      .read<SegmentedQuranReciterCubit>()
+                                      .state,
+                                  isInsideQuran: true,
+                                );
+                              }
+                            },
+                            icon:
+                                (playerState.state ==
+                                        just_audio.ProcessingState.loading &&
+                                    isCurrentSurah)
+                                ? Padding(
                                     padding: const EdgeInsets.all(3.0),
                                     child: CircularProgressIndicator(
                                       color: Colors.white,
                                       strokeWidth: 4,
-                                      backgroundColor:
-                                          context
-                                              .read<ThemeCubit>()
-                                              .state
-                                              .primaryShade100,
+                                      backgroundColor: context
+                                          .read<ThemeCubit>()
+                                          .state
+                                          .primaryShade100,
                                     ),
                                   )
-                                  : Icon(
+                                : Icon(
                                     isCurrentPlaying
                                         ? Icons.pause_rounded
                                         : Icons.play_arrow_rounded,
                                   ),
-                        ),
+                          ),
                       ],
                     );
                   },
@@ -264,16 +274,22 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
             margin: const EdgeInsets.all(10),
             child: BlocBuilder<QuranViewCubit, QuranViewState>(
               builder: (context, state) {
-                bool isUthmani = state.quranScriptType == QuranScriptType.uthmani || state.quranScriptType == QuranScriptType.tajweed;
+                bool isUthmani =
+                    state.quranScriptType == QuranScriptType.uthmani ||
+                    state.quranScriptType == QuranScriptType.tajweed;
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5),
                   child: Text(
-                    isUthmani ? "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ" : "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ",
+                    isUthmani
+                        ? "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"
+                        : "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ",
                     style: TextStyle(
                       fontFamily: isUthmani ? "QPC_Hafs" : "AlQuranNeov5x1",
                       fontSize: state.fontSize.clamp(20.0, 36.0),
                       height: state.lineHeight,
-                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF1B1B1B),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : const Color(0xFF1B1B1B),
                     ),
                     textAlign: TextAlign.center,
                     textDirection: TextDirection.rtl,

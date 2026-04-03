@@ -5,6 +5,7 @@ import "package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.d
 import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
 import "package:al_quran_v3/src/core/audio/model/recitation_info_model.dart";
 import "package:al_quran_v3/src/core/audio/player/audio_player_manager.dart";
+import "package:al_quran_v3/src/core/audio/services/audio_playback_service_access.dart";
 import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
 import "package:al_quran_v3/src/theme/values/values.dart";
 import "package:al_quran_v3/src/widget/audio/reciter_overview.dart";
@@ -138,14 +139,14 @@ class QuranScriptSettings extends StatelessWidget {
 
             if (AudioPlayerManager.audioPlayer.playing) {
               if (AudioPlayerManager.audioPlayer.audioSources.length > 1) {
-                await AudioPlayerManager.playMultipleAyahAsPlaylist(
+                await audioPlaybackService.playPlaylist(
                   startAyahKey: ayahState.start,
                   endAyahKey: ayahState.end,
                   isInsideQuran: true,
                   reciterInfoModel: reciterInfoModel,
                 );
               } else {
-                AudioPlayerManager.playSingleAyah(
+                audioPlaybackService.playSingleAyah(
                   ayahKey: ayahState.current,
                   reciterInfoModel: reciterInfoModel,
                   isInsideQuran: true,

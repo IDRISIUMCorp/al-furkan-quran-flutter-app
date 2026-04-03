@@ -26,7 +26,7 @@ import "package:al_quran_v3/src/core/audio/cubit/ayah_key_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/player_state_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
 import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
-import "package:al_quran_v3/src/core/audio/player/audio_player_manager.dart";
+import "package:al_quran_v3/src/core/audio/services/audio_playback_service_access.dart";
 import "package:al_quran_v3/src/core/notifications/khatma_notification_service.dart";
 import "package:al_quran_v3/src/screen/quran_reader/widgets/ayah_options_sheet.dart";
 import "package:al_quran_v3/src/screen/quran_resources/quran_resources_view.dart";
@@ -2354,7 +2354,7 @@ class _MushafViewState extends State<MushafView> {
       },
       onListen: () {
         final reciter = context.read<SegmentedQuranReciterCubit>().state;
-        AudioPlayerManager.playSingleAyah(
+        audioPlaybackService.playSingleAyah(
           ayahKey: ayahKey,
           reciterInfoModel: reciter,
           isInsideQuran: true,

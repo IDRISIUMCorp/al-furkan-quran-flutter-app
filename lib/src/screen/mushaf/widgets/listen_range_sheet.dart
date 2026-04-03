@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:al_quran_v3/src/core/audio/services/audio_playback_service_access.dart';
 import 'package:al_quran_v3/src/theme/controller/theme_cubit.dart';
 import 'package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.dart';
-import 'package:al_quran_v3/src/core/audio/player/audio_player_manager.dart';
 import 'package:qcf_quran/qcf_quran.dart' hide getPageNumber;
 
 Future<void> showListenRangeSheet({
@@ -25,7 +25,9 @@ Future<void> showListenRangeSheet({
         builder: (ctx, setState) {
           final isDark = Theme.of(ctx).brightness == Brightness.dark;
           final bg = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF7F1E6);
-          final card = isDark ? const Color(0xFF2A2A2A) : const Color(0xFFFFF9F2);
+          final card = isDark
+              ? const Color(0xFF2A2A2A)
+              : const Color(0xFFFFF9F2);
           final themeState = context.read<ThemeCubit>().state;
 
           return Directionality(
@@ -63,7 +65,9 @@ Future<void> showListenRangeSheet({
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w800,
-                            color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                            color: isDark
+                                ? Colors.white
+                                : const Color(0xFF1B1B1B),
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -91,24 +95,34 @@ Future<void> showListenRangeSheet({
                                       "من",
                                       style: TextStyle(
                                         fontWeight: FontWeight.w800,
-                                        color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                                        color: isDark
+                                            ? Colors.white
+                                            : const Color(0xFF1B1B1B),
                                       ),
                                     ),
                                     const SizedBox(height: 8),
                                     DropdownButtonFormField<int>(
                                       value: from,
-                                      dropdownColor: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF7F1E6),
+                                      dropdownColor: isDark
+                                          ? const Color(0xFF2A2A2A)
+                                          : const Color(0xFFF7F1E6),
                                       style: TextStyle(
-                                        color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                                        color: isDark
+                                            ? Colors.white
+                                            : const Color(0xFF1B1B1B),
                                         fontSize: 14,
                                       ),
                                       decoration: InputDecoration(
                                         isDense: true,
                                         filled: true,
-                                        fillColor: isDark ? const Color(0xFF333333) : const Color(0xFFF7F1E6),
+                                        fillColor: isDark
+                                            ? const Color(0xFF333333)
+                                            : const Color(0xFFF7F1E6),
                                         border: const OutlineInputBorder(
                                           borderSide: BorderSide.none,
-                                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(12),
+                                          ),
                                         ),
                                       ),
                                       items: List.generate(
@@ -141,24 +155,34 @@ Future<void> showListenRangeSheet({
                                       "إلى",
                                       style: TextStyle(
                                         fontWeight: FontWeight.w800,
-                                        color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                                        color: isDark
+                                            ? Colors.white
+                                            : const Color(0xFF1B1B1B),
                                       ),
                                     ),
                                     const SizedBox(height: 8),
                                     DropdownButtonFormField<int>(
                                       value: to,
-                                      dropdownColor: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF7F1E6),
+                                      dropdownColor: isDark
+                                          ? const Color(0xFF2A2A2A)
+                                          : const Color(0xFFF7F1E6),
                                       style: TextStyle(
-                                        color: isDark ? Colors.white : const Color(0xFF1B1B1B),
+                                        color: isDark
+                                            ? Colors.white
+                                            : const Color(0xFF1B1B1B),
                                         fontSize: 14,
                                       ),
                                       decoration: InputDecoration(
                                         isDense: true,
                                         filled: true,
-                                        fillColor: isDark ? const Color(0xFF333333) : const Color(0xFFF7F1E6),
+                                        fillColor: isDark
+                                            ? const Color(0xFF333333)
+                                            : const Color(0xFFF7F1E6),
                                         border: const OutlineInputBorder(
                                           borderSide: BorderSide.none,
-                                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(12),
+                                          ),
                                         ),
                                       ),
                                       items: List.generate(
@@ -201,8 +225,10 @@ Future<void> showListenRangeSheet({
                             ),
                             onPressed: () async {
                               Navigator.pop(ctx);
-                              final reciter = context.read<SegmentedQuranReciterCubit>().state;
-                              await AudioPlayerManager.playMultipleAyahAsPlaylist(
+                              final reciter = context
+                                  .read<SegmentedQuranReciterCubit>()
+                                  .state;
+                              await audioPlaybackService.playPlaylist(
                                 startAyahKey: "$surah:$from",
                                 endAyahKey: "$surah:$to",
                                 isInsideQuran: true,
@@ -214,9 +240,7 @@ Future<void> showListenRangeSheet({
                             icon: const Icon(Icons.play_arrow_rounded),
                             label: const Text(
                               "تشغيل",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w900,
-                              ),
+                              style: TextStyle(fontWeight: FontWeight.w900),
                             ),
                           ),
                         ),

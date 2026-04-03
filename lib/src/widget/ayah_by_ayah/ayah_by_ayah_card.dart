@@ -13,6 +13,7 @@ import "package:al_quran_v3/src/core/audio/model/audio_player_position_model.dar
 import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
 import "package:al_quran_v3/src/core/audio/model/recitation_info_model.dart";
 import "package:al_quran_v3/src/core/audio/player/audio_player_manager.dart";
+import "package:al_quran_v3/src/core/audio/services/audio_playback_service_access.dart";
 import "package:al_quran_v3/src/resources/quran_resources/language_resources.dart";
 import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
 import "package:al_quran_v3/src/resources/quran_resources/models/translation_book_model.dart";
@@ -1625,7 +1626,7 @@ IconButton getPlayButtonWidget(
     ),
     onPressed: () async {
       if (context.read<AudioUiCubit>().state.isInsideQuranPlayer == false) {
-        AudioPlayerManager.playSingleAyah(
+        audioPlaybackService.playSingleAyah(
           ayahKey: ayahKey,
           reciterInfoModel: context.read<SegmentedQuranReciterCubit>().state,
           instantPlay: true,
@@ -1647,7 +1648,7 @@ IconButton getPlayButtonWidget(
           );
           AudioPlayerManager.audioPlayer.play();
         } else {
-          AudioPlayerManager.playSingleAyah(
+          audioPlaybackService.playSingleAyah(
             ayahKey: ayahKey,
             reciterInfoModel: context.read<SegmentedQuranReciterCubit>().state,
             instantPlay: true,

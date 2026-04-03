@@ -157,7 +157,7 @@ extension _MushafPronunciationExtension on _MushafViewState {
                           highlightedIndex = 0;
                         });
 
-                        await AudioPlayerManager.playWordsSequence(
+                        await audioPlaybackService.playWordsSequence(
                           wordKeys,
                           onWordStart: (i, _) {
                             if (!mounted) return;
@@ -324,9 +324,8 @@ extension _MushafPronunciationExtension on _MushafViewState {
                                                       highlightedIndex = -1;
                                                     });
                                                     stopAyahHighlight();
-                                                    AudioPlayerManager.playWord(
-                                                      k,
-                                                    );
+                                                    audioPlaybackService
+                                                        .playWord(k);
                                                   },
                                             icon: AnimatedSwitcher(
                                               duration: const Duration(
@@ -368,5 +367,4 @@ extension _MushafPronunciationExtension on _MushafViewState {
       },
     );
   }
-
 }
