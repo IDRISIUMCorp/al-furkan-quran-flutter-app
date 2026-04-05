@@ -1,4 +1,4 @@
-import "dart:math" as math;
+
 
 import "package:qcf_quran/qcf_quran.dart" as qcf;
 
@@ -24,12 +24,23 @@ final Map<String, List<Map<String, dynamic>>> _quranSearchCache =
 List<_IndexedAyah>? _quranSearchIndex;
 
 String normalizeQuranSearchQuery(String input) {
-  return qcf
-      .normalise(input)
-      .replaceAll(RegExp(r"[^\u0621-\u064A0-9\s]"), " ")
-      .replaceAll(RegExp(r"\s+"), " ")
-      .trim()
-      .toLowerCase();
+  var text = qcf.normalise(input);
+
+  // Normalize Uthmani and variant characters to standard Arabic letters
+  text = text.replaceAll('\u0671', '\u0627'); // Alef Wasla (ٱ) -> Alef (ا)
+  text = text.replaceAll('\u0670', '\u0627'); // Dagger Alef -> Alef (ا)
+  text = text.replaceAll('\u0622', '\u0627'); // Alef Madda (آ) -> Alef (ا)
+  text = text.replaceAll('\u0623', '\u0627'); // Alef Hamza Above (أ) -> Alef (ا)
+  text = text.replaceAll('\u0625', '\u0627'); // Alef Hamza Below (إ) -> Alef (ا)
+  text = text.replaceAll('\u0649', '\u064A'); // Alif Maksura (ى) -> Yaa (ي)
+  text = text.replaceAll('\u0629', '\u0647'); // Taa Marbuta (ة) -> Haa (ه)
+  text = text.replaceAll('\u0624', '\u0648'); // Waw Hamza (ؤ) -> Waw (و)
+  text = text.replaceAll('\u0626', '\u064A'); // Yaa Hamza (ئ) -> Yaa (ي)
+  text = text.replaceAll('\u0640', '');       // Tatweel (ـ) -> empty
+
+  text = text.replaceAll(RegExp(r"[^\u0621-\u064A0-9\s]"), "");
+  
+  return text.replaceAll(RegExp(r"\s+"), " ").trim().toLowerCase();
 }
 
 List<_IndexedAyah> _buildQuranSearchIndex() {
@@ -59,82 +70,26 @@ List<_IndexedAyah> _buildQuranSearchIndex() {
 List<_IndexedAyah> get _indexedAyahs =>
     _quranSearchIndex ??= _buildQuranSearchIndex();
 
-double _tokenSimilarity(String queryToken, String verseToken) {
-  if (queryToken == verseToken) return 1.0;
-  if (verseToken.startsWith(queryToken) || queryToken.startsWith(verseToken)) {
-    return 0.94;
-  }
-  if (verseToken.contains(queryToken) || queryToken.contains(verseToken)) {
-    return 0.88;
-  }
-
-  final minLength = math.min(queryToken.length, verseToken.length);
-  int sharedPrefix = 0;
-  while (sharedPrefix < minLength &&
-      queryToken.codeUnitAt(sharedPrefix) ==
-          verseToken.codeUnitAt(sharedPrefix)) {
-    sharedPrefix++;
-  }
-
-  final prefixRatio =
-      sharedPrefix / math.max(queryToken.length, verseToken.length);
-  if (sharedPrefix >= 2 && prefixRatio >= 0.55) {
-    return prefixRatio;
-  }
-
-  return 0.0;
-}
-
 double _scoreAyahMatch(
   String query,
   List<String> queryTokens,
   _IndexedAyah ayah,
 ) {
   final text = ayah.normalizedText;
-  if (text.isEmpty) return 0;
+  if (text.isEmpty || queryTokens.isEmpty) return 0;
+
+  double score = 0;
+  for (final token in queryTokens) {
+    if (!text.contains(token)) return 0;
+    score += token.length * 100;
+  }
 
   final exactIndex = text.indexOf(query);
   if (exactIndex >= 0) {
-    return 4000.0 - exactIndex;
+    score += 4000.0 - exactIndex;
   }
 
-  if (queryTokens.isEmpty) return 0;
-
-  double score = 0;
-  int stronglyMatchedTokens = 0;
-  for (final queryToken in queryTokens) {
-    double best = 0;
-    for (final verseToken in ayah.tokens) {
-      final similarity = _tokenSimilarity(queryToken, verseToken);
-      if (similarity > best) {
-        best = similarity;
-      }
-      if (best >= 1.0) break;
-    }
-
-    if (best < 0.62) {
-      return 0;
-    }
-
-    if (best >= 0.88) {
-      stronglyMatchedTokens++;
-    }
-
-    score += best * queryToken.length * 100;
-  }
-
-  final coverage = stronglyMatchedTokens / queryTokens.length;
-  if (coverage < 0.34) return 0;
-
-  final startsWithBoost = ayah.tokens.any(
-    (token) => queryTokens.any((queryToken) => token.startsWith(queryToken)),
-  );
-
-  if (startsWithBoost) {
-    score += 90;
-  }
-
-  score += math.min(ayah.content.length.toDouble(), 180) * 0.1;
+  score += ayah.content.length <= 180 ? ayah.content.length * 0.1 : 18.0;
   return score;
 }
 
@@ -147,11 +102,13 @@ String _buildSnippet(String content, int maxLength) {
 Future<List<Map<String, dynamic>>> searchQuranAyahs(
   String rawQuery, {
   int limit = 120,
+  bool exactPhrase = true,
+  int? surahId,
 }) async {
   final query = normalizeQuranSearchQuery(rawQuery);
   if (query.length < 2) return const <Map<String, dynamic>>[];
 
-  final cacheKey = "$limit::$query";
+  final cacheKey = "$limit::$exactPhrase::$surahId::$query";
   final cached = _quranSearchCache[cacheKey];
   if (cached != null) return cached;
 
@@ -160,10 +117,24 @@ Future<List<Map<String, dynamic>>> searchQuranAyahs(
       .where((token) => token.trim().isNotEmpty)
       .toList(growable: false);
 
+  RegExp? exactRegex;
+  if (exactPhrase) {
+    exactRegex = RegExp(r"(^|\s)" + RegExp.escape(query) + r"($|\s)");
+  }
+
   final scored = <Map<String, dynamic>>[];
   for (final ayah in _indexedAyahs) {
-    final score = _scoreAyahMatch(query, queryTokens, ayah);
-    if (score <= 0) continue;
+    if (surahId != null && ayah.surahNumber != surahId) continue;
+
+    double score = 0;
+
+    if (exactPhrase) {
+      if (!exactRegex!.hasMatch(ayah.normalizedText)) continue;
+      score = 5000.0 - ayah.normalizedText.indexOf(query);
+    } else {
+      score = _scoreAyahMatch(query, queryTokens, ayah);
+      if (score <= 0) continue;
+    }
 
     scored.add({
       "surah_number": ayah.surahNumber,
@@ -196,3 +167,4 @@ Future<List<Map<String, dynamic>>> searchQuranAyahs(
   _quranSearchCache[cacheKey] = results;
   return results;
 }
+

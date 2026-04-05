@@ -655,9 +655,23 @@ class _MushafRootState extends State<_MushafRoot> {
   }
 
   Future<void> _openSearchScreen() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const SearchScreen()),
+    final result = await showGeneralDialog<dynamic>(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withValues(alpha: 0.65),
+      barrierLabel: "Search",
+      transitionDuration: const Duration(milliseconds: 650),
+      pageBuilder: (ctx, anim1, anim2) => const SearchScreen(),
+      transitionBuilder: (ctx, anim1, anim2, child) {
+        final curved = CurvedAnimation(parent: anim1, curve: Curves.easeOutQuart);
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 1),
+            end: Offset.zero,
+          ).animate(curved),
+          child: child,
+        );
+      },
     );
     if (result is! Map) return;
     if (!_isMushafMode || !_mushafPageController.hasClients) return;

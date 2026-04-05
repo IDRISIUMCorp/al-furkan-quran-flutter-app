@@ -10,7 +10,6 @@ import "package:al_quran_v3/src/utils/quran_search_engine.dart";
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
-import "package:flutter_animate/flutter_animate.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:gap/gap.dart";
 import "package:hive_ce_flutter/hive_flutter.dart";
@@ -30,6 +29,8 @@ class _SearchScreenState extends State<SearchScreen> {
       ValueNotifier<List<Map<String, dynamic>>>(const []);
   final ValueNotifier<bool> _hasSearchedVN = ValueNotifier<bool>(false);
   final ValueNotifier<bool> _isSearchingVN = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _isExactSearchVN = ValueNotifier<bool>(true);
+  final ValueNotifier<int?> _filterSurahIdVN = ValueNotifier<int?>(null);
 
   Timer? _debounce;
   List<String> _searchHistory = <String>[];
@@ -53,10 +54,6 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     _loadHistory();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _searchFocus.requestFocus();
-    });
   }
 
   @override
@@ -67,6 +64,8 @@ class _SearchScreenState extends State<SearchScreen> {
     _resultsVN.dispose();
     _hasSearchedVN.dispose();
     _isSearchingVN.dispose();
+    _isExactSearchVN.dispose();
+    _filterSurahIdVN.dispose();
     super.dispose();
   }
 
@@ -83,7 +82,7 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     _isSearchingVN.value = true;
-    final results = await searchQuranAyahs(rawQuery, limit: 150);
+    final results = await searchQuranAyahs(rawQuery, exactPhrase: _isExactSearchVN.value, surahId: _filterSurahIdVN.value, limit: 150);
     if (!mounted) return;
 
     _resultsVN.value = results;
@@ -139,6 +138,82 @@ class _SearchScreenState extends State<SearchScreen> {
     _performSearch(value);
   }
 
+  void _removeFromHistory(String query) {
+    _searchHistory.remove(query);
+    Hive.box("user").put(_kHistoryKey, _searchHistory);
+    if (mounted) setState(() {});
+  }
+
+  void _toggleExactSearch() {
+    _isExactSearchVN.value = !_isExactSearchVN.value;
+    _performSearch(_searchController.text);
+  }
+
+  void _showFilterSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: Container(
+            height: MediaQuery.of(ctx).size.height * 0.7,
+            decoration: const BoxDecoration(
+              color: Color(0xFFF6F3E9),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height: 16),
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(4)),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    "تخصيص نطاق البحث",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: 115,
+                    itemBuilder: (context, i) {
+                      final isAll = i == 0;
+                      final surahId = isAll ? null : i;
+                      final surahName = isAll ? "القرآن الكريم كاملاً" : "${qcf.getSurahNameArabic(surahId!)} ($surahId)";
+                      final isSelected = _filterSurahIdVN.value == surahId;
+                      return ListTile(
+                        leading: isAll ? const Icon(Icons.menu_book) : null,
+                        title: Text(
+                          surahName,
+                          style: TextStyle(
+                            color: isSelected ? const Color(0xFF4C8F5B) : Colors.black,
+                            fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+                            fontFamily: "QPC_Hafs",
+                          ),
+                        ),
+                        trailing: isSelected ? const Icon(Icons.check, color: Color(0xFF4C8F5B)) : null,
+                        onTap: () {
+                          _filterSurahIdVN.value = surahId;
+                          _performSearch(_searchController.text);
+                          Navigator.pop(ctx);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _navigateToAyah(BuildContext context, int surah, int ayah) {
     HapticFeedback.lightImpact();
     final key = "$surah:$ayah";
@@ -160,208 +235,103 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeState themeState = context.watch<ThemeCubit>().state;
-
+    final themeState = context.watch<ThemeCubit>().state;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: _pageBg,
-        body: Stack(
-          children: [
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      themeState.primary.withValues(
-                        alpha: _isDark ? 0.06 : 0.08,
-                      ),
-                      _pageBg,
-                      _pageBg,
-                    ],
+        backgroundColor: Colors.transparent,
+        body: Padding(
+          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 10),
+          child: SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
+              child: Container(
+                clipBehavior: Clip.antiAlias,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF6F3E9),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                children: [
+                  _buildSearchBarRow(themeState),
+                  const Divider(color: Color(0xFFE5DECC), height: 1, thickness: 1),
+                  Expanded(
+                    child: _buildBody(themeState),
                   ),
-                ),
+                ],
+              ),
               ),
             ),
-            _buildBody(themeState),
-            _buildTopBar(themeState),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildBody(ThemeState themeState) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: _hasSearchedVN,
-      builder: (context, hasSearched, _) {
-        return ValueListenableBuilder<bool>(
-          valueListenable: _isSearchingVN,
-          builder: (context, isSearching, __) {
-            return ValueListenableBuilder<List<Map<String, dynamic>>>(
-              valueListenable: _resultsVN,
-              builder: (context, results, ___) {
-                final topPadding = MediaQuery.of(context).padding.top + 112;
-                final bottomPadding =
-                    MediaQuery.of(context).padding.bottom + 24;
-                final query = _searchController.text.trim();
-
-                late final Widget child;
-
-                if (query.isNotEmpty &&
-                    normalizeQuranSearchQuery(query).length < 2) {
-                  child = _buildShortQueryState();
-                } else if (!hasSearched) {
-                  child = _buildIdleState(themeState);
-                } else if (isSearching) {
-                  child = _buildLoadingState(themeState);
-                } else if (results.isEmpty) {
-                  child = _buildEmptyState();
-                } else {
-                  child = _buildResultsState(themeState, results);
-                }
-
-                return AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 220),
-                  switchInCurve: Curves.easeOutCubic,
-                  switchOutCurve: Curves.easeOutCubic,
-                  child: Padding(
-                    key: ValueKey<String>(
-                      "${query}_${hasSearched}_${isSearching}_${results.length}",
-                    ),
-                    padding: EdgeInsets.only(
-                      top: topPadding,
-                      bottom: bottomPadding,
-                    ),
-                    child: child,
-                  ),
-                );
-              },
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildTopBar(ThemeState themeState) {
-    return Positioned(
-      top: 0,
-      left: 0,
-      right: 0,
-      child: ClipRRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: Container(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 8,
-              left: 16,
-              right: 16,
-              bottom: 14,
-            ),
-            color: _pageBg.withValues(alpha: 0.88),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.arrow_back_rounded),
-                      color: themeState.primary,
-                    ),
-                    const Gap(8),
-                    Expanded(
-                      child: Text(
-                        "البحث في الآيات",
-                        style: TextStyle(
-                          color: _textPrimary,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const Gap(10),
-                Container(
+  Widget _buildSearchBarRow(ThemeState themeState) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+          child: Row(
+            children: [
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.close, color: Color(0xFF8B7355), size: 28),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+              const Gap(16),
+              Expanded(
+                child: Container(
+                  height: 50,
                   decoration: BoxDecoration(
-                    color: _cardBg,
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: _cardBorder),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(
-                          alpha: _isDark ? 0.16 : 0.05,
-                        ),
-                        blurRadius: 16,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFE5DECC), width: 1.5),
                   ),
                   child: TextField(
                     controller: _searchController,
                     focusNode: _searchFocus,
                     textDirection: TextDirection.rtl,
+                    textAlign: TextAlign.center,
                     textInputAction: TextInputAction.search,
                     enableSuggestions: false,
                     autocorrect: false,
-                    style: TextStyle(
-                      color: _textPrimary,
-                      fontWeight: FontWeight.w600,
+                    style: const TextStyle(
+                      color: Color(0xFF333333),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
                     ),
                     decoration: InputDecoration(
-                      hintText: "ابحث بكلمة أو مقطع من الآية",
-                      hintStyle: TextStyle(color: _textMuted),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 16,
-                      ),
-                      prefixIcon: Icon(
-                        FluentIcons.search_24_regular,
-                        color: themeState.primary,
-                        size: 22,
-                      ),
-                      suffixIcon: ValueListenableBuilder<bool>(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                      prefixIcon: ValueListenableBuilder<bool>(
                         valueListenable: _isSearchingVN,
                         builder: (context, isSearching, _) {
                           if (isSearching) {
-                            return Padding(
-                              padding: const EdgeInsets.all(14),
+                            return const Padding(
+                              padding: EdgeInsets.all(14),
                               child: SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.2,
-                                  color: themeState.primary,
-                                ),
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF6EAE7E)),
                               ),
                             );
                           }
-
-                          return ValueListenableBuilder<TextEditingValue>(
-                            valueListenable: _searchController,
-                            builder: (context, value, __) {
-                              final hasText = value.text.trim().isNotEmpty;
-                              return IconButton(
-                                onPressed: () {
-                                  if (hasText) {
-                                    _searchController.clear();
-                                    _performSearch("");
-                                  } else {
-                                    _performSearch(_searchController.text);
-                                  }
-                                },
-                                icon: Icon(
-                                  hasText
-                                      ? FluentIcons.dismiss_24_filled
-                                      : FluentIcons.search_24_filled,
-                                  color: themeState.primary,
-                                  size: 20,
-                                ),
-                              );
+                          return const Icon(FluentIcons.search_24_regular, color: Color(0xFF6EAE7E), size: 24);
+                        },
+                      ),
+                      suffixIcon: ValueListenableBuilder<TextEditingValue>(
+                        valueListenable: _searchController,
+                        builder: (context, value, _) {
+                          if (value.text.isEmpty) return const SizedBox.shrink();
+                          return IconButton(
+                            icon: const Icon(Icons.close, color: Color(0xFFB0A89D), size: 22),
+                            onPressed: () {
+                              _searchController.clear();
+                              _performSearch("");
                             },
                           );
                         },
@@ -371,6 +341,494 @@ class _SearchScreenState extends State<SearchScreen> {
                     onSubmitted: _performSearch,
                   ),
                 ),
+              ),
+              const Gap(16),
+              ValueListenableBuilder<int?>(
+                valueListenable: _filterSurahIdVN,
+                builder: (context, surahId, _) {
+                  return IconButton(
+                    onPressed: _showFilterSheet,
+                    icon: Icon(
+                      surahId == null ? Icons.tune : Icons.filter_alt_off_rounded,
+                      size: 28,
+                      color: surahId == null ? const Color(0xFF8B7355) : const Color(0xFF4C8F5B),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSpiderWebHistory() {
+    return Center(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(FluentIcons.search_24_regular, size: 56, color: const Color(0xFF8B7355).withValues(alpha: 0.4)),
+              const Gap(16),
+              const Text("ابحث في آيات القرآن الكريم", style: TextStyle(color: Color(0xFF8B7355), fontSize: 17, fontWeight: FontWeight.w800)),
+              const Gap(8),
+              const Text(
+                "يمكنك البحث بأي كلمة أو جملة",
+                style: TextStyle(color: Color(0xFFB0A89D), fontSize: 13),
+              ),
+              if (_searchHistory.isNotEmpty) ...[
+                const Gap(28),
+                const Text(
+                  "عمليات بحثت عنها مؤخراً",
+                  style: TextStyle(color: Color(0xFF8B7355), fontSize: 14, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 16),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 10,
+                  runSpacing: 12,
+                  children: _searchHistory.map((query) {
+                    return InputChip(
+                      onPressed: () => _applySuggestion(query),
+                      onDeleted: () => _removeFromHistory(query),
+                      deleteIcon: const Icon(Icons.close, size: 16, color: Color(0xFFB0A89D)),
+                      label: Text(
+                        query,
+                        style: const TextStyle(color: Color(0xFF333333), fontWeight: FontWeight.w700, fontSize: 13),
+                      ),
+                      backgroundColor: const Color(0xFFEFE8D6),
+                      side: BorderSide.none,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    );
+                  }).toList(),
+                ),
+              ],
+              const Gap(28),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEFE8D6).withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  children: const [
+                    Text("💡 نصائح", style: TextStyle(color: Color(0xFF8B7355), fontSize: 14, fontWeight: FontWeight.w800)),
+                    Gap(8),
+                    Text(
+                      "• فعّل \"بحث مطابق\" للبحث عن جملة بالضبط\n• اضغط مطولاً على نتيجة لنسخها أو مشاركتها\n• استخدم أيقونة الفلترة لتحديد سورة معينة",
+                      style: TextStyle(color: Color(0xFF7E7B74), fontSize: 12, height: 1.8),
+                      textAlign: TextAlign.right,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHorizontalHistory() {
+    if (_searchHistory.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12, top: 12),
+      child: SizedBox(
+        height: 48,
+        child: ListView.separated(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          scrollDirection: Axis.horizontal,
+          itemCount: _searchHistory.length,
+          separatorBuilder: (_, __) => const Gap(8),
+          itemBuilder: (context, i) {
+            final query = _searchHistory[i];
+            return InputChip(
+              onPressed: () => _applySuggestion(query),
+              onDeleted: () => _removeFromHistory(query),
+              deleteIcon: const Icon(Icons.close, size: 14, color: Color(0xFFB0A89D)),
+              label: Text(
+                query,
+                style: const TextStyle(color: Color(0xFF333333), fontWeight: FontWeight.w700),
+              ),
+              backgroundColor: const Color(0xFFEFE8D6),
+              side: BorderSide.none,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatsRow(ThemeState themeState, List<Map<String, dynamic>> results) {
+    int surahsCount = 0;
+    int ayahsCount = 0;
+    int occurrences = 0;
+
+    final query = _searchController.text.trim();
+    final normQ = normalizeQuranSearchQuery(query);
+
+    if (results.isNotEmpty && normQ.isNotEmpty) {
+      surahsCount = results.map((e) => e["surah_number"]).toSet().length;
+      ayahsCount = results.length;
+      for (var res in results) {
+        final text = normalizeQuranSearchQuery(res["content"] ?? "");
+        int matched = 0;
+        int idx = -1;
+        while ((idx = text.indexOf(normQ, idx + 1)) != -1) {
+          matched++;
+        }
+        occurrences += matched;
+      }
+    }
+
+    return ValueListenableBuilder<bool>(
+      valueListenable: _isExactSearchVN,
+      builder: (context, isExactSearch, _) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (results.isNotEmpty)
+                Text(
+                  "السور: $surahsCount, الآيات: $ayahsCount (تكرار الكلمة: $occurrences)",
+                  style: const TextStyle(color: Color(0xFF555555), fontSize: 11, fontWeight: FontWeight.w700),
+                )
+              else
+                const SizedBox.shrink(),
+              GestureDetector(
+                onTap: _toggleExactSearch,
+                child: Row(
+                  children: [
+                    Icon(
+                      isExactSearch ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                      color: isExactSearch ? const Color(0xFF4C8F5B) : const Color(0xFF8B7355),
+                      size: 18,
+                    ),
+                    const Gap(6),
+                    Text(
+                      "بحث مطابق",
+                      style: TextStyle(
+                        color: isExactSearch ? Colors.black : const Color(0xFF555555),
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBody(ThemeState themeState) {
+    return ValueListenableBuilder<TextEditingValue>(
+      valueListenable: _searchController,
+      builder: (context, val, _) {
+        final isTyping = val.text.isNotEmpty;
+
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 350),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
+          layoutBuilder: (currentChild, previousChildren) {
+            return Stack(
+              fit: StackFit.expand,
+              children: <Widget>[
+                ...previousChildren,
+                if (currentChild != null) currentChild,
+              ],
+            );
+          },
+          transitionBuilder: (child, animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: ScaleTransition(
+                scale: Tween<double>(begin: 0.96, end: 1.0).animate(animation),
+                child: child,
+              ),
+            );
+          },
+          child: isTyping ? _buildActiveSearchState(themeState, key: const ValueKey("active")) : _buildSpiderWebHistory(),
+        );
+      },
+    );
+  }
+
+  Widget _buildActiveSearchState(ThemeState themeState, {Key? key}) {
+    return Column(
+      key: key,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ValueListenableBuilder<List<Map<String, dynamic>>>(
+          valueListenable: _resultsVN,
+          builder: (context, results, _) => _buildStatsRow(themeState, results),
+        ),
+        Expanded(
+          child: ValueListenableBuilder<bool>(
+            valueListenable: _hasSearchedVN,
+            builder: (context, hasSearched, _) {
+              return ValueListenableBuilder<bool>(
+                valueListenable: _isSearchingVN,
+                builder: (context, isSearching, _) {
+                  return ValueListenableBuilder<List<Map<String, dynamic>>>(
+                    valueListenable: _resultsVN,
+                    builder: (context, results, _) {
+                      final query = _searchController.text.trim();
+
+                      Widget child;
+                      if (query.isNotEmpty && normalizeQuranSearchQuery(query).length < 2) {
+                        child = const SizedBox.shrink();
+                      } else if (isSearching) {
+                        child = const Center(
+                          child: CircularProgressIndicator(color: Color(0xFF6EAE7E)),
+                        );
+                      } else if (hasSearched && results.isEmpty) {
+                        child = Center(
+                          child: Text(
+                            "لا توجد نتائج",
+                            style: TextStyle(color: Color(0xFF8B7355), fontSize: 16, fontWeight: FontWeight.w800),
+                          ),
+                        );
+                      } else if (hasSearched && results.isNotEmpty) {
+                        child = _buildResultsState(themeState, results, query);
+                      } else {
+                        child = const SizedBox.shrink();
+                      }
+
+                      return AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        child: child,
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildResultsState(
+    ThemeState themeState,
+    List<Map<String, dynamic>> results,
+    String query,
+  ) {
+    final normQ = normalizeQuranSearchQuery(query);
+    int? matchedSurahId;
+
+    for (int i = 1; i <= 114; i++) {
+      if (normalizeQuranSearchQuery(qcf.getSurahNameArabic(i)) == normQ) {
+        matchedSurahId = i;
+        break;
+      }
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.only(top: 8, bottom: 40),
+      itemCount: results.length + (matchedSurahId != null ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (matchedSurahId != null && index == 0) {
+          return _buildSurahInfoCard(matchedSurahId);
+        }
+
+        final result = results[matchedSurahId != null ? index - 1 : index];
+        final surahNumber = (result["surah_number"] as num?)?.toInt() ?? 1;
+        final ayahNumber = (result["verse_number"] as num?)?.toInt() ?? 1;
+        final surahName = qcf.getSurahNameArabic(surahNumber);
+        final content = (result["content"] as String?) ?? "";
+        final pageNumber = qcf.getPageNumber(surahNumber, ayahNumber);
+
+        return ValueListenableBuilder<bool>(
+          valueListenable: _isExactSearchVN,
+          builder: (context, isExactSearch, _) {
+            return _VerseResultCard(
+              surahName: surahName,
+              surahNumber: surahNumber,
+              ayahNumber: ayahNumber,
+              pageNumber: pageNumber,
+              content: content,
+              query: query,
+              isExactSearch: isExactSearch,
+              onTap: () => _navigateToAyah(context, surahNumber, ayahNumber),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildSurahInfoCard(int surahNum) {
+    final verseCount = qcf.quranText.where((e) => (e['surah_number'] as num).toInt() == surahNum).length;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFEBE5D9)),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              _IslamicStar(number: surahNum, color: const Color(0xFF6EAE7E)),
+              const Gap(16),
+              Text(
+                qcf.getSurahNameArabic(surahNum),
+                style: const TextStyle(
+                  fontFamily: "QPC_Hafs",
+                  fontSize: 26,
+                  color: Color(0xFF333333),
+                ),
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                "الآيات ${localizedNumber(context, verseCount)}",
+                style: const TextStyle(color: Color(0xFFD6C8A6), fontSize: 13, fontWeight: FontWeight.w800),
+              ),
+              const Gap(6),
+              Text(
+                "الصفحة ${localizedNumber(context, qcf.getPageNumber(surahNum, 1))}",
+                style: const TextStyle(color: Color(0xFFD6C8A6), fontSize: 13, fontWeight: FontWeight.w800),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: const BoxDecoration(color: Color(0xFFF3F7F4), shape: BoxShape.circle),
+                child: Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.rotationZ(3.1415),
+                  child: const Icon(Icons.send_rounded, color: Color(0xFF6EAE7E), size: 16),
+                ),
+              ),
+              const Gap(12),
+              const Icon(FluentIcons.building_mosque_24_filled, color: Colors.black, size: 28),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VerseResultCard extends StatelessWidget {
+  final String surahName;
+  final int surahNumber;
+  final int ayahNumber;
+  final int pageNumber;
+  final String content;
+  final String query;
+  final bool isExactSearch;
+  final VoidCallback onTap;
+
+  const _VerseResultCard({
+    required this.surahName,
+    required this.surahNumber,
+    required this.ayahNumber,
+    required this.pageNumber,
+    required this.content,
+    required this.query,
+    required this.isExactSearch,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFEBE5D9)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          onLongPress: () => _showActionsMenu(context),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: SearchHighlightedText(
+                        text: content,
+                        searchQuery: query,
+                        isExactSearch: isExactSearch,
+                        textStyle: const TextStyle(
+                          fontFamily: "QPC_Hafs",
+                          fontSize: 22,
+                          height: 1.7,
+                          color: Color(0xFF333333),
+                        ),
+                        highlightColor: const Color(0xFF1B82A6),
+                      ),
+                    ),
+                    const Gap(16),
+                    Column(
+                      children: [
+                        _IslamicStar(number: ayahNumber, color: const Color(0xFF6EAE7E)),
+                        const Gap(6),
+                        Text(
+                          "$surahNumber. $surahName",
+                          style: const TextStyle(
+                            color: Color(0xFF7A7A7A),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const Gap(8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "الصفحة $pageNumber",
+                      style: const TextStyle(color: Color(0xFFC0B6A7), fontSize: 12, fontWeight: FontWeight.w800),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GestureDetector(
+                          onTap: () => _copyAyah(context),
+                          child: const Icon(Icons.copy_rounded, size: 18, color: Color(0xFFC0B6A7)),
+                        ),
+                        const Gap(16),
+                        GestureDetector(
+                          onTap: () => _shareAyah(context),
+                          child: const Icon(Icons.share_outlined, size: 18, color: Color(0xFFC0B6A7)),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -379,430 +837,225 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildIdleState(ThemeState themeState) {
-    final suggestions = _searchHistory.isNotEmpty
-        ? _searchHistory
-        : const <String>["الرحمن", "الصبر", "الجنة", "المغفرة", "النور"];
+  void _copyAyah(BuildContext context) {
+    final ayahText = "$content\n\n— $surahName: $ayahNumber";
+    Clipboard.setData(ClipboardData(text: ayahText));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text("تم نسخ الآية ✓", style: TextStyle(fontWeight: FontWeight.w700)),
+        backgroundColor: const Color(0xFF4C8F5B),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-      children: [
-        Container(
+  void _shareAyah(BuildContext context) {
+    final ayahText = "$content\n\n— $surahName: $ayahNumber | الصفحة $pageNumber";
+    Clipboard.setData(ClipboardData(text: ayahText));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text("تم نسخ الآية للمشاركة ✓", style: TextStyle(fontWeight: FontWeight.w700)),
+        backgroundColor: const Color(0xFF1B82A6),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showActionsMenu(BuildContext context) {
+    HapticFeedback.mediumImpact();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Color(0xFFF6F3E9),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
           padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: _cardBg,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: _cardBorder),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: themeState.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(18),
+          child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(4)),
                 ),
-                child: Icon(
-                  FluentIcons.search_24_regular,
-                  color: themeState.primary,
+                const Gap(16),
+                Text(
+                  "$surahName — آية $ayahNumber",
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF333333)),
                 ),
-              ),
-              const Gap(16),
-              Text(
-                "ابحث بسرعة داخل القرآن الكريم",
-                style: TextStyle(
-                  color: _textPrimary,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
+                const Gap(16),
+                ListTile(
+                  leading: const Icon(Icons.copy_rounded, color: Color(0xFF4C8F5B)),
+                  title: const Text("نسخ الآية", style: TextStyle(fontWeight: FontWeight.w700)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _copyAyah(context);
+                  },
                 ),
-              ),
-              const Gap(8),
-              Text(
-                "اكتب كلمتين أو أكثر، وسنعرض لك أفضل النتائج مباشرة مع السورة والآية.",
-                style: TextStyle(color: _textMuted, fontSize: 14, height: 1.6),
-              ),
-            ],
-          ),
-        ).animate().fadeIn(duration: 260.ms).slideY(begin: 0.05, end: 0),
-        const Gap(18),
-        Row(
-          children: [
-            Text(
-              _searchHistory.isNotEmpty ? "آخر عمليات البحث" : "اقتراحات سريعة",
-              style: TextStyle(
-                color: _textPrimary,
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const Spacer(),
-            if (_searchHistory.isNotEmpty)
-              TextButton(
-                onPressed: _clearHistory,
-                child: Text(
-                  "مسح",
-                  style: TextStyle(
-                    color: themeState.primary,
-                    fontWeight: FontWeight.w800,
-                  ),
+                ListTile(
+                  leading: const Icon(Icons.share_outlined, color: Color(0xFF1B82A6)),
+                  title: const Text("مشاركة الآية", style: TextStyle(fontWeight: FontWeight.w700)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _shareAyah(context);
+                  },
                 ),
-              ),
-          ],
-        ),
-        const Gap(10),
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: suggestions
-              .map(
-                (value) => _SuggestionChip(
-                  text: value,
-                  primary: themeState.primary,
-                  onTap: () => _applySuggestion(value),
+                ListTile(
+                  leading: const Icon(Icons.arrow_forward_rounded, color: Color(0xFF6EAE7E)),
+                  title: const Text("الذهاب للآية في المصحف", style: TextStyle(fontWeight: FontWeight.w700)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    onTap();
+                  },
                 ),
-              )
-              .toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildShortQueryState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.short_text_rounded, color: _textMuted, size: 34),
-            const Gap(12),
-            Text(
-              "اكتب حرفين أو أكثر لبدء البحث",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: _textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLoadingState(ThemeState themeState) {
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-        decoration: BoxDecoration(
-          color: _cardBg,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: _cardBorder),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.2,
-                color: themeState.primary,
-              ),
-            ),
-            const Gap(12),
-            Text(
-              "جارٍ البحث في الآيات...",
-              style: TextStyle(
-                color: _textPrimary,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 78,
-              height: 78,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _cardBg,
-                border: Border.all(color: _cardBorder),
-              ),
-              child: Icon(
-                Icons.search_off_rounded,
-                size: 34,
-                color: _textMuted,
-              ),
-            ),
-            const Gap(18),
-            Text(
-              "لا توجد نتائج مطابقة",
-              style: TextStyle(
-                color: _textPrimary,
-                fontSize: 20,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const Gap(8),
-            Text(
-              "جرّب صياغة أقصر، أو اكتب الكلمات من غير تشكيل للوصول لنتائج أدق.",
-              textAlign: TextAlign.center,
-              style: TextStyle(color: _textMuted, fontSize: 14, height: 1.6),
-            ),
-          ],
-        ),
-      ),
-    ).animate().fadeIn(duration: 260.ms);
-  }
-
-  Widget _buildResultsState(
-    ThemeState themeState,
-    List<Map<String, dynamic>> results,
-  ) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: themeState.primary.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: themeState.primary.withValues(alpha: 0.14),
-              ),
-            ),
-            child: Text(
-              "تم العثور على ${localizedNumber(context, results.length)} نتيجة مرتبة حسب الأقرب",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: themeState.primary,
-                fontWeight: FontWeight.w800,
-              ),
+                const Gap(8),
+              ],
             ),
           ),
-        ),
-        Expanded(
-          child: ListView.separated(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-            itemCount: results.length,
-            separatorBuilder: (_, __) => const Gap(10),
-            itemBuilder: (context, index) {
-              final result = results[index];
-              final surahNumber = (result["surah_number"] as num?)?.toInt();
-              final ayahNumber = (result["verse_number"] as num?)?.toInt();
-              if (surahNumber == null || ayahNumber == null) {
-                return const SizedBox.shrink();
-              }
-
-              final surahName =
-                  (result["surah_name"] as String?) ??
-                  qcf.getSurahNameArabic(surahNumber);
-              final content =
-                  (result["snippet"] as String?) ??
-                  (result["content"] as String?) ??
-                  "";
-              final pageNumber = qcf.getPageNumber(surahNumber, ayahNumber);
-
-              return _SearchResultCard(
-                    surahName: surahName,
-                    ayahNumber: ayahNumber,
-                    pageNumber: pageNumber,
-                    content: content,
-                    primary: themeState.primary,
-                    surface: _cardBg,
-                    border: _cardBorder,
-                    textColor: _textPrimary,
-                    mutedColor: _textMuted,
-                    onTap: () =>
-                        _navigateToAyah(context, surahNumber, ayahNumber),
-                  )
-                  .animate()
-                  .fadeIn(duration: 260.ms, delay: (index.clamp(0, 6) * 40).ms)
-                  .slideY(begin: 0.05, end: 0);
-            },
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 }
 
-class _SuggestionChip extends StatelessWidget {
-  final String text;
-  final Color primary;
-  final VoidCallback onTap;
-
-  const _SuggestionChip({
-    required this.text,
-    required this.primary,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: primary.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: primary.withValues(alpha: 0.12)),
-          ),
-          child: Text(
-            text,
-            style: TextStyle(color: primary, fontWeight: FontWeight.w700),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SearchResultCard extends StatelessWidget {
-  final String surahName;
-  final int ayahNumber;
-  final int pageNumber;
-  final String content;
-  final Color primary;
-  final Color surface;
-  final Color border;
-  final Color textColor;
-  final Color mutedColor;
-  final VoidCallback onTap;
-
-  const _SearchResultCard({
-    required this.surahName,
-    required this.ayahNumber,
-    required this.pageNumber,
-    required this.content,
-    required this.primary,
-    required this.surface,
-    required this.border,
-    required this.textColor,
-    required this.mutedColor,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(24),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: surface,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: border),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                alignment: WrapAlignment.spaceBetween,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      surahName,
-                      style: TextStyle(
-                        color: primary,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 12.5,
-                      ),
-                    ),
-                  ),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      _MetaChip(
-                        label: "الآية ${localizedNumber(context, ayahNumber)}",
-                        color: mutedColor,
-                      ),
-                      _MetaChip(
-                        label: "الصفحة ${localizedNumber(context, pageNumber)}",
-                        color: mutedColor,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const Gap(14),
-              Text(
-                content,
-                textAlign: TextAlign.center,
-                maxLines: 4,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontFamily: "QPC_Hafs",
-                  fontSize: 23,
-                  height: 1.65,
-                  color: textColor,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MetaChip extends StatelessWidget {
-  final String label;
+class _IslamicStar extends StatelessWidget {
+  final int number;
   final Color color;
 
-  const _MetaChip({required this.label, required this.color});
+  const _IslamicStar({required this.number, required this.color});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 11.5,
-          fontWeight: FontWeight.w700,
-        ),
+    return SizedBox(
+      width: 36,
+      height: 36,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Transform.rotate(
+            angle: 0,
+            child: Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
+            ),
+          ),
+          Transform.rotate(
+            angle: 3.14159 / 4,
+            child: Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
+            ),
+          ),
+          Text(
+            "$number",
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+              fontFamily: "Roboto",
+            ),
+          ),
+        ],
       ),
     );
   }
 }
+
+class SearchHighlightedText extends StatelessWidget {
+  final String text;
+  final String searchQuery;
+  final bool isExactSearch;
+  final TextStyle textStyle;
+  final Color highlightColor;
+
+  const SearchHighlightedText({
+    super.key,
+    required this.text,
+    required this.searchQuery,
+    required this.isExactSearch,
+    required this.textStyle,
+    required this.highlightColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (searchQuery.trim().isEmpty) {
+      return Text(text, style: textStyle, textAlign: TextAlign.right);
+    }
+
+    final queryTokens = normalizeQuranSearchQuery(searchQuery)
+        .split(' ')
+        .where((t) => t.isNotEmpty)
+        .toList();
+
+    if (queryTokens.isEmpty) {
+      return Text(text, style: textStyle, textAlign: TextAlign.right);
+    }
+
+    final originalWords = text.split(' ');
+    final normWords = originalWords.map(normalizeQuranSearchQuery).toList();
+    final highlightIndices = <int>{};
+
+    if (isExactSearch) {
+      for (int i = 0; i <= normWords.length - queryTokens.length; i++) {
+        bool match = true;
+        for (int j = 0; j < queryTokens.length; j++) {
+          if (normWords[i + j] != queryTokens[j]) {
+            match = false;
+            break;
+          }
+        }
+        if (match) {
+          for (int j = 0; j < queryTokens.length; j++) {
+            highlightIndices.add(i + j);
+          }
+        }
+      }
+    } else {
+      for (int i = 0; i < normWords.length; i++) {
+        final w = normWords[i];
+        for (final t in queryTokens) {
+          if (w.contains(t)) {
+            highlightIndices.add(i);
+            break;
+          }
+        }
+      }
+    }
+
+    final spans = <TextSpan>[];
+    for (int i = 0; i < originalWords.length; i++) {
+      final shouldHighlight = highlightIndices.contains(i);
+
+      spans.add(
+        TextSpan(
+          text: originalWords[i] + (i == originalWords.length - 1 ? "" : " "),
+          style: shouldHighlight
+              ? textStyle.copyWith(
+                  backgroundColor: highlightColor.withValues(alpha: 0.15),
+                  color: highlightColor,
+                  fontWeight: FontWeight.w900,
+                )
+              : textStyle,
+        ),
+      );
+    }
+
+    return Text.rich(
+      TextSpan(children: spans),
+      textAlign: TextAlign.right,
+    );
+  }
+}
+
