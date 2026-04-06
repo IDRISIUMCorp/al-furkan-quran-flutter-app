@@ -50,7 +50,7 @@ import "package:qcf_quran/qcf_quran.dart" as qcf;
 import "package:visibility_detector/visibility_detector.dart";
 
 import "package:al_quran_v3/src/screen/quran_reader/widgets/ayah_options_sheet.dart";
-import "package:al_quran_v3/src/widget/ayah_by_ayah/share_bottom_dialog.dart";
+import "package:al_quran_v3/src/widget/share/unified_share_bottom_sheet.dart";
 
 const String _kWahyBookmarks = "wahy_bookmarks";
 const String _kWahyNotes = "wahy_notes";
@@ -475,14 +475,67 @@ Widget getAyahByAyahTafsirCard({
                     const SizedBox(height: 18),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Text(
-                        _defaultTafsirBookNameCache[ayahKey] ?? "التفسير",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: onBg.withValues(alpha: 0.70),
-                        ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _defaultTafsirBookNameCache[ayahKey] ?? "التفسير",
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: onBg.withValues(alpha: 0.70),
+                              ),
+                            ),
+                          ),
+                          // Share tafsir
+                          GestureDetector(
+                            onTap: () {
+                              final text = _defaultTafsirTextCache[ayahKey];
+                              if (text != null && text.isNotEmpty) {
+                                Clipboard.setData(ClipboardData(text: text));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text("تم نسخ التفسير"),
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              }
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(6),
+                              child: Icon(
+                                Icons.share_outlined,
+                                size: 18,
+                                color: onBg.withValues(alpha: 0.4),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          // More options
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => TafsirView(ayahKey: ayahKey),
+                                ),
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(6),
+                              child: Icon(
+                                Icons.more_vert_rounded,
+                                size: 18,
+                                color: onBg.withValues(alpha: 0.4),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -656,11 +709,37 @@ Widget getAyahByAyahCard({
                           .trim();
                       final overlayContext =
                           Navigator.of(context).overlay?.context ?? context;
+                      Future<void> openUnifiedShareSheet() {
+                        return UnifiedShareBottomSheet.show(
+                          context: overlayContext,
+                          surahNumber: surahNumber,
+                          verseNumber: ayahNumber,
+                          getAyahText: (surah, verse) {
+                            final ayahWords =
+                                QuranScriptFunction.getWordListOfAyah(
+                                  quranViewState.quranScriptType,
+                                  surah.toString(),
+                                  verse.toString(),
+                                );
+                            return ayahWords
+                                .join(" ")
+                                .replaceAll(RegExp(r"<[^>]+>"), "")
+                                .replaceAll(RegExp(r"\s+"), " ")
+                                .trim();
+                          },
+                        );
+                      }
+
                       AyahOptionsSheet.show(
                         context: overlayContext,
                         ayahKey: ayahKey,
                         ayahText: stripped,
-                        // Optional hooks can be added here
+                        onShareAsImage: () {
+                          openUnifiedShareSheet();
+                        },
+                        onShareAsText: () {
+                          openUnifiedShareSheet();
+                        },
                       );
                     },
                     child: Container(
@@ -786,6 +865,133 @@ Widget getAyahByAyahCard({
                               ),
                             ),
                           if (isSajdaAyah) const Gap(5),
+
+                          // ─── Per-Ayah Play / Menu Row ───
+                          const Gap(10),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 2),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                // Play this ayah
+                                Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(999),
+                                    onTap: () {
+                                      final reciter = context
+                                          .read<SegmentedQuranReciterCubit>()
+                                          .state;
+                                      audioPlaybackService.playSingleAyah(
+                                        ayahKey: ayahKey,
+                                        reciterInfoModel: reciter,
+                                        isInsideQuran: true,
+                                        instantPlay: true,
+                                      );
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: themeState.primary.withValues(
+                                          alpha: 0.1,
+                                        ),
+                                      ),
+                                      child: Icon(
+                                        Icons.play_arrow_rounded,
+                                        color: themeState.primary,
+                                        size: 22,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const Gap(8),
+                                // Menu button
+                                Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(999),
+                                    onTap: () {
+                                      final words =
+                                          QuranScriptFunction.getWordListOfAyah(
+                                            quranViewState.quranScriptType,
+                                            surahNumber.toString(),
+                                            ayahNumber.toString(),
+                                          );
+                                      final stripped = words
+                                          .join(" ")
+                                          .replaceAll(RegExp(r"<[^>]+>"), "")
+                                          .replaceAll(RegExp(r"\s+"), " ")
+                                          .trim();
+                                      final overlayContext =
+                                          Navigator.of(
+                                            context,
+                                          ).overlay?.context ??
+                                          context;
+                                      Future<void> openUnifiedShareSheet() {
+                                        return UnifiedShareBottomSheet.show(
+                                          context: overlayContext,
+                                          surahNumber: surahNumber,
+                                          verseNumber: ayahNumber,
+                                          getAyahText: (surah, verse) {
+                                            final ayahWords =
+                                                QuranScriptFunction.getWordListOfAyah(
+                                                  quranViewState
+                                                      .quranScriptType,
+                                                  surah.toString(),
+                                                  verse.toString(),
+                                                );
+                                            return ayahWords
+                                                .join(" ")
+                                                .replaceAll(
+                                                  RegExp(r"<[^>]+>"),
+                                                  "",
+                                                )
+                                                .replaceAll(RegExp(r"\s+"), " ")
+                                                .trim();
+                                          },
+                                        );
+                                      }
+
+                                      AyahOptionsSheet.show(
+                                        context: overlayContext,
+                                        ayahKey: ayahKey,
+                                        ayahText: stripped,
+                                        onShareAsImage: () {
+                                          openUnifiedShareSheet();
+                                        },
+                                        onShareAsText: () {
+                                          openUnifiedShareSheet();
+                                        },
+                                      );
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color:
+                                            (Theme.of(context).brightness ==
+                                                        Brightness.dark
+                                                    ? Colors.white
+                                                    : Colors.black)
+                                                .withValues(alpha: 0.06),
+                                      ),
+                                      child: Icon(
+                                        Icons.menu_rounded,
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.white70
+                                            : Colors.black54,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Gap(6),
 
                           if (!showOnlyAyah && !quranViewState.hideTranslation)
                             const Gap(5),
@@ -1451,18 +1657,23 @@ Widget getToolbarWidget(
                       ),
                     ),
                     onPressed: () {
-                      showShareBottomDialog(
-                        context,
-                        ayahKey,
-                        surahInfoModel,
-                        quranViewState.quranScriptType,
-                        translation,
-                        footNoteAsStringMap
-                            .map((e) => e.values.firstOrNull)
-                            .whereType<String>()
-                            .map((s) => <String, dynamic>{})
-                            .toList(),
-                        translationBookInfoList,
+                      UnifiedShareBottomSheet.show(
+                        context: context,
+                        surahNumber: surahInfoModel.id,
+                        verseNumber: ayahNumber,
+                        getAyahText: (surah, verse) {
+                          final ayahWords =
+                              QuranScriptFunction.getWordListOfAyah(
+                                quranViewState.quranScriptType,
+                                surah.toString(),
+                                verse.toString(),
+                              );
+                          return ayahWords
+                              .join(" ")
+                              .replaceAll(RegExp(r"<[^>]+>"), "")
+                              .replaceAll(RegExp(r"\s+"), " ")
+                              .trim();
+                        },
                       );
                     },
                     tooltip: l10n.shareButton,

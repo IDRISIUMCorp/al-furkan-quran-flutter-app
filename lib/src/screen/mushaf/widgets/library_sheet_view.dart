@@ -15,13 +15,13 @@ import "package:al_quran_v3/src/utils/quran_resources/word_info_models.dart";
 import "package:al_quran_v3/src/utils/quran_resources/word_info_repository.dart";
 import "package:al_quran_v3/src/widget/add_collection_popup/add_note_popup.dart";
 import "package:al_quran_v3/src/widget/add_collection_popup/add_to_pinned_popup.dart";
+import "package:al_quran_v3/src/widget/share/unified_share_bottom_sheet.dart";
 import "package:flutter/material.dart";
 import "package:flutter_animate/flutter_animate.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:flutter_screenutil/flutter_screenutil.dart";
 import "package:flutter/services.dart";
 import "package:qcf_quran/qcf_quran.dart" as qcf hide getPageNumber;
-import "package:share_plus/share_plus.dart";
 
 enum _LibraryWordTab { translation, eerab, tasreef, recitations }
 
@@ -909,7 +909,15 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
             action(
               icon: Icons.share_rounded,
               label: "مشاركة",
-              onTap: () => Share.share(_selectedWordShareText(context)),
+              onTap: () {
+                UnifiedShareBottomSheet.show(
+                  context: context,
+                  surahNumber: widget.surahNumber,
+                  verseNumber: _currentVerse,
+                  getAyahText: (surah, verse) =>
+                      _getAyahText(context, surah, verse),
+                );
+              },
             ),
             SizedBox(width: 8.w),
             action(
@@ -1551,16 +1559,12 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                   const Spacer(),
                   IconButton(
                     onPressed: () {
-                      final text = _getAyahText(
-                        context,
-                        surahNumber,
-                        _currentVerse,
-                      );
-                      Share.share(
-                        _formatAyahTextForSharing(
-                          ayahKey: ayahKey,
-                          ayahText: text,
-                        ),
+                      UnifiedShareBottomSheet.show(
+                        context: context,
+                        surahNumber: surahNumber,
+                        verseNumber: _currentVerse,
+                        getAyahText: (surah, verse) =>
+                            _getAyahText(context, surah, verse),
                       );
                     },
                     icon: Icon(Icons.share_rounded, size: 20.sp),

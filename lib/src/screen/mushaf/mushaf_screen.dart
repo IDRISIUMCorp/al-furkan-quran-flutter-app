@@ -65,6 +65,7 @@ import "package:al_quran_v3/src/utils/quran_ayahs_function/get_page_number.dart"
 import "package:al_quran_v3/src/resources/quran_resources/quran_pages_info.dart";
 import "package:al_quran_v3/src/utils/basic_functions.dart";
 import "package:al_quran_v3/src/theme/app_colors.dart";
+import "package:al_quran_v3/src/widget/share/unified_share_bottom_sheet.dart";
 part 'mushaf_share_extension.dart';
 part 'mushaf_pronunciation_extension.dart';
 
@@ -663,7 +664,10 @@ class _MushafRootState extends State<_MushafRoot> {
       transitionDuration: const Duration(milliseconds: 650),
       pageBuilder: (ctx, anim1, anim2) => const SearchScreen(),
       transitionBuilder: (ctx, anim1, anim2, child) {
-        final curved = CurvedAnimation(parent: anim1, curve: Curves.easeOutQuart);
+        final curved = CurvedAnimation(
+          parent: anim1,
+          curve: Curves.easeOutQuart,
+        );
         return SlideTransition(
           position: Tween<Offset>(
             begin: const Offset(0, 1),
@@ -1297,6 +1301,21 @@ class _MushafViewState extends State<MushafView> {
     return stripped.replaceAll(RegExp(r"\s+"), " ").trim();
   }
 
+  Future<void> _openUnifiedShareBottomSheet({
+    required BuildContext context,
+    required int surahNumber,
+    required int verseNumber,
+  }) {
+    final overlayContext = navigatorKey.currentState?.overlay?.context;
+    final shareContext = overlayContext ?? context;
+    return UnifiedShareBottomSheet.show(
+      context: shareContext,
+      surahNumber: surahNumber,
+      verseNumber: verseNumber,
+      getAyahText: (surah, verse) => _getAyahText(shareContext, surah, verse),
+    );
+  }
+
   void _cancelMenuTimer() {
     _menuTimer?.cancel();
     _menuTimer = null;
@@ -1325,11 +1344,10 @@ class _MushafViewState extends State<MushafView> {
       ayahKey: ayahKey,
       ayahText: ayahText,
       onShareAsImage: () async {
-        await _openTafsirStyleShareOptions(
+        await _openUnifiedShareBottomSheet(
           context: context,
           surahNumber: surah,
           verseNumber: verse,
-          ayahText: ayahText,
         );
       },
       onWordsPronunciation: () {
@@ -1359,11 +1377,10 @@ class _MushafViewState extends State<MushafView> {
         await WahyLibraryStore.removeBookmark(ayahKey);
       },
       onShareAsText: () {
-        _openTafsirStyleShareOptions(
+        _openUnifiedShareBottomSheet(
           context: context,
           surahNumber: surah,
           verseNumber: verse,
-          ayahText: ayahText,
         );
       },
       onListen: () {
@@ -1663,7 +1680,15 @@ class _MushafViewState extends State<MushafView> {
                     },
                   );
 
-                  return MediaQuery(
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      final double ar = constraints.maxWidth / constraints.maxHeight;
+                      double dynamicScale = 1.0;
+                      if (ar > 0.5) {
+                        dynamicScale = 0.5 / ar;
+                      }
+
+                      return MediaQuery(
                     data: MediaQuery.of(
                       context,
                     ).copyWith(textScaler: const TextScaler.linear(1)),
@@ -1673,9 +1698,9 @@ class _MushafViewState extends State<MushafView> {
                         controller: _pageController,
                         initialPageNumber: (widget.initialPageNumber ?? 1)
                             .clamp(1, 604),
-                        sp: widget.spOverride ?? 0.86,
-                        h: widget.hOverride ?? 0.86,
-                        fontSize: qSettings.fontSize,
+                        sp: (widget.spOverride ?? 0.86) * dynamicScale,
+                        h: (widget.hOverride ?? 0.86) * dynamicScale,
+                        fontSize: qSettings.fontSize * dynamicScale,
                         physics: const ClampingScrollPhysics(),
                         showTajweed: qSettings.tajweedEnabled,
                         tajweedWordsBuilder: (surah, verse) {

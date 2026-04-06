@@ -458,4 +458,113 @@ List<Map<String, dynamic>> recitationsInfoList = [
     "bio": "https://www.assabile.com/mohamed-tablawi-31/mohamed-tablawi.htm",
     "source": "Quran.com",
   },
+
+  {
+    "link": "https://everyayah.com/data/Bandar_Baleela_128kbps",
+    "name": "Bandar Baleelah",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/bandar-baleela.png",
+    "bio":
+        "https://www.assabile.com/bandar-baleela-44/bandar-baleela.htm",
+    "source": "EveryAyah.com",
+  },
+
+  {
+    "link":
+        "https://everyayah.com/data/warsh/warsh_Omar_Qazabri_128kbps",
+    "name": "Omar Al-Kazabri",
+    "style": "Warsh",
+    "img":
+        "https://www.assabile.com/media/person/200x256/omar-al-kazabri.png",
+    "bio":
+        "https://www.assabile.com/omar-al-kazabri-104/omar-al-kazabri.htm",
+    "source": "EveryAyah.com",
+  },
+
+  {
+    "link": "https://everyayah.com/data/Idrees_Abkar_128kbps",
+    "name": "Idrees Abkar",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/idris-abkar.png",
+    "bio": "https://www.assabile.com/idris-abkar-74/idris-abkar.htm",
+    "source": "EveryAyah.com",
+  },
+
+  {
+    "link": "https://everyayah.com/data/Abdullaah_3awwaad_Al-Juhaynee_128kbps",
+    "name": "Abdulrahman Al-Ossi",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/abdulrahman-al-ossi.png",
+    "bio":
+        "https://www.assabile.com/abdulrahman-al-ossi-106/abdulrahman-al-ossi.htm",
+    "source": "EveryAyah.com",
+  },
+
+  {
+    "link": "https://everyayah.com/data/Tawfeeq_As-Sayegh_128kbps",
+    "name": "Tawfeeq As-Sayegh",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/tawfiq-al-sayigh.png",
+    "bio":
+        "https://www.assabile.com/tawfiq-al-sayigh-96/tawfiq-al-sayigh.htm",
+    "source": "EveryAyah.com",
+  },
+
+  {
+    "link": "https://everyayah.com/data/Abdulbari_ath_Thubaity_128kbps",
+    "name": "Abdulbari Ath-Thubaity",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/abdel-bari-ath-thubaity.png",
+    "bio":
+        "https://www.assabile.com/abdel-bari-ath-thubaity-14/abdel-bari-ath-thubaity.htm",
+    "source": "EveryAyah.com",
+  },
+
+  {
+    "link": "https://everyayah.com/data/Muhammad_Al_Luhaidan_128kbps",
+    "name": "Muhammad Al-Luhaidan",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/muhammad-al-luhaidan.png",
+    "bio":
+        "https://www.assabile.com/muhammad-al-luhaidan-55/muhammad-al-luhaidan.htm",
+    "source": "EveryAyah.com",
+  },
+
+  {
+    "link": "https://everyayah.com/data/Fatih_Seferagic_64kbps",
+    "name": "Fatih Seferagic",
+    "style": "Murattal",
+    "img":
+        "https://way2quran.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fway2quran_storage%2Fimgs%2Ffatih-seferagic.png&w=640&q=75",
+    "bio": "https://en.wikipedia.org/wiki/Fatih_Seferagi%C4%87",
+    "source": "EveryAyah.com",
+  },
+
+  {
+    "link": "https://everyayah.com/data/Raad_Muhammad_Al_Kurdi_128kbps",
+    "name": "Raad Al-Kurdi",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/raad-muhammad-al-kurdi.png",
+    "bio":
+        "https://www.assabile.com/raad-muhammad-al-kurdi-130/raad-muhammad-al-kurdi.htm",
+    "source": "EveryAyah.com",
+  },
+
+  {
+    "link": "https://everyayah.com/data/Wadee_Hammadi_Al-Yamani_128kbps",
+    "name": "Wadee Hammadi Al-Yamani",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/wadih-al-yamani.jpg",
+    "bio":
+        "https://www.assabile.com/wadih-al-yamani-411/wadih-al-yamani.htm",
+    "source": "EveryAyah.com",
+  },
 ];
