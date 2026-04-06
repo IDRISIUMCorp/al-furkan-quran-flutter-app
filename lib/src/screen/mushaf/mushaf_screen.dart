@@ -1961,8 +1961,10 @@ class _MushafViewState extends State<MushafView> {
             },
           );
         },
-      ),
-    );
+      );
+    },
+  ),
+);
 
     final decoratedBody = withSystemBarBackground(body);
 
