@@ -15,6 +15,7 @@ import "package:just_audio/just_audio.dart";
 import "package:just_audio_background/just_audio_background.dart";
 import "package:path/path.dart";
 import "package:permission_handler/permission_handler.dart";
+import "package:flutter/foundation.dart";
 
 class AudioPlayerManager {
   static bool isListening = false;
@@ -33,6 +34,63 @@ class AudioPlayerManager {
   static StreamSubscription<PlayerState>? _wordCompletionStream;
 
   static AudioPlayerUiBridge? _uiBridge;
+
+  static Future<void> _waitForPlaybackCompletion({
+    required String debugKey,
+  }) async {
+    // Guard against stale `completed` from a previous source.
+    if (audioPlayer.processingState == ProcessingState.completed) {
+      try {
+        await audioPlayer.processingStateStream
+            .firstWhere((state) => state != ProcessingState.completed)
+            .timeout(const Duration(seconds: 1));
+      } catch (_) {}
+    }
+
+    Duration? duration = audioPlayer.duration;
+    if (duration == null) {
+      try {
+        duration = await audioPlayer.durationStream
+            .where((d) => d != null && d.inMilliseconds > 0)
+            .cast<Duration>()
+            .first
+            .timeout(const Duration(milliseconds: 350));
+      } catch (_) {}
+    }
+
+    final dynamicTimeout = duration == null
+        ? const Duration(milliseconds: 900)
+        : Duration(
+            milliseconds: (duration.inMilliseconds + 180).clamp(450, 950),
+          );
+
+    final completedFuture = audioPlayer.playerStateStream.firstWhere(
+      (s) =>
+          s.processingState == ProcessingState.completed &&
+          s.playing == false,
+    );
+
+    Future<void>? positionFuture;
+    if (duration != null && duration.inMilliseconds > 200) {
+      final targetMs =
+          (duration.inMilliseconds - 260).clamp(0, duration.inMilliseconds);
+      positionFuture = audioPlayer.positionStream.firstWhere(
+        (pos) => pos.inMilliseconds >= targetMs,
+      );
+    }
+
+    try {
+      await Future.any(
+        <Future<void>>[
+          completedFuture,
+          ?positionFuture,
+        ],
+      ).timeout(dynamicTimeout);
+    } catch (_) {
+      // Treat timeout/stream issues as completion to avoid UI lingering.
+      return;
+    }
+  }
 
   static void bindUiBridge(AudioPlayerUiBridge? bridge) {
     _uiBridge = bridge;
@@ -168,6 +226,7 @@ class AudioPlayerManager {
     _uiBridge?.setBufferPosition(Duration.zero);
     _uiBridge?.setTotalDuration(Duration.zero);
     _uiBridge?.setPlayerState(isPlaying: false);
+    _uiBridge?.setWordPlaying(null);
     _uiBridge?.setExpanded(false);
 
     try {
@@ -180,8 +239,16 @@ class AudioPlayerManager {
     List<String> wordKeys, {
     void Function(int index, String wordKey)? onWordStart,
   }) async {
-    if (wordKeys.isEmpty || isWordPlaying) {
+    if (wordKeys.isEmpty) {
       return;
+    }
+
+    if (isWordPlaying) {
+      try {
+        await stopPlaybackKeepUi();
+      } catch (_) {}
+      isWordPlaying = false;
+      _uiBridge?.setWordPlaying(null);
     }
 
     isWordPlaying = true;
@@ -197,23 +264,20 @@ class AudioPlayerManager {
 
         final url =
             "https://audio.qurancdn.com/wbw/${wordKeyToAudioOfWordID(wordKey)}.mp3";
-        final audioSource =
-            !(platformOwn == PlatformOwn.isIos ||
-                platformOwn == PlatformOwn.isAndroid ||
-                platformOwn == PlatformOwn.isMac)
-            ? AudioSource.uri(Uri.parse(url))
-            : LockCachingAudioSource(
-                Uri.parse(url),
-                tag: MediaItem(id: wordKey, title: wordKey),
-              );
+        final audioSource = AudioSource.uri(
+          Uri.parse(url),
+          tag: MediaItem(id: wordKey, title: wordKey),
+        );
 
         await audioPlayer.setAudioSource(audioSource);
         await audioPlayer.play();
-        await audioPlayer.processingStateStream.firstWhere(
-          (state) => state == ProcessingState.completed,
-        );
-        await audioPlayer.stop();
-        await audioPlayer.seek(Duration.zero);
+
+        await _waitForPlaybackCompletion(debugKey: wordKey);
+
+        // Clear UI highlight immediately once the clip is considered finished.
+        _uiBridge?.setWordPlaying(null);
+        unawaited(audioPlayer.stop());
+        unawaited(audioPlayer.seek(Duration.zero));
       }
     } catch (error, stackTrace) {
       log(
@@ -463,7 +527,11 @@ class AudioPlayerManager {
 
   static Future<void> playWord(String wordKey) async {
     if (isWordPlaying) {
-      return;
+      try {
+        await stopPlaybackKeepUi();
+      } catch (_) {}
+      isWordPlaying = false;
+      _uiBridge?.setWordPlaying(null);
     }
 
     if (platformOwn == PlatformOwn.isIos ||
@@ -478,52 +546,43 @@ class AudioPlayerManager {
 
       final url =
           "https://audio.qurancdn.com/wbw/${wordKeyToAudioOfWordID(wordKey)}.mp3";
-      final audioSource =
-          !(platformOwn == PlatformOwn.isIos ||
-              platformOwn == PlatformOwn.isAndroid ||
-              platformOwn == PlatformOwn.isMac)
-          ? AudioSource.uri(Uri.parse(url))
-          : LockCachingAudioSource(
-              Uri.parse(url),
-              tag: MediaItem(id: wordKey, title: wordKey),
-            );
+      final audioSource = AudioSource.uri(
+        Uri.parse(url),
+        tag: MediaItem(id: wordKey, title: wordKey),
+      );
 
       await stopListeningAudioPlayerState();
       isListening = false;
 
-      await _wordCompletionStream?.cancel();
       await audioPlayer.setAudioSource(audioSource);
       await audioPlayer.play();
 
-      _wordCompletionStream = audioPlayer.playerStateStream.listen((
-        event,
-      ) async {
-        if (event.processingState == ProcessingState.completed) {
-          try {
-            await audioPlayer.stop();
-            await audioPlayer.clearAudioSources();
-            await audioPlayer.dispose();
-          } catch (_) {}
-          audioPlayer = AudioPlayer();
-          isWordPlaying = false;
-          _uiBridge?.setWordPlaying(null);
-          await _wordCompletionStream?.cancel();
-          _wordCompletionStream = null;
-          await stopListeningAudioPlayerState();
-        }
-      });
+      final sw = Stopwatch()..start();
+      await _waitForPlaybackCompletion(debugKey: wordKey);
+      sw.stop();
+      if (kDebugMode) {
+        log(
+          "[WordAudio] wait done key=$wordKey ms=${sw.elapsedMilliseconds} durationMs=${audioPlayer.duration?.inMilliseconds}",
+          name: "AudioPlayerManager",
+        );
+      }
+
+      // Clear UI highlight immediately once the clip is considered finished.
+      _uiBridge?.setWordPlaying(null);
+
+      unawaited(audioPlayer.stop());
+      unawaited(audioPlayer.seek(Duration.zero));
     } catch (error, stackTrace) {
       log(
         "playWord failed: $error\n$stackTrace",
         name: "AudioPlayerManager.playWord",
       );
-      isWordPlaying = false;
-      _uiBridge?.setWordPlaying(null);
-      await _wordCompletionStream?.cancel();
-      _wordCompletionStream = null;
       try {
         await audioPlayer.stop();
       } catch (_) {}
+    } finally {
+      isWordPlaying = false;
+      _uiBridge?.setWordPlaying(null);
     }
   }
 
@@ -563,16 +622,10 @@ class AudioPlayerManager {
             );
     }
 
-    return (platformOwn == PlatformOwn.isIos ||
-            platformOwn == PlatformOwn.isAndroid ||
-            platformOwn == PlatformOwn.isMac)
-        ? LockCachingAudioSource(
-            Uri.parse(getUrlOfAudioFromAyahKey(ayahKey, reciter)),
-            tag: MediaItem(id: ayahKey, album: reciter.name, title: surahTitle),
-          )
-        : AudioSource.uri(
-            Uri.parse(getUrlOfAudioFromAyahKey(ayahKey, reciter)),
-          );
+    return AudioSource.uri(
+      Uri.parse(getUrlOfAudioFromAyahKey(ayahKey, reciter)),
+      tag: MediaItem(id: ayahKey, album: reciter.name, title: surahTitle),
+    );
   }
 
   static String getUrlOfAudioFromAyahKey(
