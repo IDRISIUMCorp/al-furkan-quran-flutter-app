@@ -14,6 +14,7 @@ class DefaultOfflineResources {
       "default_offline_resources_enforced_v2";
 
   static const String _saadiJsonGzAsset = "assets/wahy/saadi.json.gz";
+  static const String _saadiJsonAsset = "assets/wahy/json/Tafseer_Al_Saddi.json";
 
   static final TafsirBookModel defaultTafsirSaadi = TafsirBookModel(
     language: "Arabic",
@@ -107,11 +108,33 @@ class DefaultOfflineResources {
 
     final LazyBox box = await Hive.openLazyBox(boxName);
 
-    final ByteData bytes = await rootBundle.load(_saadiJsonGzAsset);
-    final raw = bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
-    final decoded = GZipDecoder().decodeBytes(raw);
-    final jsonString = utf8.decode(decoded);
-    final Map<dynamic, dynamic> data = await compute(_decodeJsonToMap, jsonString);
+    Map<dynamic, dynamic> data;
+    try {
+      final ByteData bytes = await rootBundle.load(_saadiJsonGzAsset);
+      final raw =
+          bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+      final decoded = GZipDecoder().decodeBytes(raw);
+      final jsonString = utf8.decode(decoded);
+      data = await compute(_decodeJsonToMap, jsonString);
+    } catch (_) {
+      final assetString = await rootBundle.loadString(_saadiJsonAsset);
+      data = await compute((message) {
+        final rawJson = jsonDecode(message);
+        if (rawJson is Map && rawJson.containsKey("tafsir")) {
+          final List tafsirList = rawJson["tafsir"];
+          final converted = <String, dynamic>{};
+          for (int s = 0; s < tafsirList.length; s++) {
+            final verses = tafsirList[s] as List;
+            for (int v = 0; v < verses.length; v++) {
+              converted["${s + 1}:${v + 1}"] = {"text": verses[v]};
+            }
+          }
+          return converted;
+        }
+        if (rawJson is Map) return rawJson;
+        return <String, dynamic>{};
+      }, assetString);
+    }
 
     for (final entry in data.entries) {
       await box.put(entry.key.toString(), entry.value);

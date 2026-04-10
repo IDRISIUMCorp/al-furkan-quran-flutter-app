@@ -142,7 +142,7 @@ flutter:
     - assets/img/sunset_forbidden_time.png
     - assets/dev/dev image.jpg
     - assets/wahy/json/azkar.json
-    - assets/wahy/saadi.json.gz
+    - assets/wahy/json/Tafseer_Al_Saddi.json
     - packages/alrab-al-quran-li-da-as.json
     - assets/quran_script/
     - assets/meta_data/
