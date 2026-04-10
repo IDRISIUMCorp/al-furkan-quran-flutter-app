@@ -3,7 +3,7 @@ import "dart:developer";
 
 import "package:al_quran_v3/src/resources/quran_resources/language_resources.dart";
 import "package:al_quran_v3/src/resources/translation/language_cubit.dart";
-import "package:al_quran_v3/src/utils/quran_resources/get_translation_with_word_by_word.dart";
+import "package:al_quran_v3/src/utils/quran_resources/get_translation.dart";
 import "package:dio/dio.dart" as dio;
 import "package:flutter/cupertino.dart";
 import "package:flutter/foundation.dart";

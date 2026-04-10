@@ -4,7 +4,7 @@ import "package:al_quran_v3/src/resources/quran_resources/meta/meta_data_surah.d
 import "package:al_quran_v3/src/resources/quran_resources/models/translation_book_model.dart";
 import "package:al_quran_v3/src/utils/filter/filter_surah.dart";
 import "package:al_quran_v3/src/utils/number_localization.dart";
-import "package:al_quran_v3/src/utils/quran_resources/get_translation_with_word_by_word.dart";
+import "package:al_quran_v3/src/utils/quran_resources/get_translation.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_translation_function.dart";
 import "package:al_quran_v3/src/resources/quran_resources/meaning_of_surah.dart";

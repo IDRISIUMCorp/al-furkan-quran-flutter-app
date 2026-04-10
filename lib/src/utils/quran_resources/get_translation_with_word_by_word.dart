@@ -1,5 +1,5 @@
 import "package:al_quran_v3/src/utils/quran_resources/quran_translation_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/word_by_word_function.dart";
+ 
 
 import "../../resources/quran_resources/models/translation_book_model.dart";
 
@@ -12,10 +12,12 @@ TranslationWithWordByWord? getTranslationFromCache(String ayahKey) {
 Future<TranslationWithWordByWord> getTranslationWithWordByWord(
   String ayahKey,
 ) async {
+  if (cacheOfAyahKeys.containsKey(ayahKey)) return cacheOfAyahKeys[ayahKey]!;
+
   final TranslationWithWordByWord translationWithWordByWord =
       TranslationWithWordByWord(
         translationList: await QuranTranslationFunction.getTranslation(ayahKey),
-        wordByWord: await WordByWordFunction.getAyahWordByWordData(ayahKey),
+        wordByWord: const [],
       );
   cacheOfAyahKeys[ayahKey] = translationWithWordByWord;
   return translationWithWordByWord;

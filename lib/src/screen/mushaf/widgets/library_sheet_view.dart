@@ -8,15 +8,18 @@ import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.da
 import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
 import "package:al_quran_v3/src/theme/controller/theme_state.dart" as theme;
 import "package:al_quran_v3/src/utils/quran_ayahs_function/get_page_number.dart";
-import "package:al_quran_v3/src/utils/quran_resources/get_translation_with_word_by_word.dart";
+import "package:al_quran_v3/src/utils/quran_resources/get_translation.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/word_info_models.dart";
 import "package:al_quran_v3/src/utils/quran_resources/word_info_repository.dart";
+import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
 import "package:al_quran_v3/src/widget/add_collection_popup/add_note_popup.dart";
 import "package:al_quran_v3/src/widget/add_collection_popup/add_to_pinned_popup.dart";
 import "package:al_quran_v3/src/widget/share/unified_share_bottom_sheet.dart";
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import "dart:developer";
 import "package:flutter_animate/flutter_animate.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:flutter_screenutil/flutter_screenutil.dart";
@@ -84,6 +87,20 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
   void initState() {
     super.initState();
     _currentVerse = widget.verseNumber;
+
+    Future.microtask(() async {
+      try {
+        await QuranTafsirFunction.init();
+      } catch (e) {
+        if (kDebugMode) {
+          log("[LibrarySheet] QuranTafsirFunction.init failed: $e");
+        }
+      }
+      if (!mounted) return;
+      setState(() {
+        _tafsirFutureCache.clear();
+      });
+    });
   }
 
   String _toArabicDigits(String input) {
@@ -95,8 +112,67 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
     return input;
   }
 
-  List<String> _getQcfWords(int surah, int verse) {
-    return qcf.getVerseQCFWords(surah, verse, verseEndSymbol: false);
+  // Unicode codepoints for special Quran symbols that should be skipped
+  static final _specialSymbolPattern = RegExp(
+    r'[\u06D6-\u06ED\u0600-\u0605\u0610-\u061A\u06DE\u06DD\u08D4-\u08E1\u08E3-\u08FF\uFD3E\uFD3F\u06E9۩۞۩]+',
+  );
+
+  bool _isSpecialSymbol(String word) {
+    final cleaned = word.replaceAll(RegExp(r'\s+'), '').trim();
+    if (cleaned.isEmpty) return true;
+    
+    // Explicitly check for exact sajdah/hizb marks that come from QCF string or unicode
+    if (cleaned == '۩' || cleaned == '۞' || cleaned == '\u06E9') return true;
+    
+    // Sometimes the Sajdah character is represented by a single special PUA char
+    // that is standard across QCF for marks. But filtering ALL PUA will hide the ayah.
+    // Let's rely on the unicode pattern.
+    return _specialSymbolPattern.hasMatch(cleaned);
+  }
+
+  List<String> _filterWordTexts(Iterable<String> rawWords) {
+    return rawWords
+        .map((w) => _stripHtml(w).trim())
+        .where((text) {
+          final cleaned = text.replaceAll(RegExp(r"\s+"), "").trim();
+          if (cleaned.isEmpty) return false;
+          if (_isSpecialSymbol(cleaned)) return false;
+          if (cleaned == "﴿" || cleaned == "﴾") return false;
+          if (RegExp(r"^[0-9٠-٩]+$").hasMatch(cleaned)) return false;
+          return true;
+        })
+        .toList();
+  }
+
+  List<_QcfWord> _getQcfWords(int surah, int verse) {
+    final rawQcf = qcf.getVerseQCFWords(surah, verse, verseEndSymbol: false);
+    final filteredQcf = rawQcf.where((token) {
+      final cleaned = token.replaceAll(RegExp(r"\s+"), "").trim();
+      if (cleaned.isEmpty) return false;
+      if (_isSpecialSymbol(cleaned)) return false;
+      if (RegExp(r"^[0-9٠-٩]+$").hasMatch(cleaned)) return false;
+      if (cleaned == "﴿" || cleaned == "﴾") return false;
+      return true;
+    }).toList();
+
+    final rawPlainText = qcf.getVerse(surah, verse, verseEndSymbol: false);
+    final plainWords = rawPlainText
+        .replaceAllMapped(_specialSymbolPattern, (m) => " ${m.group(0)} ")
+        .split(RegExp(r"\s+"))
+        .where((word) => word.isNotEmpty)
+        .where((word) => !_isSpecialSymbol(word))
+        .toList();
+
+    final limit =
+        filteredQcf.length < plainWords.length ? filteredQcf.length : plainWords.length;
+    return List<_QcfWord>.generate(
+      limit,
+      (i) => _QcfWord(
+        text: filteredQcf[i],
+        displayIndex: i + 1,
+        originalWordNumber: i + 1,
+      ),
+    );
   }
 
   List<String> _getPlainWords(BuildContext context, int surah, int verse) {
@@ -106,21 +182,28 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
       surah.toString(),
       verse.toString(),
     );
-    if (words.isNotEmpty) return words;
-    return qcf
-        .getVerse(surah, verse, verseEndSymbol: false)
-        .split(RegExp(r"\s+"))
-        .where((word) => word.isNotEmpty)
-        .toList();
+    if (words.isNotEmpty) {
+      // Keep plainWords aligned 1:1 with the displayed tokens.
+      return _filterWordTexts(words).map(_normalizeWhitespace).toList();
+    }
+    return _filterWordTexts(
+      qcf
+          .getVerse(surah, verse, verseEndSymbol: false)
+          .split(RegExp(r"\s+"))
+          .where((word) => word.isNotEmpty),
+    ).map(_normalizeWhitespace).toList();
   }
 
   String _selectedWordLabel(BuildContext context) {
     final selected = _selectedWordNumber;
     if (selected == null) return "";
-    final words = _getPlainWords(context, widget.surahNumber, _currentVerse);
+
+    final plainWords = _getPlainWords(context, widget.surahNumber, _currentVerse);
     final index = selected - 1;
-    if (index < 0 || index >= words.length) return "";
-    return _normalizeWhitespace(words[index]);
+    if (index >= 0 && index < plainWords.length) {
+      return _normalizeWhitespace(plainWords[index]);
+    }
+    return "";
   }
 
   String _stripHtml(String? htmlText) {
@@ -131,6 +214,56 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
 
   String _normalizeWhitespace(String value) {
     return value.replaceAll(RegExp(r"\s+"), " ").trim();
+  }
+
+  String _normalizeWordInfoKey(String value) {
+    return value
+        .replaceAll(RegExp(r"[\u064B-\u065F\u0670\u06D6-\u06ED]"), "")
+        .replaceAll("ـ", "")
+        .replaceAll(RegExp(r"\s+"), "")
+        .trim();
+  }
+
+  String _normalizeArabicForMatch(String value) {
+    var v = _normalizeWordInfoKey(value);
+    v = v.replaceAll(RegExp(r"[^\u0600-\u06FF]"), "");
+    v = v
+        .replaceAll(RegExp(r"[إأآٱ]"), "ا")
+        .replaceAll("ى", "ي")
+        .replaceAll("ؤ", "و")
+        .replaceAll("ئ", "ي")
+        .replaceAll("ة", "ه");
+    return v;
+  }
+
+  Iterable<String> _matchVariants(String raw) sync* {
+    final base = _normalizeArabicForMatch(raw);
+    if (base.isEmpty) return;
+    yield base;
+
+    // Common Arabic prefixes that often appear/disappear across sources.
+    const prefixes = [
+      "و",
+      "ف",
+      "ب",
+      "ك",
+      "ل",
+      "س",
+    ];
+    for (final p in prefixes) {
+      if (base.startsWith(p) && base.length > 1) {
+        yield base.substring(1);
+      }
+    }
+    if (base.startsWith("ال") && base.length > 2) {
+      yield base.substring(2);
+    }
+    for (final p in prefixes) {
+      final withP = "$p$base";
+      yield withP;
+      yield "$pال$base";
+    }
+    yield "ال$base";
   }
 
   String _getAyahText(BuildContext context, int surah, int verse) {
@@ -244,10 +377,10 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
 
   void _toggleWordSelection(int wordNumber) {
     setState(() {
-      final isSameWord = _selectedWordNumber == wordNumber;
-      _selectedWordNumber = isSameWord ? null : wordNumber;
-      if (!isSameWord) {
-        _activeTab = _LibraryWordTab.translation;
+      if (_selectedWordNumber == wordNumber) {
+        _selectedWordNumber = null;
+      } else {
+        _selectedWordNumber = wordNumber;
       }
     });
   }
@@ -345,6 +478,7 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
     final themeState = context.watch<ThemeCubit>().state;
     final quranSettings = context.watch<QuranSettingsCubit>().state;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scriptType = context.watch<QuranViewCubit>().state.quranScriptType;
     final totalVerses = quranAyahCount[widget.surahNumber - 1];
 
     final bg = isDark ? const Color(0xFF111111) : const Color(0xFFF9F4EA);
@@ -357,13 +491,57 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
 
     final ayahKey = "${widget.surahNumber}:$_currentVerse";
     final page = getPageNumber(ayahKey) ?? 1;
-    final pageFont = "QCF_P${page.toString().padLeft(3, "0")}";
-    final words = _getQcfWords(widget.surahNumber, _currentVerse);
-    final plainWords = _getPlainWords(
-      context,
-      widget.surahNumber,
-      _currentVerse,
+    final pageFont = switch (scriptType) {
+      QuranScriptType.indopak => "AlQuranNeov5x1",
+      _ => "QPC_Hafs",
+    };
+
+    final rawWords = QuranScriptFunction.getWordListOfAyah(
+      scriptType,
+      widget.surahNumber.toString(),
+      _currentVerse.toString(),
     );
+    final words = <_QcfWord>[];
+    int displayIndex = 0;
+    for (int i = 0; i < rawWords.length; i++) {
+      final text = _stripHtml(rawWords[i]).trim();
+      final cleaned = text.replaceAll(RegExp(r"\s+"), "").trim();
+      if (cleaned.isEmpty) continue;
+      if (_isSpecialSymbol(cleaned)) continue;
+      if (cleaned == "﴿" || cleaned == "﴾") continue;
+      if (RegExp(r"^[0-9٠-٩]+$").hasMatch(cleaned)) continue;
+
+      displayIndex++;
+      words.add(
+        _QcfWord(
+          text: _normalizeWhitespace(text),
+          displayIndex: displayIndex,
+          originalWordNumber: i + 1,
+        ),
+      );
+    }
+
+    final plainWords = _getPlainWords(context, widget.surahNumber, _currentVerse);
+    final selectedDisplayWordNumber = _selectedWordNumber;
+    final selectedOriginalWordNumber = selectedDisplayWordNumber == null
+        ? null
+        : words
+            .cast<_QcfWord?>()
+            .firstWhere(
+              (w) => w?.displayIndex == selectedDisplayWordNumber,
+              orElse: () => null,
+            )
+            ?.originalWordNumber;
+    final selectedDisplayedWordText = selectedDisplayWordNumber == null
+        ? ""
+        : words
+            .cast<_QcfWord?>()
+            .firstWhere(
+              (w) => w?.displayIndex == selectedDisplayWordNumber,
+              orElse: () => null,
+            )
+            ?.text ??
+        "";
 
     return Container(
       height: 0.9.sh,
@@ -396,13 +574,6 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                   themeState: themeState,
                   surfaceColor: surfaceColor,
                 ),
-                _buildMetaStrip(
-                  isDark: isDark,
-                  themeState: themeState,
-                  page: page,
-                  wordsCount: words.length,
-                  totalVerses: totalVerses,
-                ),
                 SizedBox(height: 8.h),
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 320),
@@ -433,11 +604,6 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                           ),
                           child: Column(
                             children: [
-                              _buildSelectionActions(
-                                ayahKey: ayahKey,
-                                isDark: isDark,
-                                themeState: themeState,
-                              ),
                               _buildMinimalTabs(
                                 isDark: isDark,
                                 themeState: themeState,
@@ -449,6 +615,14 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                                 surahNumber: widget.surahNumber,
                                 verseNumber: _currentVerse,
                                 selectedWord: _selectedWordNumber!,
+                                selectedOriginalWordNumber:
+                                    selectedOriginalWordNumber ??
+                                    _selectedWordNumber!,
+                                selectedWordText:
+                                    selectedDisplayedWordText.isNotEmpty
+                                        ? selectedDisplayedWordText
+                                        : _selectedWordLabel(context),
+                                displayWordsCount: words.length,
                                 isDark: isDark,
                                 cardColor: cardColor,
                                 themeState: themeState,
@@ -537,7 +711,7 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
   }
 
   Widget _buildAyahScroller({
-    required List<String> words,
+    required List<_QcfWord> words,
     required List<String> plainWords,
     required String selectedWordLabel,
     required String pageFont,
@@ -551,54 +725,31 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
     );
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 14.w),
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+      margin: EdgeInsets.symmetric(horizontal: 16.w),
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 16.h),
       decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(22),
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.025)
+            : const Color(0xFFF9F6F0),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.04),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.06)
+              : Colors.black.withValues(alpha: 0.04),
         ),
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  selectedWordLabel.isEmpty
-                      ? "اسحب الآية أفقيًا ثم اضغط على الكلمة المطلوبة."
-                      : "الكلمة المختارة: $selectedWordLabel",
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    fontSize: 11.5.sp,
-                    fontWeight: FontWeight.w700,
-                    color: selectedWordLabel.isEmpty
-                        ? (isDark ? Colors.white54 : Colors.black54)
-                        : themeState.primary,
-                  ),
-                ),
-              ),
-              SizedBox(width: 8.w),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: themeState.primary.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  "اسحب",
-                  style: TextStyle(
-                    fontSize: 10.5.sp,
-                    fontWeight: FontWeight.w800,
-                    color: themeState.primary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 12.h),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             reverse: true,
@@ -608,16 +759,17 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
               children: [
                 for (int i = 0; i < words.length; i++)
                   _buildWordItem(
-                        wordNumber: i + 1,
-                        word: words[i],
+                        wordNumber: words[i].displayIndex,
+                        word: words[i].text,
                         plainWord: i < plainWords.length ? plainWords[i] : null,
                         font: pageFont,
                         isDark: isDark,
                         themeState: themeState,
                       )
-                      .animate(delay: Duration(milliseconds: 35 * i))
-                      .fadeIn(duration: 220.ms)
-                      .slideX(begin: 0.06, end: 0, duration: 220.ms),
+                      .animate(delay: Duration(milliseconds: 25 * i))
+                      .fadeIn(duration: 350.ms, curve: Curves.easeOutCubic)
+                      .slideX(begin: 0.08, end: 0, duration: 350.ms, curve: Curves.easeOutCubic)
+                      .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1), duration: 350.ms, curve: Curves.easeOutBack),
                 SizedBox(width: 8.w),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
@@ -631,7 +783,8 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                     ayahNumberWord,
                     style: TextStyle(
                       fontFamily: pageFont,
-                      fontSize: 22.sp,
+                      fontSize: 27.sp,
+                      height: 1,
                       color: isDark ? Colors.white54 : Colors.black45,
                     ),
                   ),
@@ -660,22 +813,20 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
       child: GestureDetector(
         onTap: () => _toggleWordSelection(wordNumber),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
+          duration: const Duration(milliseconds: 260),
           curve: Curves.easeOutCubic,
           margin: EdgeInsets.symmetric(horizontal: 2.w),
-          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
           decoration: BoxDecoration(
             color: isSelected
                 ? themeState.primary.withValues(alpha: 0.12)
-                : (isDark
-                      ? Colors.white.withValues(alpha: 0.02)
-                      : Colors.white.withValues(alpha: 0.55)),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: isSelected
-                  ? themeState.primary.withValues(alpha: 0.35)
-                  : Colors.transparent,
-            ),
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+            border: isSelected
+                ? Border.all(
+                    color: themeState.primary.withValues(alpha: 0.35),
+                  )
+                : Border.all(color: Colors.transparent),
             boxShadow: isSelected
                 ? [
                     BoxShadow(
@@ -1047,6 +1198,9 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
     required int surahNumber,
     required int verseNumber,
     required int selectedWord,
+    required int selectedOriginalWordNumber,
+    required String selectedWordText,
+    required int displayWordsCount,
     required bool isDark,
     required Color cardColor,
     required theme.ThemeState themeState,
@@ -1106,16 +1260,18 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                   message:
                       "فعّل تبويب الإعراب والتحليل من إعدادات المصحف ليظهر هذا المحتوى مباشرة داخل المكتبة.",
                   actionLabel: "تفعيل الآن",
-                  onAction: () =>
-                      context.read<QuranSettingsCubit>().toggleIrab(true),
+                  onAction: () {},
                 )
               : _buildWordInfoTab(
                   kind: _activeTab.infoKind!,
                   ref: WordRef(
                     surahNumber: surahNumber,
                     ayahNumber: verseNumber,
-                    wordNumber: selectedWord,
+                    wordNumber: selectedOriginalWordNumber,
                   ),
+                  selectedDisplayWordNumber: selectedWord,
+                  selectedWordText: selectedWordText,
+                  displayWordsCount: displayWordsCount,
                   isDark: isDark,
                   themeState: themeState,
                 ),
@@ -1167,11 +1323,41 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
             .toList();
 
         if (meaning.isEmpty && translationCards.isEmpty) {
-          return _buildInlineMessage(
-            isDark: isDark,
-            icon: Icons.translate_rounded,
-            message:
-                "لا توجد ترجمة كلمة بكلمة أو ترجمات آيات مفعلة للعنصر المختار حاليًا.",
+          final themeState = context.read<ThemeCubit>().state;
+          return Column(
+            children: [
+              _buildInlineMessage(
+                isDark: isDark,
+                icon: Icons.translate_rounded,
+                message:
+                    "لا توجد ترجمة كلمة بكلمة أو ترجمات مفعّلة حاليًا.",
+              ),
+              SizedBox(height: 8.h),
+              FilledButton.tonal(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const QuranResourcesView(),
+                    ),
+                  );
+                },
+                style: FilledButton.styleFrom(
+                  backgroundColor: themeState.primary.withValues(alpha: 0.12),
+                  foregroundColor: themeState.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: Text(
+                  "اختيار ترجمة",
+                  style: TextStyle(
+                    fontSize: 12.5.sp,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
           );
         }
 
@@ -1202,15 +1388,15 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                       ),
                     ),
                     SizedBox(height: 10.h),
-                    Text(
+                    _buildRichTextContent(
                       meaning,
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
+                      TextStyle(
                         fontSize: 17.sp,
                         height: 1.7,
                         fontWeight: FontWeight.w700,
                         color: isDark ? Colors.white : Colors.black87,
                       ),
+                      Theme.of(context).primaryColor,
                     ),
                   ],
                 ),
@@ -1256,14 +1442,14 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                         ),
                       ),
                       SizedBox(height: 8.h),
-                      Text(
+                      _buildRichTextContent(
                         card.text,
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
+                        TextStyle(
                           fontSize: 14.sp,
                           height: 1.8,
                           color: isDark ? Colors.white : Colors.black87,
                         ),
+                        Theme.of(context).primaryColor,
                       ),
                     ],
                   ),
@@ -1279,6 +1465,9 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
   Widget _buildWordInfoTab({
     required WordInfoKind kind,
     required WordRef ref,
+    required int selectedDisplayWordNumber,
+    required String selectedWordText,
+    required int displayWordsCount,
     required bool isDark,
     required theme.ThemeState themeState,
   }) {
@@ -1290,8 +1479,161 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
       );
     }
 
+    Future<QiraatWordInfo?> load() async {
+      final direct = await _wordInfoRepo.getWordInfo(kind: kind, ref: ref);
+      final targetVariants = _matchVariants(_stripHtml(selectedWordText)).toSet();
+
+      if (kDebugMode) {
+        log(
+          "[LibraryWordInfo] kind=${kind.name} ref=${ref.surahNumber}:${ref.ayahNumber}:${ref.wordNumber} selectedDisplay=$selectedDisplayWordNumber selectedText='$selectedWordText' variants=${targetVariants.take(6).toList()}",
+          name: "LibrarySheet",
+        );
+        if (direct != null) {
+          log(
+            "[LibraryWordInfo] direct.word='${direct.word}' direct.contentLen=${direct.content.length}",
+            name: "LibrarySheet",
+          );
+        } else {
+          log("[LibraryWordInfo] direct=null", name: "LibrarySheet");
+        }
+      }
+      if (targetVariants.isEmpty) {
+        if (direct != null && direct.content.trim().isNotEmpty) {
+          return direct;
+        }
+        return direct;
+      }
+
+      if (direct != null && direct.content.trim().isNotEmpty) {
+        final directWord = _normalizeArabicForMatch(_stripHtml(direct.word));
+        final exact = directWord.isNotEmpty && targetVariants.contains(directWord);
+        final loose =
+            !exact &&
+            directWord.isNotEmpty &&
+            targetVariants.any((t) {
+              final lenDiff = (t.length - directWord.length).abs();
+              if (lenDiff > 2) return false;
+              return t.contains(directWord) || directWord.contains(t);
+            });
+        if (exact || loose) {
+          if (kDebugMode) {
+            log(
+              "[LibraryWordInfo] using DIRECT (validated) directWordNorm='$directWord'",
+              name: "LibrarySheet",
+            );
+          }
+          return direct;
+        }
+
+        if (kDebugMode) {
+          log(
+            "[LibraryWordInfo] direct rejected directWordNorm='$directWord'",
+            name: "LibrarySheet",
+          );
+        }
+      }
+
+      final ayahWords = await _wordInfoRepo.getAyahWords(
+        kind: kind,
+        surahNumber: ref.surahNumber,
+        ayahNumber: ref.ayahNumber,
+      );
+      if (ayahWords == null) return direct;
+
+      final displayCount = displayWordsCount <= 0 ? 1 : displayWordsCount;
+      final repoCount = ayahWords.words.isEmpty ? 1 : ayahWords.words.length;
+      final approxRepoIndex = displayCount <= 1
+          ? 0
+          : (((selectedDisplayWordNumber - 1) / (displayCount - 1)) *
+                  (repoCount - 1))
+              .round()
+              .clamp(0, repoCount - 1);
+
+      if (approxRepoIndex >= 0 && approxRepoIndex < ayahWords.words.length) {
+        final atIndex = ayahWords.words[approxRepoIndex];
+        final atIndexWord = _normalizeArabicForMatch(_stripHtml(atIndex.word));
+        final exact = atIndexWord.isNotEmpty && targetVariants.contains(atIndexWord);
+        final loose =
+            !exact &&
+            atIndexWord.isNotEmpty &&
+            targetVariants.any((t) {
+              final lenDiff = (t.length - atIndexWord.length).abs();
+              if (lenDiff > 2) return false;
+              return t.contains(atIndexWord) || atIndexWord.contains(t);
+            });
+
+        if (exact || loose) {
+          if (kDebugMode) {
+            log(
+              "[LibraryWordInfo] using APPROX match approxIdx=$approxRepoIndex repoWordNumber=${atIndex.wordNumber} repoWord='${atIndex.word}' repoWordNorm='$atIndexWord'",
+              name: "LibrarySheet",
+            );
+          }
+          return await _wordInfoRepo.getWordInfo(
+            kind: kind,
+            ref: WordRef(
+              surahNumber: ref.surahNumber,
+              ayahNumber: ref.ayahNumber,
+              wordNumber: atIndex.wordNumber,
+            ),
+          );
+        }
+
+        if (kDebugMode) {
+          log(
+            "[LibraryWordInfo] approx mismatch approxIdx=$approxRepoIndex repoWord='${atIndex.word}' repoWordNorm='$atIndexWord'",
+            name: "LibrarySheet",
+          );
+        }
+      }
+
+      int? bestWordNumber;
+      int bestDistance = 1 << 30;
+
+      for (int i = 0; i < ayahWords.words.length; i++) {
+        final w = ayahWords.words[i];
+        final candidate = _normalizeArabicForMatch(_stripHtml(w.word));
+        if (candidate.isEmpty) continue;
+
+        final exact = targetVariants.contains(candidate);
+        final loose = !exact && targetVariants.any((t) {
+          final lenDiff = (t.length - candidate.length).abs();
+          if (lenDiff > 2) return false;
+          return t.contains(candidate) || candidate.contains(t);
+        });
+
+        if (!(exact || loose)) continue;
+
+        final distance = (i - approxRepoIndex).abs();
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestWordNumber = w.wordNumber;
+          if (bestDistance == 0) break;
+        }
+      }
+
+      if (bestWordNumber != null) {
+        if (kDebugMode) {
+          log(
+            "[LibraryWordInfo] using NEAREST match repoWordNumber=$bestWordNumber distance=$bestDistance",
+            name: "LibrarySheet",
+          );
+        }
+        return await _wordInfoRepo.getWordInfo(
+          kind: kind,
+          ref: WordRef(
+            surahNumber: ref.surahNumber,
+            ayahNumber: ref.ayahNumber,
+            wordNumber: bestWordNumber,
+          ),
+        );
+      }
+
+      return direct;
+    }
+
     return FutureBuilder<QiraatWordInfo?>(
-      future: _wordInfoRepo.getWordInfo(kind: kind, ref: ref),
+      future: load(),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const Padding(
@@ -1325,14 +1667,14 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
               ),
               SizedBox(height: 10.h),
             ],
-            Text(
+            _buildRichTextContent(
               content,
-              textAlign: TextAlign.right,
-              style: TextStyle(
+              TextStyle(
                 fontSize: 15.sp,
                 height: 1.8,
                 color: isDark ? Colors.white : Colors.black87,
               ),
+              themeState.primary,
             ),
           ],
         );
@@ -1425,39 +1767,50 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
         return GestureDetector(
           onTap: () => _downloadWordInfo(kind),
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
             decoration: BoxDecoration(
-              color: themeState.primary.withValues(alpha: 0.04),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: themeState.primary.withValues(alpha: 0.15),
-              ),
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.04)
+                  : const Color(0xFFF5F0E6),
+              borderRadius: BorderRadius.circular(16),
             ),
-            child: Column(
+            child: Row(
               children: [
-                Icon(
-                  Icons.download_rounded,
-                  color: themeState.primary,
-                  size: 28.sp,
-                ),
-                SizedBox(height: 10.h),
-                Text(
-                  "تحميل بيانات ${_wordInfoLabel(kind)}",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w800,
-                    color: isDark ? Colors.white : Colors.black87,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        "تحميل ${_wordInfoLabel(kind)}",
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w800,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                      SizedBox(height: 3.h),
+                      Text(
+                        size,
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? Colors.white38 : Colors.black38,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(height: 6.h),
-                Text(
-                  "حجم الملف: $size",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white54 : Colors.black54,
+                SizedBox(width: 12.w),
+                Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: themeState.primary.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.download_rounded,
+                    color: themeState.primary,
+                    size: 20.sp,
                   ),
                 ),
               ],
@@ -1516,8 +1869,8 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
           title: "التفسير متوقف",
           message:
               "فعّل عرض التفاسير من إعدادات المصحف ليظهر هذا القسم تلقائيًا في المكتبة.",
-          actionLabel: "تفعيل التفسير",
-          onAction: () => context.read<QuranSettingsCubit>().toggleTafsir(true),
+          actionLabel: "تفعيل الآن",
+          onAction: () {},
         ),
       );
     }
@@ -1544,81 +1897,78 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 6.h),
-              child: Row(
-                children: [
-                  Text(
-                    "التفسير",
-                    style: TextStyle(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w800,
-                      color: isDark ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    onPressed: () {
-                      UnifiedShareBottomSheet.show(
-                        context: context,
-                        surahNumber: surahNumber,
-                        verseNumber: _currentVerse,
-                        getAyahText: (surah, verse) =>
-                            _getAyahText(context, surah, verse),
-                      );
-                    },
-                    icon: Icon(Icons.share_rounded, size: 20.sp),
-                    color: themeState.primary,
-                  ),
-                ],
-              ),
-            ),
             ...list.map(
-              (tafsir) => Container(
-                margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
-                padding: EdgeInsets.all(16.w),
-                decoration: BoxDecoration(
-                  color: cardColor,
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(
-                    color: isDark
-                        ? Colors.white10
-                        : Colors.black.withValues(alpha: 0.05),
+              (tafsir) => Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(16.w, 8.h, 20.w, 6.h),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            UnifiedShareBottomSheet.show(
+                              context: context,
+                              surahNumber: surahNumber,
+                              verseNumber: _currentVerse,
+                              getAyahText: (surah, verse) {
+                                final ayah = _getAyahText(context, surah, verse);
+                                return "$ayah\n\n${tafsir.title}:\n${tafsir.text}";
+                              },
+                            );
+                          },
+                          icon: Icon(Icons.share_rounded, size: 19.sp),
+                          color: themeState.primary,
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                        const Spacer(),
+                        Text(
+                          tafsir.title,
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w800,
+                            color: themeState.primary,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isDark
-                          ? Colors.black.withValues(alpha: 0.06)
-                          : const Color(0xFFB8A88A).withValues(alpha: 0.08),
-                      blurRadius: 22,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      tafsir.title,
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white54 : Colors.black54,
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: 16.w),
+                    padding: EdgeInsets.all(16.w),
+                    decoration: BoxDecoration(
+                      color: cardColor,
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(
+                        color: isDark
+                            ? Colors.white10
+                            : Colors.black.withValues(alpha: 0.05),
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: isDark
+                              ? Colors.black.withValues(alpha: 0.06)
+                              : const Color(0xFFB8A88A).withValues(alpha: 0.08),
+                          blurRadius: 22,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 10.h),
-                    Text(
+                    child: _buildRichTextContent(
                       tafsir.text,
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
+                      TextStyle(
                         fontSize: 14.sp,
                         height: 1.9,
                         color: isDark ? Colors.white : Colors.black87,
                       ),
+                      themeState.primary,
                     ),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: 10.h),
+                ],
               ),
             ),
           ],
@@ -1666,6 +2016,57 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
       ),
     );
   }
+  Widget _buildRichTextContent(
+    String text,
+    TextStyle baseStyle,
+    Color primaryColor,
+  ) {
+    if (text.isEmpty) {
+      return Text(text, style: baseStyle);
+    }
+
+    final regex = RegExp(r'\{[^\}]+\}|\([^\)]+\)|\[[^\]]+\]|«[^»]+»');
+    final matches = regex.allMatches(text);
+
+    if (matches.isEmpty) {
+      return Text(
+        text,
+        textAlign: TextAlign.right,
+        textDirection: TextDirection.rtl,
+        style: baseStyle,
+      );
+    }
+
+    final spans = <TextSpan>[];
+    int currentIndex = 0;
+
+    for (final match in matches) {
+      if (match.start > currentIndex) {
+        spans.add(TextSpan(text: text.substring(currentIndex, match.start)));
+      }
+      spans.add(
+        TextSpan(
+          text: match.group(0),
+          style: baseStyle.copyWith(
+            color: primaryColor,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      );
+      currentIndex = match.end;
+    }
+
+    if (currentIndex < text.length) {
+      spans.add(TextSpan(text: text.substring(currentIndex)));
+    }
+
+    return Text.rich(
+      TextSpan(children: spans),
+      textAlign: TextAlign.right,
+      textDirection: TextDirection.rtl,
+      style: baseStyle,
+    );
+  }
 }
 
 class _ResolvedTafsirCard {
@@ -1685,4 +2086,16 @@ class _TranslationCardData {
   final String text;
 
   const _TranslationCardData({required this.title, required this.text});
+}
+
+class _QcfWord {
+  final String text;
+  final int displayIndex;
+  final int originalWordNumber;
+
+  const _QcfWord({
+    required this.text,
+    required this.displayIndex,
+    required this.originalWordNumber,
+  });
 }
