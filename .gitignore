@@ -49,3 +49,6 @@ AppDir/usr/bin
 appimagetool-x86_64.AppImage
 *.AppImage
 /dist
+
+packages/qcf_quran_plus-master/
+android/build/reports/problems/
