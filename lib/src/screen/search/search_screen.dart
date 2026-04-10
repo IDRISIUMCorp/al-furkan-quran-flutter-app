@@ -1,5 +1,4 @@
 import "dart:async";
-import "dart:ui";
 
 import "package:al_quran_v3/src/core/audio/cubit/ayah_key_cubit.dart";
 import "package:al_quran_v3/src/screen/quran_script_view/cubit/ayah_to_highlight.dart";
@@ -543,7 +542,7 @@ class _SearchScreenState extends State<SearchScreen> {
               fit: StackFit.expand,
               children: <Widget>[
                 ...previousChildren,
-                if (currentChild != null) currentChild,
+                ?currentChild,
               ],
             );
           },

@@ -31,11 +31,9 @@ class QuranViewCubit extends Cubit<QuranViewState> {
 
   Future<bool> setViewOptions({
     bool? hideFootnote,
-    bool? hideWordByWord,
     bool? hideTranslation,
     bool? hideToolbar,
     bool? hideQuranAyah,
-    bool? alwaysOpenWordByWord,
     bool? enableWordByWordHighlight,
     bool? scrollWithRecitation,
     bool? useAudioStream,
@@ -43,19 +41,15 @@ class QuranViewCubit extends Cubit<QuranViewState> {
   }) async {
     final newState = state.copyWith(
       hideFootnote: hideFootnote,
-      hideWordByWord: hideWordByWord,
       hideTranslation: hideTranslation,
       hideToolbar: hideToolbar,
       hideQuranAyah: hideQuranAyah,
-      alwaysOpenWordByWord: alwaysOpenWordByWord,
       enableWordByWordHighlight: enableWordByWordHighlight,
       scrollWithRecitation: scrollWithRecitation,
       useAudioStream: useAudioStream,
       playbackSpeed: playbackSpeed,
     );
-    if (newState.hideWordByWord == true &&
-        newState.hideTranslation == true &&
-        newState.hideQuranAyah == true) {
+    if (newState.hideTranslation == true && newState.hideQuranAyah == true) {
       return false;
     }
 

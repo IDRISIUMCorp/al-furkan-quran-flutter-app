@@ -735,7 +735,7 @@ class AzkarShareDesign extends StatelessWidget {
   }
 
   Widget _buildMeshGradient(double width, double height, BoxDecoration decoration, Color textColor, Color accentColor, TextStyle zekrStyle, TextStyle catHeaderStyle, TextStyle descStyle, TextStyle refStyle) {
-    return Container(
+    return SizedBox(
       width: width, height: height,
       child: Stack(
         children: [

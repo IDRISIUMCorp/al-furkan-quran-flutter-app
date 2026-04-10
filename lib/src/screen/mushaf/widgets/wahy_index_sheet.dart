@@ -299,7 +299,7 @@ class WahyIndexSheetState extends State<WahyIndexSheet>
 class RubListView extends StatelessWidget {
   final ValueChanged<int> onOpenPage;
   final String query;
-  const RubListView({required this.onOpenPage, required this.query});
+  const RubListView({super.key, required this.onOpenPage, required this.query});
 
   @override
   Widget build(BuildContext context) {

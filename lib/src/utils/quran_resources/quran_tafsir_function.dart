@@ -5,8 +5,11 @@ import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_mod
 import "package:dio/dio.dart" as dio;
 import "package:flutter/cupertino.dart";
 import "package:flutter/foundation.dart";
+import "package:flutter/services.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:hive_ce_flutter/hive_flutter.dart";
+
+import "package:al_quran_v3/src/utils/quran_resources/default_offline_resources.dart";
 
 import "../../api/apis_urls.dart";
 import "../../screen/setup/cubit/resources_progress_cubit_cubit.dart";
@@ -17,6 +20,10 @@ class QuranTafsirFunction {
   static const String selectedTafsirListKey = "selected_tafsir_list";
   static const String downloadedTafsirBooksKey = "downloaded_tafsir_books";
   static final Map<String, int?> _remoteSizeBytesCache = {};
+
+  static bool _isBundled(TafsirBookModel book) {
+    return book.fullPath.startsWith("bundled/");
+  }
 
   static List<TafsirBookModel> _dedupeBooks(Iterable<TafsirBookModel> books) {
     final seen = <String>{};
@@ -30,27 +37,122 @@ class QuranTafsirFunction {
     return deduped;
   }
 
+  static final TafsirBookModel _defaultSaadiTafsir =
+      DefaultOfflineResources.defaultTafsirSaadi;
+
   static Future<void> init() async {
     if (!Hive.isBoxOpen("user")) {
       await Hive.openBox("user");
     }
+
+    // Ensure bundled offline resources (including Saadi) are installed and
+    // present in Hive before we open selections.
+    await DefaultOfflineResources.ensureInstalled();
+
     List<TafsirBookModel>? booksListToOpen = await getTafsirSelections();
-    if (booksListToOpen == null) return;
+
+    // Auto-select تفسير السعدي as default if user has no selections.
+    if (booksListToOpen == null || booksListToOpen.isEmpty) {
+      await setTafsirSelection(_defaultSaadiTafsir);
+      booksListToOpen = [_defaultSaadiTafsir];
+    }
+
+    final hasSaadiSelected = booksListToOpen.any(
+      (b) => b.fullPath == _defaultSaadiTafsir.fullPath,
+    );
+    if (!hasSaadiSelected) {
+      booksListToOpen = [_defaultSaadiTafsir, ...booksListToOpen];
+      final userBox = Hive.box("user");
+      await userBox.put(
+        selectedTafsirListKey,
+        _dedupeBooks(booksListToOpen).map((e) => e.toMap()).toList(),
+      );
+    }
+
     log(
       booksListToOpen.map((e) => e.toMap()).toString(),
       name: "QuranTafsirFunction.init",
     );
 
-    if (booksListToOpen.isNotEmpty) {
-      for (TafsirBookModel bookModel in booksListToOpen) {
-        await Hive.openLazyBox(getTafsirBoxName(tafsirBook: bookModel));
+    for (TafsirBookModel bookModel in booksListToOpen) {
+      final boxName = getTafsirBoxName(tafsirBook: bookModel);
+      if (!Hive.isBoxOpen(boxName)) {
+        try {
+          await Hive.openLazyBox(boxName);
+        } catch (_) {
+          // Box doesn't exist yet - will be downloaded later
+        }
       }
-    } else {
+    }
+
+    // Saadi is bundled; no network download should be triggered here.
+  }
+
+  /// Downloads a tafsir book silently in the background without UI feedback.
+  static Future<void> _downloadSilently(TafsirBookModel book) async {
+    try {
       log(
-        "No tafsir selection found for init.",
-        name: "QuranTafsirFunction.init",
+        "Silent download starting for '${book.name}'",
+        name: "QuranTafsirFunction",
       );
-      await close(); // Ensure any open box is closed if nothing is selected
+
+      final tafsirBoxName = getTafsirBoxName(tafsirBook: book);
+      LazyBox tafsirBox;
+      try {
+        tafsirBox = Hive.isBoxOpen(tafsirBoxName)
+            ? Hive.lazyBox(tafsirBoxName)
+            : await Hive.openLazyBox(tafsirBoxName);
+      } catch (e) {
+        await Hive.deleteBoxFromDisk(tafsirBoxName);
+        tafsirBox = await Hive.openLazyBox(tafsirBoxName);
+      }
+
+      Map data;
+      if (book.name == _defaultSaadiTafsir.name) {
+        // Load natively built-in offline Tafsir directly from assets
+        final assetString = await rootBundle.loadString(
+          "assets/wahy/json/Tafseer_Al_Saddi.json",
+        );
+        data = await compute((message) {
+          final rawJson = jsonDecode(message);
+          if (rawJson is Map && rawJson.containsKey("tafsir")) {
+            // Uncompress array of arrays into "surah:verse" -> {"text": ...}
+            final List tafsirList = rawJson["tafsir"];
+            Map<String, dynamic> converted = {};
+            for (int s = 0; s < tafsirList.length; s++) {
+               final verses = tafsirList[s] as List;
+               for (int v = 0; v < verses.length; v++) {
+                 converted["${s+1}:${v+1}"] = {"text": verses[v]};
+               }
+            }
+            return converted;
+          }
+          return rawJson as Map; // Assume it's already key-value mapped
+        }, assetString);
+      } else {
+        // Fallback for downloading other optional Tafsirs
+        final response = await dio.Dio().get(ApisUrls.base + book.fullPath);
+        data = await compute(
+          (message) => jsonDecode(decodeBZip2String(message as String)),
+          response.data,
+        );
+      }
+
+      await tafsirBox.putAll(data.cast<String, dynamic>());
+
+      await tafsirBox.put("meta_data", book.toMap());
+      await setToListAlreadyDownloaded(tafsirBook: book);
+
+      log(
+        "Silent download completed for '${book.name}'",
+        name: "QuranTafsirFunction",
+      );
+    } catch (e, s) {
+      log(
+        "Silent download failed for '${book.name}': $e\n$s",
+        name: "QuranTafsirFunction",
+      );
+      // Fail silently - user can manually download later
     }
   }
 
@@ -111,6 +213,9 @@ class QuranTafsirFunction {
   }
 
   static Future<bool> isAlreadyDownloaded(TafsirBookModel tafsirBook) async {
+    if (_isBundled(tafsirBook)) {
+      return true;
+    }
     final boxName = getTafsirBoxName(tafsirBook: tafsirBook);
     return await Hive.boxExists(boxName);
   }
@@ -138,6 +243,10 @@ class QuranTafsirFunction {
     final books = raw
         .map((e) => TafsirBookModel.fromMap(Map<String, dynamic>.from(e)))
         .toList();
+
+    // Bundled tafsirs should always be treated as downloaded.
+    // This ensures 'تفسير السعدي' never appears as a downloadable resource.
+    books.add(DefaultOfflineResources.defaultTafsirSaadi);
 
     // De-duplicate by fullPath after normalization.
     final seen = <String>{};
@@ -234,11 +343,33 @@ class QuranTafsirFunction {
     }
 
     List? booksList = userBox.get(selectedTafsirListKey);
-    final bookListModel = booksList
+    final parsed = booksList
         ?.map((e) => TafsirBookModel.fromMap(Map<String, dynamic>.from(e)))
         .toList();
 
-    return bookListModel == null ? null : _dedupeBooks(bookListModel);
+    final hasLegacySaadi = (parsed ?? const <TafsirBookModel>[]).any(
+      (b) =>
+          b.name.trim() == DefaultOfflineResources.defaultTafsirSaadi.name &&
+          b.fullPath != DefaultOfflineResources.defaultTafsirSaadi.fullPath,
+    );
+
+    final normalized = parsed
+        ?.map((b) {
+          if (b.name.trim() == DefaultOfflineResources.defaultTafsirSaadi.name) {
+            return DefaultOfflineResources.defaultTafsirSaadi;
+          }
+          return b;
+        })
+        .toList();
+
+    final result = normalized == null ? null : _dedupeBooks(normalized);
+    if (result != null && hasLegacySaadi) {
+      await userBox.put(
+        selectedTafsirListKey,
+        result.map((e) => e.toMap()).toList(),
+      );
+    }
+    return result;
   }
 
   static Future<int?> getRemoteBookSizeBytes(TafsirBookModel book) async {
@@ -264,6 +395,15 @@ class QuranTafsirFunction {
     required TafsirBookModel tafsirBook,
     bool isSetupProcess = false,
   }) async {
+    if (_isBundled(tafsirBook)) {
+      // Bundled resources are already available locally.
+      if (isSetupProcess) {
+        await setTafsirSelection(tafsirBook);
+      }
+      await init();
+      return true;
+    }
+
     final cubit = context.read<ResourcesProgressCubit>();
 
     if (await isAlreadyDownloaded(tafsirBook)) {

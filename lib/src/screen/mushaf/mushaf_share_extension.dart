@@ -615,10 +615,6 @@ extension _MushafShareExtension on _MushafViewState {
     final bool isAyahDayn = ayahKey == "2:282";
     final bool isVeryLongAyah =
         isAyahDayn || ayahText.replaceAll(RegExp(r"\s+"), "").length > 280;
-    final bool allowImageShareWithTafsir =
-        !isVeryLongAyah &&
-        (selectedMuyassar || selectedMukhtasar) &&
-        (muyassarDownloaded || mukhtasarDownloaded);
 
     await showModalBottomSheet(
       context: context,
@@ -665,100 +661,15 @@ extension _MushafShareExtension on _MushafViewState {
                     Icons.image_outlined,
                     color: themeState.primary,
                   ),
-                  title: const Text("كصورة (بدون تفسير)"),
+                  title: const Text("كصورة"),
                   subtitle: const Text(
-                    "مشاركة الآية فقط كصورة — مناسب للآيات الطويلة",
+                    "مشاركة الآية كصورة مجهزة بألوان هادئة",
                   ),
                   onTap: () async {
                     Navigator.pop(ctx);
                     await _shareAsImage(context, ayahKey, ayahText);
                   },
                 ),
-                if (allowImageShareWithTafsir && showPickBetweenImageBooks) ...[
-                  ListTile(
-                    leading: Icon(
-                      Icons.image_outlined,
-                      color: themeState.primary,
-                    ),
-                    title: const Text("كصورة - التفسير الميسر"),
-                    subtitle: const Text("مشاركة صورة بالتفسير الميسر"),
-                    onTap: () async {
-                      Navigator.pop(ctx);
-                      if (selected.isEmpty) {
-                        await _shareAsImage(context, ayahKey, ayahText);
-                        return;
-                      }
-                      final b = selected.firstWhere(
-                        (x) => x.name.contains("الميسر"),
-                        orElse: () => selected.first,
-                      );
-                      await _shareLibraryAsImage(
-                        context: context,
-                        surahNumber: surahNumber,
-                        verseNumber: verseNumber,
-                        ayahKey: ayahKey,
-                        tafsirTitle: "التفسير الميسر",
-                        loadTafsir: () =>
-                            QuranTafsirFunction.getResolvedTafsirTextForBook(
-                              b,
-                              ayahKey,
-                            ),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: Icon(
-                      Icons.image_outlined,
-                      color: themeState.primary,
-                    ),
-                    title: const Text("كصورة - التفسير المختصر"),
-                    subtitle: const Text("مشاركة صورة بالتفسير المختصر"),
-                    onTap: () async {
-                      Navigator.pop(ctx);
-                      if (selected.isEmpty) {
-                        await _shareAsImage(context, ayahKey, ayahText);
-                        return;
-                      }
-                      final b = selected.firstWhere(
-                        (x) => x.name.contains("المختصر"),
-                        orElse: () => selected.first,
-                      );
-                      await _shareLibraryAsImage(
-                        context: context,
-                        surahNumber: surahNumber,
-                        verseNumber: verseNumber,
-                        ayahKey: ayahKey,
-                        tafsirTitle: "التفسير المختصر",
-                        loadTafsir: () =>
-                            QuranTafsirFunction.getResolvedTafsirTextForBook(
-                              b,
-                              ayahKey,
-                            ),
-                      );
-                    },
-                  ),
-                ] else if (allowImageShareWithTafsir)
-                  ListTile(
-                    leading: Icon(
-                      Icons.image_outlined,
-                      color: themeState.primary,
-                    ),
-                    title: const Text("كصورة"),
-                    subtitle: Text(
-                      "يصنع صورة بنفس تنسيق المكتبة ($tafsirTitle)",
-                    ),
-                    onTap: () async {
-                      Navigator.pop(ctx);
-                      await _shareLibraryAsImage(
-                        context: context,
-                        surahNumber: surahNumber,
-                        verseNumber: verseNumber,
-                        ayahKey: ayahKey,
-                        tafsirTitle: tafsirTitle,
-                        loadTafsir: loadTafsir,
-                      );
-                    },
-                  ),
                 const SizedBox(height: 6),
               ],
             ),

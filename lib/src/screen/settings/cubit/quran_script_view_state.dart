@@ -9,11 +9,9 @@ class QuranViewState {
   final QuranScriptType quranScriptType;
   final double translationFontSize;
   final bool hideFootnote;
-  final bool hideWordByWord;
   final bool hideTranslation;
   final bool hideToolbar;
   final bool hideQuranAyah;
-  final bool alwaysOpenWordByWord;
   final bool enableWordByWordHighlight;
   final bool scrollWithRecitation;
   final bool useAudioStream;
@@ -25,11 +23,9 @@ class QuranViewState {
     required this.quranScriptType,
     required this.translationFontSize,
     this.hideFootnote = false,
-    this.hideWordByWord = false,
     this.hideTranslation = false,
     this.hideToolbar = false,
     this.hideQuranAyah = false,
-    this.alwaysOpenWordByWord = false,
     this.enableWordByWordHighlight = true,
     this.scrollWithRecitation = false,
     this.useAudioStream = true,
@@ -43,11 +39,9 @@ class QuranViewState {
     QuranScriptType? quranScriptType,
     double? translationFontSize,
     bool? hideFootnote,
-    bool? hideWordByWord,
     bool? hideTranslation,
     bool? hideToolbar,
     bool? hideQuranAyah,
-    bool? alwaysOpenWordByWord,
     bool? enableWordByWordHighlight,
     bool? scrollWithRecitation,
     bool? useAudioStream,
@@ -60,11 +54,9 @@ class QuranViewState {
       quranScriptType: quranScriptType ?? this.quranScriptType,
       translationFontSize: translationFontSize ?? this.translationFontSize,
       hideFootnote: hideFootnote ?? this.hideFootnote,
-      hideWordByWord: hideWordByWord ?? this.hideWordByWord,
       hideTranslation: hideTranslation ?? this.hideTranslation,
       hideToolbar: hideToolbar ?? this.hideToolbar,
       hideQuranAyah: hideQuranAyah ?? this.hideQuranAyah,
-      alwaysOpenWordByWord: alwaysOpenWordByWord ?? this.alwaysOpenWordByWord,
       enableWordByWordHighlight:
           enableWordByWordHighlight ?? this.enableWordByWordHighlight,
       scrollWithRecitation: scrollWithRecitation ?? this.scrollWithRecitation,
@@ -84,11 +76,9 @@ class QuranViewState {
         other.quranScriptType == quranScriptType &&
         other.translationFontSize == translationFontSize &&
         other.hideFootnote == hideFootnote &&
-        other.hideWordByWord == hideWordByWord &&
         other.hideTranslation == hideTranslation &&
         other.hideToolbar == hideToolbar &&
         other.hideQuranAyah == hideQuranAyah &&
-        other.alwaysOpenWordByWord == alwaysOpenWordByWord &&
         other.enableWordByWordHighlight == enableWordByWordHighlight &&
         other.scrollWithRecitation == scrollWithRecitation &&
         other.useAudioStream == useAudioStream &&
@@ -103,11 +93,9 @@ class QuranViewState {
         quranScriptType.hashCode ^
         translationFontSize.hashCode ^
         hideFootnote.hashCode ^
-        hideWordByWord.hashCode ^
         hideTranslation.hashCode ^
         hideToolbar.hashCode ^
         hideQuranAyah.hashCode ^
-        alwaysOpenWordByWord.hashCode ^
         enableWordByWordHighlight.hashCode ^
         scrollWithRecitation.hashCode ^
         useAudioStream.hashCode ^

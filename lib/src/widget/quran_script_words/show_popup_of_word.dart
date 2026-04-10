@@ -1,13 +1,11 @@
 import "package:al_quran_v3/l10n/app_localizations.dart";
 import "package:al_quran_v3/src/core/audio/services/audio_playback_service_access.dart";
-import "package:al_quran_v3/src/utils/quran_resources/word_by_word_function.dart";
 import "package:al_quran_v3/src/resources/quran_resources/meaning_of_surah.dart";
 import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.dart";
 import "package:al_quran_v3/src/screen/surah_list_view/model/surah_info_model.dart";
 import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
 import "package:al_quran_v3/src/widget/quran_script/script_processor.dart";
 import "package:al_quran_v3/src/widget/quran_script_words/cubit/word_playing_state_cubit.dart";
-import "package:dartx/dartx.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:gap/gap.dart";
@@ -43,11 +41,6 @@ class _ShowPopupOfWordState extends State<ShowPopupOfWord> {
         .read<QuranViewCubit>()
         .state
         .quranScriptType;
-    bool supportsWordByWord = false;
-    final metaDataOfWordByWord = WordByWordFunction.getSelectedWordByWordBook();
-    if (metaDataOfWordByWord != null) {
-      supportsWordByWord = true;
-    }
 
     return Container(
       decoration: const BoxDecoration(),
@@ -110,7 +103,7 @@ class _ShowPopupOfWordState extends State<ShowPopupOfWord> {
                   currentWordIndex = value.clamp(0, widget.wordKeys.length - 1);
                 });
               },
-              reverse: true,
+              reverse: false,
               itemBuilder: (context, index) => Column(
                 children: [
                   ScriptProcessor(
@@ -130,28 +123,6 @@ class _ShowPopupOfWordState extends State<ShowPopupOfWord> {
                     themeState: context.read<ThemeCubit>().state,
                   ),
                   const Gap(10),
-                  if (supportsWordByWord)
-                    Column(
-                      children: [
-                        Text(
-                          "المعنى",
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: themeState.primary.withValues(alpha: 0.70),
-                          ),
-                        ),
-                        const Gap(4),
-                        Text(
-                          (index >= 0 && index < widget.wordByWord.length
-                                  ? widget.wordByWord[index]
-                                  : "-")
-                              .toString()
-                              .capitalize(),
-                          style: const TextStyle(fontSize: 18),
-                        ),
-                      ],
-                    ),
                   const Gap(15),
                   BlocBuilder<WordPlayingStateCubit, String?>(
                     builder: (context, state) {
@@ -163,10 +134,22 @@ class _ShowPopupOfWordState extends State<ShowPopupOfWord> {
                           foregroundColor: themeState.primary,
                         ),
                         onPressed: () {
+                          final wordKey = widget.wordKeys[index];
+                          final isSameWord = state == wordKey;
+
+                          if (isSameWord) {
+                            context.read<WordPlayingStateCubit>().changeState(
+                              null,
+                            );
+                            audioPlaybackService.stopPlaybackKeepUi();
+                            return;
+                          }
+
+                          audioPlaybackService.stopPlaybackKeepUi();
                           context.read<WordPlayingStateCubit>().changeState(
-                            widget.wordKeys[index],
+                            wordKey,
                           );
-                          audioPlaybackService.playWord(widget.wordKeys[index]);
+                          audioPlaybackService.playWord(wordKey);
                         },
                         label: Text(AppLocalizations.of(context).playAudio),
                         icon: Icon(

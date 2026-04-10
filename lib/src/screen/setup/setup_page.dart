@@ -10,27 +10,22 @@ import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart
 import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_translation_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/segmented_resources_manager.dart";
-import "package:al_quran_v3/src/utils/quran_resources/word_by_word_function.dart";
 import "package:al_quran_v3/src/resources/quran_resources/language_resources.dart";
 import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
 import "package:al_quran_v3/src/resources/quran_resources/models/translation_book_model.dart";
 import "package:al_quran_v3/src/resources/quran_resources/tafsir_info_with_score.dart";
 import "package:al_quran_v3/src/resources/quran_resources/translation_resources.dart";
-import "package:al_quran_v3/src/resources/quran_resources/word_by_word_translation.dart";
 import "package:al_quran_v3/src/resources/translation/language_cubit.dart";
 import "package:al_quran_v3/src/resources/translation/languages.dart";
-import 'package:al_quran_v3/src/screen/mushaf/mushaf_screen.dart';
+import "package:al_quran_v3/src/screen/mushaf/mushaf_screen.dart";
 import "package:al_quran_v3/src/screen/setup/cubit/resources_progress_cubit_cubit.dart";
 import "package:al_quran_v3/src/screen/setup/cubit/resources_progress_cubit_state.dart";
-import "package:al_quran_v3/src/theme/values/values.dart";
-import "package:dartx/dartx.dart";
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:fluttertoast/fluttertoast.dart";
 import "package:gap/gap.dart";
 import "package:hive_ce_flutter/hive_flutter.dart";
-
 import "../../theme/controller/theme_cubit.dart";
 import "../../theme/controller/theme_state.dart";
 
@@ -42,6 +37,7 @@ class AppSetupPage extends StatefulWidget {
 }
 
 class _AppSetupPageState extends State<AppSetupPage> {
+  static const double roundedRadius = 12;
   List<TafsirBookModel>? selectableTafsirBook;
 
   String? appLanguage;
@@ -279,13 +275,6 @@ class _AppSetupPageState extends State<AppSetupPage> {
                                         context,
                                         appLocalizations.tafsir,
                                       ),
-                                    if (doesHaveWordByWordTranslation(
-                                      appLoc.english.toLowerCase(),
-                                    ))
-                                      getFeaturesMark(
-                                        context,
-                                        appLocalizations.wordByWord,
-                                      ),
                                   ],
                                 ),
                               ),
@@ -493,26 +482,11 @@ class _AppSetupPageState extends State<AppSetupPage> {
       tafsirBook: processState.tafsirBookModel!,
       isSetupProcess: true,
     );
-    String language = codeToLanguageMap[translationLanguageCode ?? ""] ?? "";
-    TranslationBookModel? supportedWbW = wordByWordTranslation.values
-        .map((e) => TranslationBookModel.fromMap(e))
-        .firstOrNullWhere(
-          (element) => element.language.toLowerCase() == language.toLowerCase(),
-        );
-    log(supportedWbW?.fullPath ?? "Null", name: "WBW Full Path");
-    bool success3 =
-        supportedWbW != null
-            ? await WordByWordFunction.downloadResource(
-              context: context,
-              book: supportedWbW,
-              isSetupProcess: true,
-            )
-            : true;
-    bool success4 = await SegmentedResourcesManager.downloadResources(
+    bool success3 = await SegmentedResourcesManager.downloadResources(
       context,
       context.read<SegmentedQuranReciterCubit>().state.segmentsUrl!,
     );
-    if (success1 && success2 && success3 && success4) {
+    if (success1 && success2 && success3) {
       userBox.put("is_setup_complete", true);
 
       QuranTranslationFunction.init(
@@ -530,7 +504,7 @@ class _AppSetupPageState extends State<AppSetupPage> {
       context.read<ResourcesProgressCubit>().success();
     } else {
       // error and show 'Something went wrong' in cubit
-      log([success1, success2, success3, success4].toString());
+      log([success1, success2, success3].toString());
       context.read<ResourcesProgressCubit>().failure(
         appLocalizations.unableToDownloadResources,
       );
@@ -645,17 +619,6 @@ bool doesHaveFootNote(String language) {
     }
   }
   return doesHaveFootNote;
-}
-
-bool doesHaveWordByWordTranslation(String language) {
-  bool doesHaveWordByWordTranslation = false;
-  wordByWordTranslation.forEach((lang, value) {
-    if (language == lang.toLowerCase()) {
-      doesHaveWordByWordTranslation = true;
-    }
-  });
-
-  return doesHaveWordByWordTranslation;
 }
 
 bool doesHaveTafsirSupport(String language) {

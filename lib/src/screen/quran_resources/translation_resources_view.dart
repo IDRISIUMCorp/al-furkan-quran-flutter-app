@@ -73,7 +73,7 @@ class _TranslationResourcesViewState extends State<TranslationResourcesView> {
       case TranslationResourcesType.withFootnoteTags:
         return "مع هوامش";
       case TranslationResourcesType.wordByWord:
-        return "كلمة بكلمة";
+        return "";
     }
   }
 
@@ -106,6 +106,7 @@ class _TranslationResourcesViewState extends State<TranslationResourcesView> {
       context: context,
       translationBook: book,
     );
+    await QuranTranslationFunction.setTranslationSelection(book);
     await _loadData();
   }
 
@@ -156,7 +157,7 @@ class _TranslationResourcesViewState extends State<TranslationResourcesView> {
             ? "مفعّلة داخل التطبيق ويمكن عرض أكثر من ترجمة معًا."
             : "نزّلها لتظهر مباشرة داخل المكتبة وشاشة الآيات.",
         badges: [
-          _typeLabel(book.type),
+          if (_typeLabel(book.type).trim().isNotEmpty) _typeLabel(book.type),
           if (book.score > 0) "درجة ${book.score.round()}",
         ],
         isDownloaded: downloaded,

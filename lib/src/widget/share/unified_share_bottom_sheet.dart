@@ -24,12 +24,16 @@ class UnifiedShareBottomSheet extends StatefulWidget {
   final int initialSurahNumber;
   final int initialVerseNumber;
   final String Function(int surah, int verse) getAyahText;
+  final int initialShareMode;
+  final TafsirBookModel? initialTafsirBook;
 
   const UnifiedShareBottomSheet({
     super.key,
     required this.initialSurahNumber,
     required this.initialVerseNumber,
     required this.getAyahText,
+    this.initialShareMode = 0,
+    this.initialTafsirBook,
   });
 
   static Future<void> show({
@@ -37,6 +41,8 @@ class UnifiedShareBottomSheet extends StatefulWidget {
     required int surahNumber,
     required int verseNumber,
     required String Function(int surah, int verse) getAyahText,
+    int initialShareMode = 0,
+    TafsirBookModel? initialTafsirBook,
   }) {
     return showModalBottomSheet(
       context: context,
@@ -58,6 +64,8 @@ class UnifiedShareBottomSheet extends StatefulWidget {
             initialSurahNumber: surahNumber,
             initialVerseNumber: verseNumber,
             getAyahText: getAyahText,
+            initialShareMode: initialShareMode,
+            initialTafsirBook: initialTafsirBook,
           ),
         ),
       ),
@@ -123,19 +131,24 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
   @override
   void initState() {
     super.initState();
+    _shareMode = widget.initialShareMode;
     _selectedSurah = widget.initialSurahNumber;
     _fromVerse = widget.initialVerseNumber;
     _toVerse = widget.initialVerseNumber;
 
-    // Auto-select Default Tafsir Built-in
-    final books = _getUniqueTafsirBooks();
-    if (books.isNotEmpty) {
-      final sadi = books.where((b) => b.name.contains("سعدي")).toList();
-      final muyassar = books.where((b) => b.name.contains("ميسر")).toList();
-      if (muyassar.isNotEmpty) {
-        _selectedTafsirBook = muyassar.first;
-      } else if (sadi.isNotEmpty) {
-        _selectedTafsirBook = sadi.first;
+    if (widget.initialTafsirBook != null) {
+      _selectedTafsirBook = widget.initialTafsirBook;
+    } else {
+      // Auto-select Default Tafsir Built-in
+      final books = _getUniqueTafsirBooks();
+      if (books.isNotEmpty) {
+        final sadi = books.where((b) => b.name.contains("سعدي")).toList();
+        final muyassar = books.where((b) => b.name.contains("ميسر")).toList();
+        if (muyassar.isNotEmpty) {
+          _selectedTafsirBook = muyassar.first;
+        } else if (sadi.isNotEmpty) {
+          _selectedTafsirBook = sadi.first;
+        }
       }
     }
 
@@ -1769,64 +1782,7 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
             const CircularProgressIndicator(),
           ],
 
-          if (_resolvedTafsirText != null) ...[
-            const SizedBox(height: 28),
-            Container(
-              width: double.infinity,
-              height: 1.2,
-              margin: const EdgeInsets.symmetric(vertical: 6),
-              color: textColor.withValues(alpha: 0.12),
-            ),
-            const SizedBox(height: 14),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 4),
-                child: Text(
-                  tafsirTitle,
-                  style: TextStyle(
-                    fontSize: titleFontSize,
-                    fontWeight: FontWeight.w800,
-                    color: textColor.withValues(alpha: 0.55),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 14),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 18),
-              decoration: BoxDecoration(
-                color: tafsirBgColor,
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  _resolvedTafsirText!,
-                  textAlign: TextAlign.right,
-                  textDirection: TextDirection.rtl,
-                  style: _tafsirFontFamily != 'default' && _isTafsirFontGoogle
-                      ? GoogleFonts.getFont(
-                          _tafsirFontFamily,
-                          fontSize: _tafsirFontSize,
-                          height: 2.2,
-                          fontWeight: FontWeight.w600,
-                          color: textColor,
-                        )
-                      : TextStyle(
-                          fontSize: _tafsirFontSize,
-                          height: 2.2,
-                          fontWeight: FontWeight.w600,
-                          color: textColor,
-                          fontFamily: _tafsirFontFamily != 'default'
-                              ? _tafsirFontFamily
-                              : null,
-                        ),
-                ),
-              ),
-            ),
-          ],
+
 
           if (_showBranding) ...[
             const SizedBox(height: 38),
@@ -1961,6 +1917,59 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
           ),
         );
       },
+    );
+  }
+  Widget _buildRichTafsirText(
+    String text,
+    TextStyle baseStyle,
+    Color primaryColor,
+  ) {
+    if (text.isEmpty) {
+      return Text(text, style: baseStyle);
+    }
+
+    // Match text inside { } or ( ) or [ ] to highlight ayahs
+    final regex = RegExp(r'\{[^\}]+\}|\([^\)]+\)|\[[^\]]+\]|«[^»]+»');
+    final matches = regex.allMatches(text);
+
+    if (matches.isEmpty) {
+      return Text(
+        text,
+        textAlign: TextAlign.right,
+        textDirection: TextDirection.rtl,
+        style: baseStyle,
+      );
+    }
+
+    final spans = <TextSpan>[];
+    int currentIndex = 0;
+
+    for (final match in matches) {
+      if (match.start > currentIndex) {
+        spans.add(
+          TextSpan(text: text.substring(currentIndex, match.start)),
+        );
+      }
+      spans.add(
+        TextSpan(
+          text: match.group(0),
+          style: baseStyle.copyWith(
+            color: primaryColor,
+            fontWeight: FontWeight.w900, // Makes it stand out
+          ),
+        ),
+      );
+      currentIndex = match.end;
+    }
+
+    if (currentIndex < text.length) {
+      spans.add(TextSpan(text: text.substring(currentIndex)));
+    }
+
+    return Text.rich(
+      TextSpan(children: spans),
+      textAlign: TextAlign.right,
+      textDirection: TextDirection.rtl,
     );
   }
 }

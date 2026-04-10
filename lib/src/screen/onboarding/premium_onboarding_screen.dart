@@ -30,7 +30,7 @@ class _PremiumOnboardingScreenState extends State<PremiumOnboardingScreen> {
   ThemeMode _themeMode = ThemeMode.system;
 
   // Page 4: Tajweed & Highlight
-  bool _tajweedEnabled = true;
+
   Color _highlightColor = Colors.amber;
 
   // Page 6: Notifications
@@ -78,7 +78,6 @@ class _PremiumOnboardingScreenState extends State<PremiumOnboardingScreen> {
 
       // Apply quran settings
       final qsCubit = context.read<QuranSettingsCubit>();
-      qsCubit.toggleTajweed(_tajweedEnabled);
       qsCubit.updateHighlightColor(_highlightColor);
     }
 
@@ -649,51 +648,10 @@ class _PremiumOnboardingScreenState extends State<PremiumOnboardingScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _pageTitle(
-            "التجويد والتظليل",
-            "فعّل التجويد الملون واختار لون التظليل اللي يناسبك.",
+            "لون التظليل",
+            "اختار لون التظليل اللي يناسبك لإبراز الآيات أو الكلمات.",
           ),
           const Gap(20),
-
-          // Tajweed Toggle
-          _buildGlassCard(
-            isDark,
-            themeState,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      const Text(
-                        "تلوين التجويد",
-                        textDirection: TextDirection.rtl,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      const Gap(4),
-                      Text(
-                        "تلوين الكلمات حسب أحكام التجويد (16 حكم)",
-                        textDirection: TextDirection.rtl,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDark ? Colors.white60 : Colors.black45,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Gap(12),
-                Switch.adaptive(
-                  value: _tajweedEnabled,
-                  activeColor: themeState.primary,
-                  onChanged: (v) => setState(() => _tajweedEnabled = v),
-                ),
-              ],
-            ),
-          ),
-          const Gap(16),
 
           // Highlight Color
           _sectionLabel("لون التظليل"),
@@ -833,11 +791,13 @@ class _PremiumOnboardingScreenState extends State<PremiumOnboardingScreen> {
                       ),
                     ),
                     const Gap(12),
-                    Switch.adaptive(
-                      value: qsState.enableTafsir,
-                      activeColor: themeState.primary,
-                      onChanged: (v) =>
-                          context.read<QuranSettingsCubit>().toggleTafsir(v),
+                    Text(
+                      "مُفعّل تلقائياً",
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: themeState.primary,
+                      ),
                     ),
                   ],
                 ),
@@ -875,11 +835,13 @@ class _PremiumOnboardingScreenState extends State<PremiumOnboardingScreen> {
                       ),
                     ),
                     const Gap(12),
-                    Switch.adaptive(
-                      value: qsState.enableIrab,
-                      activeColor: themeState.primary,
-                      onChanged: (v) =>
-                          context.read<QuranSettingsCubit>().toggleIrab(v),
+                    Text(
+                      "مُفعّل تلقائياً",
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: themeState.primary,
+                      ),
                     ),
                   ],
                 ),

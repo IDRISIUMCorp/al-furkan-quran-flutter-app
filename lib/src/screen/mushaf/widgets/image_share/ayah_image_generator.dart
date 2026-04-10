@@ -272,16 +272,19 @@ class AyahImageGenerator {
       color: textColor.withValues(alpha: 0.55),
     );
 
-    final tafsirStyle = TextStyle(
-      fontSize: 48,
-      height: 2.2,
-      fontWeight: FontWeight.w600,
-      color: textColor,
-    );
-
     final String tafsirBody = (tafsirText == null || tafsirText.trim().isEmpty)
         ? "لا يوجد تفسير لهذه الآية في المصدر المحدد."
         : tafsirText.trim();
+
+    final int charCount = tafsirBody.length;
+    final double dynamicFontSize = charCount > 800 ? 46.0 : charCount > 500 ? 52.0 : charCount > 300 ? 58.0 : 64.0;
+
+    final tafsirStyle = TextStyle(
+      fontSize: dynamicFontSize,
+      height: 1.9,
+      fontWeight: FontWeight.w600,
+      color: textColor,
+    );
 
     final GlobalKey cardKey = GlobalKey();
 

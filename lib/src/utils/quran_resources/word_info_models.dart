@@ -1,5 +1,6 @@
 /// Word Info Models for Qiraat, Tasreef (Sarf), and Eerab (Irab)
 /// Extracted from quran_library package
+library;
 
 /// Types of word information available
 enum WordInfoKind {

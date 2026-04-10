@@ -14,59 +14,60 @@ enum QuranTheme {
 
 class QuranSettingsState {
   final double fontSize;
-  final double pageScale;
   final QuranTheme theme;
-  final bool tajweedEnabled;
   final Color highlightColor;
-  final bool enableTafsir;
-  final bool enableIrab;
+  final Color customBackgroundColor;
+  final Color customTextColor;
   final bool showVerseNumbers;
   final bool showPageInfo;
   final bool showBasmala;
   final bool showSurahHeader;
+  final bool tajweedEnabled;
   final bool isInitialized;
+
+  // Hardcoded getters for removed settings to prevent breaking the rest of the app
+  double get pageScale => 1.0;
+  bool get enableTafsir => true;
+  bool get enableIrab => true;
 
   const QuranSettingsState({
     this.fontSize = 23.0,
-    this.pageScale = 1.0,
     this.theme = QuranTheme.oled,
-    this.tajweedEnabled = true,
     this.highlightColor = Colors.amber,
-    this.enableTafsir = true,
-    this.enableIrab = false,
+    this.customBackgroundColor = const Color(0xFF111318),
+    this.customTextColor = Colors.white,
     this.showVerseNumbers = true,
     this.showPageInfo = true,
     this.showBasmala = true,
     this.showSurahHeader = true,
+    this.tajweedEnabled = false,
     this.isInitialized = false,
   });
 
   QuranSettingsState copyWith({
     double? fontSize,
-    double? pageScale,
     QuranTheme? theme,
-    bool? tajweedEnabled,
     Color? highlightColor,
-    bool? enableTafsir,
-    bool? enableIrab,
+    Color? customBackgroundColor,
+    Color? customTextColor,
     bool? showVerseNumbers,
     bool? showPageInfo,
     bool? showBasmala,
     bool? showSurahHeader,
+    bool? tajweedEnabled,
     bool? isInitialized,
   }) {
     return QuranSettingsState(
       fontSize: fontSize ?? this.fontSize,
-      pageScale: pageScale ?? this.pageScale,
       theme: theme ?? this.theme,
-      tajweedEnabled: tajweedEnabled ?? this.tajweedEnabled,
       highlightColor: highlightColor ?? this.highlightColor,
-      enableTafsir: enableTafsir ?? this.enableTafsir,
-      enableIrab: enableIrab ?? this.enableIrab,
+      customBackgroundColor: customBackgroundColor ?? this.customBackgroundColor,
+      customTextColor: customTextColor ?? this.customTextColor,
       showVerseNumbers: showVerseNumbers ?? this.showVerseNumbers,
       showPageInfo: showPageInfo ?? this.showPageInfo,
       showBasmala: showBasmala ?? this.showBasmala,
       showSurahHeader: showSurahHeader ?? this.showSurahHeader,
+      tajweedEnabled: tajweedEnabled ?? this.tajweedEnabled,
       isInitialized: isInitialized ?? this.isInitialized,
     );
   }
@@ -88,15 +89,13 @@ class QuranSettingsState {
   }
 
   double get contentScale {
-    final fontInfluence = (fontSize - 23.0) / 140.0;
-    final pageInfluence = (pageScale - 1.0) * 0.85;
-    return (1.0 + fontInfluence + pageInfluence).clamp(0.92, 1.16);
+    final fontInfluence = (fontSize - 23.0) / 22.0;
+    return (1.0 + fontInfluence).clamp(0.85, 1.4);
   }
 
   double get verseHeightScale {
-    final fontInfluence = (fontSize - 23.0) / 220.0;
-    final pageInfluence = (pageScale - 1.0) * 0.35;
-    return (1.0 + fontInfluence + pageInfluence).clamp(0.95, 1.10);
+    final fontInfluence = (fontSize - 23.0) / 35.0;
+    return (1.0 + fontInfluence).clamp(0.9, 1.3);
   }
 
   // --- Helpers for UI Theme mapping ---
@@ -108,7 +107,7 @@ class QuranSettingsState {
       case QuranTheme.nightBlue:
         return const Color(0xFF0F172A); // Slate 900
       case QuranTheme.custom:
-        return Colors.black; // Fallback, could be expanded
+        return customBackgroundColor;
       case QuranTheme.graphite:
         return const Color(0xFF121417);
       case QuranTheme.midnightPurple:
@@ -137,7 +136,7 @@ class QuranSettingsState {
       case QuranTheme.sand:
         return Colors.black87;
       case QuranTheme.custom:
-        return Colors.white;
+        return customTextColor;
     }
   }
 }

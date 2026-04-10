@@ -41,11 +41,9 @@ class LocalSettingsRepository implements SettingsRepository {
   static const String _lineHeightKey = "quran_script_heigh_of_line";
   static const String _selectedScriptTypeKey = "selected_quran_script_type";
   static const String _hideFootnoteKey = "view_hideFootnote";
-  static const String _hideWordByWordKey = "view_hideWordByWord";
   static const String _hideTranslationKey = "view_hideTranslation";
   static const String _hideToolbarKey = "view_hideToolbar";
   static const String _hideQuranAyahKey = "view_hideQuranAyah";
-  static const String _alwaysOpenWordByWordKey = "view_alwaysOpenWordByWord";
   static const String _enableWordByWordHighlightKey =
       "view_enableWordByWordHighlight";
   static const String _scrollWithRecitationKey = "view_scrollWithRecitation";
@@ -131,9 +129,6 @@ class LocalSettingsRepository implements SettingsRepository {
       quranScriptType: selectedQuranScriptType,
       hideFootnote:
           userBox.get(_hideFootnoteKey, defaultValue: false) as bool? ?? false,
-      hideWordByWord:
-          userBox.get(_hideWordByWordKey, defaultValue: false) as bool? ??
-          false,
       hideTranslation:
           userBox.get(_hideTranslationKey, defaultValue: false) as bool? ??
           false,
@@ -141,9 +136,6 @@ class LocalSettingsRepository implements SettingsRepository {
           userBox.get(_hideToolbarKey, defaultValue: false) as bool? ?? false,
       hideQuranAyah:
           userBox.get(_hideQuranAyahKey, defaultValue: false) as bool? ?? false,
-      alwaysOpenWordByWord:
-          userBox.get(_alwaysOpenWordByWordKey, defaultValue: false) as bool? ??
-          false,
       enableWordByWordHighlight:
           userBox.get(_enableWordByWordHighlightKey, defaultValue: true)
               as bool? ??
@@ -168,11 +160,9 @@ class LocalSettingsRepository implements SettingsRepository {
       userBox.put(_lineHeightKey, state.lineHeight),
       userBox.put(_selectedScriptTypeKey, state.quranScriptType.name),
       userBox.put(_hideFootnoteKey, state.hideFootnote),
-      userBox.put(_hideWordByWordKey, state.hideWordByWord),
       userBox.put(_hideTranslationKey, state.hideTranslation),
       userBox.put(_hideToolbarKey, state.hideToolbar),
       userBox.put(_hideQuranAyahKey, state.hideQuranAyah),
-      userBox.put(_alwaysOpenWordByWordKey, state.alwaysOpenWordByWord),
       userBox.put(
         _enableWordByWordHighlightKey,
         state.enableWordByWordHighlight,

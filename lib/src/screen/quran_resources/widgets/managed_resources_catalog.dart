@@ -284,8 +284,6 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
         ),
         padding: EdgeInsets.fromLTRB(16.w, 90.h, 16.w, 100.h),
         children: [
-          _buildHeroCard(themeState, isDark),
-          SizedBox(height: 14.h),
           _buildSearchField(isDark),
           SizedBox(height: 12.h),
           _buildFilters(themeState, isDark),
@@ -792,10 +790,6 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
               ),
             ],
             if (!_deleteMode) ...[
-              if (item.isBusy) ...[
-                SizedBox(height: 12.h),
-                _buildProgressPanel(item, themeState, isDark),
-              ],
               SizedBox(height: 12.h),
               Row(
                 children: [
@@ -943,10 +937,12 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
     } else {
       color = isDark ? Colors.white54 : Colors.black45;
       icon = Icons.cloud_download_outlined;
-      label = "متاح للتنزيل";
+      label = "";
     }
 
-    return Container(
+    return label.trim().isEmpty
+        ? const SizedBox.shrink()
+        : Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.10),
@@ -991,26 +987,6 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(999),
-            child: TweenAnimationBuilder<double>(
-              tween: Tween<double>(
-                begin: 0,
-                end: item.progress.clamp(0.0, 1.0),
-              ),
-              duration: const Duration(milliseconds: 260),
-              curve: Curves.easeOutCubic,
-              builder: (context, value, _) {
-                return LinearProgressIndicator(
-                  minHeight: 7.h,
-                  value: value <= 0 ? null : value,
-                  backgroundColor: isDark ? Colors.white10 : Colors.black12,
-                  valueColor: AlwaysStoppedAnimation<Color>(themeState.primary),
-                );
-              },
-            ),
-          ),
-          SizedBox(height: 10.h),
           Text(
             "جارٍ التحميل ${((item.progress).clamp(0.0, 1.0) * 100).round()}%",
             textAlign: TextAlign.right,

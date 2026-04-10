@@ -1,5 +1,6 @@
 /// Word Info Repository for downloading and loading Qiraat, Tasreef, Eerab data
 /// Extracted and adapted from quran_library package
+library;
 
 import 'dart:convert';
 import 'dart:developer';

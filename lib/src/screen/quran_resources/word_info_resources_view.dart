@@ -156,11 +156,7 @@ class _WordInfoResourcesViewState extends State<WordInfoResourcesView> {
         title: _label(kind),
         group: "الموارد اللغوية",
         subtitle: _subtitle(kind),
-        badges: [
-          if (kind == WordInfoKind.eerab) "نحو",
-          if (kind == WordInfoKind.tasreef) "صرف",
-          if (kind == WordInfoKind.recitations) "قراءات",
-        ],
+        badges: const [],
         isDownloaded: downloaded,
         isBusy: busy,
         progress: busy ? (state.percentage ?? 0.0) : 0,

@@ -1,5 +1,6 @@
 import "dart:async";
 import "dart:convert";
+import "dart:ui";
 import "package:al_quran_v3/src/screen/mushaf/widgets/bookmarks_sheet.dart";
 import "package:al_quran_v3/src/screen/mushaf/widgets/starred_sheet.dart";
 import "package:al_quran_v3/src/screen/mushaf/widgets/notes_sheet.dart";
@@ -26,6 +27,7 @@ import "package:al_quran_v3/src/core/audio/cubit/ayah_key_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/player_state_cubit.dart";
 import "package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
 import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
+import "package:al_quran_v3/src/core/audio/player/audio_player_manager.dart";
 import "package:al_quran_v3/src/core/audio/services/audio_playback_service_access.dart";
 import "package:al_quran_v3/src/core/notifications/khatma_notification_service.dart";
 import "package:al_quran_v3/src/screen/quran_reader/widgets/ayah_options_sheet.dart";
@@ -38,7 +40,6 @@ import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.da
 import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/word_by_word_function.dart";
 import "package:al_quran_v3/src/utils/quran_word/show_popup_word_function.dart";
 import "package:hive_ce_flutter/hive_flutter.dart";
 import "package:al_quran_v3/src/utils/number_localization.dart";
@@ -1532,6 +1533,8 @@ class _MushafViewState extends State<MushafView> {
         BlocListener<PlayerPositionCubit, AudioPlayerPositionModel>(
           listener: (context, state) {
             if (!context.read<AudioUiCubit>().state.isInsideQuranPlayer) return;
+            if (ModalRoute.of(context)?.isCurrent != true) return;
+            if (AudioPlayerManager.isWordPlaying) return;
 
             final ayahKey = context.read<AyahKeyCubit>().state.current;
 
@@ -1555,8 +1558,7 @@ class _MushafViewState extends State<MushafView> {
             }
 
             if (activeWordIndex != null) {
-              // Word index from segmented JSON is 1-indexed. QcfPage is 0-indexed.
-              final wordKey = "$ayahKey:${activeWordIndex - 1}";
+              final wordKey = "$ayahKey:$activeWordIndex";
               if (context.read<WordPlayingStateCubit>().state != wordKey) {
                 context.read<WordPlayingStateCubit>().changeState(wordKey);
               }
@@ -1702,7 +1704,7 @@ class _MushafViewState extends State<MushafView> {
                         h: (widget.hOverride ?? 0.86) * dynamicScale,
                         fontSize: qSettings.fontSize * dynamicScale,
                         physics: const ClampingScrollPhysics(),
-                        showTajweed: qSettings.tajweedEnabled,
+                        showTajweed: false, // Disabled due to layout corruption with QCF rendering
                         tajweedWordsBuilder: (surah, verse) {
                           return QuranScriptFunction.getWordListOfAyah(
                             QuranScriptType.tajweed,
@@ -1927,11 +1929,7 @@ class _MushafViewState extends State<MushafView> {
                             context: context,
                             wordKeys: wordsKey,
                             initWordIndex: 0,
-                            wordByWordList:
-                                await WordByWordFunction.getAyahWordByWordData(
-                                  ayahKey,
-                                ) ??
-                                [],
+                            wordByWordList: const [],
                           );
                         },
                         onPageChanged: (page) {

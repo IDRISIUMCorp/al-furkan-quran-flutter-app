@@ -3,6 +3,7 @@ import "package:al_quran_v3/src/resources/quran_resources/tafsir_info_with_score
 import "package:al_quran_v3/src/screen/quran_resources/widgets/managed_resources_catalog.dart";
 import "package:al_quran_v3/src/screen/setup/cubit/resources_progress_cubit_cubit.dart";
 import "package:al_quran_v3/src/screen/setup/cubit/resources_progress_cubit_state.dart";
+import "package:al_quran_v3/src/utils/quran_resources/default_offline_resources.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
@@ -22,7 +23,10 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    Future.microtask(() async {
+      await QuranTafsirFunction.init();
+      await _loadData();
+    });
   }
 
   Future<void> _loadData() async {
@@ -32,7 +36,12 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
     final allBooks = <TafsirBookModel>[];
     tafsirInformationWithScore.forEach((_, books) {
       for (final book in books) {
-        allBooks.add(TafsirBookModel.fromMap(book));
+        final model = TafsirBookModel.fromMap(book);
+        if (model.name.trim() == DefaultOfflineResources.defaultTafsirSaadi.name) {
+          allBooks.add(DefaultOfflineResources.defaultTafsirSaadi);
+        } else {
+          allBooks.add(model);
+        }
       }
     });
 
@@ -85,6 +94,7 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
       context: context,
       tafsirBook: book,
     );
+    await QuranTafsirFunction.setTafsirSelection(book);
     await _loadData();
   }
 

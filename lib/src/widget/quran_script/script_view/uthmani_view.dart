@@ -6,7 +6,6 @@ import "package:al_quran_v3/src/core/audio/model/audio_player_position_model.dar
 import "package:al_quran_v3/src/core/audio/model/recitation_info_model.dart";
 import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/word_by_word_function.dart";
 import "package:al_quran_v3/src/utils/quran_word/show_popup_word_function.dart";
 import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
 import "package:al_quran_v3/src/utils/quran_ayahs_function/get_page_number.dart";
@@ -115,11 +114,7 @@ class NonTajweedScriptView extends StatelessWidget {
                           context: context,
                           wordKeys: wordsKey,
                           initWordIndex: index,
-                          wordByWordList:
-                              await WordByWordFunction.getAyahWordByWordData(
-                                "${wordsKey.first.split(":")[0]}:${wordsKey.first.split(":")[1]}",
-                              ) ??
-                              [],
+                          wordByWordList: const [],
                         );
                       }),
             );
@@ -181,18 +176,21 @@ class NonTajweedScriptView extends StatelessWidget {
                   bool willHighLight =
                       highlightingWordIndex == "$ayahKey:${index + 1}";
 
-                  return TextSpan(
-                    style: isLastWord
-                        ? const TextStyle(fontFamily: "QPC_Hafs")
-                        : (enableWordByWordHighlight && willHighLight)
-                        ? TextStyle(backgroundColor: themeState.primaryShade200)
-                        : null,
+                  final baseWordStyle = isLastWord
+                      ? const TextStyle(fontFamily: "QPC_Hafs")
+                      : quranStyle;
 
-                    text: "$word ",
-                    recognizer: scriptInfo.skipWordTap == true
-                        ? null
-                        : (DoubleTapGestureRecognizer()
-                            ..onDoubleTap = () async {
+                  final bg = (enableWordByWordHighlight && willHighLight)
+                      ? themeState.primaryShade200
+                      : null;
+
+                  return WidgetSpan(
+                    alignment: PlaceholderAlignment.baseline,
+                    baseline: TextBaseline.alphabetic,
+                    child: InkWell(
+                      onTap: scriptInfo.skipWordTap == true
+                          ? null
+                          : () async {
                               List<String> wordsKey = List.generate(
                                 words.length,
                                 (i) =>
@@ -203,12 +201,21 @@ class NonTajweedScriptView extends StatelessWidget {
                                 wordKeys: wordsKey,
                                 initWordIndex: index,
                                 wordByWordList:
-                                    await WordByWordFunction.getAyahWordByWordData(
-                                      "${wordsKey.first.split(":")[0]}:${wordsKey.first.split(":")[1]}",
-                                    ) ??
-                                    [],
+                                    const [],
                               );
-                            }),
+                            },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 1.5),
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(color: bg),
+                          child: Text(
+                            "$word ",
+                            textDirection: TextDirection.rtl,
+                            style: baseWordStyle,
+                          ),
+                        ),
+                      ),
+                    ),
                   );
                 }),
               ),

@@ -5,7 +5,6 @@ import "package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.d
 import "package:al_quran_v3/src/core/audio/model/audio_player_position_model.dart";
 import "package:al_quran_v3/src/core/audio/model/recitation_info_model.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/word_by_word_function.dart";
 import "package:al_quran_v3/src/utils/quran_word/show_popup_word_function.dart";
 import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
 import "package:al_quran_v3/src/screen/collections/collection_page.dart";
@@ -150,11 +149,7 @@ class NonTajweedPageRenderer extends StatelessWidget {
                                             context: context,
                                             initWordIndex: index,
                                             wordKeys: highlightingWord,
-                                            wordByWordList:
-                                                await WordByWordFunction.getAyahWordByWordData(
-                                                  "${highlightingWord.first.split(":")[0]}:${highlightingWord.first.split(":")[1]}",
-                                                ) ??
-                                                [],
+                                            wordByWordList: const [],
                                           );
                                         },
                                 );

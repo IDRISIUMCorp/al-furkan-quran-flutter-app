@@ -3084,7 +3084,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
       backgroundColor: Colors.black,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setModalState) => Container(
+        builder: (ctx, setModalState) => SizedBox(
           height: MediaQuery.of(context).size.height * 0.85,
           child: Column(
             children: [

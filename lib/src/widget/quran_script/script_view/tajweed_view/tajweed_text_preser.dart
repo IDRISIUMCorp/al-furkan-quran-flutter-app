@@ -1,6 +1,5 @@
 import "dart:developer";
 
-import "package:al_quran_v3/src/utils/quran_resources/word_by_word_function.dart";
 import "package:al_quran_v3/src/utils/quran_word/show_popup_word_function.dart";
 import "package:al_quran_v3/src/widget/quran_script/script_view/tajweed_view/tajweed_rules.dart";
 import "package:flutter/gestures.dart";
@@ -95,11 +94,7 @@ TextSpan parseTajweedWord({
                         context: context,
                         wordKeys: wordsKey,
                         initWordIndex: wordIndex,
-                        wordByWordList:
-                            await WordByWordFunction.getAyahWordByWordData(
-                              "${wordsKey.first.split(":")[0]}:${wordsKey.first.split(":")[1]}",
-                            ) ??
-                            [],
+                        wordByWordList: const [],
                       );
                     }),
         ),

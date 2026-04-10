@@ -8,7 +8,7 @@ import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart
 import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_translation_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/segmented_resources_manager.dart";
-import "package:al_quran_v3/src/utils/quran_resources/word_by_word_function.dart";
+ 
 import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
 
 abstract class QuranResourcesRepository {
@@ -24,7 +24,6 @@ class LocalQuranResourcesRepository implements QuranResourcesRepository {
   Future<void> initialize({required Locale locale}) async {
     await Future.wait([
       QuranTranslationFunction.init(locale: locale),
-      WordByWordFunction.init(),
       SegmentedResourcesManager.init(),
     ]);
   }

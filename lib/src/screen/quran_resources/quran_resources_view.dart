@@ -2,7 +2,6 @@ import "dart:ui";
 
 import "package:al_quran_v3/src/screen/quran_resources/tafsir_resources_view.dart";
 import "package:al_quran_v3/src/screen/quran_resources/translation_resources_view.dart";
-import "package:al_quran_v3/src/screen/quran_resources/word_by_word_resources_view.dart";
 import "package:al_quran_v3/src/screen/quran_resources/word_info_resources_view.dart";
 import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
 import "package:flutter/material.dart";
@@ -24,8 +23,7 @@ class _QuranResourcesViewState extends State<QuranResourcesView>
   static const List<String> pagesName = [
     "الترجمات",
     "التفاسير",
-    "كلمة بكلمة",
-    "معلومات الكلمات",
+    "بيانات الكلمات",
   ];
 
   @override
@@ -77,7 +75,7 @@ class _QuranResourcesViewState extends State<QuranResourcesView>
           ),
         ),
         title: Text(
-          "الموارد القرآنية",
+          "الموارد",
           style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w800),
         ),
         centerTitle: true,
@@ -100,54 +98,6 @@ class _QuranResourcesViewState extends State<QuranResourcesView>
           Column(
             children: [
               SizedBox(height: 110.h),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(18.w),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF171717) : Colors.white,
-                    borderRadius: BorderRadius.circular(28),
-                    border: Border.all(
-                      color: isDark
-                          ? Colors.white10
-                          : themeState.primary.withValues(alpha: 0.08),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: themeState.primary.withValues(alpha: 0.08),
-                        blurRadius: 24,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        "مكتبة الموارد",
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w900,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        "إدارة موحدة للترجمات والتفاسير ومصادر الكلمات، مع اختيار سريع وحذف وتنظيم أنظف.",
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          height: 1.7,
-                          color: isDark ? Colors.white60 : Colors.black54,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 14.h),
               Expanded(
                 child: TabBarView(
                   controller: _tabController,
@@ -155,7 +105,6 @@ class _QuranResourcesViewState extends State<QuranResourcesView>
                   children: const [
                     TranslationResourcesView(),
                     TafsirResourcesView(),
-                    WordByWordResourcesView(),
                     WordInfoResourcesView(),
                   ],
                 ),

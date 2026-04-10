@@ -3,7 +3,9 @@ import "dart:ui";
 import "package:al_quran_v3/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
+import "package:flutter_animate/flutter_animate.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
+import "package:flex_color_picker/flex_color_picker.dart";
 import "package:gap/gap.dart";
 
 class QuranSettingsBottomSheet extends StatelessWidget {
@@ -138,57 +140,7 @@ class QuranSettingsBottomSheet extends StatelessWidget {
                           primary: primary,
                         ),
                         const Gap(18),
-                        _SectionCard(
-                          title: "أوضاع جاهزة",
-                          subtitle:
-                              "بدّل بين أسلوب قراءة سريع بدل الضبط اليدوي كل مرة.",
-                          icon: FluentIcons.apps_list_detail_24_regular,
-                          child: Wrap(
-                            spacing: 10,
-                            runSpacing: 10,
-                            children: [
-                              _PresetChip(
-                                label: "نظيف",
-                                subtitle: "أخف وأهدأ",
-                                selected:
-                                    state.fontSize <= 21.5 &&
-                                    state.pageScale <= 0.98 &&
-                                    !state.showPageInfo,
-                                onTap: () => context
-                                    .read<QuranSettingsCubit>()
-                                    .applyPreset(QuranSettingsPreset.minimal),
-                                primary: primary,
-                                isDark: isDarkMode,
-                              ),
-                              _PresetChip(
-                                label: "متوازن",
-                                subtitle: "الافتراضي الأفضل",
-                                selected:
-                                    (state.fontSize - 23.0).abs() < 0.6 &&
-                                    (state.pageScale - 1.0).abs() < 0.03 &&
-                                    state.showPageInfo,
-                                onTap: () => context
-                                    .read<QuranSettingsCubit>()
-                                    .applyPreset(QuranSettingsPreset.balanced),
-                                primary: primary,
-                                isDark: isDarkMode,
-                              ),
-                              _PresetChip(
-                                label: "غامر",
-                                subtitle: "أكبر وأكثر تركيزًا",
-                                selected:
-                                    state.fontSize >= 26.5 &&
-                                    state.pageScale >= 1.05 &&
-                                    !state.showVerseNumbers,
-                                onTap: () => context
-                                    .read<QuranSettingsCubit>()
-                                    .applyPreset(QuranSettingsPreset.immersive),
-                                primary: primary,
-                                isDark: isDarkMode,
-                              ),
-                            ],
-                          ),
-                        ),
+                        // "أوضاع جاهزة" section removed
                         const Gap(14),
                         _SectionCard(
                           title: "القراءة",
@@ -211,23 +163,7 @@ class QuranSettingsBottomSheet extends StatelessWidget {
                                     .read<QuranSettingsCubit>()
                                     .updateFontSize(value),
                               ),
-                              const Gap(12),
-                              _SliderSettingCard(
-                                label: "اتساع الصفحة",
-                                valueLabel:
-                                    "${(state.pageScale * 100).round()}%",
-                                icon:
-                                    FluentIcons.panel_left_contract_24_regular,
-                                min: 0.94,
-                                max: 1.10,
-                                divisions: 16,
-                                value: state.pageScale,
-                                primary: primary,
-                                isDark: isDarkMode,
-                                onChanged: (value) => context
-                                    .read<QuranSettingsCubit>()
-                                    .updatePageScale(value),
-                              ),
+                              // "اتساع الصفحة" slider removed
                             ],
                           ),
                         ),
@@ -249,18 +185,6 @@ class QuranSettingsBottomSheet extends StatelessWidget {
                           icon: FluentIcons.book_open_24_regular,
                           child: Column(
                             children: [
-                              _SwitchTile(
-                                icon: FluentIcons.sparkle_circle_24_regular,
-                                title: "تجويد ملون",
-                                subtitle: "إظهار أحكام التجويد داخل النص.",
-                                value: state.tajweedEnabled,
-                                onChanged: (value) => context
-                                    .read<QuranSettingsCubit>()
-                                    .toggleTajweed(value),
-                                primary: primary,
-                                isDark: isDarkMode,
-                              ),
-                              const Gap(10),
                               _SwitchTile(
                                 icon: FluentIcons.number_symbol_24_regular,
                                 title: "أرقام الآيات",
@@ -309,45 +233,11 @@ class QuranSettingsBottomSheet extends StatelessWidget {
                                 primary: primary,
                                 isDark: isDarkMode,
                               ),
+
                             ],
                           ),
                         ),
-                        const Gap(14),
-                        _SectionCard(
-                          title: "المكتبة الذكية",
-                          subtitle:
-                              "إعدادات افتراضية للوصول السريع من نافذة المكتبة.",
-                          icon: FluentIcons.library_24_regular,
-                          child: Column(
-                            children: [
-                              _SwitchTile(
-                                icon: FluentIcons.book_database_24_regular,
-                                title: "إظهار التفاسير",
-                                subtitle:
-                                    "إبقاء بطاقات التفسير مفعلة داخل المكتبة.",
-                                value: state.enableTafsir,
-                                onChanged: (value) => context
-                                    .read<QuranSettingsCubit>()
-                                    .toggleTafsir(value),
-                                primary: primary,
-                                isDark: isDarkMode,
-                              ),
-                              const Gap(10),
-                              _SwitchTile(
-                                icon: FluentIcons
-                                    .text_grammar_arrow_left_24_regular,
-                                title: "الإعراب والتحليل",
-                                subtitle: "السماح بتبويب الإعراب من المكتبة.",
-                                value: state.enableIrab,
-                                onChanged: (value) => context
-                                    .read<QuranSettingsCubit>()
-                                    .toggleIrab(value),
-                                primary: primary,
-                                isDark: isDarkMode,
-                              ),
-                            ],
-                          ),
-                        ),
+                        // "المكتبة الذكية" section removed
                         const Gap(14),
                         _SectionCard(
                           title: "لون التظليل",
@@ -357,23 +247,28 @@ class QuranSettingsBottomSheet extends StatelessWidget {
                           child: Wrap(
                             spacing: 10,
                             runSpacing: 10,
-                            children: _highlightColors
-                                .map(
-                                  (color) => _HighlightColorDot(
-                                    color: color,
-                                    selected:
-                                        state.highlightColor.value ==
-                                        color.value,
-                                    primary: primary,
-                                    onTap: () => context
-                                        .read<QuranSettingsCubit>()
-                                        .updateHighlightColor(color),
-                                  ),
-                                )
-                                .toList(),
+                            children: [
+                              ..._highlightColors.map(
+                                (color) => _HighlightColorDot(
+                                  color: color,
+                                  selected: state.highlightColor.value ==
+                                      color.value,
+                                  primary: primary,
+                                  onTap: () => context
+                                      .read<QuranSettingsCubit>()
+                                      .updateHighlightColor(color),
+                                ),
+                              ),
+                              _CustomColorPickerDot(
+                                currentColor: state.highlightColor,
+                                onColorChanged: (c) => context
+                                    .read<QuranSettingsCubit>()
+                                    .updateHighlightColor(c),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
+                      ].animate(interval: 50.ms).fade(duration: 400.ms, curve: Curves.easeOutCubic).slideY(begin: 0.1, curve: Curves.easeOutCubic),
                     ),
                   ),
                 ),
@@ -401,12 +296,6 @@ class _PreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chips = <String>[
-      state.tajweedEnabled ? "تجويد" : "نص صافي",
-      state.showPageInfo ? "معلومات الصفحة" : "واجهة هادئة",
-      state.showVerseNumbers ? "أرقام الآيات" : "تركيز أعلى",
-    ];
-
     return AnimatedContainer(
       duration: const Duration(milliseconds: 260),
       curve: Curves.easeOutCubic,
@@ -426,34 +315,6 @@ class _PreviewCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Wrap(
-            alignment: WrapAlignment.end,
-            spacing: 8,
-            runSpacing: 8,
-            children: chips
-                .map(
-                  (chip) => Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: state.textColor.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Text(
-                      chip,
-                      style: TextStyle(
-                        color: state.textColor.withValues(alpha: 0.78),
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
-          const Gap(16),
           Text(
             "سورة الفاتحة • آية ٦",
             textAlign: TextAlign.center,
@@ -488,35 +349,6 @@ class _PreviewCard extends StatelessWidget {
                 ],
               ),
               textAlign: TextAlign.center,
-            ),
-          ),
-          const Gap(16),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: cardColor,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    "الاتساع الحالي ${(state.contentScale * 100).round()}% ويزداد تلقائيًا مع تكبير الخط.",
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: state.textColor.withValues(alpha: 0.72),
-                    ),
-                  ),
-                ),
-                const Gap(10),
-                Icon(
-                  FluentIcons.arrow_maximize_24_regular,
-                  size: 18,
-                  color: primary,
-                ),
-              ],
             ),
           ),
         ],
@@ -950,6 +782,95 @@ class _HighlightColorDot extends StatelessWidget {
   }
 }
 
+Future<Color?> showAlFurkanColorPicker(
+  BuildContext context,
+  Color currentColor, {
+  bool allowOpacity = false,
+  String heading = "اختر اللون",
+}) async {
+  Color newColor = currentColor;
+  final confirmed = await ColorPicker(
+    color: newColor,
+    onColorChanged: (c) => newColor = c,
+    enableOpacity: allowOpacity,
+    borderRadius: 22,
+    padding: const EdgeInsets.all(20),
+    heading: Text(
+      heading,
+      textDirection: TextDirection.rtl,
+      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+    ),
+    wheelSubheading: const Text(
+      "الاختيار الحر",
+      textDirection: TextDirection.rtl,
+      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+    ),
+    showColorCode: true,
+    showMaterialName: true,
+    actionButtons: const ColorPickerActionButtons(
+      okButton: true,
+      closeButton: true,
+      dialogActionButtons: false,
+    ),
+    pickersEnabled: const {
+      ColorPickerType.both: false,
+      ColorPickerType.primary: true,
+      ColorPickerType.accent: true,
+      ColorPickerType.bw: false,
+      ColorPickerType.custom: false,
+      ColorPickerType.wheel: true,
+    },
+  ).showPickerDialog(
+    context,
+    constraints: const BoxConstraints(minHeight: 460, minWidth: 320, maxWidth: 320),
+    barrierColor: Colors.black.withValues(alpha: 0.5),
+  );
+  return confirmed ? newColor : null;
+}
+
+class _CustomColorPickerDot extends StatelessWidget {
+  final Color currentColor;
+  final ValueChanged<Color> onColorChanged;
+
+  const _CustomColorPickerDot({
+    required this.currentColor,
+    required this.onColorChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () async {
+        final newColor = await showAlFurkanColorPicker(context, currentColor);
+        if (newColor != null) {
+          onColorChanged(newColor);
+        }
+      },
+      borderRadius: BorderRadius.circular(999),
+      child: Container(
+        width: 38,
+        height: 38,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: SweepGradient(
+            colors: [
+              Colors.red,
+              Colors.yellow,
+              Colors.green,
+              Colors.cyan,
+              Colors.blue,
+              Colors.purple,
+              Colors.pink,
+              Colors.red,
+            ],
+          ),
+        ),
+        child: const Icon(Icons.colorize_rounded, size: 20, color: Colors.white),
+      ),
+    );
+  }
+}
+
 class _QuranThemeSelector extends StatelessWidget {
   final QuranSettingsState state;
   final Color primary;
@@ -975,8 +896,8 @@ class _QuranThemeSelector extends StatelessWidget {
       child: Row(
         children: themes.map((entry) {
           final theme = entry.$1;
-          final swatch = entry.$2;
-          final foreground = entry.$3;
+          final swatch = theme == QuranTheme.custom ? state.customBackgroundColor : entry.$2;
+          final foreground = theme == QuranTheme.custom ? state.customTextColor : entry.$3;
           final selected = state.theme == theme;
 
           return Padding(
@@ -1014,14 +935,53 @@ class _QuranThemeSelector extends StatelessWidget {
                   children: [
                     Align(
                       alignment: AlignmentDirectional.centerStart,
-                      child: Icon(
-                        selected
-                            ? Icons.radio_button_checked_rounded
-                            : Icons.radio_button_unchecked_rounded,
-                        size: 18,
-                        color: selected
-                            ? primary
-                            : foreground.withValues(alpha: 0.5),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            selected
+                                ? Icons.radio_button_checked_rounded
+                                : Icons.radio_button_unchecked_rounded,
+                            size: 18,
+                            color: selected
+                                ? primary
+                                : foreground.withValues(alpha: 0.5),
+                          ),
+                          if (theme == QuranTheme.custom && selected) ...[
+                            const Gap(8),
+                            InkWell(
+                              onTap: () async {
+                                final qs = context.read<QuranSettingsCubit>();
+                                final newBg = await showAlFurkanColorPicker(
+                                  context,
+                                  state.customBackgroundColor,
+                                  heading: "لون الخلفية",
+                                );
+                                if (newBg != null) {
+                                  qs.updateCustomBackgroundColor(newBg);
+                                }
+                                if (context.mounted) {
+                                  final newText = await showAlFurkanColorPicker(
+                                    context,
+                                    state.customTextColor,
+                                    heading: "لون النص",
+                                  );
+                                  if (newText != null) {
+                                    qs.updateCustomTextColor(newText);
+                                  }
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: primary.withValues(alpha: 0.2),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(Icons.edit_rounded, size: 14, color: primary),
+                              ),
+                            )
+                          ],
+                        ],
                       ),
                     ),
                     const Gap(20),
