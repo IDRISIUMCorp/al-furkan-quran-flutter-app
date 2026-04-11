@@ -8,8 +8,6 @@ Al-Furkan is a **production-ready Flutter Quran app (Android)** built with **BLo
 
 It includes an interactive mushaf, tafsir and translation resources, a word-level Ayah library, prayer times, qibla, azkar, collections, notifications, and a fully customizable **“Ayah of the Day”** home widget.
 
-## Human-focused line
-
 _Whether you are a daily Quran reader, a student of knowledge, or a Flutter developer building a serious product… Al-Furkan is made to serve you._
 
 <p align="center">
