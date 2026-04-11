@@ -2,17 +2,13 @@
 
 # 📖 Al-Furkan — الفُرقان
 
-## 1) Title + Strong Hook
-
 **Al-Furkan is one of the most advanced open-source Quran apps built with Flutter.**
-
-## 2) Short high-impact description
 
 Al-Furkan is a **production-ready Flutter Quran app (Android)** built with **BLoC + Clean Architecture** and **Uthmanic (QCF) script rendering**—designed for daily reading, deep study, remembrance, and personalization.
 
 It includes an interactive mushaf, tafsir and translation resources, a word-level Ayah library, prayer times, qibla, azkar, collections, notifications, and a fully customizable **“Ayah of the Day”** home widget.
 
-## 3) Human-focused line
+## Human-focused line
 
 _Whether you are a daily Quran reader, a student of knowledge, or a Flutter developer building a serious product… Al-Furkan is made to serve you._
 
@@ -31,7 +27,7 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
 
 ---
 
-## 4) Screenshots (نظرة على واجهة المستخدم)
+## Screenshots (نظرة على واجهة المستخدم)
 
 <p align="center">
   <img src="assets/img/ScreenSH (1).png" width="22%" style="border-radius: 12px; margin: 4px;" />
@@ -46,7 +42,7 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
   <img src="assets/img/ScreenSH (8).png" width="22%" style="border-radius: 12px; margin: 4px;" />
 </p>
 
-## 5) 🏆 Why Al-Furkan (ليه الفُرقان؟)
+## 🏆 Why Al-Furkan (ليه الفُرقان؟)
 
 - **Production-ready Flutter Quran app** مش مجرد demo: مشروع معماري واضح، قابل للتوسعة، ومتجه للتشغيل الحقيقي.
 - **Uthmanic script rendering (QCF Mushaf)** بتجربة قريبة جدًا من المصحف الورقي، مع دعم Dark/Light.
@@ -69,7 +65,7 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
 2. **العمود الفقري وقاعدة البيانات**:
    اعتمدنا في القواعد الأساسية (قاعدة بيانات القراء، تفريعات التفاسير، الترجمات، ومحرك حساب مواقيت الصلاة) على مشروع [al_quran_v3](https://github.com/IsmailHosenIsmailJames/al_quran_v3) للمطور **Ismail Hosen** (بارك الله في جهده).
 
-## 6) ⚖️ Comparison (ليه أحسن من أغلب Quran apps / demo projects؟)
+## ⚖️ Comparison (ليه أحسن من أغلب Quran apps / demo projects؟)
 
 ### مقارنة مع تطبيقات قرآن “البسيطة”
 
@@ -85,7 +81,7 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
 - **Performance/Packaging** محسوب: تحميل خطوط QCF عند الطلب وتخفيف الأصول.
 - **Refactoring موثق** (تفتيت شاشة المصحف العملاقة) عشان contributors يقدروا يشتغلوا بوضوح.
 
-## 7) 👨‍💻 Perfect For Developers
+## 👨‍💻 Perfect For Developers
 
 - اللي عايز يدرس أو يطبق **BLoC + Clean Architecture** في Flutter Quran app حقيقي.
 - اللي بيحب مشاريع **production-ready**: modular، قابل للاختبار، ومهيأ للتوسع.
@@ -107,7 +103,7 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
 
 </div>
 
-## 8) ✨ Features (المزايا الحالية داخل التطبيق)
+## ✨ Features (المزايا الحالية داخل التطبيق)
 
 تمت مراجعة الشاشات والموديولات الحالية داخل المشروع، وهذه أبرز القدرات الموجودة فعلاً الآن في "الفُرقان" (Flutter Quran app):
 
@@ -164,7 +160,7 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
 - **مجموعات ومفضلات وملاحظات**.
 - **مشاركة المحتوى** نصيًا وبصريًا.
 
-## 9) 🏗️ Architecture (BLoC + Clean Architecture)
+## 🏗️ Architecture (BLoC + Clean Architecture)
 
 التطبيق مبني كـ **open-source Quran application** حقيقي، مش مجرد واجهة—والهدف إن التطوير يفضل سهل ومضمون مع الوقت.
 
@@ -203,7 +199,7 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
 - **تسريع أول تشغيل** عبر تأجيل تهيئة الموارد الثقيلة وتجهيز بعض الخدمات إلى ما بعد ظهور أول واجهة للمستخدم.
 - **تنظيف الحزمة النهائية** باستبعاد ملفات تطوير/عرض وموارد كبيرة غير مستخدمة من النسخة الموزعة للمستخدم.
 
-## 10) 🚀 Installation
+## 🚀 Installation
 
 لتشغيل تطبيق "الفُرقان" على جهازك أو المساهمة في تطويره:
 
@@ -234,7 +230,7 @@ flutter run
 
 > ملاحظة للمطورين: التطبيق يعتمد على قواعد بيانات محلية (`hive_ce`) ولا يتطلب أي إعدادات خوادم أو مفاتيح API خارجية للتشغيل المبدئي.
 
-## 11) 🔍 SEO Keywords
+## 🔍 SEO Keywords
 
 > الكلمات دي مقصودة لتحسين اكتشاف المشروع على GitHub والبحث وAI models بدون حشو.
 
@@ -250,7 +246,7 @@ flutter run
 - prayer times qibla azkar Flutter
 - offline-first Flutter app (Hive)
 
-## 12) ⚖️ الترخيص الوقفي (Charity & License)
+## ⚖️ الترخيص الوقفي (Charity & License)
 
 هذا المشروع يخضع لترخيص **Apache License 2.0** مقترناً بـ **شرط وقفي قطعي الدلالة**:
 
