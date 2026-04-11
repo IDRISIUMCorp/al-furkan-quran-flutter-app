@@ -8,8 +8,12 @@ It currently includes an interactive mushaf, tafsir and translation resources, w
 
 keywords:
 flutter quran app
-open source islamic app
-quran app bloc flutter
+open source quran
+flutter islamic app
+bloc flutter app
+clean architecture flutter
+quran audio app
+uthmanic script flutter
 
 <p align="center">
   <img src="assets/img/Quran_Logo_v3.png" width="120" style="border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); margin-bottom: 20px;" /><br>
