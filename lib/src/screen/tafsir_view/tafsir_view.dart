@@ -232,7 +232,7 @@ class _TafsirViewState extends State<TafsirView> {
           ),
           const Spacer(),
           const Text(
-            "المكتبة",
+            "الموارد",
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
           ),
           const Spacer(),

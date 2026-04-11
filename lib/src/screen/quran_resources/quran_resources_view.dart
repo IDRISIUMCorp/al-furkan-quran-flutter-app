@@ -97,7 +97,7 @@ class _QuranResourcesViewState extends State<QuranResourcesView>
           ),
           Column(
             children: [
-              SizedBox(height: 110.h),
+              SizedBox(height: 78.h),
               Expanded(
                 child: TabBarView(
                   controller: _tabController,
@@ -115,13 +115,13 @@ class _QuranResourcesViewState extends State<QuranResourcesView>
             child: Align(
               alignment: Alignment.topCenter,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(100),
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
                     child: Container(
-                      height: 44.h,
+                      height: 48.h,
                       decoration: BoxDecoration(
                         color: (isDark ? Colors.white : Colors.black)
                             .withValues(alpha: 0.05),
