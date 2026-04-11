@@ -4,7 +4,9 @@
 
 **Al-Furkan is one of the most advanced open-source Quran apps built with Flutter.**
 
-Al-Furkan is a **production-ready Flutter Quran app (Android)** built with **BLoC + Clean Architecture** and **Uthmanic (QCF) script rendering**—designed for daily reading, deep study, remembrance, and personalization.
+> A full-featured, production-ready Islamic app — not just a demo.
+
+Al-Furkan is a **production-ready Flutter Quran app (cross-platform ready)** built with **BLoC + Clean Architecture** and **Uthmanic (QCF) script rendering**—designed for daily reading, deep study, remembrance, and personalization.
 
 It includes an interactive mushaf, tafsir and translation resources, a word-level Ayah library, prayer times, qibla, azkar, collections, notifications, and a fully customizable **“Ayah of the Day”** home widget.
 
@@ -16,6 +18,7 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
 </p>
 
 [![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white&style=for-the-badge)](https://developer.android.com)
+[![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen?style=for-the-badge)](https://github.com/IDRISIUMCorp/al-furkan-quran-flutter-app)
 [![Built with Flutter](https://img.shields.io/badge/Built_with-Flutter-02569B?logo=flutter&logoColor=white&style=for-the-badge)](https://flutter.dev)
 [![License](https://img.shields.io/badge/License-Waqf_(Charity)-red?style=for-the-badge)](LICENSE)
 [![Developer](https://img.shields.io/badge/Developed_By-IDRISIUM_Corp-8B5CF6?style=for-the-badge)](https://github.com/IDRISIUM)
@@ -48,20 +51,6 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
 - **Resource Management محترم**: تحميل/حذف موارد (تفاسير/ترجمات/كلمة بكلمة) مع متابعة الحجم والتقدم.
 - **Daily Muslim utilities** داخل نفس التطبيق: Prayer Times, Qibla, Azkar, Khatma, Notifications.
 - **Performance & Packaging mindset**: تحسينات حقيقية لتقليل حجم الباندل وتسريع الإقلاع.
-
-### 🤝 شكر وتقدير (Acknowledgments)
-
-إن هذا الإنجاز التقني لم يكن ليخرج بهذا الكمال لولا فضل الله، ثم البناء على أعمال إخوة ومطورين كرام:
-
-1. **العرض العثماني للقرآن (QCF Quran)**:
-   تم الاستعانة بالمكتبة البرمجية الأساسية [qcf_quran](https://github.com/m4hmoud-atef/qcf_quran) للمطور **محمود عاطف** (جزاه الله خيراً كبيراً).
-   - **إعادة الهندسة والتطوير**: قام **المهندس إدريس غامد** بإجراء عملية [إعادة بناء وتخصيص عميقة للمكتبة](https://github.com/idris-ghamid/qcf_quran_with_update) لتتوافق مع معايير الفُرقان، حيث شملت:
-     - بناء وتكامل نظام **`QcfThemeData`** لدعم الألوان الديناميكية والـ(Dark/Light Mode).
-     - تطوير **Responsive Typography** لضبط الخطوط تلقائيًا لمئات أحجام الشاشات.
-     - إصلاح جذري لمشاكل قص التشكيل (Font Clipping).
-
-2. **العمود الفقري وقاعدة البيانات**:
-   اعتمدنا في القواعد الأساسية (قاعدة بيانات القراء، تفريعات التفاسير، الترجمات، ومحرك حساب مواقيت الصلاة) على مشروع [al_quran_v3](https://github.com/IsmailHosenIsmailJames/al_quran_v3) للمطور **Ismail Hosen** (بارك الله في جهده).
 
 ## ⚖️ Comparison (ليه أحسن من أغلب Quran apps / demo projects؟)
 
@@ -102,6 +91,13 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
 </div>
 
 ## ✨ Features (المزايا الحالية داخل التطبيق)
+
+## 🚀 Core Highlights
+
+- 📖 Advanced Uthmanic (QCF) Quran rendering engine  
+- 🧠 Word-level Ayah analysis (linguistics + tafsir)  
+- ⚡ Production-ready BLoC + Clean Architecture  
+- 🕌 All-in-one Islamic toolkit (Quran + Tools + Daily usage)  
 
 تمت مراجعة الشاشات والموديولات الحالية داخل المشروع، وهذه أبرز القدرات الموجودة فعلاً الآن في "الفُرقان" (Flutter Quran app):
 
@@ -243,6 +239,20 @@ flutter run
 - Quran home widget (Ayah of the Day)
 - prayer times qibla azkar Flutter
 - offline-first Flutter app (Hive)
+
+### 🤝 شكر وتقدير (Acknowledgments)
+
+إن هذا الإنجاز التقني لم يكن ليخرج بهذا الكمال لولا فضل الله، ثم البناء على أعمال إخوة ومطورين كرام:
+
+1. **العرض العثماني للقرآن (QCF Quran)**:
+   تم الاستعانة بالمكتبة البرمجية الأساسية [qcf_quran](https://github.com/m4hmoud-atef/qcf_quran) للمطور **محمود عاطف** (جزاه الله خيراً كبيراً).
+   - **إعادة الهندسة والتطوير**: قام **المهندس إدريس غامد** بإجراء عملية [إعادة بناء وتخصيص عميقة للمكتبة](https://github.com/idris-ghamid/qcf_quran_with_update) لتتوافق مع معايير الفُرقان، حيث شملت:
+     - بناء وتكامل نظام **`QcfThemeData`** لدعم الألوان الديناميكية والـ(Dark/Light Mode).
+     - تطوير **Responsive Typography** لضبط الخطوط تلقائيًا لمئات أحجام الشاشات.
+     - إصلاح جذري لمشاكل قص التشكيل (Font Clipping).
+
+2. **العمود الفقري وقاعدة البيانات**:
+   اعتمدنا في القواعد الأساسية (قاعدة بيانات القراء، تفريعات التفاسير، الترجمات، ومحرك حساب مواقيت الصلاة) على مشروع [al_quran_v3](https://github.com/IsmailHosenIsmailJames/al_quran_v3) للمطور **Ismail Hosen** (بارك الله في جهده).
 
 ## ⚖️ الترخيص الوقفي (Charity & License)
 
