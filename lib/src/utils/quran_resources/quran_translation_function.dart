@@ -20,7 +20,56 @@ class QuranTranslationFunction {
   static const String selectedTranslationListKey = "selected_translation_list";
   static const String downloadedTranslationBooks =
       "downloaded_translation_books";
+  static const String downloadedTranslationOrderKey =
+      "downloaded_translation_order";
+  static const String downloadedTranslationSizeBytesKey =
+      "downloaded_translation_size_bytes";
   static final Map<String, int?> _remoteSizeBytesCache = {};
+
+  static List<String> getDownloadedTranslationOrderIds() {
+    final userBox = Hive.box("user");
+    final raw = userBox.get(downloadedTranslationOrderKey, defaultValue: []);
+    if (raw is List) {
+      return raw.map((e) => e.toString()).toList();
+    }
+    return const <String>[];
+  }
+
+  static Future<void> setDownloadedTranslationOrderIds(
+    List<String> ids,
+  ) async {
+    final userBox = Hive.box("user");
+    final seen = <String>{};
+    final deduped = <String>[];
+    for (final id in ids) {
+      if (seen.add(id)) deduped.add(id);
+    }
+    await userBox.put(downloadedTranslationOrderKey, deduped);
+  }
+
+  static int? getDownloadedTranslationSizeBytes(String id) {
+    final userBox = Hive.box("user");
+    final raw = userBox.get(downloadedTranslationSizeBytesKey);
+    if (raw is Map) {
+      final value = raw[id];
+      return value is int ? value : int.tryParse(value?.toString() ?? "");
+    }
+    return null;
+  }
+
+  static Future<void> setDownloadedTranslationSizeBytes(
+    String id,
+    int bytes,
+  ) async {
+    final userBox = Hive.box("user");
+    final raw = userBox.get(downloadedTranslationSizeBytesKey);
+    final map = <String, dynamic>{};
+    if (raw is Map) {
+      map.addAll(raw.map((k, v) => MapEntry(k.toString(), v)));
+    }
+    map[id] = bytes;
+    await userBox.put(downloadedTranslationSizeBytesKey, map);
+  }
 
   static List<TranslationBookModel> _dedupeBooks(
     Iterable<TranslationBookModel> books,
@@ -154,7 +203,7 @@ class QuranTranslationFunction {
   }
 
   static Future<void> setTranslationSelection(TranslationBookModel book) async {
-    cacheOfAyahKeys.clear();
+    clearTranslationCache();
     final userBox = Hive.box("user");
     List<TranslationBookModel> selectedTranslationList =
         (await getTranslationSelections()) ?? [];
@@ -171,7 +220,7 @@ class QuranTranslationFunction {
   static Future<void> removeTranslationSelection(
     TranslationBookModel book,
   ) async {
-    cacheOfAyahKeys.clear();
+    clearTranslationCache();
     final userBox = Hive.box("user");
     List<TranslationBookModel> selectedTranslationList =
         (await getTranslationSelections()) ?? [];
@@ -186,7 +235,7 @@ class QuranTranslationFunction {
   static Future<void> replaceTranslationSelections(
     List<TranslationBookModel> books,
   ) async {
-    cacheOfAyahKeys.clear();
+    clearTranslationCache();
     final userBox = Hive.box("user");
     final deduped = _dedupeBooks(books);
     await userBox.put(
@@ -324,6 +373,7 @@ class QuranTranslationFunction {
       }
     }
 
+    int? reportedTotalBytes;
     try {
       String base = ApisUrls.base;
       // Using fullPath from the model for the download URL
@@ -336,6 +386,7 @@ class QuranTranslationFunction {
         base + translationBook.fullPath,
         onReceiveProgress: (received, total) {
           if (total != -1) {
+            reportedTotalBytes = total;
             double progress = received / total;
             cubit.updateProgress(
               progress * 0.5,
@@ -375,6 +426,12 @@ class QuranTranslationFunction {
       await newTranslationBox.put("meta_data", translationBook.toMap());
 
       await setToListAlreadyDownloaded(translationBook);
+      if (reportedTotalBytes != null && reportedTotalBytes! > 0) {
+        await setDownloadedTranslationSizeBytes(
+          translationBook.fullPath,
+          reportedTotalBytes!,
+        );
+      }
       if (isSetupProcess) {
         await setTranslationSelection(translationBook);
       }
@@ -538,7 +595,7 @@ class QuranTranslationFunction {
   }
 
   static Future<void> close() async {
-    cacheOfAyahKeys.clear();
+    clearTranslationCache();
     List<TranslationBookModel> selectedBooks = getDownloadedTranslationBooks();
     selectedBooks.addAll(await getTranslationSelections() ?? []);
     for (TranslationBookModel bookModel in selectedBooks) {

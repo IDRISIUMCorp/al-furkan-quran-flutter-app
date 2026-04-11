@@ -281,22 +281,19 @@ class _CollectionContentViewState extends State<CollectionContentView> {
       return ListView.builder(
         itemCount: widget.pinnedCollectionModel!.pinned.length,
         itemBuilder: (context, index) {
-          final TranslationWithWordByWord? translationData =
-              getTranslationFromCache(
+          final translationData = getTranslationFromCache(
             widget.pinnedCollectionModel!.pinned[index].ayahKey,
           );
           return translationData != null
               ? getAyahByAyahCard(
-                  ayahKey:
-                      widget.pinnedCollectionModel!.pinned[index].ayahKey,
+                  ayahKey: widget.pinnedCollectionModel!.pinned[index].ayahKey,
                   context: context,
                   showFullKey: true,
-                  translationListWithInfo:
-                      translationData.translationList,
-                  wordByWord: translationData.wordByWord ?? [],
+                  translationListWithInfo: translationData,
+                  wordByWord: const [],
                 )
               : FutureBuilder(
-                  future: getTranslationWithWordByWord(
+                  future: getTranslation(
                     widget.pinnedCollectionModel!.pinned[index].ayahKey,
                   ),
                   builder: (context, asyncSnapshot) {
@@ -311,10 +308,8 @@ class _CollectionContentViewState extends State<CollectionContentView> {
                           .ayahKey,
                       context: context,
                       showFullKey: true,
-                      translationListWithInfo:
-                          asyncSnapshot.data?.translationList ?? [],
-                      wordByWord:
-                          asyncSnapshot.data?.wordByWord ?? [],
+                      translationListWithInfo: asyncSnapshot.data ?? const [],
+                      wordByWord: const [],
                     );
                   },
                 );

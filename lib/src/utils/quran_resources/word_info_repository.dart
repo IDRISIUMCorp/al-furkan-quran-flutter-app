@@ -37,6 +37,7 @@ class WordInfoRepository {
   WordInfoRepository();
 
   static const _downloadedKindsKey = 'word_info_downloaded_kinds';
+  static const _downloadedKindsOrderKey = 'word_info_downloaded_kinds_order';
 
   /// Download URLs and configs for each kind
   static const Map<WordInfoKind, _WordInfoKindConfig> _configs = {
@@ -96,6 +97,44 @@ class WordInfoRepository {
   /// Check if a kind is downloaded
   bool isKindDownloaded(WordInfoKind kind) {
     return _downloadedKinds().contains(kind.name);
+  }
+
+  List<String> getDownloadedOrderIds() {
+    if (!Hive.isBoxOpen('user')) return const <String>[];
+    final box = Hive.box('user');
+    final raw = box.get(_downloadedKindsOrderKey, defaultValue: []);
+    if (raw is List) {
+      return raw.map((e) => e.toString()).toList();
+    }
+    return const <String>[];
+  }
+
+  Future<void> setDownloadedOrderIds(List<String> ids) async {
+    if (!Hive.isBoxOpen('user')) await Hive.openBox('user');
+    final box = Hive.box('user');
+    final seen = <String>{};
+    final deduped = <String>[];
+    for (final id in ids) {
+      if (seen.add(id)) deduped.add(id);
+    }
+    await box.put(_downloadedKindsOrderKey, deduped);
+  }
+
+  Future<int?> getLocalKindSizeBytes(WordInfoKind kind) async {
+    try {
+      final dir = await _getKindDir(kind);
+      if (!await dir.exists()) return null;
+      int total = 0;
+      await for (final entity in dir.list(recursive: true, followLinks: false)) {
+        if (entity is File) {
+          final stat = await entity.stat();
+          total += stat.size;
+        }
+      }
+      return total;
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Download a specific kind
@@ -318,6 +357,16 @@ class WordInfoRepository {
     final set = _downloadedKinds();
     set.add(kind.name);
     box.put(_downloadedKindsKey, set.toList());
+
+    final orderRaw = box.get(_downloadedKindsOrderKey, defaultValue: []);
+    final order = <String>[];
+    if (orderRaw is List) {
+      order.addAll(orderRaw.map((e) => e.toString()));
+    }
+    if (!order.contains(kind.name)) {
+      order.add(kind.name);
+      box.put(_downloadedKindsOrderKey, order);
+    }
   }
 
   /// Clear cache for a kind
@@ -338,6 +387,13 @@ class WordInfoRepository {
       final set = _downloadedKinds();
       set.remove(kind.name);
       await box.put(_downloadedKindsKey, set.toList());
+
+      final orderRaw = box.get(_downloadedKindsOrderKey, defaultValue: []);
+      if (orderRaw is List) {
+        final order = orderRaw.map((e) => e.toString()).toList();
+        order.remove(kind.name);
+        await box.put(_downloadedKindsOrderKey, order);
+      }
       
       clearCache(kind);
       _filePathBySurahByKind[kind]?.clear();

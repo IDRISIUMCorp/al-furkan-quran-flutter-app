@@ -1285,8 +1285,8 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
     required int selectedWord,
     required bool isDark,
   }) {
-    return FutureBuilder<TranslationWithWordByWord>(
-      future: getTranslationWithWordByWord(ayahKey),
+    return FutureBuilder<List<TranslationOfAyah>>(
+      future: getTranslation(ayahKey),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const Padding(
@@ -1295,19 +1295,7 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
           );
         }
 
-        final data = snapshot.data;
-        final wordByWord = data?.wordByWord;
-        final translations =
-            data?.translationList ?? const <TranslationOfAyah>[];
-        final selectedIndex = selectedWord - 1;
-        final rawMeaning =
-            wordByWord != null &&
-                selectedIndex >= 0 &&
-                selectedIndex < wordByWord.length
-            ? wordByWord[selectedIndex]?.toString()
-            : null;
-        final meaning = _normalizeWhitespace(_stripHtml(rawMeaning));
-        final selectedWordLabel = _selectedWordLabel(context);
+        final translations = snapshot.data ?? const <TranslationOfAyah>[];
         final translationCards = translations
             .map((translation) {
               final text = _normalizeWhitespace(
@@ -1322,15 +1310,14 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
             .whereType<_TranslationCardData>()
             .toList();
 
-        if (meaning.isEmpty && translationCards.isEmpty) {
+        if (translationCards.isEmpty) {
           final themeState = context.read<ThemeCubit>().state;
           return Column(
             children: [
               _buildInlineMessage(
                 isDark: isDark,
                 icon: Icons.translate_rounded,
-                message:
-                    "لا توجد ترجمة كلمة بكلمة أو ترجمات مفعّلة حاليًا.",
+                message: "لا توجد ترجمات مفعّلة حاليًا.",
               ),
               SizedBox(height: 8.h),
               FilledButton.tonal(
@@ -1364,36 +1351,39 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (meaning.isNotEmpty)
-              Container(
+            ...translationCards.map(
+              (card) => Container(
+                margin: EdgeInsets.only(bottom: 10.h),
                 padding: EdgeInsets.all(14.w),
                 decoration: BoxDecoration(
                   color: isDark
                       ? Colors.white.withValues(alpha: 0.03)
                       : Colors.black.withValues(alpha: 0.025),
                   borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.white10
+                        : Colors.black.withValues(alpha: 0.04),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      selectedWordLabel.isEmpty
-                          ? "ترجمة الكلمة المختارة"
-                          : "ترجمة: $selectedWordLabel",
+                      card.title,
                       textAlign: TextAlign.right,
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 11.5.sp,
                         fontWeight: FontWeight.w700,
                         color: isDark ? Colors.white54 : Colors.black54,
                       ),
                     ),
-                    SizedBox(height: 10.h),
+                    SizedBox(height: 8.h),
                     _buildRichTextContent(
-                      meaning,
+                      card.text,
                       TextStyle(
-                        fontSize: 17.sp,
-                        height: 1.7,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 14.sp,
+                        height: 1.8,
                         color: isDark ? Colors.white : Colors.black87,
                       ),
                       Theme.of(context).primaryColor,
@@ -1401,61 +1391,7 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                   ],
                 ),
               ),
-            if (meaning.isNotEmpty && translationCards.isNotEmpty)
-              SizedBox(height: 12.h),
-            if (translationCards.isNotEmpty) ...[
-              Text(
-                "الترجمات المختارة للآية",
-                textAlign: TextAlign.right,
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white54 : Colors.black54,
-                ),
-              ),
-              SizedBox(height: 10.h),
-              ...translationCards.map(
-                (card) => Container(
-                  margin: EdgeInsets.only(bottom: 10.h),
-                  padding: EdgeInsets.all(14.w),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.03)
-                        : Colors.black.withValues(alpha: 0.025),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: isDark
-                          ? Colors.white10
-                          : Colors.black.withValues(alpha: 0.04),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        card.title,
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                          fontSize: 11.5.sp,
-                          fontWeight: FontWeight.w700,
-                          color: isDark ? Colors.white54 : Colors.black54,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      _buildRichTextContent(
-                        card.text,
-                        TextStyle(
-                          fontSize: 14.sp,
-                          height: 1.8,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
-                        Theme.of(context).primaryColor,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+            ),
           ],
         );
       },

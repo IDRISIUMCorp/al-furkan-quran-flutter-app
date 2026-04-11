@@ -19,6 +19,7 @@ class _TranslationResourcesViewState extends State<TranslationResourcesView> {
   List<TranslationBookModel> _allBooks = [];
   List<TranslationBookModel> _selectedBooks = [];
   List<TranslationBookModel> _downloadedBooks = [];
+  List<String> _downloadedOrderIds = const [];
 
   @override
   void initState() {
@@ -30,6 +31,7 @@ class _TranslationResourcesViewState extends State<TranslationResourcesView> {
     final selected =
         await QuranTranslationFunction.getTranslationSelections() ?? [];
     final downloaded = QuranTranslationFunction.getDownloadedTranslationBooks();
+    final orderIds = QuranTranslationFunction.getDownloadedTranslationOrderIds();
 
     final allBooks = <TranslationBookModel>[];
     translationResources.forEach((_, books) {
@@ -43,7 +45,15 @@ class _TranslationResourcesViewState extends State<TranslationResourcesView> {
       _allBooks = allBooks;
       _selectedBooks = selected;
       _downloadedBooks = downloaded;
+      _downloadedOrderIds = orderIds;
     });
+  }
+
+  Future<void> _saveDownloadedOrder(List<ManagedResourceItem> ordered) async {
+    await QuranTranslationFunction.setDownloadedTranslationOrderIds(
+      ordered.map((e) => e.id).toList(),
+    );
+    await _loadData();
   }
 
   bool _isSelected(TranslationBookModel book) {
@@ -146,6 +156,10 @@ class _TranslationResourcesViewState extends State<TranslationResourcesView> {
   }
 
   List<ManagedResourceItem> _buildItems(ResourcesProgressCubitState state) {
+    final orderMap = <String, int>{
+      for (int i = 0; i < _downloadedOrderIds.length; i++)
+        _downloadedOrderIds[i]: i,
+    };
     return _allBooks.map((book) {
       final downloaded = _isDownloaded(book);
       final busy = _isBookBusy(state, book);
@@ -164,6 +178,12 @@ class _TranslationResourcesViewState extends State<TranslationResourcesView> {
         isActive: _isSelected(book),
         isBusy: busy,
         progress: busy ? (state.percentage ?? 0.0).clamp(0.0, 1.0) : 0,
+        orderIndex: downloaded ? orderMap[book.fullPath] : null,
+        sizeBytes: downloaded
+            ? QuranTranslationFunction.getDownloadedTranslationSizeBytes(
+                book.fullPath,
+              )
+            : null,
         onLoadSize: downloaded
             ? null
             : () => QuranTranslationFunction.getRemoteBookSizeBytes(book),
@@ -198,6 +218,7 @@ class _TranslationResourcesViewState extends State<TranslationResourcesView> {
           onActivateAllDownloaded: _activateAllDownloaded,
           onClearActive: _clearActiveSelections,
           onDeleteMany: _deleteMany,
+          onReorderDownloaded: _saveDownloadedOrder,
         );
       },
     );

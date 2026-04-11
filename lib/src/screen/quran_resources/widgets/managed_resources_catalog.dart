@@ -20,6 +20,7 @@ class ManagedResourceItem {
   final bool isActive;
   final bool isBusy;
   final double progress;
+  final int? orderIndex;
   final int? sizeBytes;
   final Future<int?> Function()? onLoadSize;
   final int? transferredBytes;
@@ -38,6 +39,7 @@ class ManagedResourceItem {
     this.isActive = false,
     this.isBusy = false,
     this.progress = 0,
+    this.orderIndex,
     this.sizeBytes,
     this.onLoadSize,
     this.transferredBytes,
@@ -63,6 +65,8 @@ class ManagedResourcesCatalog extends StatefulWidget {
   final Future<void> Function()? onActivateAllDownloaded;
   final Future<void> Function()? onClearActive;
   final Future<void> Function(List<ManagedResourceItem> items)? onDeleteMany;
+  final Future<void> Function(List<ManagedResourceItem> orderedItems)?
+  onReorderDownloaded;
 
   const ManagedResourcesCatalog({
     super.key,
@@ -80,6 +84,7 @@ class ManagedResourcesCatalog extends StatefulWidget {
     this.onActivateAllDownloaded,
     this.onClearActive,
     this.onDeleteMany,
+    this.onReorderDownloaded,
   });
 
   @override
@@ -100,6 +105,29 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  bool get _reorderEnabled {
+    if (widget.onReorderDownloaded == null) return false;
+    if (_deleteMode) return false;
+    if (_filter != ResourceLibraryFilter.downloaded) return false;
+    final query = _searchController.text.trim();
+    if (query.isNotEmpty) return false;
+    if (_visibleItems.any((item) => item.isBusy)) return false;
+    return true;
+  }
+
+  List<ManagedResourceItem> get _downloadedFlatList {
+    final items = _visibleItems.where((item) => item.isDownloaded).toList();
+    items.sort((a, b) {
+      final ai = a.orderIndex;
+      final bi = b.orderIndex;
+      if (ai != null && bi != null) return ai.compareTo(bi);
+      if (ai != null && bi == null) return -1;
+      if (ai == null && bi != null) return 1;
+      return a.title.compareTo(b.title);
+    });
+    return items;
   }
 
   List<ManagedResourceItem> get _visibleItems {
@@ -143,6 +171,13 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
           a.isDownloaded ? 1 : 0,
         );
         if (downloadedCompare != 0) return downloadedCompare;
+        if (a.isDownloaded && b.isDownloaded) {
+          final ai = a.orderIndex;
+          final bi = b.orderIndex;
+          if (ai != null && bi != null) return ai.compareTo(bi);
+          if (ai != null && bi == null) return -1;
+          if (ai == null && bi != null) return 1;
+        }
         return a.title.compareTo(b.title);
       });
     }
@@ -167,8 +202,7 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
       item.sizeBytes ?? _resolvedSizeById[item.id];
 
   void _ensureSizeLoaded(ManagedResourceItem item) {
-    if (item.isDownloaded ||
-        item.onLoadSize == null ||
+    if (item.onLoadSize == null ||
         _loadingSizeIds.contains(item.id) ||
         _resolvedSizeById.containsKey(item.id)) {
       return;
@@ -296,6 +330,8 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
           SizedBox(height: 14.h),
           if (groupedItems.isEmpty)
             _buildEmptyState(isDark)
+          else if (_reorderEnabled)
+            _buildReorderList(themeState, isDark)
           else
             ...groupedItems.entries.map(
               (entry) => _buildGroupSection(
@@ -307,6 +343,31 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
             ),
         ],
       ),
+    );
+  }
+
+  Widget _buildReorderList(theme.ThemeState themeState, bool isDark) {
+    final items = _downloadedFlatList;
+    return ReorderableListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: items.length,
+      onReorder: (oldIndex, newIndex) async {
+        final current = List<ManagedResourceItem>.from(items);
+        if (newIndex > oldIndex) newIndex -= 1;
+        final moved = current.removeAt(oldIndex);
+        current.insert(newIndex, moved);
+        await widget.onReorderDownloaded?.call(current);
+        if (mounted) setState(() {});
+      },
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return Padding(
+          key: ValueKey<String>("reorder-${item.id}"),
+          padding: EdgeInsets.only(bottom: 12.h),
+          child: _buildItemCard(item, themeState, isDark),
+        );
+      },
     );
   }
 
@@ -652,16 +713,30 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
     final cardColor = isDark ? const Color(0xFF171717) : Colors.white;
     final marked = _markedForDeletion.contains(item.id);
 
-    return InkWell(
-      onTap: _deleteMode && item.isDownloaded
-          ? () => _toggleMarkedItem(item.id)
-          : null,
-      borderRadius: BorderRadius.circular(22),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        margin: EdgeInsets.only(bottom: 12.h),
-        padding: EdgeInsets.all(14.w),
-        decoration: BoxDecoration(
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 220),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, animation) {
+        final slide = Tween<Offset>(
+          begin: const Offset(0, 0.06),
+          end: Offset.zero,
+        ).animate(animation);
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(position: slide, child: child),
+        );
+      },
+      child: InkWell(
+        key: ValueKey<String>("card-${item.id}-${item.isDownloaded}-${item.isBusy}-${item.isActive}"),
+        onTap: _deleteMode && item.isDownloaded
+            ? () => _toggleMarkedItem(item.id)
+            : null,
+        borderRadius: BorderRadius.circular(22),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: EdgeInsets.all(14.w),
+          decoration: BoxDecoration(
           color: cardColor,
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
@@ -684,7 +759,7 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
             ),
           ],
         ),
-        child: Column(
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
@@ -712,8 +787,7 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
                           color: isDark ? Colors.white : Colors.black87,
                         ),
                       ),
-                      if (!item.isDownloaded &&
-                          !_deleteMode &&
+                      if (!_deleteMode &&
                           (_resolvedSizeBytes(item) != null ||
                               _loadingSizeIds.contains(item.id))) ...[
                         SizedBox(height: 8.h),
@@ -732,7 +806,9 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
                                   ),
                                 )
                               : Text(
-                                  "الحجم التقريبي: ${_formatBytes(_resolvedSizeBytes(item))}",
+                                  item.isDownloaded
+                                      ? "الحجم على الجهاز: ${_formatBytes(_resolvedSizeBytes(item))}"
+                                      : "الحجم التقريبي: ${_formatBytes(_resolvedSizeBytes(item))}",
                                   key: ValueKey<String>("size-${item.id}"),
                                   style: TextStyle(
                                     fontSize: 10.5.sp,
@@ -810,7 +886,8 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildTrailingAction(

@@ -16,11 +16,27 @@ class WordInfoResourcesView extends StatefulWidget {
 class _WordInfoResourcesViewState extends State<WordInfoResourcesView> {
   final WordInfoRepository _wordInfoRepo = WordInfoRepository();
   final Map<WordInfoKind, int?> _sizes = {};
+  List<String> _downloadedOrderIds = const [];
 
   @override
   void initState() {
     super.initState();
     _loadSizes();
+    _loadOrder();
+  }
+
+  void _loadOrder() {
+    _downloadedOrderIds = _wordInfoRepo.getDownloadedOrderIds();
+  }
+
+  Future<void> _saveDownloadedOrder(List<ManagedResourceItem> ordered) async {
+    await _wordInfoRepo.setDownloadedOrderIds(
+      ordered.map((e) => e.id).toList(),
+    );
+    if (!mounted) return;
+    setState(() {
+      _downloadedOrderIds = _wordInfoRepo.getDownloadedOrderIds();
+    });
   }
 
   Future<void> _loadSizes() async {
@@ -148,6 +164,10 @@ class _WordInfoResourcesViewState extends State<WordInfoResourcesView> {
   }
 
   List<ManagedResourceItem> _buildItems(ResourcesProgressCubitState state) {
+    final orderMap = <String, int>{
+      for (int i = 0; i < _downloadedOrderIds.length; i++)
+        _downloadedOrderIds[i]: i,
+    };
     return WordInfoKind.values.map((kind) {
       final downloaded = _wordInfoRepo.isKindDownloaded(kind);
       final busy = _isBusy(state, kind);
@@ -160,7 +180,9 @@ class _WordInfoResourcesViewState extends State<WordInfoResourcesView> {
         isDownloaded: downloaded,
         isBusy: busy,
         progress: busy ? (state.percentage ?? 0.0) : 0,
-        sizeBytes: _sizes[kind],
+        orderIndex: downloaded ? orderMap[kind.name] : null,
+        sizeBytes: downloaded ? null : _sizes[kind],
+        onLoadSize: downloaded ? () => _wordInfoRepo.getLocalKindSizeBytes(kind) : null,
         transferredBytes: busy ? state.transferredBytes : null,
         totalBytes: busy ? state.totalBytes : null,
         onDownload: downloaded ? null : () => _downloadKind(kind),
@@ -187,6 +209,7 @@ class _WordInfoResourcesViewState extends State<WordInfoResourcesView> {
           items: _buildItems(state),
           onRefresh: () async => setState(() {}),
           onDeleteMany: _deleteMany,
+          onReorderDownloaded: _saveDownloadedOrder,
         );
       },
     );

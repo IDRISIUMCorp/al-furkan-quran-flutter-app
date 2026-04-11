@@ -19,7 +19,50 @@ import "../get_tafsir_from_db.dart";
 class QuranTafsirFunction {
   static const String selectedTafsirListKey = "selected_tafsir_list";
   static const String downloadedTafsirBooksKey = "downloaded_tafsir_books";
+  static const String downloadedTafsirOrderKey = "downloaded_tafsir_order";
+  static const String downloadedTafsirSizeBytesKey =
+      "downloaded_tafsir_size_bytes";
   static final Map<String, int?> _remoteSizeBytesCache = {};
+
+  static List<String> getDownloadedTafsirOrderIds() {
+    final userBox = Hive.box("user");
+    final raw = userBox.get(downloadedTafsirOrderKey, defaultValue: []);
+    if (raw is List) {
+      return raw.map((e) => e.toString()).toList();
+    }
+    return const <String>[];
+  }
+
+  static Future<void> setDownloadedTafsirOrderIds(List<String> ids) async {
+    final userBox = Hive.box("user");
+    final seen = <String>{};
+    final deduped = <String>[];
+    for (final id in ids) {
+      if (seen.add(id)) deduped.add(id);
+    }
+    await userBox.put(downloadedTafsirOrderKey, deduped);
+  }
+
+  static int? getDownloadedTafsirSizeBytes(String id) {
+    final userBox = Hive.box("user");
+    final raw = userBox.get(downloadedTafsirSizeBytesKey);
+    if (raw is Map) {
+      final value = raw[id];
+      return value is int ? value : int.tryParse(value?.toString() ?? "");
+    }
+    return null;
+  }
+
+  static Future<void> setDownloadedTafsirSizeBytes(String id, int bytes) async {
+    final userBox = Hive.box("user");
+    final raw = userBox.get(downloadedTafsirSizeBytesKey);
+    final map = <String, dynamic>{};
+    if (raw is Map) {
+      map.addAll(raw.map((k, v) => MapEntry(k.toString(), v)));
+    }
+    map[id] = bytes;
+    await userBox.put(downloadedTafsirSizeBytesKey, map);
+  }
 
   static bool _isBundled(TafsirBookModel book) {
     return book.fullPath.startsWith("bundled/");
@@ -454,6 +497,7 @@ class QuranTafsirFunction {
       }
     }
 
+    int? reportedTotalBytes;
     try {
       String base = ApisUrls.base;
       cubit.updateProgress(
@@ -465,6 +509,7 @@ class QuranTafsirFunction {
         base + tafsirBook.fullPath,
         onReceiveProgress: (received, total) {
           if (total != -1) {
+            reportedTotalBytes = total;
             double progress = received / total;
             cubit.updateProgress(
               progress * 0.5,
@@ -504,6 +549,9 @@ class QuranTafsirFunction {
       await tafsirBox.put("meta_data", tafsirBook.toMap());
 
       await setToListAlreadyDownloaded(tafsirBook: tafsirBook);
+      if (reportedTotalBytes != null && reportedTotalBytes! > 0) {
+        await setDownloadedTafsirSizeBytes(tafsirBook.fullPath, reportedTotalBytes!);
+      }
       if (isSetupProcess) {
         await setTafsirSelection(tafsirBook);
       }

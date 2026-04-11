@@ -17,8 +17,7 @@ BlocBuilder<QuranViewCubit, QuranViewState> getAyahPreviewWidget({
 }) {
   return BlocBuilder<QuranViewCubit, QuranViewState>(
     builder: (context, quranViewState) {
-      final TranslationWithWordByWord? translationWithWordByWord =
-          getTranslationFromCache(quranViewState.ayahKey);
+      final translationData = getTranslationFromCache(quranViewState.ayahKey);
       return Column(
         children: [
           if (!(showHeaderOptions == false))
@@ -58,19 +57,18 @@ BlocBuilder<QuranViewCubit, QuranViewState> getAyahPreviewWidget({
               ],
             ),
 
-          translationWithWordByWord != null
+          translationData != null
               ? getAyahByAyahCard(
                 ayahKey: quranViewState.ayahKey,
                 context: context,
                 showTopOptions: showHeaderOptions,
                 keepMargin: false,
                 showOnlyAyah: showOnlyAyah,
-                translationListWithInfo:
-                    translationWithWordByWord.translationList,
-                wordByWord: translationWithWordByWord.wordByWord ?? [],
+                translationListWithInfo: translationData,
+                wordByWord: const [],
               )
               : FutureBuilder(
-                future: getTranslationWithWordByWord(quranViewState.ayahKey),
+                future: getTranslation(quranViewState.ayahKey),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState != ConnectionState.done) {
                     return const SizedBox(height: 250);
@@ -81,9 +79,8 @@ BlocBuilder<QuranViewCubit, QuranViewState> getAyahPreviewWidget({
                     showTopOptions: showHeaderOptions,
                     keepMargin: false,
                     showOnlyAyah: showOnlyAyah,
-                    translationListWithInfo:
-                        snapshot.data?.translationList ?? [],
-                    wordByWord: snapshot.data?.wordByWord ?? [],
+                    translationListWithInfo: snapshot.data ?? const [],
+                    wordByWord: const [],
                   );
                 },
               ),

@@ -19,6 +19,7 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
   List<TafsirBookModel> _allBooks = [];
   List<TafsirBookModel> _selectedBooks = [];
   List<TafsirBookModel> _downloadedBooks = [];
+  List<String> _downloadedOrderIds = const [];
 
   @override
   void initState() {
@@ -32,6 +33,7 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
   Future<void> _loadData() async {
     final selected = await QuranTafsirFunction.getTafsirSelections() ?? [];
     final downloaded = QuranTafsirFunction.getDownloadedTafsirBooks();
+    final orderIds = QuranTafsirFunction.getDownloadedTafsirOrderIds();
 
     final allBooks = <TafsirBookModel>[];
     tafsirInformationWithScore.forEach((_, books) {
@@ -50,7 +52,15 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
       _allBooks = allBooks;
       _selectedBooks = selected;
       _downloadedBooks = downloaded;
+      _downloadedOrderIds = orderIds;
     });
+  }
+
+  Future<void> _saveDownloadedOrder(List<ManagedResourceItem> ordered) async {
+    await QuranTafsirFunction.setDownloadedTafsirOrderIds(
+      ordered.map((e) => e.id).toList(),
+    );
+    await _loadData();
   }
 
   bool _isSelected(TafsirBookModel book) {
@@ -134,6 +144,10 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
   }
 
   List<ManagedResourceItem> _buildItems(ResourcesProgressCubitState state) {
+    final orderMap = <String, int>{
+      for (int i = 0; i < _downloadedOrderIds.length; i++)
+        _downloadedOrderIds[i]: i,
+    };
     return _allBooks.map((book) {
       final downloaded = _isDownloaded(book);
       final busy = _isBookBusy(state, book);
@@ -152,6 +166,10 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
         isActive: _isSelected(book),
         isBusy: busy,
         progress: busy ? (state.percentage ?? 0.0).clamp(0.0, 1.0) : 0,
+        orderIndex: downloaded ? orderMap[book.fullPath] : null,
+        sizeBytes: downloaded
+            ? QuranTafsirFunction.getDownloadedTafsirSizeBytes(book.fullPath)
+            : null,
         onLoadSize: downloaded
             ? null
             : () => QuranTafsirFunction.getRemoteBookSizeBytes(book),
@@ -186,6 +204,7 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
           onActivateAllDownloaded: _activateAllDownloaded,
           onClearActive: _clearActiveSelections,
           onDeleteMany: _deleteMany,
+          onReorderDownloaded: _saveDownloadedOrder,
         );
       },
     );
