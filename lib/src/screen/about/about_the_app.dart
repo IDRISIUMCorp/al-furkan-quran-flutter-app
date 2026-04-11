@@ -354,7 +354,7 @@ class _AboutAppPageState extends State<AboutAppPage> {
                     const Gap(16),
                     _buildFeatureCategory(
                       icon: Icons.library_books_rounded,
-                      title: "المكتبة والتفاسير",
+                      title: "الموارد والتفاسير",
                       items: [
                         "متعدد التفاسير (الميسر، ابن كثير للمختصين)",
                         "إعراب وصرف متكامل للآيات",

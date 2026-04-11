@@ -316,7 +316,7 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
         physics: const BouncingScrollPhysics(
           parent: AlwaysScrollableScrollPhysics(),
         ),
-        padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 100.h),
+        padding: EdgeInsets.fromLTRB(16.w, 26.h, 16.w, 100.h),
         children: [
           _buildSearchField(isDark),
           SizedBox(height: 12.h),
