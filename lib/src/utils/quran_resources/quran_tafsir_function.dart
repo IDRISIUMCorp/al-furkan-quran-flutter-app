@@ -317,14 +317,19 @@ class QuranTafsirFunction {
     });
 
     if (changed) {
+      // Filter out bundled tafsir before saving to DB
+      final toSave = downloadedBooks.where((b) => !_isBundled(b)).toList();
       await userBox.put(
         downloadedTafsirBooksKey,
-        downloadedBooks.map((e) => e.toMap()).toList(),
+        toSave.map((e) => e.toMap()).toList(),
       );
     }
 
     final tafsirBoxName = getTafsirBoxName(tafsirBook: tafsirBook);
     if (await Hive.boxExists(tafsirBoxName)) {
+      if (Hive.isBoxOpen(tafsirBoxName)) {
+        await Hive.lazyBox(tafsirBoxName).close();
+      }
       await Hive.deleteBoxFromDisk(tafsirBoxName);
       log(
         "Deleted Tafsir box: $tafsirBoxName",

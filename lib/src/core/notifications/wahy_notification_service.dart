@@ -156,6 +156,11 @@ class WahyNotificationService {
     if (key == kActionOpenMushaf) {
       // Will be handled by the app navigation when foregrounded
       debugPrint("[WahyNotif] Action: Open Mushaf");
+    } else if (key == "SUNNAH_WUDU" || key == "SUNNAH_PRAYER") {
+      // Handled by the app when foregrounded. We can save a flag to open the page.
+      final box = await Hive.openBox("user");
+      await box.put("pending_sunnah_page", key);
+      debugPrint("[WahyNotif] Action: Open Sunnah Page $key");
     } else if (key == kActionSnooze) {
       // Re-schedule same notification 30 minutes later
       await AwesomeNotifications().createNotification(
@@ -495,17 +500,28 @@ class WahyNotificationService {
           category: NotificationCategory.Reminder,
         ),
         schedule: NotificationCalendar.fromDate(date: scheduled),
-        actionButtons: [
-          NotificationActionButton(
-            key: kActionOpenMushaf,
-            label: "افتح التطبيق",
-          ),
-          NotificationActionButton(
-            key: kActionSnooze,
-            label: "تأجيل 30 دقيقة",
-            actionType: ActionType.SilentBackgroundAction,
-          ),
-        ],
+        actionButtons: prayer == Prayer.fajr
+            ? [
+                NotificationActionButton(
+                  key: "SUNNAH_WUDU",
+                  label: "سنن الوضوء",
+                ),
+                NotificationActionButton(
+                  key: "SUNNAH_PRAYER",
+                  label: "سنن الصلاة",
+                ),
+              ]
+            : [
+                NotificationActionButton(
+                  key: kActionOpenMushaf,
+                  label: "افتح التطبيق",
+                ),
+                NotificationActionButton(
+                  key: kActionSnooze,
+                  label: "تأجيل 30 دقيقة",
+                  actionType: ActionType.SilentBackgroundAction,
+                ),
+              ],
       );
     }
 

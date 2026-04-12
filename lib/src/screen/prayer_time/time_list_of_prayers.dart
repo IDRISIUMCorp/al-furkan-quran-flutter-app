@@ -1,6 +1,7 @@
 import "dart:async";
 
 import "package:adhan_dart/adhan_dart.dart" hide Prayer;
+import "package:adhan_dart/adhan_dart.dart" as adhan;
 import "package:al_quran_v3/l10n/app_localizations.dart";
 import "package:al_quran_v3/src/core/notifications/wahy_notification_service.dart";
 import "package:al_quran_v3/src/screen/location_handler/cubit/location_data_qibla_data_cubit.dart";
@@ -24,6 +25,10 @@ import "package:gap/gap.dart";
 import "package:google_fonts/google_fonts.dart";
 import "package:permission_handler/permission_handler.dart";
 import "package:url_launcher/url_launcher.dart";
+
+import "package:hive_ce_flutter/hive_flutter.dart";
+import "sunnah_wudu_page.dart";
+import "sunnah_prayer_page.dart";
 
 class TimeListOfPrayers extends StatefulWidget {
   const TimeListOfPrayers({super.key});
@@ -52,14 +57,57 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
   int _leadMinutes = 0;
   Set<Prayer> _selectedAlerts = _prayers.toSet();
   String? _scheduleSignature;
+  Map<Prayer, int> _adjustments = {
+    Prayer.fajr: 0,
+    Prayer.dhuhr: 0,
+    Prayer.asr: 0,
+    Prayer.maghrib: 0,
+    Prayer.isha: 0,
+  };
+  Map<Prayer, int> _iqamahTimes = {
+    Prayer.fajr: 20,
+    Prayer.dhuhr: 15,
+    Prayer.asr: 15,
+    Prayer.maghrib: 10,
+    Prayer.isha: 20,
+  };
 
   @override
   void initState() {
     super.initState();
+    _loadAdjustments();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() => _now = DateTime.now());
     });
     _restoreNotifications();
+  }
+
+  void _loadAdjustments() {
+    final box = Hive.box("user");
+    final adj = box.get("prayer_adjustments");
+    if (adj is Map) {
+      _adjustments = {
+        for (final p in _prayers) p: (adj[p.name] as int?) ?? 0,
+      };
+    }
+    final iqamah = box.get("iqamah_times");
+    if (iqamah is Map) {
+      _iqamahTimes = {
+        for (final p in _prayers) p: (iqamah[p.name] as int?) ?? _iqamahTimes[p]!,
+      };
+    }
+  }
+
+  Future<void> _saveAdjustments() async {
+    final box = Hive.box("user");
+    await box.put(
+      "prayer_adjustments",
+      {for (final p in _prayers) p.name: _adjustments[p]},
+    );
+    await box.put(
+      "iqamah_times",
+      {for (final p in _prayers) p.name: _iqamahTimes[p]},
+    );
   }
 
   Future<void> _restoreNotifications() async {
@@ -98,6 +146,11 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
         state.calculationMethod?.method ?? CalculationMethod.egyptian;
     final params = getCalculationParameters(fromLibraryEnum(method));
     params.madhab = state.madhab ?? Madhab.shafi;
+    params.adjustments[adhan.Prayer.fajr] = _adjustments[Prayer.fajr] ?? 0;
+    params.adjustments[adhan.Prayer.dhuhr] = _adjustments[Prayer.dhuhr] ?? 0;
+    params.adjustments[adhan.Prayer.asr] = _adjustments[Prayer.asr] ?? 0;
+    params.adjustments[adhan.Prayer.maghrib] = _adjustments[Prayer.maghrib] ?? 0;
+    params.adjustments[adhan.Prayer.isha] = _adjustments[Prayer.isha] ?? 0;
     return params;
   }
 
@@ -668,7 +721,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            "جدول الصلوات",
+            "جدول الصلوات والتعديلات",
             textAlign: TextAlign.right,
             style: _titleStyle(isDark),
           ),
@@ -681,6 +734,10 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                 : isNext
                 ? const Color(0xFFC6922D)
                 : (isDark ? Colors.white24 : Colors.black26);
+            
+            final time = _timeOf(today, prayer);
+            final iqamahTime = time.add(Duration(minutes: _iqamahTimes[prayer] ?? 0));
+            
             return Container(
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(14),
@@ -691,59 +748,133 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(color: activeColor.withValues(alpha: 0.22)),
               ),
-              child: Row(
+              child: Column(
                 children: [
-                  Icon(
-                    _selectedAlerts.contains(prayer)
-                        ? Icons.notifications_active_rounded
-                        : Icons.notifications_none_rounded,
-                    color: _selectedAlerts.contains(prayer)
-                        ? themeState.primary
-                        : activeColor,
+                  Row(
+                    children: [
+                      Icon(
+                        _selectedAlerts.contains(prayer)
+                            ? Icons.notifications_active_rounded
+                            : Icons.notifications_none_rounded,
+                        color: _selectedAlerts.contains(prayer)
+                            ? themeState.primary
+                            : activeColor,
+                      ),
+                      const Gap(12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              PrayerTimeHelper.localizedPrayerName(
+                                    context,
+                                    prayer,
+                                  ) ??
+                                  "-",
+                              textAlign: TextAlign.right,
+                              style: _titleStyle(isDark),
+                            ),
+                            const Gap(4),
+                            Text(
+                              isCurrent
+                                  ? "الوقت الحالي"
+                                  : isNext
+                                  ? "القادمة"
+                                  : "موعد اليوم",
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: activeColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Gap(12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            formatTimeOfDay(
+                              context,
+                              TimeOfDay.fromDateTime(time),
+                            ),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                          if (_iqamahTimes[prayer] != null && _iqamahTimes[prayer]! > 0)
+                            Text(
+                              "الإقامة: ${formatTimeOfDay(context, TimeOfDay.fromDateTime(iqamahTime))}",
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? Colors.white54 : Colors.black54,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
                   ),
                   const Gap(12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          PrayerTimeHelper.localizedPrayerName(
-                                context,
-                                prayer,
-                              ) ??
-                              "-",
-                          textAlign: TextAlign.right,
-                          style: _titleStyle(isDark),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _actionPill(
+                          icon: Icons.edit_notifications_rounded,
+                          label: "تعديل الأذان",
+                          color: themeState.primary,
+                          onTap: () => _editPrayerAdjustment(prayer, isDark, themeState),
                         ),
-                        const Gap(4),
-                        Text(
-                          isCurrent
-                              ? "الوقت الحالي"
-                              : isNext
-                              ? "القادمة"
-                              : "موعد اليوم",
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: activeColor,
+                      ),
+                      const Gap(8),
+                      Expanded(
+                        child: _actionPill(
+                          icon: Icons.timer_rounded,
+                          label: "وقت الإقامة",
+                          color: themeState.primary,
+                          onTap: () => _editIqamahTime(prayer, isDark, themeState),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (prayer == Prayer.fajr) ...[
+                    const Gap(8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _actionPill(
+                            icon: Icons.menu_book_rounded,
+                            label: "سنن الوضوء",
+                            color: const Color(0xFF0F766E),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const SunnahWuduPage()),
+                               );
+                             },
+                           ),
+                         ),
+                         const Gap(8),
+                         Expanded(
+                           child: _actionPill(
+                             icon: Icons.book_rounded,
+                             label: "سنن الصلاة",
+                             color: const Color(0xFF0F766E),
+                             onTap: () {
+                               Navigator.push(
+                                 context,
+                                 MaterialPageRoute(builder: (_) => const SunnahPrayerPage()),
+                              );
+                            },
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  const Gap(12),
-                  Text(
-                    formatTimeOfDay(
-                      context,
-                      TimeOfDay.fromDateTime(_timeOf(today, prayer)),
-                    ),
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      color: isDark ? Colors.white : Colors.black87,
-                    ),
-                  ),
+                  ],
                 ],
               ),
             );
@@ -751,6 +882,111 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
         ],
       ),
     );
+  }
+
+  Future<void> _editPrayerAdjustment(Prayer prayer, bool isDark, ThemeState themeState) async {
+    int currentAdj = _adjustments[prayer] ?? 0;
+    final res = await showDialog<int>(
+      context: context,
+      builder: (ctx) {
+        int tempAdj = currentAdj;
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+              title: Text("تعديل وقت الأذان", textAlign: TextAlign.right, style: _titleStyle(isDark)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text("يمكنك تقديم أو تأخير الأذان بالدقائق ليتوافق مع المسجد.", textAlign: TextAlign.right, style: _mutedStyle(isDark)),
+                  const Gap(20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: () => setDialogState(() => tempAdj--),
+                        icon: const Icon(Icons.remove_circle_outline_rounded),
+                        color: themeState.primary,
+                      ),
+                      const Gap(12),
+                      Text("$tempAdj دقيقة", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                      const Gap(12),
+                      IconButton(
+                        onPressed: () => setDialogState(() => tempAdj++),
+                        icon: const Icon(Icons.add_circle_outline_rounded),
+                        color: themeState.primary,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("إلغاء")),
+                FilledButton(onPressed: () => Navigator.pop(ctx, tempAdj), child: const Text("حفظ")),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (res != null && res != currentAdj) {
+      setState(() => _adjustments[prayer] = res);
+      await _saveAdjustments();
+      _scheduleSignature = null;
+    }
+  }
+
+  Future<void> _editIqamahTime(Prayer prayer, bool isDark, ThemeState themeState) async {
+    int currentIqamah = _iqamahTimes[prayer] ?? 0;
+    final res = await showDialog<int>(
+      context: context,
+      builder: (ctx) {
+        int tempIqamah = currentIqamah;
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+              title: Text("وقت الإقامة", textAlign: TextAlign.right, style: _titleStyle(isDark)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text("كم دقيقة بين الأذان والإقامة؟", textAlign: TextAlign.right, style: _mutedStyle(isDark)),
+                  const Gap(20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: tempIqamah > 0 ? () => setDialogState(() => tempIqamah--) : null,
+                        icon: const Icon(Icons.remove_circle_outline_rounded),
+                        color: themeState.primary,
+                      ),
+                      const Gap(12),
+                      Text("$tempIqamah دقيقة", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                      const Gap(12),
+                      IconButton(
+                        onPressed: () => setDialogState(() => tempIqamah++),
+                        icon: const Icon(Icons.add_circle_outline_rounded),
+                        color: themeState.primary,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("إلغاء")),
+                FilledButton(onPressed: () => Navigator.pop(ctx, tempIqamah), child: const Text("حفظ")),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (res != null && res != currentIqamah) {
+      setState(() => _iqamahTimes[prayer] = res);
+      await _saveAdjustments();
+    }
   }
 
   Widget _buildForbiddenCard(

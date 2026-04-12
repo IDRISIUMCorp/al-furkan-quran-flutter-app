@@ -29,139 +29,189 @@ class _LocationAcquireState extends State<LocationAcquire> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final themeState = context.watch<ThemeCubit>().state;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      appBar: widget.backToPage ? AppBar() : null,
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
-          child: SafeArea(
-            child: SizedBox(
-              width: 500,
+      appBar: widget.backToPage ? AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+      ) : null,
+      backgroundColor: isDark ? const Color(0xFF111111) : const Color(0xFFF9F6F0),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    l10n.getPrayerTimesAndQibla,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: themeState.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.mosque_rounded,
+                      size: 80,
+                      color: themeState.primary,
                     ),
                   ),
-                  const Gap(10),
+                  const Gap(32),
                   Text(
-                    l10n.getPrayerTimesAndQiblaDescription,
+                    "مواقيت الصلاة واتجاه القبلة",
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.grey.shade500,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w900,
+                      color: isDark ? Colors.white : Colors.black87,
                     ),
                   ),
-
-                  const Gap(30),
-                  if (!(platformOwn == PlatformOwn.isLinux))
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: 50,
-                      child: OutlinedButton.icon(
-                        onPressed: () async {
-                          setState(() {
-                            isGPSLocationLoading = true;
-                          });
-                          try {
-                            bool isServiceAvailable =
-                                await Geolocator.isLocationServiceEnabled();
-                            if (!isServiceAvailable) {
-                              Fluttertoast.showToast(
-                                msg: l10n.pleaseEnableLocationService,
-                              );
-                              await Geolocator.openLocationSettings();
-                            }
-                            LocationPermission permission =
-                                await Geolocator.checkPermission();
-                            if (!(permission == LocationPermission.whileInUse ||
-                                permission == LocationPermission.always)) {
-                              permission = await Geolocator.requestPermission();
-                            }
-                            permission = await Geolocator.checkPermission();
-                            if (permission == LocationPermission.whileInUse ||
-                                permission == LocationPermission.always) {
-                              Position position =
-                                  await Geolocator.getCurrentPosition();
-                              context
-                                  .read<LocationQiblaPrayerDataCubit>()
-                                  .saveLocationData(
-                                    LatLon(
-                                      latitude: position.latitude,
-                                      longitude: position.longitude,
-                                    ),
-                                    save: !widget.backToPage,
-                                  );
-                              setState(() {
-                                isGPSLocationLoading = false;
-                              });
-                              if (widget.backToPage) {
-                                Navigator.pop(context);
-                              }
-                            }
-                          } catch (e) {
-                            log(e.toString());
-                          }
-                        },
-                        label: Text(l10n.getFromGPS),
-                        icon: isGPSLocationLoading
-                            ? Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(3.0),
-                                  child: CircularProgressIndicator(
-                                    backgroundColor: context
-                                        .read<ThemeCubit>()
-                                        .state
-                                        .primaryShade100,
-                                  ),
-                                ),
-                              )
-                            : const Icon(Icons.gps_fixed_rounded),
-                      ),
+                  const Gap(16),
+                  Text(
+                    "لتجربة متكاملة، يرجى تزويدنا بموقعك الجغرافي. سنقوم بحساب أوقات الصلاة بدقة فائقة وتحديد اتجاه القبلة لمكانك الحالي.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 15,
+                      height: 1.6,
+                      color: isDark ? Colors.white60 : Colors.black54,
                     ),
-                  if (!(platformOwn == PlatformOwn.isLinux)) const Gap(5),
+                  ),
+                  const Gap(40),
+                  
                   if (!(platformOwn == PlatformOwn.isLinux))
-                    Align(alignment: Alignment.center, child: Text(l10n.or)),
-                  const Gap(5),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: 50,
-                    child: OutlinedButton.icon(
+                    FilledButton.icon(
                       onPressed: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BlocProvider(
-                              create: (context) =>
-                                  ManualLocationSelectionCubit(),
-                              child: AddressSelection(
-                                backToPage: widget.backToPage,
-                              ),
-                            ),
-                          ),
-                        );
-                        if (widget.backToPage) {
-                          Navigator.pop(context);
+                        setState(() => isGPSLocationLoading = true);
+                        try {
+                          bool isServiceAvailable = await Geolocator.isLocationServiceEnabled();
+                          if (!isServiceAvailable) {
+                            Fluttertoast.showToast(msg: l10n.pleaseEnableLocationService);
+                            await Geolocator.openLocationSettings();
+                          }
+                          LocationPermission permission = await Geolocator.checkPermission();
+                          if (!(permission == LocationPermission.whileInUse || permission == LocationPermission.always)) {
+                            permission = await Geolocator.requestPermission();
+                          }
+                          if (permission == LocationPermission.whileInUse || permission == LocationPermission.always) {
+                            Position position = await Geolocator.getCurrentPosition();
+                            if (!mounted) return;
+                            context.read<LocationQiblaPrayerDataCubit>().saveLocationData(
+                              LatLon(latitude: position.latitude, longitude: position.longitude),
+                              save: !widget.backToPage,
+                            );
+                            if (widget.backToPage) Navigator.pop(context);
+                          }
+                        } catch (e) {
+                          log(e.toString());
+                        } finally {
+                          if (mounted) setState(() => isGPSLocationLoading = false);
                         }
                       },
-                      label: Text(l10n.selectYourCity),
-                      icon: const Icon(Icons.location_city_rounded),
-                    ),
-                  ),
-                  const Gap(20),
-                  if (!(platformOwn == PlatformOwn.isLinux))
-                    Text(
-                      l10n.noteAboutGPS,
-                      style: TextStyle(
-                        color: Colors.grey.shade500,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: themeState.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      icon: isGPSLocationLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Icon(Icons.my_location_rounded),
+                      label: Text(
+                        "تحديد الموقع تلقائياً",
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
+                    
+                  if (!(platformOwn == PlatformOwn.isLinux)) ...[
+                    const Gap(16),
+                    Row(
+                      children: [
+                        Expanded(child: Divider(color: isDark ? Colors.white10 : Colors.black12)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            "أو",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isDark ? Colors.white38 : Colors.black38,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Expanded(child: Divider(color: isDark ? Colors.white10 : Colors.black12)),
+                      ],
+                    ),
+                    const Gap(16),
+                  ],
+
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BlocProvider(
+                            create: (context) => ManualLocationSelectionCubit(),
+                            child: AddressSelection(backToPage: widget.backToPage),
+                          ),
+                        ),
+                      );
+                      if (widget.backToPage && mounted) {
+                        Navigator.pop(context);
+                      }
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: themeState.primary,
+                      side: BorderSide(color: themeState.primary.withValues(alpha: 0.5)),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    icon: const Icon(Icons.location_city_rounded),
+                    label: Text(
+                      "اختيار المدينة يدوياً",
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  
+                  const Gap(32),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.info_outline_rounded, color: themeState.primary, size: 20),
+                        const Gap(12),
+                        Expanded(
+                          child: Text(
+                            "نحتاج للموقع فقط لحساب المواقيت واتجاه القبلة، ولا يتم مشاركته مع أي جهة خارجية.",
+                            style: TextStyle(
+                              fontSize: 12,
+                              height: 1.5,
+                              color: isDark ? Colors.white60 : Colors.black54,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

@@ -273,7 +273,8 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
       surah.toString(),
       verse.toString(),
     );
-    return words.join(" ");
+    if (words.isNotEmpty) return words.join(" ");
+    return qcf.getVerse(surah, verse, verseEndSymbol: false);
   }
 
   String _formatAyahTextForSharing({
@@ -496,11 +497,16 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
       _ => "QPC_Hafs",
     };
 
-    final rawWords = QuranScriptFunction.getWordListOfAyah(
+    // If QuranScriptFunction is empty or not loaded, fallback to QCF.
+    List<String> rawWords = QuranScriptFunction.getWordListOfAyah(
       scriptType,
       widget.surahNumber.toString(),
       _currentVerse.toString(),
     );
+    if (rawWords.isEmpty) {
+      rawWords = qcf.getVerse(widget.surahNumber, _currentVerse, verseEndSymbol: false).split(" ").where((w) => w.trim().isNotEmpty).toList();
+    }
+    
     final words = <_QcfWord>[];
     int displayIndex = 0;
     for (int i = 0; i < rawWords.length; i++) {

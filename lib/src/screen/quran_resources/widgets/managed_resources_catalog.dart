@@ -318,6 +318,8 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
         ),
         padding: EdgeInsets.fromLTRB(16.w, 26.h, 16.w, 100.h),
         children: [
+          _buildHeroCard(themeState, isDark),
+          SizedBox(height: 16.h),
           _buildSearchField(isDark),
           SizedBox(height: 12.h),
           _buildFilters(themeState, isDark),

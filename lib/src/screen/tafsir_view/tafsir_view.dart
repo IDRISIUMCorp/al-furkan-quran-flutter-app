@@ -7,7 +7,9 @@ import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.da
 import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_state.dart";
 import "package:al_quran_v3/src/screen/surah_list_view/model/surah_info_model.dart";
 import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
+import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart";
 import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
+import "package:qcf_quran/qcf_quran.dart" as qcf;
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "dart:ui" as ui;
@@ -246,6 +248,7 @@ class _TafsirViewState extends State<TafsirView> {
   }
 
   Widget _sectionsBody() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return FutureBuilder<_TafsirSectionsData>(
       future: _sectionsFuture,
       builder: (context, snapshot) {
@@ -268,6 +271,49 @@ class _TafsirViewState extends State<TafsirView> {
         return ListView(
           padding: const EdgeInsets.fromLTRB(12, 6, 12, 12),
           children: [
+            // Display the Ayah text
+            Container(
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.06),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+                border: Border.all(color: context.read<ThemeCubit>().state.primaryShade100),
+              ),
+              padding: const EdgeInsets.all(16),
+              child: BlocBuilder<QuranViewCubit, QuranViewState>(
+                builder: (context, state) {
+                  final surah = int.parse(widget.ayahKey.split(":").first);
+                  final ayah = int.parse(widget.ayahKey.split(":").last);
+                  final words = QuranScriptFunction.getWordListOfAyah(
+                    state.quranScriptType,
+                    surah.toString(),
+                    ayah.toString(),
+                  );
+                  final text = words.isNotEmpty
+                      ? words.join(" ")
+                      : qcf.getVerse(surah, ayah, verseEndSymbol: false);
+
+                  return Text(
+                    text,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: "QPC_Hafs",
+                      fontSize: state.translationFontSize + 6,
+                      color: isDark ? Colors.white : Colors.black,
+                      height: 1.8,
+                    ),
+                  );
+                },
+              ),
+            ),
+            const Gap(12),
+
             if (data.surahNamingHtml != null && data.surahNamingHtml!.trim().isNotEmpty)
               _sectionCard(
                 title: "التفسير (العربية)",

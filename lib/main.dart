@@ -46,6 +46,9 @@ import "package:just_audio_background/just_audio_background.dart";
 import "package:just_audio_media_kit/just_audio_media_kit.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
+import "package:al_quran_v3/src/screen/prayer_time/sunnah_prayer_page.dart";
+import "package:al_quran_v3/src/screen/prayer_time/sunnah_wudu_page.dart";
+
 String? applicationDataPath;
 platform_services.PlatformOwn platformOwn = platform_services.getPlatform();
 
@@ -253,6 +256,9 @@ class _UsageTimeTrackerState extends State<_UsageTimeTracker>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _sessionStart = DateTime.now();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkPendingSunnahPage();
+    });
   }
 
   @override
@@ -266,6 +272,7 @@ class _UsageTimeTrackerState extends State<_UsageTimeTracker>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _sessionStart ??= DateTime.now();
+      _checkPendingSunnahPage();
       return;
     }
 
@@ -274,6 +281,29 @@ class _UsageTimeTrackerState extends State<_UsageTimeTracker>
         state == AppLifecycleState.detached) {
       _flush();
     }
+  }
+
+  Future<void> _checkPendingSunnahPage() async {
+    try {
+      final box = Hive.box(AppBoxes.user);
+      final pending = box.get("pending_sunnah_page") as String?;
+      if (pending != null && pending.isNotEmpty) {
+        await box.delete("pending_sunnah_page");
+        if (navigatorKey.currentContext != null) {
+          if (pending == "SUNNAH_WUDU") {
+            Navigator.push(
+              navigatorKey.currentContext!,
+              MaterialPageRoute(builder: (_) => const SunnahWuduPage()),
+            );
+          } else if (pending == "SUNNAH_PRAYER") {
+            Navigator.push(
+              navigatorKey.currentContext!,
+              MaterialPageRoute(builder: (_) => const SunnahPrayerPage()),
+            );
+          }
+        }
+      }
+    } catch (_) {}
   }
 
   void _flush() {

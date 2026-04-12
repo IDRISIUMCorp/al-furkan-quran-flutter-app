@@ -196,10 +196,6 @@ class QuranTranslationFunction {
       );
     }
     await removeTranslationSelection(bookToRemove);
-    await Hive.box("user").put(
-      downloadedTranslationBooks,
-      downloaded.map((e) => e.toMap()).toList(),
-    );
   }
 
   static Future<void> setTranslationSelection(TranslationBookModel book) async {
