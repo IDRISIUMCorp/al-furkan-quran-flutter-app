@@ -2,7 +2,7 @@
 
 # 📖 Al-Furkan — الفُرقان
 
-**Al-Furkan is one of the most advanced open-source Quran apps built with Flutter.**
+**Al-Furkan is A modern, full-featured open-source Quran app built with Flutter.**
 
 > A full-featured, production-ready Islamic app — not just a demo.
 
