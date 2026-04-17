@@ -1,7 +1,7 @@
 import 'dart:ui' as ui;
-import 'package:al_quran_v3/l10n/app_localizations.dart';
-import 'package:al_quran_v3/src/theme/controller/theme_cubit.dart';
-import 'package:al_quran_v3/src/theme/controller/theme_state.dart';
+import 'package:al_furkan/l10n/app_localizations.dart';
+import 'package:al_furkan/src/theme/controller/theme_cubit.dart';
+import 'package:al_furkan/src/theme/controller/theme_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -45,7 +45,7 @@ class _AboutAppPageState extends State<AboutAppPage> {
     final primary = themeState.primary;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFF9F6F0),
+      backgroundColor: isDark ? Theme.of(context).colorScheme.surface : const Color(0xFFF9F6F0),
       body: Stack(
         children: [
           // ── Premium Animated Background ──

@@ -71,6 +71,10 @@ Map<String, String> languageToCodeMap = {
   "swedish": "sv",
   "maranao": "mrn",
   "arabic": "ar",
+  "greek": "el",
+  "latvian": "lv",
+  "estonian": "et",
+  "punjabi": "pa",
 };
 
 Map<String, String> codeToLanguageMap = {
@@ -146,6 +150,10 @@ Map<String, String> codeToLanguageMap = {
   "sv": "swedish",
   "mrn": "maranao",
   "ar": "arabic",
+  "el": "greek",
+  "lv": "latvian",
+  "et": "estonian",
+  "pa": "punjabi",
 };
 
 Map<String, String> languageNativeNames = {
@@ -221,4 +229,8 @@ Map<String, String> languageNativeNames = {
   "swedish": "Svenska",
   "maranao": "Maranao",
   "arabic": "العربية",
+  "greek": "Ελληνικά",
+  "latvian": "Latviešu",
+  "estonian": "Eesti",
+  "punjabi": "ਪੰਜਾਬੀ",
 };

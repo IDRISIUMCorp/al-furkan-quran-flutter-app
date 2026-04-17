@@ -1,5 +1,5 @@
-import "package:al_quran_v3/src/core/audio/model/recitation_info_model.dart";
-import "package:al_quran_v3/src/core/audio/player/audio_player_manager.dart";
+import "package:al_furkan/src/core/audio/model/recitation_info_model.dart";
+import "package:al_furkan/src/core/audio/player/audio_player_manager.dart";
 import "package:just_audio/just_audio.dart";
 
 abstract class AudioPlaybackService {

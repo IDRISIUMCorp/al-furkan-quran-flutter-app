@@ -1,14 +1,14 @@
 import "dart:ui";
 
-import "package:al_quran_v3/l10n/app_localizations.dart";
-import "package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
-import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
-import "package:al_quran_v3/src/core/audio/model/recitation_info_model.dart";
-import "package:al_quran_v3/src/core/audio/services/audio_playback_service_access.dart";
-import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
-import "package:al_quran_v3/src/theme/values/values.dart";
-import "package:al_quran_v3/src/widget/audio/reciter_overview.dart";
-import "package:al_quran_v3/src/widget/theme/theme_icon_button.dart";
+import "package:al_furkan/l10n/app_localizations.dart";
+import "package:al_furkan/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
+import "package:al_furkan/src/core/audio/model/ayahkey_management.dart";
+import "package:al_furkan/src/core/audio/model/recitation_info_model.dart";
+import "package:al_furkan/src/core/audio/services/audio_playback_service_access.dart";
+import "package:al_furkan/src/theme/controller/theme_cubit.dart";
+import "package:al_furkan/src/theme/values/values.dart";
+import "package:al_furkan/src/widget/audio/reciter_overview.dart";
+import "package:al_furkan/src/widget/theme/theme_icon_button.dart";
 import "package:flutter/material.dart";
 import "package:flutter_animate/flutter_animate.dart";
 import "package:flutter_bloc/flutter_bloc.dart";

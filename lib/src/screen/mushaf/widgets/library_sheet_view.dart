@@ -1,22 +1,22 @@
-import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
-import "package:al_quran_v3/src/resources/quran_resources/quran_ayah_count.dart";
-import "package:al_quran_v3/src/resources/quran_resources/meaning_of_surah.dart";
-import "package:al_quran_v3/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
-import "package:al_quran_v3/src/core/unified_quran_settings/quran_settings_bottom_sheet.dart";
-import "package:al_quran_v3/src/screen/quran_resources/quran_resources_view.dart";
-import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.dart";
-import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
-import "package:al_quran_v3/src/theme/controller/theme_state.dart" as theme;
-import "package:al_quran_v3/src/utils/quran_ayahs_function/get_page_number.dart";
-import "package:al_quran_v3/src/utils/quran_resources/get_translation.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/word_info_models.dart";
-import "package:al_quran_v3/src/utils/quran_resources/word_info_repository.dart";
-import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
-import "package:al_quran_v3/src/widget/add_collection_popup/add_note_popup.dart";
-import "package:al_quran_v3/src/widget/add_collection_popup/add_to_pinned_popup.dart";
-import "package:al_quran_v3/src/widget/share/unified_share_bottom_sheet.dart";
+import "package:al_furkan/src/resources/quran_resources/models/tafsir_book_model.dart";
+import "package:al_furkan/src/resources/quran_resources/quran_ayah_count.dart";
+import "package:al_furkan/src/resources/quran_resources/meaning_of_surah.dart";
+import "package:al_furkan/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
+import "package:al_furkan/src/core/unified_quran_settings/quran_settings_bottom_sheet.dart";
+import "package:al_furkan/src/screen/quran_resources/quran_resources_view.dart";
+import "package:al_furkan/src/screen/settings/cubit/quran_script_view_cubit.dart";
+import "package:al_furkan/src/theme/controller/theme_cubit.dart";
+import "package:al_furkan/src/theme/controller/theme_state.dart" as theme;
+import "package:al_furkan/src/utils/quran_ayahs_function/get_page_number.dart";
+import "package:al_furkan/src/utils/quran_resources/get_translation.dart";
+import "package:al_furkan/src/utils/quran_resources/quran_script_function.dart";
+import "package:al_furkan/src/utils/quran_resources/quran_tafsir_function.dart";
+import "package:al_furkan/src/utils/quran_resources/word_info_models.dart";
+import "package:al_furkan/src/utils/quran_resources/word_info_repository.dart";
+import "package:al_furkan/src/widget/quran_script/model/script_info.dart";
+import "package:al_furkan/src/widget/add_collection_popup/add_note_popup.dart";
+import "package:al_furkan/src/widget/add_collection_popup/add_to_pinned_popup.dart";
+import "package:al_furkan/src/widget/share/unified_share_bottom_sheet.dart";
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import "dart:developer";
@@ -126,8 +126,9 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
     
     // Sometimes the Sajdah character is represented by a single special PUA char
     // that is standard across QCF for marks. But filtering ALL PUA will hide the ayah.
-    // Let's rely on the unicode pattern.
-    return _specialSymbolPattern.hasMatch(cleaned);
+    // Let's rely on the unicode pattern to check if the entire word is a special symbol.
+    final match = _specialSymbolPattern.firstMatch(cleaned);
+    return match != null && match.group(0) == cleaned;
   }
 
   List<String> _filterWordTexts(Iterable<String> rawWords) {
@@ -411,11 +412,7 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
   }
 
   String _tafsirDedupKey(TafsirBookModel book) {
-    final normalizedName = _normalizeWhitespace(book.name).toLowerCase();
-    final normalizedLanguage = _normalizeWhitespace(
-      book.language,
-    ).toLowerCase();
-    return "$normalizedLanguage::$normalizedName";
+    return book.fullPath;
   }
 
   int _tafsirPriority(_ResolvedTafsirCard card) {
@@ -732,7 +729,7 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w),
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 16.h),
+      padding: EdgeInsets.symmetric(vertical: 16.h),
       decoration: BoxDecoration(
         color: isDark
             ? Colors.white.withValues(alpha: 0.025)
@@ -753,52 +750,49 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
                 ),
               ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            reverse: true,
-            physics: const BouncingScrollPhysics(),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (int i = 0; i < words.length; i++)
-                  _buildWordItem(
-                        wordNumber: words[i].displayIndex,
-                        word: words[i].text,
-                        plainWord: i < plainWords.length ? plainWords[i] : null,
-                        font: pageFont,
-                        isDark: isDark,
-                        themeState: themeState,
-                      )
-                      .animate(delay: Duration(milliseconds: 25 * i))
-                      .fadeIn(duration: 350.ms, curve: Curves.easeOutCubic)
-                      .slideX(begin: 0.08, end: 0, duration: 350.ms, curve: Curves.easeOutCubic)
-                      .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1), duration: 350.ms, curve: Curves.easeOutBack),
-                SizedBox(width: 8.w),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.03)
-                        : Colors.white.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Text(
-                    ayahNumberWord,
-                    style: TextStyle(
-                      fontFamily: pageFont,
-                      fontSize: 27.sp,
-                      height: 1,
-                      color: isDark ? Colors.white54 : Colors.black45,
-                    ),
-                  ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        reverse: true, // لتبدأ من اليمين لليسار
+        physics: const BouncingScrollPhysics(),
+        padding: EdgeInsets.symmetric(horizontal: 12.w),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          textDirection: TextDirection.rtl,
+          children: [
+            for (int i = 0; i < words.length; i++)
+              _buildWordItem(
+                    wordNumber: words[i].displayIndex,
+                    word: words[i].text,
+                    plainWord: i < plainWords.length ? plainWords[i] : null,
+                    font: pageFont,
+                    isDark: isDark,
+                    themeState: themeState,
+                  )
+                  .animate(delay: Duration(milliseconds: 25 * i))
+                  .fadeIn(duration: 350.ms, curve: Curves.easeOutCubic)
+                  .slideX(begin: 0.08, end: 0, duration: 350.ms, curve: Curves.easeOutCubic)
+                  .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1), duration: 350.ms, curve: Curves.easeOutBack),
+            SizedBox(width: 8.w),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.03)
+                    : Colors.white.withValues(alpha: 0.7),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text(
+                ayahNumberWord,
+                style: TextStyle(
+                  fontFamily: pageFont,
+                  fontSize: 27.sp,
+                  height: 1,
+                  color: isDark ? Colors.white54 : Colors.black45,
                 ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

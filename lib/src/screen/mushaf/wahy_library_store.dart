@@ -1,4 +1,4 @@
-import "package:al_quran_v3/src/screen/collections/common_function.dart";
+import "package:al_furkan/src/screen/collections/common_function.dart";
 import "package:hive_ce_flutter/hive_flutter.dart";
 
 class WahyLibraryStore {

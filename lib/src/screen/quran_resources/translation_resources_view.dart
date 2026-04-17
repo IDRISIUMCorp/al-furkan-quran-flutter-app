@@ -1,9 +1,9 @@
-import "package:al_quran_v3/src/resources/quran_resources/models/translation_book_model.dart";
-import "package:al_quran_v3/src/resources/quran_resources/translation_resources.dart";
-import "package:al_quran_v3/src/screen/quran_resources/widgets/managed_resources_catalog.dart";
-import "package:al_quran_v3/src/screen/setup/cubit/resources_progress_cubit_cubit.dart";
-import "package:al_quran_v3/src/screen/setup/cubit/resources_progress_cubit_state.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_translation_function.dart";
+import "package:al_furkan/src/resources/quran_resources/models/translation_book_model.dart";
+import "package:al_furkan/src/resources/quran_resources/translation_resources.dart";
+import "package:al_furkan/src/screen/quran_resources/widgets/managed_resources_catalog.dart";
+import "package:al_furkan/src/screen/setup/cubit/resources_progress_cubit_cubit.dart";
+import "package:al_furkan/src/screen/setup/cubit/resources_progress_cubit_state.dart";
+import "package:al_furkan/src/utils/quran_resources/quran_translation_function.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 
@@ -69,11 +69,7 @@ class _TranslationResourcesViewState extends State<TranslationResourcesView> {
     TranslationBookModel book,
   ) {
     if (state.onProcess != true) return false;
-    if (state.activeResourceId != null) {
-      return state.activeResourceId == book.fullPath;
-    }
-    final processName = state.processName ?? "";
-    return processName.contains(book.name);
+    return state.progressMap.containsKey(book.fullPath);
   }
 
   String _typeLabel(TranslationResourcesType type) {
@@ -167,17 +163,12 @@ class _TranslationResourcesViewState extends State<TranslationResourcesView> {
         id: book.fullPath,
         title: book.name,
         group: book.language,
-        subtitle: downloaded
-            ? "مفعّلة داخل التطبيق ويمكن عرض أكثر من ترجمة معًا."
-            : "نزّلها لتظهر مباشرة داخل المكتبة وشاشة الآيات.",
-        badges: [
-          if (_typeLabel(book.type).trim().isNotEmpty) _typeLabel(book.type),
-          if (book.score > 0) "درجة ${book.score.round()}",
-        ],
+        subtitle: null,
+        badges: const [],
         isDownloaded: downloaded,
         isActive: _isSelected(book),
         isBusy: busy,
-        progress: busy ? (state.percentage ?? 0.0).clamp(0.0, 1.0) : 0,
+        progress: busy ? (state.progressMap[book.fullPath] ?? 0.0).clamp(0.0, 1.0) : 0,
         orderIndex: downloaded ? orderMap[book.fullPath] : null,
         sizeBytes: downloaded
             ? QuranTranslationFunction.getDownloadedTranslationSizeBytes(
@@ -187,8 +178,8 @@ class _TranslationResourcesViewState extends State<TranslationResourcesView> {
         onLoadSize: downloaded
             ? null
             : () => QuranTranslationFunction.getRemoteBookSizeBytes(book),
-        transferredBytes: busy ? state.transferredBytes : null,
-        totalBytes: busy ? state.totalBytes : null,
+        transferredBytes: busy ? state.transferredBytesMap[book.fullPath] : null,
+        totalBytes: busy ? state.totalBytesMap[book.fullPath] : null,
         onToggleActive: downloaded
             ? (value) => _toggleSelection(book, value)
             : null,
@@ -205,11 +196,11 @@ class _TranslationResourcesViewState extends State<TranslationResourcesView> {
         return ManagedResourcesCatalog(
           title: "إدارة الترجمات",
           description:
-              "اختَر ترجمة واحدة أو أكثر، فعّلها فورًا، أو احذف ما لا تحتاجه من نفس الشاشة.",
-          searchHint: "ابحث عن ترجمة أو لغة...",
-          emptyMessage: "لا توجد ترجمات مطابقة للبحث أو للفلاتر الحالية.",
+              "اختَر ترجمة واحدة أو أكثر وفعّلها فورًا.",
+          searchHint: "",
+          emptyMessage: "لا توجد ترجمات مطابقة.",
           deleteModeLabel: "تحديد للحذف",
-          activateAllLabel: "تفعيل كل المحمّل",
+          activateAllLabel: "تفعيل الكل",
           clearActiveLabel: "مسح المختار",
           deleteSelectionLabel: "حذف المحدد",
           activationBehavior: ResourceActivationBehavior.multi,

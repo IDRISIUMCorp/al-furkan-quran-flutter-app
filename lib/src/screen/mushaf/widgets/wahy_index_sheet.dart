@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:al_quran_v3/src/theme/controller/theme_cubit.dart';
-import 'package:al_quran_v3/src/screen/surah_list_view/model/surah_info_model.dart';
+import 'package:al_furkan/src/theme/controller/theme_cubit.dart';
+import 'package:al_furkan/src/screen/surah_list_view/model/surah_info_model.dart';
 import 'package:qcf_quran/qcf_quran.dart';
 
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:al_quran_v3/src/utils/number_localization.dart';
-import 'package:al_quran_v3/src/resources/quran_resources/meta/meta_data_surah.dart';
-import 'package:al_quran_v3/src/utils/quran_ayahs_function/get_page_number.dart' as p;
+import 'package:al_furkan/src/utils/number_localization.dart';
+import 'package:al_furkan/src/resources/quran_resources/meta/meta_data_surah.dart';
+import 'package:al_furkan/src/utils/quran_ayahs_function/get_page_number.dart' as p;
 class WahyIndexSheet extends StatefulWidget {
   final ValueChanged<int> onOpenPage;
   final ValueChanged<String>? onOpenAyah;
@@ -39,12 +39,13 @@ class WahyIndexSheetState extends State<WahyIndexSheet>
 
   Widget _sheetSearchField(BuildContext context) {
     final themeState = context.read<ThemeCubit>().state;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF9F2),
+        color: isDark ? Theme.of(context).colorScheme.surfaceContainer : const Color(0xFFFFF9F2),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
+        border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -133,9 +134,9 @@ class WahyIndexSheetState extends State<WahyIndexSheet>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF9F2),
+              color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).colorScheme.surfaceContainerHighest : const Color(0xFFFFF9F2),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
+              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.06)),
             ),
             child: Row(
               children: [
@@ -248,8 +249,8 @@ class WahyIndexSheetState extends State<WahyIndexSheet>
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF9F2),
-              border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
+              color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).colorScheme.surfaceContainer : const Color(0xFFFFF9F2),
+              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06)),
               borderRadius: BorderRadius.circular(18),
             ),
             child: TabBar(
@@ -384,10 +385,10 @@ class RubListView extends StatelessWidget {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF9F2),
+                  color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).colorScheme.surfaceContainerHighest : const Color(0xFFFFF9F2),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: Colors.black.withValues(alpha: 0.06),
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.06),
                   ),
                 ),
                 child: Row(

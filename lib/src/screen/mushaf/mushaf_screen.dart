@@ -1,72 +1,73 @@
 import "dart:async";
 import "dart:convert";
 import "dart:ui";
-import "package:al_quran_v3/src/screen/mushaf/widgets/bookmarks_sheet.dart";
-import "package:al_quran_v3/src/screen/mushaf/widgets/starred_sheet.dart";
-import "package:al_quran_v3/src/screen/mushaf/widgets/notes_sheet.dart";
-import 'package:al_quran_v3/src/screen/mushaf/widgets/wahy_feedback_dialog.dart';
-import "package:al_quran_v3/src/screen/mushaf/widgets/wahy_mushaf_top_header.dart";
-import 'package:al_quran_v3/src/screen/mushaf/widgets/wahy_index_sheet.dart';
-import "package:al_quran_v3/src/screen/mushaf/wahy_library_store.dart";
+import "package:al_furkan/src/screen/mushaf/widgets/bookmarks_sheet.dart";
+import "package:al_furkan/src/screen/mushaf/widgets/starred_sheet.dart";
+import "package:al_furkan/src/screen/mushaf/widgets/notes_sheet.dart";
+import 'package:al_furkan/src/screen/mushaf/widgets/wahy_feedback_dialog.dart';
+import "package:al_furkan/src/screen/mushaf/widgets/wahy_mushaf_top_header.dart";
+import 'package:al_furkan/src/screen/mushaf/widgets/wahy_index_sheet.dart';
+import "package:al_furkan/src/screen/mushaf/wahy_library_store.dart";
 import 'widgets/library_sheet.dart';
-import "package:al_quran_v3/src/screen/mushaf/widgets/listen_range_sheet.dart";
+import "package:al_furkan/src/screen/mushaf/widgets/listen_range_sheet.dart";
 
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
+import "package:shared_preferences/shared_preferences.dart";
 import "package:qcf_quran/qcf_quran.dart" hide getPageNumber;
 import "package:share_plus/share_plus.dart";
 
-import "package:al_quran_v3/src/core/audio/cubit/player_position_cubit.dart";
-import "package:al_quran_v3/src/core/audio/model/audio_player_position_model.dart";
-import "package:al_quran_v3/src/utils/quran_resources/segmented_resources_manager.dart";
+import "package:al_furkan/src/core/audio/cubit/player_position_cubit.dart";
+import "package:al_furkan/src/core/audio/model/audio_player_position_model.dart";
+import "package:al_furkan/src/utils/quran_resources/segmented_resources_manager.dart";
 
-import "package:al_quran_v3/l10n/app_localizations.dart";
-import "package:al_quran_v3/main.dart";
-import "package:al_quran_v3/src/core/audio/cubit/audio_ui_cubit.dart";
-import "package:al_quran_v3/src/core/audio/cubit/ayah_key_cubit.dart";
-import "package:al_quran_v3/src/core/audio/cubit/player_state_cubit.dart";
-import "package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
-import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
-import "package:al_quran_v3/src/core/audio/player/audio_player_manager.dart";
-import "package:al_quran_v3/src/core/audio/services/audio_playback_service_access.dart";
-import "package:al_quran_v3/src/core/notifications/khatma_notification_service.dart";
-import "package:al_quran_v3/src/screen/quran_reader/widgets/ayah_options_sheet.dart";
-import "package:al_quran_v3/src/screen/quran_resources/quran_resources_view.dart";
-import "package:al_quran_v3/src/widget/audio/audio_controller_ui.dart";
-import "package:al_quran_v3/src/screen/quran_script_view/cubit/ayah_to_highlight.dart";
-import "package:al_quran_v3/src/screen/quran_script_view/quran_script_view.dart";
-import "package:al_quran_v3/src/screen/search/search_screen.dart";
-import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.dart";
-import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
-import "package:al_quran_v3/src/utils/quran_word/show_popup_word_function.dart";
+import "package:al_furkan/l10n/app_localizations.dart";
+import "package:al_furkan/main.dart";
+import "package:al_furkan/src/core/audio/cubit/audio_ui_cubit.dart";
+import "package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart";
+import "package:al_furkan/src/core/audio/cubit/player_state_cubit.dart";
+import "package:al_furkan/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
+import "package:al_furkan/src/core/audio/model/ayahkey_management.dart";
+import "package:al_furkan/src/core/audio/player/audio_player_manager.dart";
+import "package:al_furkan/src/core/audio/services/audio_playback_service_access.dart";
+import "package:al_furkan/src/core/notifications/khatma_notification_service.dart";
+import "package:al_furkan/src/screen/quran_reader/widgets/ayah_options_sheet.dart";
+import "package:al_furkan/src/screen/quran_resources/quran_resources_view.dart";
+import "package:al_furkan/src/widget/audio/audio_controller_ui.dart";
+import "package:al_furkan/src/screen/quran_script_view/cubit/ayah_to_highlight.dart";
+import "package:al_furkan/src/screen/quran_script_view/quran_script_view.dart";
+import "package:al_furkan/src/screen/search/search_screen.dart";
+import "package:al_furkan/src/screen/settings/cubit/quran_script_view_cubit.dart";
+import "package:al_furkan/src/resources/quran_resources/models/tafsir_book_model.dart";
+import "package:al_furkan/src/utils/quran_resources/quran_script_function.dart";
+import "package:al_furkan/src/utils/quran_resources/quran_tafsir_function.dart";
+import "package:al_furkan/src/utils/quran_word/show_popup_word_function.dart";
 import "package:hive_ce_flutter/hive_flutter.dart";
-import "package:al_quran_v3/src/utils/number_localization.dart";
-import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
-import "package:al_quran_v3/src/widget/quran_script_words/cubit/word_playing_state_cubit.dart";
-import "package:al_quran_v3/src/screen/settings/settings_page.dart";
-import "package:al_quran_v3/src/core/unified_quran_settings/quran_settings_bottom_sheet.dart";
-import "package:al_quran_v3/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
-import "package:al_quran_v3/src/screen/prayer_time/prayer_time_page.dart";
-import "package:al_quran_v3/src/screen/qibla/qibla_direction.dart";
-import "package:al_quran_v3/src/screen/mushaf/index/aya_index_page.dart";
+import "package:al_furkan/src/utils/number_localization.dart";
+import "package:al_furkan/src/widget/quran_script/model/script_info.dart";
+import "package:al_furkan/src/widget/quran_script_words/cubit/word_playing_state_cubit.dart";
+import "package:al_furkan/src/screen/settings/settings_page.dart";
+import "package:al_furkan/src/core/unified_quran_settings/quran_settings_bottom_sheet.dart";
+import "package:al_furkan/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
+import "package:al_furkan/src/screen/prayer_time/prayer_time_page.dart";
+import "package:al_furkan/src/screen/qibla/qibla_direction.dart";
+import "package:al_furkan/src/screen/mushaf/index/aya_index_page.dart";
 // Removed audio_page.dart import
-import "package:al_quran_v3/src/widget/add_collection_popup/add_note_popup.dart";
-import "package:al_quran_v3/src/screen/about/about_the_app.dart";
-import "package:al_quran_v3/src/screen/mushaf/widgets/image_share/ayah_image_generator.dart";
-import "package:al_quran_v3/src/screen/mushaf/widgets/khatma_sheet.dart";
-import "package:al_quran_v3/src/screen/azkar/azkar_categories_screen.dart";
+import "package:al_furkan/src/widget/add_collection_popup/add_note_popup.dart";
+import "package:al_furkan/src/screen/about/about_the_app.dart";
+import "package:al_furkan/src/screen/mushaf/widgets/image_share/ayah_image_generator.dart";
+import "package:al_furkan/src/screen/mushaf/widgets/khatma_sheet.dart";
+import "package:al_furkan/src/screen/azkar/azkar_categories_screen.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
-import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
-import "package:al_quran_v3/src/theme/controller/theme_state.dart";
+import "package:al_furkan/src/theme/controller/theme_cubit.dart";
+import "package:al_furkan/src/theme/controller/theme_state.dart";
 import "package:qcf_quran/qcf_quran.dart" as qcf;
-import "package:al_quran_v3/src/resources/quran_resources/tafsir_info_with_score.dart";
-import "package:al_quran_v3/src/utils/quran_ayahs_function/get_page_number.dart";
-import "package:al_quran_v3/src/resources/quran_resources/quran_pages_info.dart";
-import "package:al_quran_v3/src/utils/basic_functions.dart";
-import "package:al_quran_v3/src/theme/app_colors.dart";
-import "package:al_quran_v3/src/widget/share/unified_share_bottom_sheet.dart";
+import "package:al_furkan/src/resources/quran_resources/tafsir_info_with_score.dart";
+import "package:al_furkan/src/utils/quran_ayahs_function/get_page_number.dart";
+import "package:al_furkan/src/resources/quran_resources/quran_pages_info.dart";
+import "package:al_furkan/src/utils/basic_functions.dart";
+import "package:al_furkan/src/theme/app_colors.dart";
+import "package:al_furkan/src/widget/share/unified_share_bottom_sheet.dart";
 part 'mushaf_share_extension.dart';
 part 'mushaf_pronunciation_extension.dart';
 
@@ -758,9 +759,9 @@ class _MushafRootState extends State<_MushafRoot> {
   Widget build(BuildContext context) {
     final themeState = context.read<ThemeCubit>().state;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF000000) : AppColors.ayaBackground;
+    final bgColor = isDark ? Theme.of(context).colorScheme.surface : AppColors.ayaBackground;
     final topBarColor = isDark
-        ? const Color(0xFF000000).withValues(alpha: 0.85)
+        ? Theme.of(context).colorScheme.surface.withValues(alpha: 0.85)
         : const Color(0xFFF4EAD5).withValues(alpha: 0.85);
     final topBarBorderColor = isDark
         ? Colors.white10
@@ -930,8 +931,8 @@ class MushafView extends StatefulWidget {
 class _MushafViewState extends State<MushafView> {
   static Color _bg(BuildContext ctx) =>
       Theme.of(ctx).brightness == Brightness.dark
-      ? Color(0xFF000000)
-      : Color(0xFFF7F1E6);
+      ? Theme.of(ctx).colorScheme.surface
+      : const Color(0xFFF7F1E6);
 
   /// Word Info Repository instance for Qiraat/Sarf/Irab
 
@@ -1429,30 +1430,48 @@ class _MushafViewState extends State<MushafView> {
     final ThemeState themeState = context.read<ThemeCubit>().state;
     final qSettings = context.watch<QuranSettingsCubit>().state;
 
-    final bool isThemeCompatibleWithMode = isDark
-        ? (qSettings.theme == QuranTheme.oled ||
-              qSettings.theme == QuranTheme.nightBlue ||
-              qSettings.theme == QuranTheme.custom ||
-              qSettings.theme == QuranTheme.graphite ||
-              qSettings.theme == QuranTheme.midnightPurple)
-        : (qSettings.theme == QuranTheme.sepia ||
-              qSettings.theme == QuranTheme.cream ||
-              qSettings.theme == QuranTheme.paperWhite ||
-              qSettings.theme == QuranTheme.sand);
-
-    if (qSettings.isInitialized && !isThemeCompatibleWithMode) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!context.mounted) return;
-        context.read<QuranSettingsCubit>().updateTheme(
-          isDark ? QuranTheme.nightBlue : QuranTheme.cream,
-        );
-      });
-    }
+    // Graceful Auto-Switch Logic with Preference Memory
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final prefs = await SharedPreferences.getInstance();
+      final cubit = context.read<QuranSettingsCubit>();
+      
+      if (isDark) {
+        if (!qSettings.isDarkTheme) {
+          // OS is Dark, but Settings is Light -> Save Light, Restore Dark
+          await prefs.setInt('wahy_pref_light_mushaf_theme', qSettings.theme.index);
+          final savedDarkIndex = prefs.getInt('wahy_pref_dark_mushaf_theme');
+          final targetTheme = savedDarkIndex != null 
+              ? QuranTheme.values[savedDarkIndex] 
+              : QuranTheme.oled; // User requested OLED as default dark theme!
+          
+          if (qSettings.theme != targetTheme) cubit.updateTheme(targetTheme);
+        } else {
+          // Update saved dark preference
+          await prefs.setInt('wahy_pref_dark_mushaf_theme', qSettings.theme.index);
+        }
+      } else {
+        if (qSettings.isDarkTheme) {
+          // OS is Light, but Settings is Dark -> Save Dark, Restore Light
+          await prefs.setInt('wahy_pref_dark_mushaf_theme', qSettings.theme.index);
+          final savedLightIndex = prefs.getInt('wahy_pref_light_mushaf_theme');
+          final targetTheme = savedLightIndex != null 
+              ? QuranTheme.values[savedLightIndex] 
+              : QuranTheme.cream;
+              
+          if (qSettings.theme != targetTheme) cubit.updateTheme(targetTheme);
+        } else {
+          // Update saved light preference
+          await prefs.setInt('wahy_pref_light_mushaf_theme', qSettings.theme.index);
+        }
+      }
+    });
 
     QcfThemeData baseThemeForScaffold() {
       switch (qSettings.theme) {
         case QuranTheme.oled:
           return QcfThemeData.oled();
+        case QuranTheme.charcoal:
+          return QcfThemeData.charcoal();
         case QuranTheme.graphite:
           return QcfThemeData.graphite();
         case QuranTheme.midnightPurple:
@@ -1468,7 +1487,14 @@ class _MushafViewState extends State<MushafView> {
         case QuranTheme.nightBlue:
           return QcfThemeData.nightBlue();
         case QuranTheme.custom:
-          return QcfThemeData.dark();
+          final isLight = qSettings.customBackgroundColor.computeLuminance() > 0.5;
+          return QcfThemeData(
+            pageBackgroundColor: qSettings.customBackgroundColor,
+            verseTextColor: qSettings.customTextColor,
+            verseNumberColor: qSettings.customTextColor.withValues(alpha: 0.7),
+            basmalaColor: qSettings.customTextColor,
+            headerTextColor: qSettings.customTextColor,
+          );
       }
     }
 
@@ -1577,6 +1603,8 @@ class _MushafViewState extends State<MushafView> {
             switch (qSettings.theme) {
               case QuranTheme.oled:
                 return QcfThemeData.oled();
+              case QuranTheme.charcoal:
+                return QcfThemeData.charcoal();
               case QuranTheme.graphite:
                 return QcfThemeData.graphite();
               case QuranTheme.midnightPurple:
@@ -1592,7 +1620,13 @@ class _MushafViewState extends State<MushafView> {
               case QuranTheme.nightBlue:
                 return QcfThemeData.nightBlue();
               case QuranTheme.custom:
-                return QcfThemeData.dark();
+                return QcfThemeData(
+                  pageBackgroundColor: qSettings.customBackgroundColor,
+                  verseTextColor: qSettings.customTextColor,
+                  verseNumberColor: qSettings.customTextColor.withValues(alpha: 0.7),
+                  basmalaColor: qSettings.customTextColor,
+                  headerTextColor: qSettings.customTextColor,
+                );
             }
           }
 
@@ -1619,7 +1653,7 @@ class _MushafViewState extends State<MushafView> {
                   final qcfTheme = baseTheme.copyWith(
                     pageBackgroundColor: baseTheme.pageBackgroundColor,
                     headerBackgroundColor: Colors.transparent,
-                    headerTextColor: Colors.black,
+                    headerTextColor: baseTheme.headerTextColor,
                     verseTextColor: baseTheme.verseTextColor,
                     verseNumberColor: verseNumberColor,
                     verseNumberBuilder: (surah, verse, verseNumber) {

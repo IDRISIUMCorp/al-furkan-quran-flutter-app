@@ -2,6 +2,7 @@ part of 'quran_settings_cubit.dart';
 
 enum QuranTheme {
   oled,
+  charcoal,
   nightBlue,
   custom,
   graphite,
@@ -24,6 +25,7 @@ class QuranSettingsState {
   final bool showSurahHeader;
   final bool tajweedEnabled;
   final bool isInitialized;
+  final List<Color> customBackgroundColors;
 
   // Hardcoded getters for removed settings to prevent breaking the rest of the app
   double get pageScale => 1.0;
@@ -32,7 +34,7 @@ class QuranSettingsState {
 
   const QuranSettingsState({
     this.fontSize = 23.0,
-    this.theme = QuranTheme.oled,
+    this.theme = QuranTheme.charcoal,
     this.highlightColor = Colors.amber,
     this.customBackgroundColor = const Color(0xFF111318),
     this.customTextColor = Colors.white,
@@ -42,6 +44,7 @@ class QuranSettingsState {
     this.showSurahHeader = true,
     this.tajweedEnabled = false,
     this.isInitialized = false,
+    this.customBackgroundColors = const [],
   });
 
   QuranSettingsState copyWith({
@@ -56,6 +59,7 @@ class QuranSettingsState {
     bool? showSurahHeader,
     bool? tajweedEnabled,
     bool? isInitialized,
+    List<Color>? customBackgroundColors,
   }) {
     return QuranSettingsState(
       fontSize: fontSize ?? this.fontSize,
@@ -69,17 +73,20 @@ class QuranSettingsState {
       showSurahHeader: showSurahHeader ?? this.showSurahHeader,
       tajweedEnabled: tajweedEnabled ?? this.tajweedEnabled,
       isInitialized: isInitialized ?? this.isInitialized,
+      customBackgroundColors: customBackgroundColors ?? this.customBackgroundColors,
     );
   }
 
   bool get isDarkTheme {
     switch (theme) {
       case QuranTheme.oled:
+      case QuranTheme.charcoal:
       case QuranTheme.nightBlue:
-      case QuranTheme.custom:
       case QuranTheme.graphite:
       case QuranTheme.midnightPurple:
         return true;
+      case QuranTheme.custom:
+        return customBackgroundColor.computeLuminance() < 0.5;
       case QuranTheme.sepia:
       case QuranTheme.cream:
       case QuranTheme.paperWhite:
@@ -104,6 +111,8 @@ class QuranSettingsState {
     switch (theme) {
       case QuranTheme.oled:
         return Colors.black;
+      case QuranTheme.charcoal:
+        return const Color(0xFF212529);
       case QuranTheme.nightBlue:
         return const Color(0xFF0F172A); // Slate 900
       case QuranTheme.custom:
@@ -126,6 +135,7 @@ class QuranSettingsState {
   Color get textColor {
     switch (theme) {
       case QuranTheme.oled:
+      case QuranTheme.charcoal:
       case QuranTheme.nightBlue:
       case QuranTheme.graphite:
       case QuranTheme.midnightPurple:

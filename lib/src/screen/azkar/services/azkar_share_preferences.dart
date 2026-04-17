@@ -1,5 +1,5 @@
 ﻿import 'package:shared_preferences/shared_preferences.dart';
-import 'package:al_quran_v3/src/screen/azkar/models/azkar_share_settings.dart';
+import 'package:al_furkan/src/screen/azkar/models/azkar_share_settings.dart';
 
 /// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 /// AZKAR SHARE PREFERENCES - ╪¡┘ü╪╕ ┘ê╪¬╪¡┘à┘è┘ä ╪º┘ä╪Ñ╪╣╪»╪º╪»╪º╪¬

@@ -1,5 +1,5 @@
-import "package:al_quran_v3/src/screen/prayer_time/models/prayer_enum.dart";
-import "package:al_quran_v3/src/screen/prayer_time/models/reminder_type.dart";
+import "package:al_furkan/src/screen/prayer_time/models/prayer_enum.dart";
+import "package:al_furkan/src/screen/prayer_time/models/reminder_type.dart";
 
 class ReminderTypeWithPrayModel {
   final PrayerReminderType reminderType;

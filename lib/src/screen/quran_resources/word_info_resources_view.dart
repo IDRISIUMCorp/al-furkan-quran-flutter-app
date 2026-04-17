@@ -1,8 +1,8 @@
-import "package:al_quran_v3/src/screen/quran_resources/widgets/managed_resources_catalog.dart";
-import "package:al_quran_v3/src/screen/setup/cubit/resources_progress_cubit_cubit.dart";
-import "package:al_quran_v3/src/screen/setup/cubit/resources_progress_cubit_state.dart";
-import "package:al_quran_v3/src/utils/quran_resources/word_info_models.dart";
-import "package:al_quran_v3/src/utils/quran_resources/word_info_repository.dart";
+import "package:al_furkan/src/screen/quran_resources/widgets/managed_resources_catalog.dart";
+import "package:al_furkan/src/screen/setup/cubit/resources_progress_cubit_cubit.dart";
+import "package:al_furkan/src/screen/setup/cubit/resources_progress_cubit_state.dart";
+import "package:al_furkan/src/utils/quran_resources/word_info_models.dart";
+import "package:al_furkan/src/utils/quran_resources/word_info_repository.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 
@@ -70,11 +70,7 @@ class _WordInfoResourcesViewState extends State<WordInfoResourcesView> {
 
   bool _isBusy(ResourcesProgressCubitState state, WordInfoKind kind) {
     if (state.onProcess != true) return false;
-    if (state.activeResourceId != null) {
-      return state.activeResourceId == kind.name;
-    }
-    final processName = state.processName ?? "";
-    return processName.contains(_label(kind));
+    return state.progressMap.containsKey(kind.name);
   }
 
   Future<void> _downloadKind(WordInfoKind kind) async {
@@ -113,10 +109,10 @@ class _WordInfoResourcesViewState extends State<WordInfoResourcesView> {
         totalBytes: totalBytes ?? 1,
       );
       await Future<void>.delayed(const Duration(milliseconds: 220));
-      cubit.success();
+      cubit.success(activeResourceId: kind.name);
       if (mounted) setState(() {});
     } catch (_) {
-      cubit.failure("تعذر تحميل ${_label(kind)}");
+      cubit.failure("تعذر تحميل ${_label(kind)}", activeResourceId: kind.name);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -175,16 +171,16 @@ class _WordInfoResourcesViewState extends State<WordInfoResourcesView> {
         id: kind.name,
         title: _label(kind),
         group: "الموارد اللغوية",
-        subtitle: _subtitle(kind),
+        subtitle: null,
         badges: const [],
         isDownloaded: downloaded,
         isBusy: busy,
-        progress: busy ? (state.percentage ?? 0.0) : 0,
+        progress: busy ? (state.progressMap[kind.name] ?? 0.0) : 0,
         orderIndex: downloaded ? orderMap[kind.name] : null,
         sizeBytes: downloaded ? null : _sizes[kind],
         onLoadSize: downloaded ? () => _wordInfoRepo.getLocalKindSizeBytes(kind) : null,
-        transferredBytes: busy ? state.transferredBytes : null,
-        totalBytes: busy ? state.totalBytes : null,
+        transferredBytes: busy ? state.transferredBytesMap[kind.name] : null,
+        totalBytes: busy ? state.totalBytesMap[kind.name] : null,
         onDownload: downloaded ? null : () => _downloadKind(kind),
         onDelete: downloaded ? () => _deleteKind(kind) : null,
       );
@@ -198,9 +194,9 @@ class _WordInfoResourcesViewState extends State<WordInfoResourcesView> {
         return ManagedResourcesCatalog(
           title: "معلومات الكلمات",
           description:
-              "مصادر لغوية تضيف الإعراب والصرف والقراءات للكلمة المختارة، مع تنزيل وحذف مباشر.",
-          searchHint: "ابحث عن نوع المورد...",
-          emptyMessage: "لا توجد نتائج مطابقة في موارد معلومات الكلمات.",
+              "مصادر لغوية تضيف الإعراب والصرف والقراءات للكلمة المختارة.",
+          searchHint: "",
+          emptyMessage: "لا توجد نتائج مطابقة.",
           deleteModeLabel: "تحديد للحذف",
           activateAllLabel: "",
           clearActiveLabel: "",

@@ -1,12 +1,12 @@
-import "package:al_quran_v3/l10n/app_localizations.dart";
-import "package:al_quran_v3/src/core/audio/cubit/audio_ui_cubit.dart";
-import "package:al_quran_v3/src/core/audio/cubit/ayah_key_cubit.dart";
-import "package:al_quran_v3/src/core/audio/cubit/player_position_cubit.dart";
-import "package:al_quran_v3/src/core/audio/cubit/player_state_cubit.dart";
-import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
-import "package:al_quran_v3/src/resources/quran_resources/meaning_of_surah.dart";
-import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.dart";
-import "package:al_quran_v3/src/widget/quran_script_words/cubit/word_playing_state_cubit.dart";
+import "package:al_furkan/l10n/app_localizations.dart";
+import "package:al_furkan/src/core/audio/cubit/audio_ui_cubit.dart";
+import "package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart";
+import "package:al_furkan/src/core/audio/cubit/player_position_cubit.dart";
+import "package:al_furkan/src/core/audio/cubit/player_state_cubit.dart";
+import "package:al_furkan/src/core/audio/model/ayahkey_management.dart";
+import "package:al_furkan/src/resources/quran_resources/meaning_of_surah.dart";
+import "package:al_furkan/src/screen/settings/cubit/quran_script_view_cubit.dart";
+import "package:al_furkan/src/widget/quran_script_words/cubit/word_playing_state_cubit.dart";
 import "package:flutter/material.dart";
 import "package:just_audio/just_audio.dart";
 

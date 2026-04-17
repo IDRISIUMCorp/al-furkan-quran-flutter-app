@@ -1,12 +1,12 @@
 import "dart:convert";
 
-import "package:al_quran_v3/l10n/app_localizations.dart";
-import "package:al_quran_v3/src/api/apis_urls.dart";
-import "package:al_quran_v3/src/utils/encode_decode.dart";
-import "package:al_quran_v3/src/screen/location_handler/manual_selection/cubit/manual_location_selection_cubit.dart";
-import "package:al_quran_v3/src/screen/location_handler/manual_selection/pages/administrator_selection.dart";
-import "package:al_quran_v3/src/screen/location_handler/manual_selection/pages/city_selection.dart";
-import "package:al_quran_v3/src/screen/location_handler/manual_selection/pages/countries_selection.dart";
+import "package:al_furkan/l10n/app_localizations.dart";
+import "package:al_furkan/src/api/apis_urls.dart";
+import "package:al_furkan/src/utils/encode_decode.dart";
+import "package:al_furkan/src/screen/location_handler/manual_selection/cubit/manual_location_selection_cubit.dart";
+import "package:al_furkan/src/screen/location_handler/manual_selection/pages/administrator_selection.dart";
+import "package:al_furkan/src/screen/location_handler/manual_selection/pages/city_selection.dart";
+import "package:al_furkan/src/screen/location_handler/manual_selection/pages/countries_selection.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:http/http.dart" as http;

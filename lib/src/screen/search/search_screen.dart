@@ -1,11 +1,11 @@
 import "dart:async";
 
-import "package:al_quran_v3/src/core/audio/cubit/ayah_key_cubit.dart";
-import "package:al_quran_v3/src/screen/quran_script_view/cubit/ayah_to_highlight.dart";
-import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
-import "package:al_quran_v3/src/theme/controller/theme_state.dart";
-import "package:al_quran_v3/src/utils/number_localization.dart";
-import "package:al_quran_v3/src/utils/quran_search_engine.dart";
+import "package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart";
+import "package:al_furkan/src/screen/quran_script_view/cubit/ayah_to_highlight.dart";
+import "package:al_furkan/src/theme/controller/theme_cubit.dart";
+import "package:al_furkan/src/theme/controller/theme_state.dart";
+import "package:al_furkan/src/utils/number_localization.dart";
+import "package:al_furkan/src/utils/quran_search_engine.dart";
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
@@ -13,6 +13,7 @@ import "package:flutter_bloc/flutter_bloc.dart";
 import "package:gap/gap.dart";
 import "package:hive_ce_flutter/hive_flutter.dart";
 import "package:qcf_quran/qcf_quran.dart" as qcf;
+import "package:al_furkan/src/widget/share/unified_share_bottom_sheet.dart";
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -247,14 +248,14 @@ class _SearchScreenState extends State<SearchScreen> {
               padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
               child: Container(
                 clipBehavior: Clip.antiAlias,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF6F3E9),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              decoration: BoxDecoration(
+                color: _pageBg,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
               ),
               child: Column(
                 children: [
                   _buildSearchBarRow(themeState),
-                  const Divider(color: Color(0xFFE5DECC), height: 1, thickness: 1),
+                  Divider(color: _cardBorder, height: 1, thickness: 1),
                   Expanded(
                     child: _buildBody(themeState),
                   ),
@@ -286,9 +287,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: Container(
                   height: 50,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: _cardBg,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFFE5DECC), width: 1.5),
+                    border: Border.all(color: _cardBorder, width: 1.5),
                   ),
                   child: TextField(
                     controller: _searchController,
@@ -298,8 +299,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     textInputAction: TextInputAction.search,
                     enableSuggestions: false,
                     autocorrect: false,
-                    style: const TextStyle(
-                      color: Color(0xFF333333),
+                    style: TextStyle(
+                      color: _textPrimary,
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
                     ),
@@ -672,9 +673,9 @@ class _SearchScreenState extends State<SearchScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFEBE5D9)),
+        border: Border.all(color: _cardBorder),
       ),
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -686,10 +687,10 @@ class _SearchScreenState extends State<SearchScreen> {
               const Gap(16),
               Text(
                 qcf.getSurahNameArabic(surahNum),
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: "QPC_Hafs",
                   fontSize: 26,
-                  color: Color(0xFF333333),
+                  color: _textPrimary,
                 ),
               ),
             ],
@@ -720,7 +721,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ),
               const Gap(12),
-              const Icon(FluentIcons.building_mosque_24_filled, color: Colors.black, size: 28),
+              Icon(FluentIcons.building_mosque_24_filled, color: _textPrimary, size: 28),
             ],
           ),
         ],
@@ -752,12 +753,17 @@ class _VerseResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white;
+    final cardBorder = isDark ? Colors.white.withValues(alpha: 0.08) : const Color(0xFFEBE5D9);
+    final textPrimary = isDark ? Colors.white : const Color(0xFF333333);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFEBE5D9)),
+        border: Border.all(color: cardBorder),
       ),
       child: Material(
         color: Colors.transparent,
@@ -778,11 +784,11 @@ class _VerseResultCard extends StatelessWidget {
                         text: content,
                         searchQuery: query,
                         isExactSearch: isExactSearch,
-                        textStyle: const TextStyle(
+                        textStyle: TextStyle(
                           fontFamily: "QPC_Hafs",
                           fontSize: 22,
                           height: 1.7,
-                          color: Color(0xFF333333),
+                          color: textPrimary,
                         ),
                         highlightColor: const Color(0xFF1B82A6),
                       ),
@@ -851,16 +857,11 @@ class _VerseResultCard extends StatelessWidget {
   }
 
   void _shareAyah(BuildContext context) {
-    final ayahText = "$content\n\n— $surahName: $ayahNumber | الصفحة $pageNumber";
-    Clipboard.setData(ClipboardData(text: ayahText));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text("تم نسخ الآية للمشاركة ✓", style: TextStyle(fontWeight: FontWeight.w700)),
-        backgroundColor: const Color(0xFF1B82A6),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        duration: const Duration(seconds: 2),
-      ),
+    UnifiedShareBottomSheet.show(
+      context: context,
+      surahNumber: surahNumber,
+      verseNumber: ayahNumber,
+      getAyahText: (surah, verse) => content,
     );
   }
 

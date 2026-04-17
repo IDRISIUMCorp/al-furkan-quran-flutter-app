@@ -1,8 +1,8 @@
 import "dart:convert";
 
-import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_irab_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
+import "package:al_furkan/src/resources/quran_resources/models/tafsir_book_model.dart";
+import "package:al_furkan/src/utils/quran_resources/quran_irab_function.dart";
+import "package:al_furkan/src/utils/quran_resources/quran_tafsir_function.dart";
 import "package:archive/archive.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/services.dart";
@@ -54,9 +54,8 @@ class DefaultOfflineResources {
         userBox.get(_installFlagKey, defaultValue: false) == true;
     if (alreadyInstalled) {
       // Do NOT force-enable Saadi every start.
-      // Only auto-select if the user has no tafsir selected at all.
-      final currentSelections = await QuranTafsirFunction.getTafsirSelections();
-      if (currentSelections == null || currentSelections.isEmpty) {
+      // Only auto-select if the user has no tafsir selected at all AND the key has never been set.
+      if (!userBox.containsKey(QuranTafsirFunction.selectedTafsirListKey)) {
         await QuranTafsirFunction.setTafsirSelection(defaultTafsirSaadi);
       }
       return;
@@ -65,8 +64,7 @@ class DefaultOfflineResources {
     await _installSaadiTafsir();
 
     // First install: make sure at least one tafsir is enabled (Saadi).
-    final currentSelections = await QuranTafsirFunction.getTafsirSelections();
-    if (currentSelections == null || currentSelections.isEmpty) {
+    if (!userBox.containsKey(QuranTafsirFunction.selectedTafsirListKey)) {
       await QuranTafsirFunction.setTafsirSelection(defaultTafsirSaadi);
     }
 
@@ -145,8 +143,11 @@ class DefaultOfflineResources {
     await QuranTafsirFunction.setToListAlreadyDownloaded(
       tafsirBook: defaultTafsirSaadi,
     );
-
-    await QuranTafsirFunction.setTafsirSelection(defaultTafsirSaadi);
+    
+    final userBox = Hive.box("user");
+    if (!userBox.containsKey(QuranTafsirFunction.selectedTafsirListKey)) {
+      await QuranTafsirFunction.setTafsirSelection(defaultTafsirSaadi);
+    }
   }
 
   static Map<dynamic, dynamic> _decodeJsonToMap(String source) {

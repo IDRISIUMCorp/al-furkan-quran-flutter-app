@@ -235,7 +235,7 @@ class WahyMushafMoreMenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isDark ? const Color(0xFF000000) : const Color(0xFFF7F5EC);
+    final bgColor = isDark ? Theme.of(context).colorScheme.surface : const Color(0xFFF7F5EC);
 
     return Theme(
       data: Theme.of(context).copyWith(
@@ -276,15 +276,15 @@ class WahyMushafMoreMenuButton extends StatelessWidget {
             ),
           ),
           itemBuilder: (context) => [
-            _buildMenuItem(_menuItems[0]),
-            _buildMenuItem(_menuItems[1]),
-            _buildMenuItem(_menuItems[2]),
-            _buildMenuItem(_menuItems[3]),
-            _buildMenuItem(_menuItems[4]),
+            _buildMenuItem(_menuItems[0]), // إعدادات المصحف
+            _buildMenuItem(_menuItems[1]), // أذكار المسلم
+            _buildMenuItem(_menuItems[2]), // مواقيت الصلاة
+            _buildMenuItem(_menuItems[3]), // القبلة
+            _buildMenuItem(_menuItems[4]), // المكتبة
             const PopupMenuDivider(height: 16),
-            _buildMenuItem(_menuItems[5]),
-            _buildMenuItem(_menuItems[6]),
-            _buildMenuItem(_menuItems[7]),
+            _buildMenuItem(_menuItems[5]), // الإعدادات
+            _buildMenuItem(_menuItems[6]), // عن التطبيق
+            _buildMenuItem(_menuItems[7]), // إرسال ملاحظة
           ],
           onSelected: onSelected,
         ),

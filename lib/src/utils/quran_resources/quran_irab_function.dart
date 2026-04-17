@@ -1,5 +1,5 @@
 import "package:hive_ce_flutter/hive_flutter.dart";
-import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
+import "package:al_furkan/src/resources/quran_resources/models/tafsir_book_model.dart";
 import "dart:convert";
 import "package:flutter/services.dart";
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:al_quran_v3/src/screen/smart_khatma/smart_khatma_page.dart';
+import 'package:al_furkan/src/screen/smart_khatma/smart_khatma_page.dart';
 
 Future<void> showKhatmaSheet({
   required BuildContext context,

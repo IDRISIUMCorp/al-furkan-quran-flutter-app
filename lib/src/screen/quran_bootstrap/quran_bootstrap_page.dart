@@ -1,9 +1,9 @@
 import "dart:async";
 import "dart:developer";
 
-import "package:al_quran_v3/src/core/bootstrap/app_bootstrap_coordinator.dart";
-import "package:al_quran_v3/src/core/di/service_locator.dart";
-import "package:al_quran_v3/src/screen/mushaf/mushaf_screen.dart";
+import "package:al_furkan/src/core/bootstrap/app_bootstrap_coordinator.dart";
+import "package:al_furkan/src/core/di/service_locator.dart";
+import "package:al_furkan/src/screen/mushaf/mushaf_screen.dart";
 import "package:flutter/material.dart";
 
 class QuranBootstrapPage extends StatefulWidget {

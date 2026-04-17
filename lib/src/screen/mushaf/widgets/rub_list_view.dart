@@ -1,9 +1,9 @@
 import "dart:convert";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
-import "package:al_quran_v3/src/utils/number_localization.dart";
-import "package:al_quran_v3/src/resources/quran_resources/meaning_of_surah.dart";
-import "package:al_quran_v3/src/utils/quran_ayahs_function/get_page_number.dart";
+import "package:al_furkan/src/utils/number_localization.dart";
+import "package:al_furkan/src/resources/quran_resources/meaning_of_surah.dart";
+import "package:al_furkan/src/utils/quran_ayahs_function/get_page_number.dart";
 
 class RubListView extends StatelessWidget {
   final ValueChanged<int> onOpenPage;

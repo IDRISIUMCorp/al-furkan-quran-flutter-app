@@ -1,4 +1,4 @@
-import "package:al_quran_v3/src/core/storage/app_storage.dart";
+import "package:al_furkan/src/core/storage/app_storage.dart";
 
 abstract class ReaderSessionRepository {
   int loadLastReadPage();

@@ -1,13 +1,14 @@
 import "dart:ui" as ui;
 import "package:flutter/material.dart";
 
-import "package:al_quran_v3/src/screen/about/about_the_app.dart";
-import "package:al_quran_v3/src/screen/smart_khatma/smart_khatma_page.dart";
-import "package:al_quran_v3/src/screen/qibla/qibla_direction.dart";
-import "package:al_quran_v3/src/screen/settings/settings_page.dart";
-import "package:al_quran_v3/src/screen/prayer_time/prayer_time_page.dart";
-import "package:al_quran_v3/src/screen/azkar/azkar_categories_screen.dart";
-import "package:al_quran_v3/src/screen/settings/widgets/ayah_widget_settings_page.dart";
+import "package:al_furkan/src/screen/about/about_the_app.dart";
+import "package:al_furkan/src/screen/smart_khatma/smart_khatma_page.dart";
+import "package:al_furkan/src/screen/qibla/qibla_direction.dart";
+import "package:al_furkan/src/screen/settings/settings_page.dart";
+import "package:al_furkan/src/screen/prayer_time/prayer_time_page.dart";
+import "package:al_furkan/src/screen/azkar/azkar_categories_screen.dart";
+import 'package:al_furkan/src/screen/settings/widgets/home_widget_studio_screen.dart';
+import "package:al_furkan/features/sunnah/presentation/screens/sunnah_prayer_screen_v2.dart";
 
 class WahySideDrawer extends StatefulWidget {
   final Color primary;
@@ -82,9 +83,10 @@ class _WahySideDrawerState extends State<WahySideDrawer>
 
   @override
   Widget build(BuildContext context) {
-    const bg = Color(0xFF0A0A0A);
-    const card = Color(0xFF161616);
-    const onBg = Colors.white;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isDark ? Theme.of(context).colorScheme.surface : const Color(0xFFFAFAFA);
+    final card = isDark ? Theme.of(context).colorScheme.surfaceContainerHighest : const Color(0xFFFFFFFF);
+    final onBg = isDark ? Colors.white : const Color(0xFF222222);
 
     int i = 0;
 
@@ -250,7 +252,18 @@ class _WahySideDrawerState extends State<WahySideDrawer>
                                     primary: widget.primary,
                                     onTap: () => _closeThenPush(
                                       context,
-                                      const AyahWidgetSettingsPage(),
+                                      const HomeWidgetStudioScreen(),
+                                    ),
+                                  ),
+                                  const WahyDrawerDivider(),
+                                  WahyDrawerItem(
+                                    title: "السنن",
+                                    subtitle: "سنن الصلاة والوضوء",
+                                    icon: Icons.favorite_rounded,
+                                    primary: widget.primary,
+                                    onTap: () => _closeThenPush(
+                                      context,
+                                      const SunnahPrayerScreenV2(),
                                     ),
                                   ),
                                 ],

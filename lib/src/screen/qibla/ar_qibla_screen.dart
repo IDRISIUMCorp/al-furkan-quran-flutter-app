@@ -1,13 +1,13 @@
 import "dart:math" as math;
 import "dart:ui" as ui;
 
-import "package:al_quran_v3/l10n/app_localizations.dart";
-import "package:al_quran_v3/src/screen/location_handler/cubit/location_data_qibla_data_cubit.dart";
-import "package:al_quran_v3/src/screen/location_handler/location_aquire.dart";
-import "package:al_quran_v3/src/screen/location_handler/model/location_data_qibla_data_state.dart";
-import "package:al_quran_v3/src/screen/qibla/qibla_guidance.dart";
-import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
-import "package:al_quran_v3/src/theme/controller/theme_state.dart";
+import "package:al_furkan/l10n/app_localizations.dart";
+import "package:al_furkan/src/screen/location_handler/cubit/location_data_qibla_data_cubit.dart";
+import "package:al_furkan/src/screen/location_handler/location_aquire.dart";
+import "package:al_furkan/src/screen/location_handler/model/location_data_qibla_data_state.dart";
+import "package:al_furkan/src/screen/qibla/qibla_guidance.dart";
+import "package:al_furkan/src/theme/controller/theme_cubit.dart";
+import "package:al_furkan/src/theme/controller/theme_state.dart";
 import "package:camera/camera.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
@@ -31,6 +31,20 @@ class _ARQiblaScreenState extends State<ARQiblaScreen> {
   bool _hasVibrator = false;
   bool _hasAmplitudeSupport = false;
   late final Future<bool?> _sensorSupportFuture;
+  
+  // Advanced Kalman Filter parameters for AR mode
+  final double _kalmanQ = 0.0005; // Process noise (lower = smoother)
+  final double _kalmanR = 0.05; // Measurement noise (lower = trust sensor more)
+  double _kalmanP = 1.0; // Estimation error
+  double _kalmanK = 0.0; // Kalman gain
+  double? _kalmanX; // Filtered value
+  
+  // Complementary filter for sensor fusion
+  final List<double> _headingHistory = [];
+  static const int _historySize = 8;
+  
+  // Dead zone to prevent micro-jitters
+  static const double _deadZone = 0.3;
 
   @override
   void initState() {
@@ -78,6 +92,83 @@ class _ARQiblaScreenState extends State<ARQiblaScreen> {
     } else {
       _alignedLatch = false;
     }
+  }
+  
+  /// Advanced Kalman Filter for AR mode - provides superior smoothing
+  double _applyKalmanFilter(double measurement) {
+    if (_kalmanX == null) {
+      _kalmanX = measurement;
+      return measurement;
+    }
+    
+    // Prediction update
+    _kalmanP = _kalmanP + _kalmanQ;
+    
+    // Measurement update
+    _kalmanK = _kalmanP / (_kalmanP + _kalmanR);
+    
+    // Handle circular angle wrapping (0-360 degrees)
+    double delta = shortestSignedAngleDifference(_kalmanX!, measurement);
+    _kalmanX = normalizeDegrees(_kalmanX! + _kalmanK * delta);
+    
+    _kalmanP = (1 - _kalmanK) * _kalmanP;
+    
+    return _kalmanX!;
+  }
+  
+  /// Complementary filter using weighted moving average
+  double _applyComplementaryFilter(double value) {
+    _headingHistory.add(value);
+    if (_headingHistory.length > _historySize) {
+      _headingHistory.removeAt(0);
+    }
+    
+    if (_headingHistory.length == 1) return value;
+    
+    // Calculate weighted average with more weight on recent values
+    double sum = 0;
+    double weightSum = 0;
+    for (int i = 0; i < _headingHistory.length; i++) {
+      double weight = (i + 1).toDouble(); // Linear weight increase
+      double angle = _headingHistory[i];
+      
+      // Handle circular averaging
+      if (i > 0) {
+        double delta = shortestSignedAngleDifference(_headingHistory[i - 1], angle);
+        angle = normalizeDegrees(_headingHistory[i - 1] + delta);
+      }
+      
+      sum += angle * weight;
+      weightSum += weight;
+    }
+    
+    return normalizeDegrees(sum / weightSum);
+  }
+  
+  /// Apply dead zone to prevent micro-jitters
+  double _applyDeadZone(double newValue, double? oldValue) {
+    if (oldValue == null) return newValue;
+    
+    double delta = shortestSignedAngleDifference(oldValue, newValue).abs();
+    if (delta < _deadZone) {
+      return oldValue; // Stay at old value if change is too small
+    }
+    
+    return newValue;
+  }
+  
+  /// Master smoothing function combining all filters
+  double _smoothHeadingForAR(double rawHeading) {
+    // Step 1: Apply Kalman Filter (primary smoothing)
+    double kalmanFiltered = _applyKalmanFilter(rawHeading);
+    
+    // Step 2: Apply Complementary Filter (secondary smoothing)
+    double complementaryFiltered = _applyComplementaryFilter(kalmanFiltered);
+    
+    // Step 3: Apply Dead Zone (prevent micro-jitters)
+    double finalValue = _applyDeadZone(complementaryFiltered, _smoothedHeading);
+    
+    return finalValue;
   }
 
   @override
@@ -206,12 +297,8 @@ class _ARQiblaScreenState extends State<ARQiblaScreen> {
                               );
                             }
 
-                            _smoothedHeading = smoothHeading(
-                              previousDegrees: _smoothedHeading,
-                              nextDegrees: rawHeading,
-                              factor: 0.24,
-                              jitterThreshold: 0.35,
-                            );
+                            // Apply advanced multi-stage smoothing for AR mode
+                            _smoothedHeading = _smoothHeadingForAR(rawHeading);
 
                             final guidance = resolveQiblaGuidance(
                               headingDegrees: _smoothedHeading!,
@@ -259,7 +346,13 @@ class _ARQiblaScreenState extends State<ARQiblaScreen> {
     required ThemeState themeState,
   }) {
     final statusColor = _statusColor(guidance, themeState);
-    final clampedOffset = (guidance.signedDifference / 45).clamp(-1.0, 1.0);
+    
+    // Use exponential smoothing for the offset to prevent sudden jumps
+    final targetOffset = (guidance.signedDifference / 45).clamp(-1.0, 1.0);
+    
+    // Apply additional smoothing to the visual offset
+    final smoothedOffset = _smoothOffset(targetOffset);
+    
     final arrowVisible = guidance.absoluteDifference > 7;
 
     return SafeArea(
@@ -289,35 +382,60 @@ class _ARQiblaScreenState extends State<ARQiblaScreen> {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 260),
-                  width: 110,
-                  height: 110,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: statusColor.withValues(alpha: 0.88),
-                      width: 3,
-                    ),
-                    boxShadow: guidance.isAligned
-                        ? [
-                            BoxShadow(
-                              color: statusColor.withValues(alpha: 0.26),
-                              blurRadius: 26,
-                              spreadRadius: 6,
-                            ),
-                          ]
-                        : null,
-                  ),
+                // Outer circle with smooth animation
+                TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeOutCubic,
+                  tween: Tween(begin: 110, end: guidance.isAligned ? 120 : 110),
+                  builder: (context, size, child) {
+                    return Container(
+                      width: size,
+                      height: size,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: statusColor.withValues(alpha: 0.88),
+                          width: 3,
+                        ),
+                        boxShadow: guidance.isAligned
+                            ? [
+                                BoxShadow(
+                                  color: statusColor.withValues(alpha: 0.26),
+                                  blurRadius: 26,
+                                  spreadRadius: 6,
+                                ),
+                              ]
+                            : null,
+                      ),
+                    );
+                  },
                 ),
-                Container(
-                  width: 18,
-                  height: 18,
-                  decoration: BoxDecoration(
-                    color: statusColor,
-                    shape: BoxShape.circle,
-                  ),
+                // Center dot
+                TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeOutCubic,
+                  tween: Tween(begin: 18, end: guidance.isAligned ? 22 : 18),
+                  builder: (context, size, child) {
+                    return Container(
+                      width: size,
+                      height: size,
+                      decoration: BoxDecoration(
+                        color: statusColor,
+                        shape: BoxShape.circle,
+                        boxShadow: guidance.isAligned
+                            ? [
+                                BoxShadow(
+                                  color: statusColor.withValues(alpha: 0.5),
+                                  blurRadius: 12,
+                                  spreadRadius: 2,
+                                ),
+                              ]
+                            : null,
+                      ),
+                    );
+                  },
                 ),
+                // Crosshair lines
                 Positioned(
                   top: 40,
                   child: Container(
@@ -335,56 +453,96 @@ class _ARQiblaScreenState extends State<ARQiblaScreen> {
                     color: Colors.white.withValues(alpha: 0.18),
                   ),
                 ),
-                AnimatedAlign(
-                  duration: const Duration(milliseconds: 260),
+                // Kaaba icon with ultra-smooth animation
+                TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 600),
                   curve: Curves.easeOutCubic,
-                  alignment: Alignment(clampedOffset, 0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        width: 90,
-                        height: 90,
-                        child: SvgPicture.asset(
-                          "assets/img/kaaba.svg",
-                          colorFilter: ColorFilter.mode(
-                            statusColor,
-                            BlendMode.srcIn,
+                  tween: Tween(begin: smoothedOffset, end: smoothedOffset),
+                  builder: (context, offset, child) {
+                    return Align(
+                      alignment: Alignment(offset, 0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Kaaba icon with scale animation
+                          TweenAnimationBuilder<double>(
+                            duration: const Duration(milliseconds: 400),
+                            curve: Curves.easeOutBack,
+                            tween: Tween(begin: 1.0, end: guidance.isAligned ? 1.15 : 1.0),
+                            builder: (context, scale, child) {
+                              return Transform.scale(
+                                scale: scale,
+                                child: SizedBox(
+                                  width: 90,
+                                  height: 90,
+                                  child: SvgPicture.asset(
+                                    "assets/img/kaaba.svg",
+                                    colorFilter: ColorFilter.mode(
+                                      statusColor,
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        ),
-                      ),
-                      const Gap(10),
-                      if (guidance.isAligned)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: statusColor.withValues(alpha: 0.94),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: const Text(
-                            "القبلة في المنتصف",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w800,
+                          const Gap(10),
+                          // Aligned badge with fade animation
+                          AnimatedOpacity(
+                            duration: const Duration(milliseconds: 300),
+                            opacity: guidance.isAligned ? 1.0 : 0.0,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: statusColor.withValues(alpha: 0.94),
+                                borderRadius: BorderRadius.circular(999),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: statusColor.withValues(alpha: 0.3),
+                                    blurRadius: 12,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
+                              ),
+                              child: const Text(
+                                "القبلة في المنتصف",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                    ],
-                  ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
+                // Direction arrows with fade animation
                 if (arrowVisible)
-                  Positioned(
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeOutCubic,
                     right: guidance.turn == QiblaTurn.right ? 26 : null,
                     left: guidance.turn == QiblaTurn.left ? 26 : null,
-                    child: Icon(
-                      guidance.turn == QiblaTurn.right
-                          ? Icons.arrow_forward_ios_rounded
-                          : Icons.arrow_back_ios_rounded,
-                      color: Colors.white,
-                      size: 56,
+                    child: TweenAnimationBuilder<double>(
+                      duration: const Duration(milliseconds: 300),
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      builder: (context, opacity, child) {
+                        return Opacity(
+                          opacity: opacity,
+                          child: Icon(
+                            guidance.turn == QiblaTurn.right
+                                ? Icons.arrow_forward_ios_rounded
+                                : Icons.arrow_back_ios_rounded,
+                            color: Colors.white,
+                            size: 56,
+                          ),
+                        );
+                      },
                     ),
                   ),
               ],
@@ -462,6 +620,21 @@ class _ARQiblaScreenState extends State<ARQiblaScreen> {
         ],
       ),
     );
+  }
+  
+  // Smooth offset for Kaaba icon position
+  double? _lastOffset;
+  double _smoothOffset(double targetOffset) {
+    if (_lastOffset == null) {
+      _lastOffset = targetOffset;
+      return targetOffset;
+    }
+    
+    // Exponential moving average for ultra-smooth transitions
+    const double alpha = 0.15; // Lower = smoother
+    _lastOffset = alpha * targetOffset + (1 - alpha) * _lastOffset!;
+    
+    return _lastOffset!;
   }
 
   Widget _buildUnavailableOverlay({

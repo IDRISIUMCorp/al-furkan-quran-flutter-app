@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
-import 'package:al_quran_v3/src/screen/azkar/azkar_share_screen.dart';
+import 'package:al_furkan/src/screen/azkar/azkar_share_screen.dart';
 
 class AzkarDetailScreen extends StatefulWidget {
   final String categoryName;

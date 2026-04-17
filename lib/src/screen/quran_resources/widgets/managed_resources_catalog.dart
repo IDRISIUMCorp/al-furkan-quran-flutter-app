@@ -1,10 +1,11 @@
 import "dart:async";
 
-import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
-import "package:al_quran_v3/src/theme/controller/theme_state.dart" as theme;
+import "package:al_furkan/src/theme/controller/theme_cubit.dart";
+import "package:al_furkan/src/theme/controller/theme_state.dart" as theme;
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:flutter_screenutil/flutter_screenutil.dart";
+import "package:flutter_animate/flutter_animate.dart";
 
 enum ResourceLibraryFilter { all, active, downloaded, available }
 
@@ -318,30 +319,44 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
         ),
         padding: EdgeInsets.fromLTRB(16.w, 26.h, 16.w, 100.h),
         children: [
-          _buildHeroCard(themeState, isDark),
-          SizedBox(height: 16.h),
-          _buildSearchField(isDark),
+          _buildSearchField(isDark)
+              .animate()
+              .fadeIn(delay: 50.ms, duration: 400.ms, curve: Curves.easeOutCubic)
+              .slideY(begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOutCubic),
           SizedBox(height: 12.h),
-          _buildFilters(themeState, isDark),
+          _buildFilters(themeState, isDark)
+              .animate()
+              .fadeIn(delay: 100.ms, duration: 400.ms, curve: Curves.easeOutCubic),
           SizedBox(height: 12.h),
-          _buildQuickActions(themeState, isDark, hasDownloadedItems),
+          _buildQuickActions(themeState, isDark, hasDownloadedItems)
+              .animate()
+              .fadeIn(delay: 150.ms, duration: 400.ms, curve: Curves.easeOutCubic),
           if (_deleteMode && _markedForDeletion.isNotEmpty) ...[
             SizedBox(height: 12.h),
-            _buildDeleteBanner(themeState, isDark),
+            _buildDeleteBanner(themeState, isDark)
+                .animate()
+                .fadeIn(duration: 300.ms)
+                .slideY(begin: -0.1, end: 0, duration: 300.ms, curve: Curves.easeOutCubic),
           ],
           SizedBox(height: 14.h),
           if (groupedItems.isEmpty)
             _buildEmptyState(isDark)
+                .animate()
+                .fadeIn(delay: 200.ms, duration: 400.ms)
           else if (_reorderEnabled)
             _buildReorderList(themeState, isDark)
+                .animate()
+                .fadeIn(delay: 200.ms, duration: 400.ms)
           else
-            ...groupedItems.entries.map(
-              (entry) => _buildGroupSection(
-                entry.key,
-                entry.value,
+            ...groupedItems.entries.toList().asMap().entries.map(
+              (mapEntry) => _buildGroupSection(
+                mapEntry.value.key,
+                mapEntry.value.value,
                 themeState,
                 isDark,
-              ),
+              ).animate()
+               .fadeIn(delay: Duration(milliseconds: 200 + (mapEntry.key * 100)), duration: 400.ms)
+               .slideY(begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOutCubic),
             ),
         ],
       ),
@@ -373,120 +388,30 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
     );
   }
 
-  Widget _buildHeroCard(theme.ThemeState themeState, bool isDark) {
-    final cardColor = isDark ? const Color(0xFF171717) : Colors.white;
-    return Container(
-      padding: EdgeInsets.all(18.w),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: isDark
-              ? Colors.white10
-              : themeState.primary.withValues(alpha: 0.08),
+  Widget _buildEmptyState(bool isDark) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.only(top: 40.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.search_off_rounded,
+              size: 30.sp,
+              color: isDark ? Colors.white38 : Colors.black38,
+            ),
+            SizedBox(height: 12.h),
+            Text(
+              widget.emptyMessage,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white54 : Colors.black54,
+              ),
+            ),
+          ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.18)
-                : themeState.primary.withValues(alpha: 0.08),
-            blurRadius: 22,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            widget.title,
-            textAlign: TextAlign.right,
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w900,
-              color: isDark ? Colors.white : Colors.black87,
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            widget.description,
-            textAlign: TextAlign.right,
-            style: TextStyle(
-              fontSize: 11.5.sp,
-              height: 1.7,
-              color: isDark ? Colors.white60 : Colors.black54,
-            ),
-          ),
-          SizedBox(height: 14.h),
-          Wrap(
-            alignment: WrapAlignment.start,
-            spacing: 8.w,
-            runSpacing: 8.h,
-            children: [
-              _buildCounterPill(
-                label: "الكل",
-                value: widget.items.length,
-                themeState: themeState,
-                isDark: isDark,
-              ),
-              _buildCounterPill(
-                label: "المفعّل",
-                value: _activeCount,
-                themeState: themeState,
-                isDark: isDark,
-              ),
-              _buildCounterPill(
-                label: "المحمّل",
-                value: _downloadedCount,
-                themeState: themeState,
-                isDark: isDark,
-              ),
-              _buildCounterPill(
-                label: "المتاح",
-                value: _availableCount,
-                themeState: themeState,
-                isDark: isDark,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCounterPill({
-    required String label,
-    required int value,
-    required theme.ThemeState themeState,
-    required bool isDark,
-  }) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-      decoration: BoxDecoration(
-        color: themeState.primary.withValues(alpha: isDark ? 0.14 : 0.08),
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            value.toString(),
-            style: TextStyle(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w900,
-              color: themeState.primary,
-            ),
-          ),
-          SizedBox(width: 6.w),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w700,
-              color: isDark ? Colors.white70 : Colors.black87,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -678,7 +603,7 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: EdgeInsets.only(bottom: 8.h, top: 6.h),
+          padding: EdgeInsets.only(bottom: 12.h, top: 12.h),
           child: Row(
             children: [
               Text(
@@ -686,23 +611,33 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w900,
-                  color: themeState.primary,
+                  color: isDark ? Colors.white : Colors.black87,
                 ),
               ),
               SizedBox(width: 8.w),
-              Text(
-                "${items.length}",
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white38 : Colors.black38,
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                decoration: BoxDecoration(
+                  color: themeState.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  "${items.length}",
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w800,
+                    color: themeState.primary,
+                  ),
                 ),
               ),
             ],
           ),
         ),
-        ...items.map((item) => _buildItemCard(item, themeState, isDark)),
-        SizedBox(height: 8.h),
+        ...items.map((item) => Padding(
+              padding: EdgeInsets.only(bottom: 12.h),
+              child: _buildItemCard(item, themeState, isDark),
+            )),
+        SizedBox(height: 12.h),
       ],
     );
   }
@@ -737,159 +672,159 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
         borderRadius: BorderRadius.circular(22),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
-          padding: EdgeInsets.all(14.w),
+          padding: EdgeInsets.all(16.w),
           decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(
-            color: marked
-                ? Colors.redAccent.withValues(alpha: 0.45)
-                : item.isActive
-                ? themeState.primary.withValues(alpha: 0.25)
-                : (isDark
-                      ? Colors.white10
-                      : Colors.black.withValues(alpha: 0.05)),
-            width: marked || item.isActive ? 1.4 : 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: isDark
-                  ? Colors.black.withValues(alpha: 0.10)
-                  : Colors.black.withValues(alpha: 0.05),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
+            color: cardColor,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: marked
+                  ? Colors.redAccent.withOpacity(0.45)
+                  : item.isActive
+                  ? themeState.primary.withOpacity(0.25)
+                  : (isDark
+                        ? Colors.white.withOpacity(0.05)
+                        : Colors.black.withOpacity(0.04)),
+              width: marked || item.isActive ? 1.5 : 1,
             ),
-          ],
-        ),
-          child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (_deleteMode && item.isDownloaded)
-                  Padding(
-                    padding: EdgeInsets.only(left: 10.w, top: 2.h),
-                    child: Icon(
-                      marked
-                          ? Icons.check_circle_rounded
-                          : Icons.radio_button_unchecked_rounded,
-                      color: marked ? Colors.redAccent : Colors.grey,
-                    ),
-                  ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.title,
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w800,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
-                      ),
-                      if (!_deleteMode &&
-                          (_resolvedSizeBytes(item) != null ||
-                              _loadingSizeIds.contains(item.id))) ...[
-                        SizedBox(height: 8.h),
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 180),
-                          child: _loadingSizeIds.contains(item.id)
-                              ? Text(
-                                  "جاري جلب حجم الملف...",
-                                  key: ValueKey<String>("loading-${item.id}"),
-                                  style: TextStyle(
-                                    fontSize: 10.5.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: isDark
-                                        ? Colors.white38
-                                        : Colors.black45,
-                                  ),
-                                )
-                              : Text(
-                                  item.isDownloaded
-                                      ? "الحجم على الجهاز: ${_formatBytes(_resolvedSizeBytes(item))}"
-                                      : "الحجم التقريبي: ${_formatBytes(_resolvedSizeBytes(item))}",
-                                  key: ValueKey<String>("size-${item.id}"),
-                                  style: TextStyle(
-                                    fontSize: 10.5.sp,
-                                    fontWeight: FontWeight.w700,
-                                    color: themeState.primary,
-                                  ),
-                                ),
-                        ),
-                      ],
-                      if ((item.subtitle ?? "").trim().isNotEmpty) ...[
-                        SizedBox(height: 4.h),
-                        Text(
-                          item.subtitle!,
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            height: 1.5,
-                            color: isDark ? Colors.white54 : Colors.black54,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
+            boxShadow: [
+              if (!isDark)
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 ),
-                if (!_deleteMode)
-                  _buildTrailingAction(item, themeState, isDark),
-              ],
-            ),
-            if (item.badges.isNotEmpty) ...[
-              SizedBox(height: 10.h),
-              Wrap(
-                spacing: 8.w,
-                runSpacing: 8.h,
-                children: item.badges
-                    .map(
-                      (badge) => Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 10.w,
-                          vertical: 6.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: themeState.primary.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Text(
-                          badge,
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_deleteMode && item.isDownloaded)
+                    Padding(
+                      padding: EdgeInsets.only(left: 12.w, top: 2.h),
+                      child: Icon(
+                        marked
+                            ? Icons.check_circle_rounded
+                            : Icons.radio_button_unchecked_rounded,
+                        color: marked ? Colors.redAccent : Colors.grey,
+                      ),
+                    ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.title,
                           style: TextStyle(
-                            fontSize: 10.sp,
-                            fontWeight: FontWeight.w700,
-                            color: themeState.primary,
+                            fontSize: 14.5.sp,
+                            fontWeight: FontWeight.w800,
+                            color: isDark ? Colors.white : Colors.black87,
                           ),
                         ),
-                      ),
-                    )
-                    .toList(),
-              ),
-            ],
-            if (!_deleteMode) ...[
-              SizedBox(height: 12.h),
-              Row(
-                children: [
-                  _buildStatusPill(item, themeState, isDark),
-                  const Spacer(),
-                  if (item.isDownloaded && item.onDelete != null)
-                    IconButton(
-                      onPressed: item.onDelete,
-                      icon: const Icon(
-                        Icons.delete_outline_rounded,
-                        color: Colors.redAccent,
-                      ),
-                      visualDensity: VisualDensity.compact,
+                        if (!_deleteMode &&
+                            (_resolvedSizeBytes(item) != null ||
+                                _loadingSizeIds.contains(item.id))) ...[
+                          SizedBox(height: 6.h),
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 180),
+                            child: _loadingSizeIds.contains(item.id)
+                                ? Text(
+                                    "جاري جلب حجم الملف...",
+                                    key: ValueKey<String>("loading-${item.id}"),
+                                    style: TextStyle(
+                                      fontSize: 10.5.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: isDark
+                                          ? Colors.white38
+                                          : Colors.black45,
+                                    ),
+                                  )
+                                : Text(
+                                    item.isDownloaded
+                                        ? "الحجم على الجهاز: ${_formatBytes(_resolvedSizeBytes(item))}"
+                                        : "الحجم التقريبي: ${_formatBytes(_resolvedSizeBytes(item))}",
+                                    key: ValueKey<String>("size-${item.id}"),
+                                    style: TextStyle(
+                                      fontSize: 10.5.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: themeState.primary.withOpacity(0.8),
+                                    ),
+                                  ),
+                          ),
+                        ],
+                        if ((item.subtitle ?? "").trim().isNotEmpty) ...[
+                          SizedBox(height: 6.h),
+                          Text(
+                            item.subtitle!,
+                            style: TextStyle(
+                              fontSize: 11.5.sp,
+                              height: 1.5,
+                              color: isDark ? Colors.white60 : Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
+                  ),
+                  if (!_deleteMode)
+                    _buildTrailingAction(item, themeState, isDark),
                 ],
               ),
+              if (item.badges.isNotEmpty) ...[
+                SizedBox(height: 12.h),
+                Wrap(
+                  spacing: 8.w,
+                  runSpacing: 8.h,
+                  children: item.badges
+                      .map(
+                        (badge) => Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 6.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: themeState.primary.withOpacity(isDark ? 0.15 : 0.08),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            badge,
+                            style: TextStyle(
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w800,
+                              color: themeState.primary,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ],
+              if (!_deleteMode) ...[
+                SizedBox(height: 12.h),
+                Row(
+                  children: [
+                    _buildStatusPill(item, themeState, isDark),
+                    const Spacer(),
+                    if (item.isDownloaded && item.onDelete != null)
+                      IconButton(
+                        onPressed: item.onDelete,
+                        icon: const Icon(
+                          Icons.delete_outline_rounded,
+                          color: Colors.redAccent,
+                        ),
+                        visualDensity: VisualDensity.compact,
+                        tooltip: "حذف المورد",
+                      ),
+                  ],
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
-    ),
-  );
+    );
   }
 
   Widget _buildTrailingAction(
@@ -899,12 +834,12 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
   ) {
     if (item.isBusy) {
       return SizedBox(
-        width: 60.w,
+        width: 50.w,
         child: Column(
           children: [
             SizedBox(
-              width: 26.w,
-              height: 26.w,
+              width: 24.w,
+              height: 24.w,
               child: CircularProgressIndicator(
                 strokeWidth: 2.4,
                 value: item.progress > 0 ? item.progress.clamp(0.0, 1.0) : null,
@@ -916,7 +851,7 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
               "${(item.progress * 100).round()}%",
               style: TextStyle(
                 fontSize: 10.sp,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w800,
                 color: themeState.primary,
               ),
             ),
@@ -926,20 +861,21 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
     }
 
     if (!item.isDownloaded) {
-      return ElevatedButton(
+      return ElevatedButton.icon(
         onPressed: item.onDownload,
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: themeState.primary,
-          foregroundColor: Colors.white,
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+          backgroundColor: themeState.primary.withOpacity(0.12),
+          foregroundColor: themeState.primary,
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(999),
           ),
         ),
-        child: Text(
+        icon: Icon(Icons.download_rounded, size: 16.sp),
+        label: Text(
           "تحميل",
-          style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w800),
+          style: TextStyle(fontSize: 11.5.sp, fontWeight: FontWeight.w800),
         ),
       );
     }
@@ -960,7 +896,7 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
         decoration: BoxDecoration(
-          color: activeColor.withValues(alpha: 0.10),
+          color: activeColor.withOpacity(0.10),
           borderRadius: BorderRadius.circular(999),
         ),
         child: Row(
@@ -1102,29 +1038,4 @@ class _ManagedResourcesCatalogState extends State<ManagedResourcesCatalog> {
     );
   }
 
-  Widget _buildEmptyState(bool isDark) {
-    return Padding(
-      padding: EdgeInsets.only(top: 28.h),
-      child: Column(
-        children: [
-          Icon(
-            Icons.search_off_rounded,
-            size: 30.sp,
-            color: isDark ? Colors.white38 : Colors.black38,
-          ),
-          SizedBox(height: 10.h),
-          Text(
-            widget.emptyMessage,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 13.sp,
-              height: 1.7,
-              fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white54 : Colors.black54,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

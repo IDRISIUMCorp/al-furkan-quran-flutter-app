@@ -1,7 +1,8 @@
-import "package:al_quran_v3/src/screen/location_handler/cubit/location_data_qibla_data_cubit.dart";
-import "package:al_quran_v3/src/screen/location_handler/location_aquire.dart";
-import "package:al_quran_v3/src/screen/location_handler/model/location_data_qibla_data_state.dart";
-import "package:al_quran_v3/src/screen/prayer_time/time_list_of_prayers.dart";
+import "package:al_furkan/src/screen/location_handler/cubit/location_data_qibla_data_cubit.dart";
+import "package:al_furkan/src/screen/location_handler/location_aquire.dart";
+import "package:al_furkan/src/screen/location_handler/model/location_data_qibla_data_state.dart";
+import "package:al_furkan/src/screen/prayer_time/time_list_of_prayers.dart";
+import "package:al_furkan/src/screen/mushaf/widgets/wahy_side_drawer.dart";
 
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
@@ -14,11 +15,22 @@ class PrayerTimePage extends StatefulWidget {
 }
 
 class _PrayerTimePageState extends State<PrayerTimePage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: cs.surface,
+      drawer: WahySideDrawer(
+        primary: cs.primary,
+        onOpenIndex: () {},
+        onOpenBookmarks: () {},
+        onOpenStarred: () {},
+        onOpenNotes: () {},
+        onJumpToAyah: (_) {},
+      ),
       appBar: AppBar(
         backgroundColor: cs.surface,
         surfaceTintColor: Colors.transparent,
@@ -33,8 +45,9 @@ class _PrayerTimePageState extends State<PrayerTimePage> {
           ),
         ),
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back_ios_rounded, color: cs.primary),
+          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+          icon: Icon(Icons.menu_rounded, color: cs.primary),
+          tooltip: "القائمة الرئيسية",
         ),
       ),
       body: BlocBuilder<

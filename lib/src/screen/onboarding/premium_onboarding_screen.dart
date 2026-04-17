@@ -1,9 +1,9 @@
 import "dart:ui";
 
-import "package:al_quran_v3/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
-import "package:al_quran_v3/src/screen/settings/theme_settings.dart";
-import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
-import "package:al_quran_v3/src/theme/controller/theme_state.dart";
+import "package:al_furkan/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
+import "package:al_furkan/src/screen/settings/theme_settings.dart";
+import "package:al_furkan/src/theme/controller/theme_cubit.dart";
+import "package:al_furkan/src/theme/controller/theme_state.dart";
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:flutter_animate/flutter_animate.dart";

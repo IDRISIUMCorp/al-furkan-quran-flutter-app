@@ -1,5 +1,5 @@
 import "package:adhan_dart/adhan_dart.dart" hide Prayer;
-import "package:al_quran_v3/src/screen/prayer_time/models/prayer_enum.dart";
+import "package:al_furkan/src/screen/prayer_time/models/prayer_enum.dart";
 
 extension PrayerTimesExtensions on PrayerTimes {
   DateTime _toLocalTime(DateTime value) =>

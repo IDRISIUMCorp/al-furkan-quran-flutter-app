@@ -1,4 +1,4 @@
-import "package:al_quran_v3/src/utils/quran_resources/quran_translation_function.dart";
+import "package:al_furkan/src/utils/quran_resources/quran_translation_function.dart";
  
 import "../../resources/quran_resources/models/translation_book_model.dart";
  

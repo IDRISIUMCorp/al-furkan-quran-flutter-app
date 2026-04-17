@@ -1,6 +1,6 @@
 import "package:flutter/foundation.dart";
 import "package:adhan_dart/adhan_dart.dart";
-import "package:al_quran_v3/src/screen/location_handler/model/lat_lon.dart";
+import "package:al_furkan/src/screen/location_handler/model/lat_lon.dart";
 
 @immutable
 class LocationQiblaPrayerDataState {

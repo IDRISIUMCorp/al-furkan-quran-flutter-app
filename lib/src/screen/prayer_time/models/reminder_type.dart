@@ -1,4 +1,4 @@
-import "package:al_quran_v3/l10n/app_localizations.dart";
+import "package:al_furkan/l10n/app_localizations.dart";
 import "package:flutter/material.dart";
 
 enum PrayerReminderType { notification, alarm }

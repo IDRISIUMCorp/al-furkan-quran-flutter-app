@@ -40,7 +40,7 @@ class AppTheme {
   static ThemeData darkTheme(FlexScheme scheme) {
     final theme = FlexThemeData.dark(
       scheme: scheme,
-      darkIsTrueBlack: true,
+      darkIsTrueBlack: false,
       surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
       blendLevel: 13,
       subThemesData: const FlexSubThemesData(

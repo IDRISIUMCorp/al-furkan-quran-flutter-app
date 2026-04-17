@@ -1,13 +1,13 @@
 import "dart:developer";
 
-import "package:al_quran_v3/src/core/notifications/notification_scheduler.dart";
-import "package:al_quran_v3/src/core/quran_resources/quran_resources_repository.dart";
-import "package:al_quran_v3/src/core/settings/settings_repository.dart";
-import "package:al_quran_v3/src/platform_services.dart" as platform_services;
-import "package:al_quran_v3/src/resources/translation/language_cubit.dart";
-import "package:al_quran_v3/src/resources/translation/languages.dart";
-import "package:al_quran_v3/src/screen/location_handler/model/location_data_qibla_data_state.dart";
-import "package:al_quran_v3/src/theme/functions/theme_functions.dart";
+import "package:al_furkan/src/core/notifications/notification_scheduler.dart";
+import "package:al_furkan/src/core/quran_resources/quran_resources_repository.dart";
+import "package:al_furkan/src/core/settings/settings_repository.dart";
+import "package:al_furkan/src/platform_services.dart" as platform_services;
+import "package:al_furkan/src/resources/translation/language_cubit.dart";
+import "package:al_furkan/src/resources/translation/languages.dart";
+import "package:al_furkan/src/screen/location_handler/model/location_data_qibla_data_state.dart";
+import "package:al_furkan/src/theme/functions/theme_functions.dart";
 
 class AppBootstrapSnapshot {
   const AppBootstrapSnapshot({

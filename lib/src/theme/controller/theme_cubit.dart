@@ -1,5 +1,5 @@
-import "package:al_quran_v3/src/theme/controller/theme_state.dart";
-import "package:al_quran_v3/src/theme/functions/theme_functions.dart";
+import "package:al_furkan/src/theme/controller/theme_state.dart";
+import "package:al_furkan/src/theme/functions/theme_functions.dart";
 import "package:flex_color_scheme/flex_color_scheme.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";

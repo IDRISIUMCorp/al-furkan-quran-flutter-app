@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:qcf_quran/qcf_quran.dart' hide getPageNumber;
 import 'package:share_plus/share_plus.dart';
 
-import 'package:al_quran_v3/src/utils/quran_ayahs_function/get_page_number.dart';
+import 'package:al_furkan/src/utils/quran_ayahs_function/get_page_number.dart';
 
 class AyahImageGenerator {
   /// شارك الآية كصورة فقط (بدون تفسير)

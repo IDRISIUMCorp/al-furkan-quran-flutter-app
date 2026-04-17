@@ -1,10 +1,10 @@
-import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
-import "package:al_quran_v3/src/resources/quran_resources/tafsir_info_with_score.dart";
-import "package:al_quran_v3/src/screen/quran_resources/widgets/managed_resources_catalog.dart";
-import "package:al_quran_v3/src/screen/setup/cubit/resources_progress_cubit_cubit.dart";
-import "package:al_quran_v3/src/screen/setup/cubit/resources_progress_cubit_state.dart";
-import "package:al_quran_v3/src/utils/quran_resources/default_offline_resources.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
+import "package:al_furkan/src/resources/quran_resources/models/tafsir_book_model.dart";
+import "package:al_furkan/src/resources/quran_resources/tafsir_info_with_score.dart";
+import "package:al_furkan/src/screen/quran_resources/widgets/managed_resources_catalog.dart";
+import "package:al_furkan/src/screen/setup/cubit/resources_progress_cubit_cubit.dart";
+import "package:al_furkan/src/screen/setup/cubit/resources_progress_cubit_state.dart";
+import "package:al_furkan/src/utils/quran_resources/default_offline_resources.dart";
+import "package:al_furkan/src/utils/quran_resources/quran_tafsir_function.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 
@@ -24,10 +24,7 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() async {
-      await QuranTafsirFunction.init();
-      await _loadData();
-    });
+    _loadData();
   }
 
   Future<void> _loadData() async {
@@ -73,11 +70,7 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
 
   bool _isBookBusy(ResourcesProgressCubitState state, TafsirBookModel book) {
     if (state.onProcess != true) return false;
-    if (state.activeResourceId != null) {
-      return state.activeResourceId == book.fullPath;
-    }
-    final processName = state.processName ?? "";
-    return processName.contains(book.name);
+    return state.progressMap.containsKey(book.fullPath);
   }
 
   Future<void> _toggleSelection(TafsirBookModel book, bool selected) async {
@@ -155,17 +148,12 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
         id: book.fullPath,
         title: book.name,
         group: book.language,
-        subtitle: downloaded
-            ? "مفعّل داخل التطبيق ويمكن المقارنة بين أكثر من تفسير معًا."
-            : "نزّله ليظهر داخل المكتبة مع التنقل بين الآيات.",
-        badges: [
-          "${book.hasTafsir} آية",
-          if (book.score > 0) "درجة ${book.score.round()}",
-        ],
+        subtitle: null,
+        badges: const [],
         isDownloaded: downloaded,
         isActive: _isSelected(book),
         isBusy: busy,
-        progress: busy ? (state.percentage ?? 0.0).clamp(0.0, 1.0) : 0,
+        progress: busy ? (state.progressMap[book.fullPath] ?? 0.0).clamp(0.0, 1.0) : 0,
         orderIndex: downloaded ? orderMap[book.fullPath] : null,
         sizeBytes: downloaded
             ? QuranTafsirFunction.getDownloadedTafsirSizeBytes(book.fullPath)
@@ -173,8 +161,8 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
         onLoadSize: downloaded
             ? null
             : () => QuranTafsirFunction.getRemoteBookSizeBytes(book),
-        transferredBytes: busy ? state.transferredBytes : null,
-        totalBytes: busy ? state.totalBytes : null,
+        transferredBytes: busy ? state.transferredBytesMap[book.fullPath] : null,
+        totalBytes: busy ? state.totalBytesMap[book.fullPath] : null,
         onToggleActive: downloaded
             ? (value) => _toggleSelection(book, value)
             : null,
@@ -191,11 +179,11 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
         return ManagedResourcesCatalog(
           title: "إدارة التفاسير",
           description:
-              "فعّل أكثر من تفسير للمقارنة السريعة، أو نظّف التفاسير المحمّلة بحذف فردي أو جماعي.",
-          searchHint: "ابحث عن تفسير أو لغة...",
-          emptyMessage: "لا توجد تفاسير مطابقة للبحث أو للفلاتر الحالية.",
+              "فعّل أكثر من تفسير للمقارنة السريعة.",
+          searchHint: "",
+          emptyMessage: "لا توجد تفاسير مطابقة.",
           deleteModeLabel: "تحديد للحذف",
-          activateAllLabel: "تفعيل كل المحمّل",
+          activateAllLabel: "تفعيل الكل",
           clearActiveLabel: "مسح المختار",
           deleteSelectionLabel: "حذف المحدد",
           activationBehavior: ResourceActivationBehavior.multi,

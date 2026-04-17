@@ -1,5 +1,5 @@
-import "package:al_quran_v3/src/utils/basic_functions.dart";
-import "package:al_quran_v3/src/resources/quran_resources/quran_pages_info.dart";
+import "package:al_furkan/src/utils/basic_functions.dart";
+import "package:al_furkan/src/resources/quran_resources/quran_pages_info.dart";
 
 int? getPageNumber(String ayahKey) {
   int? ayahID = convertKeyToAyahNumber(ayahKey);

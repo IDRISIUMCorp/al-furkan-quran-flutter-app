@@ -1,14 +1,14 @@
-import "package:al_quran_v3/l10n/app_localizations.dart";
-import "package:al_quran_v3/src/resources/quran_resources/meta/meta_data_surah.dart";
-import "package:al_quran_v3/src/resources/quran_resources/meaning_of_surah.dart";
-import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
-import "package:al_quran_v3/src/screen/quran_resources/quran_resources_view.dart";
-import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.dart";
-import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_state.dart";
-import "package:al_quran_v3/src/screen/surah_list_view/model/surah_info_model.dart";
-import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart";
+import "package:al_furkan/l10n/app_localizations.dart";
+import "package:al_furkan/src/resources/quran_resources/meta/meta_data_surah.dart";
+import "package:al_furkan/src/resources/quran_resources/meaning_of_surah.dart";
+import "package:al_furkan/src/resources/quran_resources/models/tafsir_book_model.dart";
+import "package:al_furkan/src/screen/quran_resources/quran_resources_view.dart";
+import "package:al_furkan/src/screen/settings/cubit/quran_script_view_cubit.dart";
+import "package:al_furkan/src/screen/settings/cubit/quran_script_view_state.dart";
+import "package:al_furkan/src/screen/surah_list_view/model/surah_info_model.dart";
+import "package:al_furkan/src/theme/controller/theme_cubit.dart";
+import "package:al_furkan/src/utils/quran_resources/quran_script_function.dart";
+import "package:al_furkan/src/utils/quran_resources/quran_tafsir_function.dart";
 import "package:qcf_quran/qcf_quran.dart" as qcf;
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
@@ -16,9 +16,9 @@ import "dart:ui" as ui;
 import "package:flutter_html/flutter_html.dart";
 import "package:gap/gap.dart";
 import "package:share_plus/share_plus.dart";
-import "package:al_quran_v3/src/resources/quran_resources/quran_ayah_count.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_irab_function.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_sarf_function.dart";
+import "package:al_furkan/src/resources/quran_resources/quran_ayah_count.dart";
+import "package:al_furkan/src/utils/quran_resources/quran_irab_function.dart";
+import "package:al_furkan/src/utils/quran_resources/quran_sarf_function.dart";
 
 class TafsirView extends StatefulWidget {
   final String ayahKey;

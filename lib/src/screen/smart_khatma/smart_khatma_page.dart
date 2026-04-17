@@ -1,12 +1,13 @@
 import "dart:math";
 
-import "package:al_quran_v3/src/resources/quran_resources/quran_pages_info.dart";
-import "package:al_quran_v3/src/screen/mushaf/mushaf_screen.dart";
-import "package:al_quran_v3/src/core/notifications/khatma_notification_service.dart";
-import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
-import "package:al_quran_v3/src/theme/controller/theme_state.dart";
-import "package:al_quran_v3/src/utils/basic_functions.dart";
-import "package:al_quran_v3/src/utils/number_localization.dart";
+import "package:al_furkan/src/resources/quran_resources/quran_pages_info.dart";
+import "package:al_furkan/src/screen/mushaf/mushaf_screen.dart";
+import "package:al_furkan/src/screen/mushaf/widgets/wahy_side_drawer.dart";
+import "package:al_furkan/src/core/notifications/khatma_notification_service.dart";
+import "package:al_furkan/src/theme/controller/theme_cubit.dart";
+import "package:al_furkan/src/theme/controller/theme_state.dart";
+import "package:al_furkan/src/utils/basic_functions.dart";
+import "package:al_furkan/src/utils/number_localization.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:gap/gap.dart";
@@ -38,6 +39,7 @@ enum _WahyKhatmaStep {
 }
 
 class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   static const String _boxName = "user";
 
   static const String _kEnabledKey = "smart_khatma_enabled";
@@ -320,7 +322,14 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
               ),
             )
           else
-            const SizedBox(width: 44),
+            IconButton(
+              onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+              icon: Icon(
+                Icons.menu_rounded,
+                color: themeState.primary,
+              ),
+              tooltip: "القائمة الرئيسية",
+            ),
           Expanded(
             child: Text(
               title,
@@ -962,14 +971,26 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
       }
     }
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 260),
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeInCubic,
-      child: Container(
-        key: ValueKey(_step),
-        color: Colors.transparent,
-        child: current(),
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF7F1E6),
+      drawer: WahySideDrawer(
+        primary: themeState.primary,
+        onOpenIndex: () {},
+        onOpenBookmarks: () {},
+        onOpenStarred: () {},
+        onOpenNotes: () {},
+        onJumpToAyah: (_) {},
+      ),
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 260),
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeInCubic,
+        child: Container(
+          key: ValueKey(_step),
+          color: Colors.transparent,
+          child: current(),
+        ),
       ),
     );
   }

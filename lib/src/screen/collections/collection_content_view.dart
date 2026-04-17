@@ -1,15 +1,15 @@
 
-import "package:al_quran_v3/l10n/app_localizations.dart";
-import "package:al_quran_v3/src/screen/collections/models/note_collection_model.dart";
-import "package:al_quran_v3/src/screen/collections/models/note_model.dart";
-import "package:al_quran_v3/src/screen/collections/models/pinned_collection_model.dart";
-import "package:al_quran_v3/src/theme/values/values.dart";
-import "package:al_quran_v3/src/utils/number_localization.dart";
-import "package:al_quran_v3/src/utils/quran_ayahs_function/get_page_number.dart";
-import "package:al_quran_v3/src/utils/quran_resources/get_translation.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_script_function.dart";
-import "package:al_quran_v3/src/widget/ayah_by_ayah/ayah_by_ayah_card.dart";
-import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
+import "package:al_furkan/l10n/app_localizations.dart";
+import "package:al_furkan/src/screen/collections/models/note_collection_model.dart";
+import "package:al_furkan/src/screen/collections/models/note_model.dart";
+import "package:al_furkan/src/screen/collections/models/pinned_collection_model.dart";
+import "package:al_furkan/src/theme/values/values.dart";
+import "package:al_furkan/src/utils/number_localization.dart";
+import "package:al_furkan/src/utils/quran_ayahs_function/get_page_number.dart";
+import "package:al_furkan/src/utils/quran_resources/get_translation.dart";
+import "package:al_furkan/src/utils/quran_resources/quran_script_function.dart";
+import "package:al_furkan/src/widget/ayah_by_ayah/ayah_by_ayah_card.dart";
+import "package:al_furkan/src/widget/quran_script/model/script_info.dart";
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";

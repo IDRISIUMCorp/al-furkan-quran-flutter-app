@@ -1,5 +1,5 @@
 import "package:awesome_notifications/awesome_notifications.dart";
-import "package:al_quran_v3/src/screen/prayer_time/models/prayer_enum.dart";
+import "package:al_furkan/src/screen/prayer_time/models/prayer_enum.dart";
 import "package:flutter/material.dart";
 import "package:hive_ce_flutter/hive_flutter.dart";
 

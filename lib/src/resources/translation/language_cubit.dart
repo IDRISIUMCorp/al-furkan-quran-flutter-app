@@ -1,4 +1,4 @@
-import "package:al_quran_v3/src/resources/translation/languages.dart";
+import "package:al_furkan/src/resources/translation/languages.dart";
 import "package:dartx/dartx.dart";
 import "package:flutter/widgets.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
@@ -25,6 +25,13 @@ class LanguageCubit extends Cubit<MyAppLocalization> {
     );
 
     emit(localeInfo);
+    
+    // Force app rebuild by emitting again after a short delay
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (!isClosed) {
+        emit(localeInfo);
+      }
+    });
   }
 
   static Future<MyAppLocalization> getInitialLocale() async {

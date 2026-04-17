@@ -1,6 +1,6 @@
 import "dart:ui";
 
-import "package:al_quran_v3/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
+import "package:al_furkan/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:flutter_animate/flutter_animate.dart";
@@ -33,7 +33,7 @@ class QuranSettingsBottomSheet extends StatelessWidget {
         builder: (context, state) {
           final primary = Theme.of(context).colorScheme.primary;
           final surface = isDarkMode
-              ? const Color(0xFF121214)
+              ? Theme.of(context).colorScheme.surface
               : const Color(0xFFFFFCF7);
           final cardColor = isDarkMode
               ? Colors.white.withValues(alpha: 0.05)
@@ -43,18 +43,8 @@ class QuranSettingsBottomSheet extends StatelessWidget {
               : Colors.black.withValues(alpha: 0.06);
           final onSurface = isDarkMode ? Colors.white : const Color(0xFF151515);
 
-          final bool themeMatchesMode = isDarkMode
-              ? state.isDarkTheme
-              : !state.isDarkTheme;
-
-          if (state.isInitialized && !themeMatchesMode) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (!context.mounted) return;
-              context.read<QuranSettingsCubit>().updateTheme(
-                isDarkMode ? QuranTheme.nightBlue : QuranTheme.cream,
-              );
-            });
-          }
+          // Don't auto-switch themes at all - let user control it
+          // The postFrameCallback was causing the custom theme to reset
 
           return DraggableScrollableSheet(
             initialChildSize: 0.82,
@@ -107,12 +97,12 @@ class QuranSettingsBottomSheet extends StatelessWidget {
                                   "إعدادات المصحف",
                                   style: TextStyle(
                                     fontSize: 20,
-                                    fontWeight: FontWeight.w900,
+                                    fontWeight: FontWeight.w800,
                                     color: onSurface,
                                   ),
                                 ),
                                 Text(
-                                  "تحكم في القراءة والمظهر والمكتبة",
+                                  "تحكم في القراءة والمظهر",
                                   style: TextStyle(
                                     fontSize: 12.5,
                                     fontWeight: FontWeight.w600,
@@ -140,42 +130,47 @@ class QuranSettingsBottomSheet extends StatelessWidget {
                           primary: primary,
                         ),
                         const Gap(18),
-                        // "أوضاع جاهزة" section removed
-                        const Gap(14),
                         _SectionCard(
-                          title: "القراءة",
-                          subtitle:
-                              "تكبير الخط الآن يوسّع الإحساس البصري للصفحة عرضًا وارتفاعًا معًا.",
-                          icon: FluentIcons.text_font_size_24_regular,
-                          child: Column(
-                            children: [
-                              _SliderSettingCard(
-                                label: "حجم الخط",
-                                valueLabel: state.fontSize.toStringAsFixed(0),
-                                icon: FluentIcons.text_font_size_24_regular,
-                                min: 18,
-                                max: 34,
-                                divisions: 16,
-                                value: state.fontSize,
-                                primary: primary,
-                                isDark: isDarkMode,
-                                onChanged: (value) => context
-                                    .read<QuranSettingsCubit>()
-                                    .updateFontSize(value),
-                              ),
-                              // "اتساع الصفحة" slider removed
-                            ],
+                          title: "خلفيات المصحف",
+                          subtitle: "اختر من الخلفيات الجاهزة أو أضف خلفيتك الخاصة.",
+                          icon: FluentIcons.color_background_24_regular,
+                          child: _UnifiedBackgroundsSection(
+                            state: state,
+                            primary: primary,
+                            isDark: isDarkMode,
                           ),
                         ),
                         const Gap(14),
                         _SectionCard(
-                          title: "الثيم",
-                          subtitle: "اختيار ثيم هادئ ومقروء بنفس روح التطبيق.",
-                          icon: FluentIcons.color_24_regular,
-                          child: _QuranThemeSelector(
+                          title: "لون التظليل",
+                          subtitle:
+                              "لون إبراز الكلمة أو الآية أثناء التفاعل أو الاستماع.",
+                          icon: FluentIcons.highlight_24_regular,
+                          child: _HighlightColorSection(
                             state: state,
                             primary: primary,
                             isDark: isDarkMode,
+                          ),
+                        ),
+                        const Gap(14),
+                        _SectionCard(
+                          title: "القراءة",
+                          subtitle:
+                              "تكبير الخط يوسّع الإحساس البصري للصفحة.",
+                          icon: FluentIcons.text_font_size_24_regular,
+                          child: _SliderSettingCard(
+                            label: "حجم الخط",
+                            valueLabel: state.fontSize.toStringAsFixed(0),
+                            icon: FluentIcons.text_font_size_24_regular,
+                            min: 18,
+                            max: 34,
+                            divisions: 16,
+                            value: state.fontSize,
+                            primary: primary,
+                            isDark: isDarkMode,
+                            onChanged: (value) => context
+                                .read<QuranSettingsCubit>()
+                                .updateFontSize(value),
                           ),
                         ),
                         const Gap(14),
@@ -232,38 +227,6 @@ class QuranSettingsBottomSheet extends StatelessWidget {
                                     .toggleBasmala(value),
                                 primary: primary,
                                 isDark: isDarkMode,
-                              ),
-
-                            ],
-                          ),
-                        ),
-                        // "المكتبة الذكية" section removed
-                        const Gap(14),
-                        _SectionCard(
-                          title: "لون التظليل",
-                          subtitle:
-                              "لون إبراز الكلمة أو الآية أثناء التفاعل أو الاستماع.",
-                          icon: FluentIcons.highlight_24_regular,
-                          child: Wrap(
-                            spacing: 10,
-                            runSpacing: 10,
-                            children: [
-                              ..._highlightColors.map(
-                                (color) => _HighlightColorDot(
-                                  color: color,
-                                  selected: state.highlightColor.value ==
-                                      color.value,
-                                  primary: primary,
-                                  onTap: () => context
-                                      .read<QuranSettingsCubit>()
-                                      .updateHighlightColor(color),
-                                ),
-                              ),
-                              _CustomColorPickerDot(
-                                currentColor: state.highlightColor,
-                                onColorChanged: (c) => context
-                                    .read<QuranSettingsCubit>()
-                                    .updateHighlightColor(c),
                               ),
                             ],
                           ),
@@ -338,7 +301,7 @@ class _PreviewCard extends StatelessWidget {
                 children: [
                   const TextSpan(text: "ٱهْدِنَا "),
                   TextSpan(
-                    text: "ٱلصِّرَٰطَ",
+                    text: "ٱلصِّرَٰطَ",
                     style: TextStyle(
                       backgroundColor: state.highlightColor.withValues(
                         alpha: 0.28,
@@ -412,7 +375,7 @@ class _SectionCard extends StatelessWidget {
                       textAlign: TextAlign.right,
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.w800,
                         color: isDark ? Colors.white : const Color(0xFF151515),
                       ),
                     ),
@@ -499,7 +462,7 @@ class _SliderSettingCard extends StatelessWidget {
                 valueLabel,
                 style: TextStyle(
                   fontSize: 13,
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w800,
                   color: primary,
                 ),
               ),
@@ -622,87 +585,6 @@ class _SwitchTile extends StatelessWidget {
   }
 }
 
-class _PresetChip extends StatelessWidget {
-  final String label;
-  final String subtitle;
-  final bool selected;
-  final VoidCallback onTap;
-  final Color primary;
-  final bool isDark;
-
-  const _PresetChip({
-    required this.label,
-    required this.subtitle,
-    required this.selected,
-    required this.onTap,
-    required this.primary,
-    required this.isDark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
-        width: 110,
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: selected
-              ? primary.withValues(alpha: 0.12)
-              : (isDark
-                    ? Colors.white.withValues(alpha: 0.035)
-                    : Colors.black.withValues(alpha: 0.025)),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: selected
-                ? primary.withValues(alpha: 0.28)
-                : (isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : Colors.black.withValues(alpha: 0.04)),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Icon(
-              selected ? Icons.check_circle_rounded : Icons.tune_rounded,
-              size: 18,
-              color: selected
-                  ? primary
-                  : (isDark ? Colors.white54 : Colors.black54),
-            ),
-            const Gap(12),
-            Text(
-              label,
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w800,
-                color: isDark ? Colors.white : const Color(0xFF151515),
-              ),
-            ),
-            const Gap(2),
-            Text(
-              subtitle,
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: (isDark ? Colors.white : Colors.black).withValues(
-                  alpha: 0.55,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _CircleActionButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
@@ -730,6 +612,160 @@ class _CircleActionButton extends StatelessWidget {
         ),
         child: Icon(icon, size: 20, color: color),
       ),
+    );
+  }
+}
+
+class _HighlightColorSection extends StatefulWidget {
+  final QuranSettingsState state;
+  final Color primary;
+  final bool isDark;
+
+  const _HighlightColorSection({
+    required this.state,
+    required this.primary,
+    required this.isDark,
+  });
+
+  @override
+  State<_HighlightColorSection> createState() => _HighlightColorSectionState();
+}
+
+class _HighlightColorSectionState extends State<_HighlightColorSection> {
+  bool _showColorPicker = false;
+  Color _pickerColor = Colors.amber;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            ..._highlightColors.map(
+              (color) => _HighlightColorDot(
+                color: color,
+                selected: widget.state.highlightColor.value == color.value,
+                primary: widget.primary,
+                onTap: () => context
+                    .read<QuranSettingsCubit>()
+                    .updateHighlightColor(color),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _showColorPicker = !_showColorPicker;
+                  _pickerColor = widget.state.highlightColor;
+                });
+              },
+              borderRadius: BorderRadius.circular(999),
+              child: Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: _showColorPicker
+                      ? null
+                      : const SweepGradient(
+                          colors: [
+                            Colors.red,
+                            Colors.yellow,
+                            Colors.green,
+                            Colors.cyan,
+                            Colors.blue,
+                            Colors.purple,
+                            Colors.pink,
+                            Colors.red,
+                          ],
+                        ),
+                  color: _showColorPicker ? widget.primary.withValues(alpha: 0.2) : null,
+                ),
+                child: Icon(
+                  _showColorPicker ? Icons.close_rounded : Icons.colorize_rounded,
+                  size: 20,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+        if (_showColorPicker) ...[
+          const Gap(14),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: widget.isDark
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.black.withValues(alpha: 0.03),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: widget.primary.withValues(alpha: 0.2),
+                width: 1.5,
+              ),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _showColorPicker = false;
+                        });
+                      },
+                      icon: const Icon(Icons.close_rounded),
+                    ),
+                    Text(
+                      "اختر لون التظليل",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: widget.isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        context.read<QuranSettingsCubit>().updateHighlightColor(_pickerColor);
+                        setState(() {
+                          _showColorPicker = false;
+                        });
+                      },
+                      icon: Icon(Icons.check_rounded, color: widget.primary),
+                    ),
+                  ],
+                ),
+                const Gap(12),
+                ColorPicker(
+                  color: _pickerColor,
+                  onColorChanged: (color) {
+                    setState(() {
+                      _pickerColor = color;
+                    });
+                  },
+                  enableOpacity: false,
+                  borderRadius: 16,
+                  padding: EdgeInsets.zero,
+                  showColorCode: true,
+                  pickersEnabled: const {
+                    ColorPickerType.both: false,
+                    ColorPickerType.primary: true,
+                    ColorPickerType.accent: true,
+                    ColorPickerType.bw: false,
+                    ColorPickerType.custom: false,
+                    ColorPickerType.wheel: true,
+                  },
+                ),
+              ],
+            ),
+          ).animate().scale(duration: 300.ms, curve: Curves.easeOutCubic).fade(),
+        ],
+      ],
     );
   }
 }
@@ -871,12 +907,12 @@ class _CustomColorPickerDot extends StatelessWidget {
   }
 }
 
-class _QuranThemeSelector extends StatelessWidget {
+class _UnifiedBackgroundsSection extends StatelessWidget {
   final QuranSettingsState state;
   final Color primary;
   final bool isDark;
 
-  const _QuranThemeSelector({
+  const _UnifiedBackgroundsSection({
     required this.state,
     required this.primary,
     required this.isDark,
@@ -884,134 +920,380 @@ class _QuranThemeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themes = _themeOptions.where((entry) {
+    return BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
+      builder: (context, currentState) {
+        return _UnifiedBackgroundsSectionContent(
+          state: currentState,
+          primary: primary,
+          isDark: isDark,
+        );
+      },
+    );
+  }
+}
+
+class _UnifiedBackgroundsSectionContent extends StatefulWidget {
+  final QuranSettingsState state;
+  final Color primary;
+  final bool isDark;
+
+  const _UnifiedBackgroundsSectionContent({
+    required this.state,
+    required this.primary,
+    required this.isDark,
+  });
+
+  @override
+  State<_UnifiedBackgroundsSectionContent> createState() => _UnifiedBackgroundsSectionContentState();
+}
+
+class _UnifiedBackgroundsSectionContentState extends State<_UnifiedBackgroundsSectionContent> {
+  bool _showColorPicker = false;
+  Color _pickerColor = Colors.blue;
+
+  @override
+  Widget build(BuildContext context) {
+    // Get current system brightness
+    final currentBrightness = Theme.of(context).brightness;
+    final isCurrentlyDark = currentBrightness == Brightness.dark;
+
+    
+    // Filter themes based on CURRENT mode using the theme's isDark property
+    final presetThemes = _themeOptions.where((entry) {
       final theme = entry.$1;
-      if (isDark) return theme.isDark;
+      if (theme == QuranTheme.custom) return false; // Skip custom from presets
+      // Show dark themes in dark mode, light themes in light mode
+      if (isCurrentlyDark) return theme.isDark;
       return !theme.isDark;
     }).toList();
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      reverse: true,
-      child: Row(
-        children: themes.map((entry) {
-          final theme = entry.$1;
-          final swatch = theme == QuranTheme.custom ? state.customBackgroundColor : entry.$2;
-          final foreground = theme == QuranTheme.custom ? state.customTextColor : entry.$3;
-          final selected = state.theme == theme;
+    // Combine preset and custom backgrounds
+    final allBackgrounds = <Widget>[];
+    
+    // Add preset themes
+    for (final entry in presetThemes) {
+      final theme = entry.$1;
+      final bgColor = entry.$2;
+      final textColor = entry.$3;
+      final isSelected = widget.state.theme == theme;
 
-          return Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: InkWell(
-              onTap: () =>
-                  context.read<QuranSettingsCubit>().updateTheme(theme),
-              borderRadius: BorderRadius.circular(20),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
-                width: 112,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: swatch,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: selected
-                        ? primary
-                        : foreground.withValues(alpha: 0.14),
-                    width: selected ? 2.2 : 1,
-                  ),
-                  boxShadow: selected
-                      ? [
-                          BoxShadow(
-                            color: primary.withValues(alpha: 0.18),
-                            blurRadius: 18,
-                            offset: const Offset(0, 8),
-                          ),
-                        ]
-                      : null,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            selected
-                                ? Icons.radio_button_checked_rounded
-                                : Icons.radio_button_unchecked_rounded,
-                            size: 18,
-                            color: selected
-                                ? primary
-                                : foreground.withValues(alpha: 0.5),
-                          ),
-                          if (theme == QuranTheme.custom && selected) ...[
-                            const Gap(8),
-                            InkWell(
-                              onTap: () async {
-                                final qs = context.read<QuranSettingsCubit>();
-                                final newBg = await showAlFurkanColorPicker(
-                                  context,
-                                  state.customBackgroundColor,
-                                  heading: "لون الخلفية",
-                                );
-                                if (newBg != null) {
-                                  qs.updateCustomBackgroundColor(newBg);
-                                }
-                                if (context.mounted) {
-                                  final newText = await showAlFurkanColorPicker(
-                                    context,
-                                    state.customTextColor,
-                                    heading: "لون النص",
-                                  );
-                                  if (newText != null) {
-                                    qs.updateCustomTextColor(newText);
-                                  }
-                                }
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  color: primary.withValues(alpha: 0.2),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(Icons.edit_rounded, size: 14, color: primary),
-                              ),
-                            )
-                          ],
-                        ],
-                      ),
+      allBackgrounds.add(
+        _BackgroundCard(
+          label: theme.label,
+          backgroundColor: bgColor,
+          textColor: textColor,
+          isSelected: isSelected,
+          primary: widget.primary,
+          isDark: widget.isDark,
+          onTap: () {
+
+            final cubit = context.read<QuranSettingsCubit>();
+            cubit.updateTheme(theme);
+          },
+        ),
+      );
+    }
+    
+    // Add custom backgrounds
+    for (var i = 0; i < widget.state.customBackgroundColors.length; i++) {
+      final color = widget.state.customBackgroundColors[i];
+      final textColor = color.computeLuminance() > 0.5 ? Colors.black87 : Colors.white;
+      final isSelected = widget.state.theme == QuranTheme.custom && 
+                         widget.state.customBackgroundColor.value == color.value;
+
+      allBackgrounds.add(
+        _BackgroundCard(
+          label: "مخصصة ${i + 1}",
+          backgroundColor: color,
+          textColor: textColor,
+          isSelected: isSelected,
+          primary: widget.primary,
+          isDark: widget.isDark,
+          isCustom: true,
+          onTap: () {
+            context.read<QuranSettingsCubit>().applyCustomBackground(color, textColor);
+          },
+          onDelete: () async {
+            final confirmed = await showDialog<bool>(
+              context: context,
+              builder: (context) => Directionality(
+                textDirection: TextDirection.rtl,
+                child: AlertDialog(
+                  title: const Text("تأكيد الحذف"),
+                  content: const Text("هل تريد حذف هذه الخلفية؟"),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text("إلغاء"),
                     ),
-                    const Gap(20),
-                    Text(
-                      theme.label,
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w900,
-                        color: foreground,
-                      ),
-                    ),
-                    const Gap(4),
-                    Text(
-                      theme.description,
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: foreground.withValues(alpha: 0.62),
-                      ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text("حذف"),
                     ),
                   ],
                 ),
               ),
+            );
+            if (confirmed == true && context.mounted) {
+              context.read<QuranSettingsCubit>().removeCustomBackgroundColor(i);
+            }
+          },
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          reverse: true,
+          child: Row(
+            children: allBackgrounds.map((widget) {
+              return Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: widget,
+              );
+            }).toList(),
+          ),
+        ),
+        const Gap(14),
+        if (_showColorPicker) ...[
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: widget.isDark
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.black.withValues(alpha: 0.03),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: widget.primary.withValues(alpha: 0.2),
+                width: 1.5,
+              ),
             ),
-          );
-        }).toList(),
-      ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _showColorPicker = false;
+                        });
+                      },
+                      icon: const Icon(Icons.close_rounded),
+                    ),
+                    Text(
+                      "اختر لون الخلفية",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: widget.isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        final cubit = context.read<QuranSettingsCubit>();
+                        // Add to the list first
+                        cubit.addCustomBackgroundColor(_pickerColor);
+                        // Then switch to custom theme with this color (single atomic emit)
+                        final textColor = _pickerColor.computeLuminance() > 0.5 
+                            ? Colors.black87 
+                            : Colors.white;
+                        cubit.applyCustomBackground(_pickerColor, textColor);
+                        setState(() {
+                          _showColorPicker = false;
+                        });
+                      },
+                      icon: Icon(Icons.check_rounded, color: widget.primary),
+                    ),
+                  ],
+                ),
+                const Gap(12),
+                ColorPicker(
+                  color: _pickerColor,
+                  onColorChanged: (color) {
+                    setState(() {
+                      _pickerColor = color;
+                    });
+                  },
+                  enableOpacity: false,
+                  borderRadius: 16,
+                  padding: EdgeInsets.zero,
+                  showColorCode: true,
+                  pickersEnabled: const {
+                    ColorPickerType.both: false,
+                    ColorPickerType.primary: true,
+                    ColorPickerType.accent: true,
+                    ColorPickerType.bw: false,
+                    ColorPickerType.custom: false,
+                    ColorPickerType.wheel: true,
+                  },
+                ),
+              ],
+            ),
+          ).animate().scale(duration: 300.ms, curve: Curves.easeOutCubic).fade(),
+          const Gap(14),
+        ],
+        InkWell(
+          onTap: () {
+            setState(() {
+              _showColorPicker = !_showColorPicker;
+              _pickerColor = widget.isDark 
+                  ? const Color(0xFF1A1A1A) 
+                  : const Color(0xFFFFF8E7);
+            });
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            decoration: BoxDecoration(
+              color: widget.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: widget.primary.withValues(alpha: 0.25),
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  _showColorPicker ? Icons.close_rounded : Icons.add_rounded, 
+                  size: 20, 
+                  color: widget.primary,
+                ),
+                const Gap(8),
+                Text(
+                  _showColorPicker ? "إلغاء" : "إضافة خلفية مخصصة",
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w800,
+                    color: widget.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
+  }
+}
+
+class _BackgroundCard extends StatelessWidget {
+  final String label;
+  final Color backgroundColor;
+  final Color textColor;
+  final bool isSelected;
+  final Color primary;
+  final bool isDark;
+  final bool isCustom;
+  final VoidCallback onTap;
+  final VoidCallback? onDelete;
+
+  const _BackgroundCard({
+    required this.label,
+    required this.backgroundColor,
+    required this.textColor,
+    required this.isSelected,
+    required this.primary,
+    required this.isDark,
+    this.isCustom = false,
+    required this.onTap,
+    this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        width: 110,
+        height: 100,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? primary : textColor.withValues(alpha: 0.2),
+            width: isSelected ? 2.5 : 1.5,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: primary.withValues(alpha: 0.25),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: backgroundColor.withValues(alpha: 0.15),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (isCustom && onDelete != null)
+                  InkWell(
+                    onTap: onDelete,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade400.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 14,
+                        color: Colors.red.shade400,
+                      ),
+                    ),
+                  )
+                else
+                  const SizedBox(width: 22),
+                Icon(
+                  isSelected ? Icons.check_circle_rounded : Icons.circle_outlined,
+                  size: 18,
+                  color: isSelected ? primary : textColor.withValues(alpha: 0.4),
+                ),
+              ],
+            ),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w800,
+                color: textColor,
+                height: 1.2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ).animate(delay: (isCustom ? 100 : 0).ms).scale(
+      begin: const Offset(0.9, 0.9),
+      duration: 300.ms,
+      curve: Curves.easeOutCubic,
+    ).fade(duration: 300.ms);
   }
 }
 
@@ -1020,10 +1302,12 @@ extension on QuranTheme {
     switch (this) {
       case QuranTheme.oled:
         return "OLED";
+      case QuranTheme.charcoal:
+        return "فحمي";
       case QuranTheme.nightBlue:
         return "أزرق ليلي";
       case QuranTheme.custom:
-        return "داكن ناعم";
+        return "مخصص";
       case QuranTheme.graphite:
         return "جرافيت";
       case QuranTheme.midnightPurple:
@@ -1039,32 +1323,10 @@ extension on QuranTheme {
     }
   }
 
-  String get description {
-    switch (this) {
-      case QuranTheme.oled:
-        return "أسود عميق";
-      case QuranTheme.nightBlue:
-        return "هادئ ومريح";
-      case QuranTheme.custom:
-        return "داكن متزن";
-      case QuranTheme.graphite:
-        return "محترف محايد";
-      case QuranTheme.midnightPurple:
-        return "عميق وحالم";
-      case QuranTheme.sepia:
-        return "كلاسيكي دافئ";
-      case QuranTheme.cream:
-        return "الأقرب للمصحف";
-      case QuranTheme.paperWhite:
-        return "أوضح تباين";
-      case QuranTheme.sand:
-        return "فاتح هادئ";
-    }
-  }
-
   bool get isDark {
     switch (this) {
       case QuranTheme.oled:
+      case QuranTheme.charcoal:
       case QuranTheme.nightBlue:
       case QuranTheme.custom:
       case QuranTheme.graphite:
@@ -1091,13 +1353,14 @@ const List<Color> _highlightColors = [
 ];
 
 final List<(QuranTheme, Color, Color)> _themeOptions = [
+  (QuranTheme.charcoal, const Color(0xFF212529), Colors.white),
   (QuranTheme.oled, Colors.black, Colors.white),
   (QuranTheme.nightBlue, const Color(0xFF0F172A), Colors.white),
   (QuranTheme.custom, const Color(0xFF111318), Colors.white),
-  (QuranTheme.graphite, const Color(0xFF161A1D), Colors.white),
-  (QuranTheme.midnightPurple, const Color(0xFF1B1234), Colors.white),
+  (QuranTheme.graphite, const Color(0xFF121417), Colors.white),
+  (QuranTheme.midnightPurple, const Color(0xFF140B2D), Colors.white),
   (QuranTheme.sepia, const Color(0xFFF4ECD8), const Color(0xFF3E2723)),
-  (QuranTheme.cream, const Color(0xFFFFF7DD), const Color(0xFF2F2417)),
+  (QuranTheme.cream, const Color(0xFFFFFDD0), const Color(0xFF2F2417)),
   (QuranTheme.paperWhite, Colors.white, const Color(0xFF151515)),
   (QuranTheme.sand, const Color(0xFFF3E7D3), const Color(0xFF2E241B)),
 ];

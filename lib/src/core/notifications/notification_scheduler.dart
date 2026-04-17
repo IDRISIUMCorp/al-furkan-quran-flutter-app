@@ -1,5 +1,5 @@
-import "package:al_quran_v3/src/core/notifications/khatma_notification_service.dart";
-import "package:al_quran_v3/src/platform_services.dart" as platform_services;
+import "package:al_furkan/src/core/notifications/khatma_notification_service.dart";
+import "package:al_furkan/src/platform_services.dart" as platform_services;
 
 abstract class NotificationScheduler {
   Future<void> initialize();

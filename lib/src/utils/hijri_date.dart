@@ -1,4 +1,4 @@
-import "package:al_quran_v3/src/utils/number_localization.dart";
+import "package:al_furkan/src/utils/number_localization.dart";
 import "package:flutter/material.dart";
 import "package:hijri/hijri_calendar.dart";
 

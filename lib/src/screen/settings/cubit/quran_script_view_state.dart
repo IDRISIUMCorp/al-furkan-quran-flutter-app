@@ -1,5 +1,5 @@
 import "package:flutter/foundation.dart";
-import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
+import "package:al_furkan/src/widget/quran_script/model/script_info.dart";
 
 @immutable
 class QuranViewState {

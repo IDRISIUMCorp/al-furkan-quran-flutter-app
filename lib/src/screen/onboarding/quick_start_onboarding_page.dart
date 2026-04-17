@@ -1,10 +1,10 @@
 import "dart:ui";
 
-import "package:al_quran_v3/src/screen/quran_script_view/cubit/ayah_by_ayah_in_scroll_info_cubit.dart";
-import "package:al_quran_v3/src/screen/onboarding/quick_start_demo_page.dart";
-import "package:al_quran_v3/src/screen/setup/setup_page.dart";
-import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
-import "package:al_quran_v3/src/theme/controller/theme_state.dart";
+import "package:al_furkan/src/screen/quran_script_view/cubit/ayah_by_ayah_in_scroll_info_cubit.dart";
+import "package:al_furkan/src/screen/onboarding/quick_start_demo_page.dart";
+import "package:al_furkan/src/screen/setup/setup_page.dart";
+import "package:al_furkan/src/theme/controller/theme_cubit.dart";
+import "package:al_furkan/src/theme/controller/theme_state.dart";
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";

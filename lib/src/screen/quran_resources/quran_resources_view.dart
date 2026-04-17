@@ -1,9 +1,9 @@
 import "dart:ui";
 
-import "package:al_quran_v3/src/screen/quran_resources/tafsir_resources_view.dart";
-import "package:al_quran_v3/src/screen/quran_resources/translation_resources_view.dart";
-import "package:al_quran_v3/src/screen/quran_resources/word_info_resources_view.dart";
-import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
+import "package:al_furkan/src/screen/quran_resources/tafsir_resources_view.dart";
+import "package:al_furkan/src/screen/quran_resources/translation_resources_view.dart";
+import "package:al_furkan/src/screen/quran_resources/word_info_resources_view.dart";
+import "package:al_furkan/src/theme/controller/theme_cubit.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:flutter_screenutil/flutter_screenutil.dart";
@@ -115,7 +115,7 @@ class _QuranResourcesViewState extends State<QuranResourcesView>
             child: Align(
               alignment: Alignment.topCenter,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
+                padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 6.h),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(100),
                   child: BackdropFilter(

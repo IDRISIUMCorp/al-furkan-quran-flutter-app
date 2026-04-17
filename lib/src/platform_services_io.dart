@@ -1,6 +1,6 @@
 import "dart:io";
 
-import "package:al_quran_v3/src/core/notifications/wahy_notification_service.dart";
+import "package:al_furkan/src/core/notifications/wahy_notification_service.dart";
 import "package:flutter/material.dart";
 import "package:path_provider/path_provider.dart";
 import "package:window_manager/window_manager.dart";

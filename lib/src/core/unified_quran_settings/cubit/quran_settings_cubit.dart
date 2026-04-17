@@ -18,6 +18,7 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
   static const String _kShowBasmala = 'show_basmala';
   static const String _kShowSurahHeader = 'show_surah_header';
   static const String _kTajweedEnabled = 'tajweed_enabled';
+  static const String _kCustomBackgroundColors = 'custom_background_colors';
 
   late Box _box;
 
@@ -46,13 +47,16 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
         _box.get(_kShowSurahHeader, defaultValue: true) as bool;
     final tajweedEnabled =
         _box.get(_kTajweedEnabled, defaultValue: false) as bool;
+    
+    final customColorsData = _box.get(_kCustomBackgroundColors, defaultValue: <int>[]) as List;
+    final customBackgroundColors = customColorsData.map((e) => Color(e as int)).toList();
 
     emit(
       QuranSettingsState(
         fontSize: fontSize,
         theme: QuranTheme.values.firstWhere(
           (e) => e.name == themeString,
-          orElse: () => QuranTheme.oled,
+          orElse: () => QuranTheme.charcoal,
         ),
         customBackgroundColor: Color(customBg),
         customTextColor: Color(customText),
@@ -62,6 +66,7 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
         showBasmala: showBasmala,
         showSurahHeader: showSurahHeader,
         tajweedEnabled: tajweedEnabled,
+        customBackgroundColors: customBackgroundColors,
         isInitialized: true,
       ),
     );
@@ -78,6 +83,7 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
     await _box.put(_kShowBasmala, next.showBasmala);
     await _box.put(_kShowSurahHeader, next.showSurahHeader);
     await _box.put(_kTajweedEnabled, next.tajweedEnabled);
+    await _box.put(_kCustomBackgroundColors, next.customBackgroundColors.map((c) => c.value).toList());
   }
 
   void updateFontSize(double size) {
@@ -150,7 +156,47 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
     _persistState(next);
   }
 
-  // Presets removed
+  /// Apply a custom background in a single atomic emit to avoid race conditions.
+  void applyCustomBackground(Color bgColor, Color textColor) {
+    if (!state.isInitialized) return;
+    final next = state.copyWith(
+      customBackgroundColor: bgColor,
+      customTextColor: textColor,
+      theme: QuranTheme.custom,
+    );
+    emit(next);
+    _persistState(next);
+  }
+
+  void addCustomBackgroundColor(Color color) {
+    if (!state.isInitialized) return;
+    final updatedList = List<Color>.from(state.customBackgroundColors)..add(color);
+    final next = state.copyWith(customBackgroundColors: updatedList);
+    emit(next);
+    _persistState(next);
+  }
+
+  void removeCustomBackgroundColor(int index) {
+    if (!state.isInitialized) return;
+    if (index < 0 || index >= state.customBackgroundColors.length) return;
+    final updatedList = List<Color>.from(state.customBackgroundColors)..removeAt(index);
+    final next = state.copyWith(customBackgroundColors: updatedList);
+    emit(next);
+    _persistState(next);
+  }
+
+  void reorderCustomBackgroundColors(int oldIndex, int newIndex) {
+    if (!state.isInitialized) return;
+    final updatedList = List<Color>.from(state.customBackgroundColors);
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final item = updatedList.removeAt(oldIndex);
+    updatedList.insert(newIndex, item);
+    final next = state.copyWith(customBackgroundColors: updatedList);
+    emit(next);
+    _persistState(next);
+  }
 
   void resetToDefaults() {
     if (!state.isInitialized) return;

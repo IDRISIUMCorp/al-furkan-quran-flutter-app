@@ -12,11 +12,11 @@ import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:al_quran_v3/src/theme/controller/theme_cubit.dart';
-import 'package:al_quran_v3/src/screen/azkar/widgets/azkar_share_design.dart';
-import 'package:al_quran_v3/src/core/constants/app_fonts.dart';
-import 'package:al_quran_v3/src/screen/azkar/models/azkar_share_settings.dart';
-import 'package:al_quran_v3/src/screen/azkar/services/azkar_share_preferences.dart';
+import 'package:al_furkan/src/theme/controller/theme_cubit.dart';
+import 'package:al_furkan/src/screen/azkar/widgets/azkar_share_design.dart';
+import 'package:al_furkan/src/core/constants/app_fonts.dart';
+import 'package:al_furkan/src/screen/azkar/models/azkar_share_settings.dart';
+import 'package:al_furkan/src/screen/azkar/services/azkar_share_preferences.dart';
 
 
 

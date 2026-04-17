@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:al_quran_v3/src/core/audio/services/audio_playback_service_access.dart';
-import 'package:al_quran_v3/src/theme/controller/theme_cubit.dart';
-import 'package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.dart';
+import 'package:al_furkan/src/core/audio/services/audio_playback_service_access.dart';
+import 'package:al_furkan/src/theme/controller/theme_cubit.dart';
+import 'package:al_furkan/src/core/audio/cubit/segmented_quran_reciter_cubit.dart';
 import 'package:qcf_quran/qcf_quran.dart' hide getPageNumber;
 
 Future<void> showListenRangeSheet({

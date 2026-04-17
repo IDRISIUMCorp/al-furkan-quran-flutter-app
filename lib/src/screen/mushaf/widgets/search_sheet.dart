@@ -1,7 +1,7 @@
 import "dart:async";
 import "dart:math" as math;
 
-import "package:al_quran_v3/src/utils/number_localization.dart";
+import "package:al_furkan/src/utils/number_localization.dart";
 import "package:flutter/material.dart";
 import "package:flutter_animate/flutter_animate.dart";
 import "package:qcf_quran/qcf_quran.dart";
@@ -45,7 +45,7 @@ class SearchSheetState extends State<SearchSheet> {
 
   bool get _isDark => Theme.of(context).brightness == Brightness.dark;
   Color get _surfaceColor =>
-      _isDark ? const Color(0xFF141414) : const Color(0xFFF7F1E6);
+      _isDark ? Theme.of(context).colorScheme.surface : const Color(0xFFF7F1E6);
   Color get _cardColor =>
       _isDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFFFFBF5);
   Color get _borderColor => _isDark

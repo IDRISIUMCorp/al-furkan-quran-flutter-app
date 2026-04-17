@@ -1,8 +1,8 @@
 import "package:adhan_dart/adhan_dart.dart";
-import "package:al_quran_v3/src/screen/prayer_time/models/calculation_method_enum.dart";
-import "package:al_quran_v3/src/screen/location_handler/model/lat_lon.dart";
-import "package:al_quran_v3/src/screen/location_handler/model/location_data_qibla_data_state.dart";
-import "package:al_quran_v3/src/screen/qibla/qibla_guidance.dart";
+import "package:al_furkan/src/screen/prayer_time/models/calculation_method_enum.dart";
+import "package:al_furkan/src/screen/location_handler/model/lat_lon.dart";
+import "package:al_furkan/src/screen/location_handler/model/location_data_qibla_data_state.dart";
+import "package:al_furkan/src/screen/qibla/qibla_guidance.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:geolocator/geolocator.dart";
 import "package:hive_ce_flutter/hive_flutter.dart";

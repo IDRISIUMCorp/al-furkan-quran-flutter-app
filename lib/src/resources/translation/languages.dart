@@ -2,15 +2,15 @@ import "dart:ui";
 
 List<MyAppLocalization> usedAppLanguageMap = [
   MyAppLocalization(
-    english: "English",
-    native: "English",
-    locale: const Locale("en", "US"),
-  ),
-
-  MyAppLocalization(
     english: "Arabic",
     native: "العربية",
     locale: const Locale("ar"),
+  ),
+
+  MyAppLocalization(
+    english: "English",
+    native: "English",
+    locale: const Locale("en", "US"),
   ),
 
   MyAppLocalization(
@@ -44,18 +44,6 @@ List<MyAppLocalization> usedAppLanguageMap = [
   ),
 
   MyAppLocalization(
-    english: "Punjabi",
-    native: "ਪੰਜਾਬੀ",
-    locale: const Locale("pa", "IN"),
-  ),
-
-  MyAppLocalization(
-    english: "Pashto",
-    native: "پښتو",
-    locale: const Locale("ps", "AF"),
-  ),
-
-  MyAppLocalization(
     english: "Malay",
     native: "Bahasa Melayu",
     locale: const Locale("ms", "MY"),
@@ -71,24 +59,6 @@ List<MyAppLocalization> usedAppLanguageMap = [
     english: "Russian",
     native: "Русский",
     locale: const Locale("ru", "RU"),
-  ),
-
-  MyAppLocalization(
-    english: "Swahili",
-    native: "Kiswahili",
-    locale: const Locale("sw", "KE"),
-  ),
-
-  MyAppLocalization(
-    english: "Azerbaijani",
-    native: "Azərbaycanca",
-    locale: const Locale("az", "AZ"),
-  ),
-
-  MyAppLocalization(
-    english: "Kazakh",
-    native: "Қазақ тілі",
-    locale: const Locale("kk", "KZ"),
   ),
 
   MyAppLocalization(
@@ -149,6 +119,36 @@ List<MyAppLocalization> usedAppLanguageMap = [
     english: "Italian",
     native: "Italiano",
     locale: const Locale("it"),
+  ),
+
+  MyAppLocalization(
+    english: "Swahili",
+    native: "Kiswahili",
+    locale: const Locale("sw", "KE"),
+  ),
+
+  MyAppLocalization(
+    english: "Azerbaijani",
+    native: "Azərbaycanca",
+    locale: const Locale("az", "AZ"),
+  ),
+
+  MyAppLocalization(
+    english: "Kazakh",
+    native: "Қазақ тілі",
+    locale: const Locale("kk", "KZ"),
+  ),
+
+  MyAppLocalization(
+    english: "Punjabi",
+    native: "ਪੰਜਾਬੀ",
+    locale: const Locale("pa", "IN"),
+  ),
+
+  MyAppLocalization(
+    english: "Pashto",
+    native: "پښتو",
+    locale: const Locale("ps", "AF"),
   ),
 ];
 
