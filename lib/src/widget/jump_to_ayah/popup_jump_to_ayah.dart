@@ -1,5 +1,5 @@
-import "package:al_quran_v3/src/theme/values/values.dart";
-import "package:al_quran_v3/src/widget/jump_to_ayah/jump_to_ayah.dart";
+import "package:al_furkan/src/theme/values/values.dart";
+import "package:al_furkan/src/widget/jump_to_ayah/jump_to_ayah.dart";
 import "package:flutter/material.dart";
 
 Future<void> popupJumpToAyah({
