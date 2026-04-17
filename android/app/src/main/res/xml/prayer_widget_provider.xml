@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:minWidth="320dp"
-    android:minHeight="180dp"
-    android:minResizeWidth="280dp"
-    android:minResizeHeight="140dp"
+    android:minHeight="110dp"
+    android:minResizeWidth="220dp"
+    android:minResizeHeight="70dp"
     android:targetCellWidth="4"
-    android:targetCellHeight="2"
+    android:targetCellHeight="1"
     android:maxResizeWidth="420dp"
     android:maxResizeHeight="280dp"
     android:updatePeriodMillis="0"
-    android:initialLayout="@layout/ayah_widget"
-    android:previewLayout="@layout/ayah_widget"
+    android:initialLayout="@layout/prayer_widget"
+    android:previewLayout="@layout/prayer_widget"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
-    android:description="@string/app_name" />
+    android:description="@string/widget_prayer_desc" />

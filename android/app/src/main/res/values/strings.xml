@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">الفُرقان</string>
+    <string name="app_name">الفرقان</string>
+    <string name="widget_prayer_desc">أوقات الصلاة</string>
 </resources>
