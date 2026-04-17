@@ -1,4 +1,4 @@
-import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
+import "package:al_furkan/src/resources/quran_resources/models/tafsir_book_model.dart";
 
 class QuranSarfFunction {
   static Future<List<TafsirBookModel>?> getSarfSelections() async {

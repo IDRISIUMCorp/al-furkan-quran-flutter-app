@@ -1,7 +1,7 @@
 import "dart:convert";
 
-import "package:al_quran_v3/src/utils/tajweed_rules.dart";
-import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
+import "package:al_furkan/src/utils/tajweed_rules.dart";
+import "package:al_furkan/src/widget/quran_script/model/script_info.dart";
 import "package:flutter/services.dart";
 import "package:hive_ce/hive.dart";
 

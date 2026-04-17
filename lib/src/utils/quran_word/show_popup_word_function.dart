@@ -1,5 +1,5 @@
-import "package:al_quran_v3/src/screen/surah_list_view/model/surah_info_model.dart";
-import "package:al_quran_v3/src/widget/quran_script_words/show_popup_of_word.dart";
+import "package:al_furkan/src/screen/surah_list_view/model/surah_info_model.dart";
+import "package:al_furkan/src/widget/quran_script_words/show_popup_of_word.dart";
 import "package:flutter/material.dart";
 
 import "../../resources/quran_resources/meta/meta_data_surah.dart";

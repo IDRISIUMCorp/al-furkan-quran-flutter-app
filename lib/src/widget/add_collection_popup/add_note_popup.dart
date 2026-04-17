@@ -1,8 +1,8 @@
 import "dart:ui";
-import "package:al_quran_v3/l10n/app_localizations.dart";
-import "package:al_quran_v3/src/screen/collections/collection_page.dart";
-import "package:al_quran_v3/src/screen/collections/models/note_collection_model.dart";
-import "package:al_quran_v3/src/screen/collections/models/note_model.dart";
+import "package:al_furkan/l10n/app_localizations.dart";
+import "package:al_furkan/src/screen/collections/collection_page.dart";
+import "package:al_furkan/src/screen/collections/models/note_collection_model.dart";
+import "package:al_furkan/src/screen/collections/models/note_model.dart";
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";

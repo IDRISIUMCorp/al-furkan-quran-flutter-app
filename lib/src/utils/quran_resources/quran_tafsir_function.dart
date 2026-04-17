@@ -1,7 +1,7 @@
 import "dart:convert";
 import "dart:developer";
 
-import "package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart";
+import "package:al_furkan/src/resources/quran_resources/models/tafsir_book_model.dart";
 import "package:dio/dio.dart" as dio;
 import "package:flutter/cupertino.dart";
 import "package:flutter/foundation.dart";
@@ -9,7 +9,7 @@ import "package:flutter/services.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:hive_ce_flutter/hive_flutter.dart";
 
-import "package:al_quran_v3/src/utils/quran_resources/default_offline_resources.dart";
+import "package:al_furkan/src/utils/quran_resources/default_offline_resources.dart";
 
 import "../../api/apis_urls.dart";
 import "../../screen/setup/cubit/resources_progress_cubit_cubit.dart";
@@ -94,22 +94,16 @@ class QuranTafsirFunction {
 
     List<TafsirBookModel>? booksListToOpen = await getTafsirSelections();
 
-    // Auto-select تفسير السعدي as default if user has no selections.
-    if (booksListToOpen == null || booksListToOpen.isEmpty) {
-      await setTafsirSelection(_defaultSaadiTafsir);
+    // Only auto-select Saadi if the key doesn't exist at all (first run).
+    final userBox = Hive.box("user");
+    if (!userBox.containsKey(selectedTafsirListKey)) {
       booksListToOpen = [_defaultSaadiTafsir];
-    }
-
-    final hasSaadiSelected = booksListToOpen.any(
-      (b) => b.fullPath == _defaultSaadiTafsir.fullPath,
-    );
-    if (!hasSaadiSelected) {
-      booksListToOpen = [_defaultSaadiTafsir, ...booksListToOpen];
-      final userBox = Hive.box("user");
       await userBox.put(
         selectedTafsirListKey,
         _dedupeBooks(booksListToOpen).map((e) => e.toMap()).toList(),
       );
+    } else {
+      booksListToOpen ??= [];
     }
 
     log(
@@ -497,7 +491,7 @@ class QuranTafsirFunction {
           "Failed to open LazyBox '$tafsirBoxName' even after delete: $e2",
           name: "downloadResources",
         );
-        cubit.failure("Error preparing Tafsir storage");
+        cubit.failure("Error preparing Tafsir storage", activeResourceId: tafsirBook.fullPath);
         return false;
       }
     }
@@ -537,19 +531,13 @@ class QuranTafsirFunction {
         response.data,
       );
 
-      int totalEntries = data.length;
-      int processedEntries = 0;
-      for (String key in data.keys) {
-        await tafsirBox.put(key, data[key]);
-        processedEntries++;
-        if (processedEntries % 50 == 0 || processedEntries == totalEntries) {
-          cubit.updateProgress(
-            0.5 + (processedEntries / totalEntries * 0.5),
-            "Processing Tafsir",
-            activeResourceId: tafsirBook.fullPath,
-          );
-        }
-      }
+      cubit.updateProgress(
+        0.75,
+        "Processing Tafsir",
+        activeResourceId: tafsirBook.fullPath,
+      );
+      
+      await tafsirBox.putAll(data.cast<String, dynamic>());
 
       await tafsirBox.put("meta_data", tafsirBook.toMap());
 
@@ -574,14 +562,14 @@ class QuranTafsirFunction {
         activeResourceId: tafsirBook.fullPath,
       );
       await Future<void>.delayed(const Duration(milliseconds: 220));
-      cubit.success();
+      cubit.success(activeResourceId: tafsirBook.fullPath);
       return true;
     } catch (e, s) {
       log(
         "Error downloading or processing Tafsir '${tafsirBook.name}': $e\n$s",
         name: "downloadResources",
       );
-      cubit.failure("Error downloading Tafsir");
+      cubit.failure("Error downloading Tafsir", activeResourceId: tafsirBook.fullPath);
       if (tafsirBox.isOpen) {
         await tafsirBox.close();
       }
@@ -593,6 +581,18 @@ class QuranTafsirFunction {
   static Future<List<TafsirOfAyah>> getTafsir(String ayahKey) async {
     final List<TafsirOfAyah> toReturn = [];
     List<TafsirBookModel>? selectedBooks = await getTafsirSelections() ?? [];
+
+    final orderIds = getDownloadedTafsirOrderIds();
+    if (orderIds.isNotEmpty) {
+      selectedBooks.sort((a, b) {
+        final indexA = orderIds.indexOf(a.fullPath);
+        final indexB = orderIds.indexOf(b.fullPath);
+        if (indexA != -1 && indexB != -1) return indexA.compareTo(indexB);
+        if (indexA != -1) return -1;
+        if (indexB != -1) return 1;
+        return 0;
+      });
+    }
 
     for (TafsirBookModel bookModel in selectedBooks) {
       String boxName = getTafsirBoxName(tafsirBook: bookModel);
@@ -619,8 +619,18 @@ class QuranTafsirFunction {
     final List<TafsirOfAyah> toReturn = [];
 
     List<TafsirBookModel> targetBooks = await getTafsirSelections() ?? [];
-    if (targetBooks.isEmpty) {
-      targetBooks = getDownloadedTafsirBooks();
+
+    // Sort targetBooks according to downloadedTafsirOrderKey
+    final orderIds = getDownloadedTafsirOrderIds();
+    if (orderIds.isNotEmpty) {
+      targetBooks.sort((a, b) {
+        final indexA = orderIds.indexOf(a.fullPath);
+        final indexB = orderIds.indexOf(b.fullPath);
+        if (indexA != -1 && indexB != -1) return indexA.compareTo(indexB);
+        if (indexA != -1) return -1;
+        if (indexB != -1) return 1;
+        return 0;
+      });
     }
 
     for (TafsirBookModel bookModel in targetBooks) {

@@ -1,9 +1,9 @@
 import "dart:convert";
 import "dart:developer";
 
-import "package:al_quran_v3/src/resources/quran_resources/language_resources.dart";
-import "package:al_quran_v3/src/resources/translation/language_cubit.dart";
-import "package:al_quran_v3/src/utils/quran_resources/get_translation.dart";
+import "package:al_furkan/src/resources/quran_resources/language_resources.dart";
+import "package:al_furkan/src/resources/translation/language_cubit.dart";
+import "package:al_furkan/src/utils/quran_resources/get_translation.dart";
 import "package:dio/dio.dart" as dio;
 import "package:flutter/cupertino.dart";
 import "package:flutter/foundation.dart";
@@ -364,7 +364,7 @@ class QuranTranslationFunction {
           "Failed to open Box '$translationBoxName' even after delete: $e2",
           name: "downloadResources",
         );
-        cubit.failure("Error preparing translation storage");
+        cubit.failure("Error preparing translation storage", activeResourceId: translationBook.fullPath);
         return false;
       }
     }
@@ -405,20 +405,13 @@ class QuranTranslationFunction {
         response.data,
       );
 
-      int totalEntries = data.length;
-      int processedEntries = 0;
-      for (int i = 0; i < data.length; i++) {
-        String key = data.keys.elementAt(i);
-        await newTranslationBox.put(key, data[key]);
-        processedEntries++;
-        if (processedEntries % 50 == 0 || processedEntries == totalEntries) {
-          cubit.updateProgress(
-            0.5 + (processedEntries / totalEntries * 0.5),
-            "Processing Translation",
-            activeResourceId: translationBook.fullPath,
-          );
-        }
-      }
+      cubit.updateProgress(
+        0.75,
+        "Processing Translation",
+        activeResourceId: translationBook.fullPath,
+      );
+      
+      await newTranslationBox.putAll(data.cast<String, dynamic>());
       await newTranslationBox.put("meta_data", translationBook.toMap());
 
       await setToListAlreadyDownloaded(translationBook);
@@ -456,14 +449,14 @@ class QuranTranslationFunction {
         activeResourceId: translationBook.fullPath,
       );
       await Future<void>.delayed(const Duration(milliseconds: 220));
-      cubit.success();
+      cubit.success(activeResourceId: translationBook.fullPath);
       return true;
     } catch (e, s) {
       log(
         "Error downloading or processing Translation '${translationBook.name}' (path: ${translationBook.fullPath}): $e\n$s",
         name: "downloadResources",
       );
-      cubit.failure("Error downloading Translation");
+      cubit.failure("Error downloading Translation", activeResourceId: translationBook.fullPath);
       if (newTranslationBox.isOpen) {
         await newTranslationBox.close();
       }
