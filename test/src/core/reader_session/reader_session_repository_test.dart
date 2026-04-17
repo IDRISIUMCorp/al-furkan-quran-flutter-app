@@ -1,7 +1,7 @@
 import "dart:io";
 
-import "package:al_quran_v3/src/core/reader_session/reader_session_repository.dart";
-import "package:al_quran_v3/src/core/storage/app_storage.dart";
+import "package:al_furkan/src/core/reader_session/reader_session_repository.dart";
+import "package:al_furkan/src/core/storage/app_storage.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:hive_ce/hive.dart";
 import "package:shared_preferences/shared_preferences.dart";

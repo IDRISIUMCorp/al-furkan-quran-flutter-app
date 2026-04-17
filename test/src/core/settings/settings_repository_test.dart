@@ -1,13 +1,13 @@
 import "dart:io";
 
-import "package:al_quran_v3/src/core/settings/settings_repository.dart";
-import "package:al_quran_v3/src/core/storage/app_storage.dart";
-import "package:al_quran_v3/src/screen/prayer_time/cubit/prayer_time_state.dart";
-import "package:al_quran_v3/src/screen/prayer_time/models/prayer_enum.dart";
-import "package:al_quran_v3/src/screen/prayer_time/models/reminder_type.dart";
-import "package:al_quran_v3/src/screen/prayer_time/models/reminder_type_with_pray_model.dart";
-import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_state.dart";
-import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
+import "package:al_furkan/src/core/settings/settings_repository.dart";
+import "package:al_furkan/src/core/storage/app_storage.dart";
+import "package:al_furkan/src/screen/prayer_time/cubit/prayer_time_state.dart";
+import "package:al_furkan/src/screen/prayer_time/models/prayer_enum.dart";
+import "package:al_furkan/src/screen/prayer_time/models/reminder_type.dart";
+import "package:al_furkan/src/screen/prayer_time/models/reminder_type_with_pray_model.dart";
+import "package:al_furkan/src/screen/settings/cubit/quran_script_view_state.dart";
+import "package:al_furkan/src/widget/quran_script/model/script_info.dart";
 import "package:flutter/material.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:hive_ce/hive.dart";

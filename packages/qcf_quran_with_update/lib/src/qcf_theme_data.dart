@@ -324,8 +324,8 @@ class QcfThemeData {
       verseTextColor: Color(0xFFE0E0E0),
       verseNumberColor: Color(0xFFFFB74D), // amber
       basmalaColor: Color(0xFFE0E0E0),
-      headerTextColor: Color(0xFFE0E0E0),
-      pageBackgroundColor: Color(0xFF1E1E1E),
+      headerTextColor: Color(0xFFE0E0E0), // Fixed: was black, now white
+      pageBackgroundColor: Color(0xFF000000), // Changed to pure OLED black
     );
   }
 
@@ -344,10 +344,10 @@ class QcfThemeData {
   /// Uses true black (#000000) to save battery and reduce eye strain at night.
   factory QcfThemeData.oled() {
     return const QcfThemeData(
-      verseTextColor: Color(0xFFD0D0D0),
+      verseTextColor: Color(0xFFE0E0E0), // Brighter for better contrast
       verseNumberColor: Color(0xFFFFCC80),
-      basmalaColor: Color(0xFFBDBDBD),
-      headerTextColor: Color(0xFFBDBDBD),
+      basmalaColor: Color(0xFFE0E0E0), // Brighter
+      headerTextColor: Color(0xFFE0E0E0), // Brighter
       pageBackgroundColor: Color(0xFF000000), // True black
     );
   }
@@ -358,9 +358,9 @@ class QcfThemeData {
     return const QcfThemeData(
       verseTextColor: Color(0xFFCFD8DC),
       verseNumberColor: Color(0xFF80CBC4),
-      basmalaColor: Color(0xFFB0BEC5),
-      headerTextColor: Color(0xFFB0BEC5),
-      pageBackgroundColor: Color(0xFF0D1B2A), // Deep navy
+      basmalaColor: Color(0xFFCFD8DC),
+      headerTextColor: Color(0xFFCFD8DC),
+      pageBackgroundColor: Color(0xFF0F172A), // Deep Navy Blue
     );
   }
 
@@ -380,9 +380,9 @@ class QcfThemeData {
     return const QcfThemeData(
       verseTextColor: Color(0xFFE6E6E6),
       verseNumberColor: Color(0xFF90CAF9),
-      basmalaColor: Color(0xFFDADADA),
-      headerTextColor: Color(0xFFDADADA),
-      pageBackgroundColor: Color(0xFF121417),
+      basmalaColor: Color(0xFFE6E6E6),
+      headerTextColor: Color(0xFFE6E6E6),
+      pageBackgroundColor: Color(0xFF212529), // Graphite Dark Grey
     );
   }
 
@@ -390,9 +390,9 @@ class QcfThemeData {
     return const QcfThemeData(
       verseTextColor: Color(0xFFEDE7F6),
       verseNumberColor: Color(0xFFB39DDB),
-      basmalaColor: Color(0xFFD1C4E9),
-      headerTextColor: Color(0xFFD1C4E9),
-      pageBackgroundColor: Color(0xFF140B2D),
+      basmalaColor: Color(0xFFEDE7F6),
+      headerTextColor: Color(0xFFEDE7F6),
+      pageBackgroundColor: Color(0xFF1E1B2A), // Midnight Purple
     );
   }
 
@@ -413,6 +413,18 @@ class QcfThemeData {
       basmalaColor: Color(0xFF2B2620),
       headerTextColor: Color(0xFF2B2620),
       pageBackgroundColor: Color(0xFFF3E7D3),
+    );
+  }
+
+  /// Charcoal dark theme — matches the app's "Quiet Luxury" Charcoal aesthetic.
+  /// Deep slate background with warm-toned accents for elegant dark reading.
+  factory QcfThemeData.charcoal() {
+    return const QcfThemeData(
+      verseTextColor: Color(0xFFF8F9FA),
+      verseNumberColor: Color(0xFFADB5BD),
+      basmalaColor: Color(0xFFF8F9FA),
+      headerTextColor: Color(0xFFF8F9FA),
+      pageBackgroundColor: Color(0xFF212529), // Deep Charcoal
     );
   }
 }

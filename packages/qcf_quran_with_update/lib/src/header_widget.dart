@@ -48,25 +48,33 @@ class HeaderWidget extends StatelessWidget {
                       )) *
                   effectiveTheme.headerScale,
             ),
-            RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
-                text: "$suraNumber",
-                style: TextStyle(
-                  fontFamily: "arsura",
-                  package: 'qcf_quran',
-                  fontSize:
-                      isPortrait
-                          ? (getScreenType(context) == ScreenType.large
-                              ? effectiveTheme.headerFontSizeLarge.sp
-                              : effectiveTheme.headerFontSizeSmall.sp)
-                          : (MediaQuery.of(context).size.width * 0.04).clamp(
-                            0.0,
-                            50.0.sp,
-                          ),
-                  color: effectiveTheme.headerTextColor,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  "surah-icon",
+                  style: TextStyle(
+                    fontFamily: "surah-name-v1",
+                    fontSize: isPortrait
+                        ? (getScreenType(context) == ScreenType.large ? 24.0.sp : 30.0.sp)
+                        : 34.0.sp,
+                    color: effectiveTheme.headerTextColor,
+                  ),
                 ),
-              ),
+                Text(
+                  "surah${suraNumber.toString().padLeft(3, '0')}",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: "surah-name-v1",
+                    fontSize: isPortrait
+                        ? (getScreenType(context) == ScreenType.large ? 28.0.sp : 34.0.sp)
+                        : 38.0.sp,
+                    color: effectiveTheme.headerTextColor,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

@@ -1,4 +1,4 @@
-name: al_quran_v3
+name: al_furkan
 description: "A Flutter application for reading the Holy Quran, tracking prayer times, and managing Islamic practices."
 publish_to: none
 
@@ -36,8 +36,6 @@ dependencies:
   vibration: ^3.1.3
   just_audio: ^0.10.3
   just_audio_media_kit: ^2.1.0
-  media_kit_libs_linux: any
-  media_kit_libs_windows_audio: any
   just_audio_background: ^0.0.1-beta.17
   audio_video_progress_bar: ^2.0.3
   dartx: ^1.2.0
@@ -48,16 +46,14 @@ dependencies:
   clipboard: ^3.0.8
   flutter_html: ^3.0.0
   visibility_detector: ^0.4.0+2
-  # alarm: (custom fork)
+  connectivity_plus: ^6.1.2
   cached_network_image: ^3.4.1
   screenshot: ^3.0.0
   device_info_plus: ^12.1.0
   package_info_plus: ^9.0.0
-  # flutter_spinkit: ^5.2.1
   simple_icons: ^14.6.1
   uuid: ^4.5.1
   flex_color_picker: ^3.7.1
-  window_manager: ^0.5.0
   awesome_notifications: ^0.11.0
   path: ^1.9.1
   wakelock_plus: ^1.3.2
@@ -86,13 +82,8 @@ dependencies:
   workmanager: ^0.9.0+3
   file_picker: ^10.0.0
   auto_size_text: ^3.0.0
-  # background_fetch:
-  #   git:
-  #     url: https://github.com/transistorsoft/flutter_background_fetch
-  # firebase_core: ^4.2.1
-  # firebase_ai: ^3.6.0
-  # firebase_auth: ^6.1.2
-  # firebase_database: ^12.1.0
+  flutter_staggered_animations: ^1.1.1
+  window_manager: ^0.5.1
 
 dev_dependencies:
   flutter_test:
@@ -143,9 +134,9 @@ flutter:
     - assets/dev/dev image.jpg
     - assets/wahy/json/azkar.json
     - assets/wahy/json/Tafseer_Al_Saddi.json
-    - packages/alrab-al-quran-li-da-as.json
     - assets/quran_script/
     - assets/meta_data/
+    - assets/fonts/google_fonts/
 
   fonts:
     - family: QPC_Hafs
@@ -183,73 +174,30 @@ flutter:
         - asset: assets/fonts/App/NotoSans-SemiBold.ttf
           weight: 600
 
-    - family: Amiri-Regular
+    - family: Cairo-Black
       fonts:
-        - asset: assets/New Fonts/Amiri-Regular.ttf
-
-    - family: AmiriQuran-Regular
-      fonts:
-        - asset: assets/New Fonts/AmiriQuran-Regular.ttf
-
-    - family: Cairo-Regular
-      fonts:
-        - asset: assets/New Fonts/Cairo-Regular.ttf
-
-    - family: Cairo-Light
-      fonts:
-        - asset: assets/New Fonts/Cairo-Light.ttf
-
-    - family: Cairo-SemiBold
-      fonts:
-        - asset: assets/New Fonts/Cairo-SemiBold.ttf
+        - asset: assets/fonts/App/Cairo-Black.ttf
+          weight: 900
 
     - family: Cairo-Bold
       fonts:
-        - asset: assets/New Fonts/Cairo-Bold.ttf
+        - asset: assets/fonts/App/Cairo-Bold.ttf
+          weight: 700
 
-    - family: Cairo-Black
+    - family: Cairo-SemiBold
       fonts:
-        - asset: assets/New Fonts/Cairo-Black.ttf
+        - asset: assets/fonts/App/Cairo-SemiBold.ttf
+          weight: 600
 
-    - family: Aref Ruqaa Bold
+    - family: Cairo-Regular
       fonts:
-        - asset: assets/New Fonts/Aref Ruqaa Bold.ttf
+        - asset: assets/fonts/App/Cairo-Regular.ttf
+          weight: 400
 
-    - family: al-majd
+    - family: Cairo-Light
       fonts:
-        - asset: assets/New Fonts/al-majd.ttf
-
-    - family: bader-lamsat
-      fonts:
-        - asset: assets/New Fonts/bader-lamsat.ttf
-
-    - family: Afsaneh-Font
-      fonts:
-        - asset: assets/New Fonts/Afsaneh-Font.ttf
-
-    - family: Abd-ElRady-Regular
-      fonts:
-        - asset: assets/New Fonts/Abd-ElRady-Regular.otf
-
-    - family: al-hadaribold
-      fonts:
-        - asset: assets/New Fonts/al-hadaribold.ttf
-
-    - family: a-massir-ballpoint
-      fonts:
-        - asset: assets/New Fonts/a-massir-ballpoint.ttf
-
-    - family: b-helal
-      fonts:
-        - asset: assets/New Fonts/b-helal.ttf
-
-    - family: ASane-Jaleh
-      fonts:
-        - asset: assets/New Fonts/ASane-Jaleh.ttf
-
-    - family: BritishCouncil-Arabic-Black
-      fonts:
-        - asset: assets/New Fonts/BritishCouncil-Arabic-Black.ttf
+        - asset: assets/fonts/App/Cairo-Light.ttf
+          weight: 300
 
 icons_launcher:
   image_path: "assets/img/Quran_Logo_v3.png"
