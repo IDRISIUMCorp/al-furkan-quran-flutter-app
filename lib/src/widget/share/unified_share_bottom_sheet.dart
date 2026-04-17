@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:al_quran_v3/src/model/ayah_image_settings.dart';
-import 'package:al_quran_v3/src/resources/quran_resources/quran_pages_info.dart';
-import 'package:al_quran_v3/src/theme/controller/theme_cubit.dart';
-import 'package:al_quran_v3/src/utils/basic_functions.dart';
-import 'package:al_quran_v3/src/utils/quran_ayahs_function/get_page_number.dart';
+import 'package:al_furkan/src/model/ayah_image_settings.dart';
+import 'package:al_furkan/src/resources/quran_resources/quran_pages_info.dart';
+import 'package:al_furkan/src/theme/controller/theme_cubit.dart';
+import 'package:al_furkan/src/utils/basic_functions.dart';
+import 'package:al_furkan/src/utils/quran_ayahs_function/get_page_number.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -15,9 +15,9 @@ import 'package:qcf_quran/qcf_quran.dart' hide getPageNumber;
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 
-import 'package:al_quran_v3/src/resources/quran_resources/models/tafsir_book_model.dart';
-import 'package:al_quran_v3/src/utils/quran_resources/quran_tafsir_function.dart';
-import 'package:al_quran_v3/src/core/constants/app_fonts.dart';
+import 'package:al_furkan/src/resources/quran_resources/models/tafsir_book_model.dart';
+import 'package:al_furkan/src/utils/quran_resources/quran_tafsir_function.dart';
+import 'package:al_furkan/src/core/constants/app_fonts.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class UnifiedShareBottomSheet extends StatefulWidget {
@@ -81,7 +81,7 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
   // ── SearchSheet-style color tokens ──
   bool get _isDark => Theme.of(context).brightness == Brightness.dark;
   Color get _surfaceColor =>
-      _isDark ? const Color(0xFF141414) : const Color(0xFFF7F1E6);
+      _isDark ? Theme.of(context).colorScheme.surface : const Color(0xFFF7F1E6);
   Color get _cardColor =>
       _isDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFFFFBF5);
   Color get _borderColor => _isDark
@@ -110,7 +110,7 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
   bool _forceDarkMode = false; // Independent dark mode toggle for the image
   bool _shareFullPage = false; // Share all surahs on the same page
   final ScreenshotController _screenshotController = ScreenshotController();
-  String _shareFontFamily = 'default'; // 'default' = use QCF page fonts
+  String _shareFontFamily = 'default'; // Use 'default' to render the authentic Mushaf font (QCF page fonts)
   bool _isShareFontGoogle = false;
   String _tafsirFontFamily = 'default';
   bool _isTafsirFontGoogle = false;
@@ -1578,8 +1578,8 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
             headerBackgroundColor: const Color(0xFF111111),
             headerWidthLarge: bannerWidth * 1.25,
             headerWidthSmall: bannerWidth * 1.25,
-            headerFontSizeLarge: 85,
-            headerFontSizeSmall: 85,
+            headerFontSizeLarge: 85 * _surahNameScale,
+            headerFontSizeSmall: 85 * _surahNameScale,
             headerTextColor: Colors.white,
             verseTextColor: Colors.white,
             verseNumberColor: Colors.white,
@@ -1589,8 +1589,8 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
             headerBackgroundColor: const Color(0xFFEFE3D2),
             headerWidthLarge: bannerWidth * 1.25,
             headerWidthSmall: bannerWidth * 1.25,
-            headerFontSizeLarge: 85,
-            headerFontSizeSmall: 85,
+            headerFontSizeLarge: 85 * _surahNameScale,
+            headerFontSizeSmall: 85 * _surahNameScale,
             headerTextColor: const Color(0xFF1B1B1B),
             verseTextColor: const Color(0xFF1B1B1B),
             verseNumberColor: const Color(0xFF1B1B1B),
@@ -1782,8 +1782,43 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
             const CircularProgressIndicator(),
           ],
 
-
-
+          if (_resolvedTafsirText != null) ...[
+            const SizedBox(height: 38),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
+              decoration: BoxDecoration(
+                color: tafsirBgColor,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: textColor.withValues(alpha: 0.1)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    tafsirTitle,
+                    style: TextStyle(
+                      fontSize: titleFontSize,
+                      fontWeight: FontWeight.w900,
+                      color: const Color(0xFFC09B5A),
+                    ),
+                    textAlign: TextAlign.right,
+                    textDirection: TextDirection.rtl,
+                  ),
+                  const SizedBox(height: 20),
+                  _buildRichTafsirText(
+                    _resolvedTafsirText!,
+                    TextStyle(
+                      fontSize: _tafsirFontSize,
+                      height: 2.0,
+                      color: textColor,
+                    ),
+                    const Color(0xFFC09B5A),
+                  ),
+                ],
+              ),
+            ),
+          ],
           if (_showBranding) ...[
             const SizedBox(height: 38),
             Container(
@@ -1955,7 +1990,6 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
           text: match.group(0),
           style: baseStyle.copyWith(
             color: primaryColor,
-            fontWeight: FontWeight.w900, // Makes it stand out
           ),
         ),
       );

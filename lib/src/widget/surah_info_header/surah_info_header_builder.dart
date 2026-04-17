@@ -1,19 +1,18 @@
-import "package:al_quran_v3/l10n/app_localizations.dart";
-import "package:al_quran_v3/src/core/audio/cubit/audio_ui_cubit.dart";
-import "package:al_quran_v3/src/core/audio/cubit/ayah_key_cubit.dart";
-import "package:al_quran_v3/src/core/audio/cubit/player_state_cubit.dart";
-import "package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
-import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
-import "package:al_quran_v3/src/core/audio/services/audio_playback_service_access.dart";
-import "package:al_quran_v3/src/resources/translation/language_cubit.dart";
-import "package:al_quran_v3/src/utils/quran_resources/quran_translation_function.dart";
-import "package:al_quran_v3/src/resources/quran_resources/meaning_of_surah.dart";
-import "package:al_quran_v3/src/screen/quran_script_view/model/surah_header_info.dart";
-import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_cubit.dart";
-import "package:al_quran_v3/src/screen/settings/cubit/quran_script_view_state.dart";
-import "package:al_quran_v3/src/screen/surah_info/surah_info_view.dart";
-import "package:al_quran_v3/src/theme/values/values.dart";
-import "package:al_quran_v3/src/widget/quran_script/model/script_info.dart";
+import "package:al_furkan/l10n/app_localizations.dart";
+import "package:al_furkan/src/core/audio/cubit/audio_ui_cubit.dart";
+import "package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart";
+import "package:al_furkan/src/core/audio/cubit/player_state_cubit.dart";
+import "package:al_furkan/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
+import "package:al_furkan/src/core/audio/model/ayahkey_management.dart";
+import "package:al_furkan/src/core/audio/services/audio_playback_service_access.dart";
+import "package:al_furkan/src/resources/translation/language_cubit.dart";
+import "package:al_furkan/src/utils/quran_resources/quran_translation_function.dart";
+import "package:al_furkan/src/screen/quran_script_view/model/surah_header_info.dart";
+import "package:al_furkan/src/screen/settings/cubit/quran_script_view_cubit.dart";
+import "package:al_furkan/src/screen/settings/cubit/quran_script_view_state.dart";
+import "package:al_furkan/src/screen/surah_info/surah_info_view.dart";
+import "package:al_furkan/src/theme/values/values.dart";
+import "package:al_furkan/src/widget/quran_script/model/script_info.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
@@ -32,6 +31,10 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeState themeState = context.read<ThemeCubit>().state;
     AppLocalizations l10n = AppLocalizations.of(context);
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final onSurface = isDark ? Colors.white : const Color(0xFF1B1B1B);
+    final onSurfaceMuted = onSurface.withValues(alpha: 0.65);
 
     Widget surahInfoHeader = Container(
       margin: const EdgeInsets.only(left: 5, top: 5, bottom: 5, right: 10),
@@ -65,51 +68,45 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text:
-                                "${headerInfoModel.surahInfoModel.id}. ${getSurahName(context, headerInfoModel.surahInfoModel.id)}  - ",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
-                          ),
-                          TextSpan(
-                            text:
-                                "surah${headerInfoModel.surahInfoModel.id.toString().padLeft(3, '0')}",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontFamily: "surah-name-v1",
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
                       children: [
-                        Text(l10n.verseCount),
                         Text(
-                          headerInfoModel.surahInfoModel.versesCount.toString(),
+                          "${headerInfoModel.surahInfoModel.id}. ",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? Colors.white
-                                : Colors.black,
+                            fontSize: 16,
+                            color: onSurface,
+                          ),
+                        ),
+                        Text(
+                          "surah-icon",
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontFamily: "surah-name-v1",
+                            color: onSurface,
+                          ),
+                        ),
+                        const Gap(5),
+                        Text(
+                          "surah${headerInfoModel.surahInfoModel.id.toString().padLeft(3, '0')}",
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontFamily: "surah-name-v1",
+                            color: onSurface,
                           ),
                         ),
                       ],
+                    ),
+                    const Gap(4),
+                    Text(
+                      "${l10n.verseCount} ${headerInfoModel.surahInfoModel.versesCount}",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                        color: onSurfaceMuted,
+                      ),
                     ),
                     if (QuranTranslationFunction.isInfoAvailable(
                       context.read<LanguageCubit>().state.locale,
