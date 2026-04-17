@@ -1,10 +1,10 @@
-import "package:al_quran_v3/src/core/audio/cubit/audio_ui_cubit.dart";
-import "package:al_quran_v3/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
-import "package:al_quran_v3/src/core/audio/model/audio_controller_ui.dart";
-import "package:al_quran_v3/src/core/audio/model/ayahkey_management.dart";
-import "package:al_quran_v3/src/core/audio/model/recitation_info_model.dart";
-import "package:al_quran_v3/src/theme/controller/theme_cubit.dart";
-import "package:al_quran_v3/src/widget/audio/reciter_overview.dart";
+import "package:al_furkan/src/core/audio/cubit/audio_ui_cubit.dart";
+import "package:al_furkan/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
+import "package:al_furkan/src/core/audio/model/audio_controller_ui.dart";
+import "package:al_furkan/src/core/audio/model/ayahkey_management.dart";
+import "package:al_furkan/src/core/audio/model/recitation_info_model.dart";
+import "package:al_furkan/src/theme/controller/theme_cubit.dart";
+import "package:al_furkan/src/widget/audio/reciter_overview.dart";
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
