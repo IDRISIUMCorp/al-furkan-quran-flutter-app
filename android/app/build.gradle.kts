@@ -62,7 +62,10 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             val hasReleaseKeystore =
                 !((keystoreProperties["keyAlias"] as? String).isNullOrBlank()) &&
                     (keystoreProperties["storeFile"] as? String)?.isNotBlank() == true
@@ -79,6 +82,10 @@ android {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    
+    // Google Play Core for deferred components (optional, but prevents R8 errors)
+    implementation("com.google.android.play:core:1.10.3")
+    implementation("com.google.android.play:core-ktx:1.8.1")
 }
 
 flutter {

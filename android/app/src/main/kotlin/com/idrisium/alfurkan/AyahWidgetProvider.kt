@@ -32,9 +32,14 @@ class AyahWidgetProvider : AppWidgetProvider() {
         views.setImageViewResource(R.id.ayah_image, R.drawable.launch_background)
       }
 
-      // Launch app on tap
+      // Launch app on tap with deep link
+      val ayahUrl = HomeWidgetPlugin.getData(context).getString("ayah_url", null)
       val launchIntent = Intent(context, MainActivity::class.java).apply {
         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        if (!ayahUrl.isNullOrBlank()) {
+          data = android.net.Uri.parse(ayahUrl)
+          action = Intent.ACTION_VIEW
+        }
       }
       val pendingIntent = PendingIntent.getActivity(
         context,
