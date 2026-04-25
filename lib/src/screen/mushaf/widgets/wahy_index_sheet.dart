@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:al_furkan/src/theme/controller/theme_cubit.dart';
+import 'package:al_furkan/src/theme/app_colors.dart';
 import 'package:al_furkan/src/screen/surah_list_view/model/surah_info_model.dart';
 import 'package:qcf_quran/qcf_quran.dart';
 
@@ -43,7 +44,7 @@ class WahyIndexSheetState extends State<WahyIndexSheet>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: isDark ? Theme.of(context).colorScheme.surfaceContainer : const Color(0xFFFFF9F2),
+        color: isDark ? Theme.of(context).colorScheme.surfaceContainer : AppColors.ayaSurface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06)),
         boxShadow: [
@@ -103,7 +104,7 @@ class WahyIndexSheetState extends State<WahyIndexSheet>
           "مفيش نتائج",
           style: TextStyle(
             fontWeight: FontWeight.w800,
-            color: Color(0xFF9C9C9C),
+            color: AppColors.ayaTextMuted,
           ),
         ),
       );
@@ -134,7 +135,7 @@ class WahyIndexSheetState extends State<WahyIndexSheet>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).colorScheme.surfaceContainerHighest : const Color(0xFFFFF9F2),
+              color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).colorScheme.surfaceContainerHighest : const Color(0xFFF5EBE0),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.06)),
             ),
@@ -145,7 +146,7 @@ class WahyIndexSheetState extends State<WahyIndexSheet>
                   height: 36,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF141414) : const Color(0xFFF7F1E6)),
+                    color: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF141414) : AppColors.ayaBackground),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: Colors.black.withValues(alpha: 0.06),
@@ -155,7 +156,7 @@ class WahyIndexSheetState extends State<WahyIndexSheet>
                     localizedNumber(context, id),
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
-                      color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF1B1B1B)),
+                      color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.ayaTextMain),
                     ),
                   ),
                 ),
@@ -169,7 +170,7 @@ class WahyIndexSheetState extends State<WahyIndexSheet>
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
-                          color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF1B1B1B)),
+                          color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.ayaTextMain),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -177,7 +178,7 @@ class WahyIndexSheetState extends State<WahyIndexSheet>
                         "الصفحة ${localizedNumber(context, page)} · ${localizedNumber(context, s.versesCount)} آية",
                         style: TextStyle(
                           fontWeight: FontWeight.w800,
-                          color: Color(0xFF8F8F8F),
+                          color: AppColors.ayaTextMuted,
                         ),
                       ),
                     ],
@@ -185,7 +186,7 @@ class WahyIndexSheetState extends State<WahyIndexSheet>
                 ),
                 const Icon(
                   Icons.chevron_left_rounded,
-                  color: Color(0xFF8F8F8F),
+                  color: AppColors.ayaTextMuted,
                 ),
               ],
             ),
@@ -224,7 +225,7 @@ class WahyIndexSheetState extends State<WahyIndexSheet>
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w900,
-                    color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF1B1B1B)),
+                    color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.ayaTextMain),
                   ),
                 ),
               ),
@@ -232,7 +233,7 @@ class WahyIndexSheetState extends State<WahyIndexSheet>
                 "السور والأربع",
                 style: TextStyle(
                   fontWeight: FontWeight.w800,
-                  color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF1B1B1B))
+                  color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.ayaTextMain)
                       .withValues(alpha: 0.42),
                 ),
               ),
@@ -249,7 +250,7 @@ class WahyIndexSheetState extends State<WahyIndexSheet>
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).colorScheme.surfaceContainer : const Color(0xFFFFF9F2),
+              color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).colorScheme.surfaceContainer : const Color(0xFFF5EBE0),
               border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06)),
               borderRadius: BorderRadius.circular(18),
             ),
@@ -358,7 +359,7 @@ class RubListView extends StatelessWidget {
               "مفيش نتائج",
               style: TextStyle(
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF9C9C9C),
+                color: AppColors.ayaTextMuted,
               ),
             ),
           );
@@ -385,7 +386,7 @@ class RubListView extends StatelessWidget {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).colorScheme.surfaceContainerHighest : const Color(0xFFFFF9F2),
+                  color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).colorScheme.surfaceContainerHighest : AppColors.ayaCard,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.06),
@@ -398,7 +399,7 @@ class RubListView extends StatelessWidget {
                       height: 36,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF141414) : const Color(0xFFF7F1E6)),
+                        color: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF141414) : AppColors.ayaBackground),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: Colors.black.withValues(alpha: 0.06),
@@ -408,7 +409,7 @@ class RubListView extends StatelessWidget {
                         localizedNumber(context, rubNumber),
                         style: TextStyle(
                           fontWeight: FontWeight.w900,
-                          color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF1B1B1B)),
+                          color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.ayaTextMain),
                         ),
                       ),
                     ),
@@ -422,7 +423,7 @@ class RubListView extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w900,
-                              color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF1B1B1B)),
+                              color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : AppColors.ayaTextMain),
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -430,7 +431,7 @@ class RubListView extends StatelessWidget {
                             "${getSurahNameArabic(surah)}: ${localizedNumber(context, verse)} · الصفحة ${localizedNumber(context, page)}",
                             style: const TextStyle(
                               fontWeight: FontWeight.w800,
-                              color: Color(0xFF8F8F8F),
+                              color: AppColors.ayaTextMuted,
                             ),
                           ),
                         ],
@@ -438,7 +439,7 @@ class RubListView extends StatelessWidget {
                     ),
                     const Icon(
                       Icons.chevron_left_rounded,
-                      color: Color(0xFF8F8F8F),
+                      color: AppColors.ayaTextMuted,
                     ),
                   ],
                 ),

@@ -195,16 +195,10 @@ class _WordInfoResourcesViewState extends State<WordInfoResourcesView> {
           title: "معلومات الكلمات",
           description:
               "مصادر لغوية تضيف الإعراب والصرف والقراءات للكلمة المختارة.",
-          searchHint: "",
-          emptyMessage: "لا توجد نتائج مطابقة.",
-          deleteModeLabel: "تحديد للحذف",
-          activateAllLabel: "",
-          clearActiveLabel: "",
-          deleteSelectionLabel: "حذف المحدد",
+          emptyMessage: "لا توجد نتائج.",
           activationBehavior: ResourceActivationBehavior.none,
           items: _buildItems(state),
           onRefresh: () async => setState(() {}),
-          onDeleteMany: _deleteMany,
           onReorderDownloaded: _saveDownloadedOrder,
         );
       },

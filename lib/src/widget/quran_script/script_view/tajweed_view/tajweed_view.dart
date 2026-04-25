@@ -1,11 +1,5 @@
-import "dart:developer";
-
-import "package:al_furkan/src/core/audio/cubit/audio_ui_cubit.dart";
-import "package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart";
-import "package:al_furkan/src/core/audio/cubit/player_position_cubit.dart";
-import "package:al_furkan/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
-import "package:al_furkan/src/core/audio/model/audio_player_position_model.dart";
-import "package:al_furkan/src/core/audio/model/recitation_info_model.dart";
+import "package:al_furkan/src/core/audio/services/idrisium_audio_tracker.dart";
+import "package:al_furkan/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
 import "package:al_furkan/src/screen/settings/cubit/quran_script_view_cubit.dart";
 import "package:al_furkan/src/utils/quran_ayahs_function/get_page_number.dart";
 import "package:al_furkan/src/utils/quran_resources/quran_script_function.dart";
@@ -37,12 +31,15 @@ class TajweedView extends StatelessWidget {
         words = words.sublist(0, scriptInfo.limitWord);
       }
     }
+    // Use the user-selected font family from settings
+    final settingsFont = context.watch<QuranSettingsCubit>().state.fontFamily;
+    final effectiveFont = settingsFont.flutterFontFamily;
     TextStyle quranStyle =
         scriptInfo.textStyle?.copyWith(
-          fontFamily: "QPC_Hafs",
+          fontFamily: effectiveFont,
           letterSpacing: 0,
         ) ??
-        const TextStyle(letterSpacing: 0, fontFamily: "QPC_Hafs");
+        TextStyle(letterSpacing: 0, fontFamily: effectiveFont);
 
     String ayahKey = "${scriptInfo.surahNumber}:${scriptInfo.ayahNumber}";
 
@@ -66,7 +63,6 @@ class TajweedView extends StatelessWidget {
       );
     }
 
-    String? highlightingWordIndex;
     if (scriptInfo.wordIndex != null) {
       return Text.rich(
         style: quranStyle,
@@ -83,7 +79,6 @@ class TajweedView extends StatelessWidget {
     }
 
     if (scriptInfo.forImage == true) {
-      log("For Image");
       return Text.rich(
         style: quranStyle,
         textDirection: TextDirection.rtl,
@@ -104,78 +99,60 @@ class TajweedView extends StatelessWidget {
     bool enableWordByWordHighlight =
         context.read<QuranViewCubit>().state.enableWordByWordHighlight == true;
 
-    return BlocBuilder<SegmentedQuranReciterCubit, ReciterInfoModel>(
-      builder: (context, segmentsReciterState) {
-        List<List>? segments = context
-            .read<SegmentedQuranReciterCubit>()
-            .getAyahSegments(ayahKey);
-
-        return BlocBuilder<PlayerPositionCubit, AudioPlayerPositionModel>(
-          buildWhen: (previous, current) {
-            if (scriptInfo.showWordHighlights == false ||
-                context.read<AudioUiCubit>().state.isInsideQuranPlayer ==
-                    false) {
-              return false;
-            }
-            String? currentAyahKey = context.read<AyahKeyCubit>().state.current;
-            if (currentAyahKey == ayahKey) {
-              if (segments != null) {
-                for (List word in segments) {
-                  word = word.map((e) => e.toInt()).toList();
-                  if (Duration(milliseconds: word[1]) <
-                          (current.currentDuration ?? Duration.zero) &&
-                      Duration(milliseconds: word[2]) >
-                          (current.currentDuration ?? Duration.zero)) {
-                    if (highlightingWordIndex != "$currentAyahKey:${word[0]}") {
-                      highlightingWordIndex = "$currentAyahKey:${word[0]}";
-                      return true;
-                    }
-                    return false;
-                  }
-                }
-              }
-            } else {
-              if (highlightingWordIndex != null) {
-                highlightingWordIndex = null;
-                return true;
-              }
-            }
-            return false;
-          },
-          builder: (context, positionState) {
-            return Text.rich(
-              style: quranStyle,
-              textDirection: TextDirection.rtl,
-              textAlign: scriptInfo.textAlign,
-              TextSpan(
-                children: List<InlineSpan>.generate(words.length, (index) {
-                  bool willHighLight =
-                      highlightingWordIndex == "$ayahKey:${index + 1}";
-
-                  return qcf.parseTajweedWord(
-                    wordWithTajweed: words[index],
-                    wordIndex: index,
-                    baseStyle: quranStyle.copyWith(
-                      backgroundColor:
-                          enableWordByWordHighlight && willHighLight
-                          ? themeState.primaryShade200
-                          : null,
+    return BlocBuilder<AudioAyahHighlightCubit, AudioAyahHighlightState>(
+      buildWhen: (previous, current) {
+        bool wasInScope = previous.activeAyahKey != null && previous.activeAyahKey == ayahKey;
+        bool isInScope = current.activeAyahKey != null && current.activeAyahKey == ayahKey;
+        if (wasInScope || isInScope) {
+          return previous.activeAyahKey != current.activeAyahKey ||
+              previous.activeWordKey != current.activeWordKey;
+        }
+        return false;
+      },
+      builder: (context, highlightState) {
+        final bool isDark = Theme.of(context).brightness == Brightness.dark;
+        final bool isAyahHighlighted = highlightState.activeAyahKey == ayahKey;
+        final String? highlightingWordIndex = highlightState.activeWordKey;
+        final highlightColor = context.watch<QuranSettingsCubit>().state.highlightColor;
+        return Text.rich(
+          style: quranStyle,
+          textDirection: TextDirection.rtl,
+          textAlign: scriptInfo.textAlign,
+          TextSpan(
+            style: isAyahHighlighted
+                ? TextStyle(
+                    backgroundColor: highlightColor.withValues(
+                      alpha: isDark ? 0.26 : 0.22,
                     ),
-                    isLight: Theme.of(context).brightness == Brightness.light,
-                    enableTajweed: true,
-                    highlights: (enableWordByWordHighlight && willHighLight)
-                        ? [
-                            qcf.HighlightRange(
-                              wordIndex: index,
-                              color: themeState.primaryShade200,
-                            ),
-                          ]
-                        : null,
-                  );
-                }),
-              ),
-            );
-          },
+                  )
+                : null,
+            children: List<InlineSpan>.generate(words.length, (index) {
+              bool willHighLight =
+                  enableWordByWordHighlight &&
+                  highlightingWordIndex == "$ayahKey:${index + 1}";
+
+              return qcf.parseTajweedWord(
+                wordWithTajweed: words[index],
+                wordIndex: index,
+                baseStyle: quranStyle.copyWith(
+                  backgroundColor:
+                      willHighLight
+                      ? highlightColor.withValues(alpha: 0.35)
+                      : null,
+                ),
+                isLight: Theme.of(context).brightness == Brightness.light,
+                enableTajweed: true,
+                highlights: willHighLight
+                    ? [
+                        qcf.HighlightRange(
+                          wordIndex: index,
+                          color: highlightColor.withValues(alpha: 0.35),
+                        ),
+                      ]
+                    : null,
+              );
+            }),
+          ),
         );
       },
     );

@@ -2,13 +2,11 @@ import "dart:async";
 
 import "package:al_furkan/l10n/app_localizations.dart";
 import "package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart";
-import "package:al_furkan/src/core/audio/cubit/player_state_cubit.dart";
 import "package:al_furkan/src/resources/quran_resources/meaning_of_surah.dart";
 import "package:al_furkan/src/resources/quran_resources/meta/meta_data_surah.dart";
 import "package:al_furkan/src/resources/quran_resources/quran_pages_info.dart";
 import "package:al_furkan/src/screen/mushaf/mushaf_screen.dart";
 import "package:al_furkan/src/screen/quran_script_view/cubit/ayah_by_ayah_in_scroll_info_cubit.dart";
-import "package:al_furkan/src/screen/quran_script_view/cubit/ayah_to_highlight.dart";
 import "package:al_furkan/src/screen/quran_script_view/model/surah_header_info.dart";
 import "package:al_furkan/src/screen/quran_script_view/settings/quran_script_settings.dart";
 import "package:al_furkan/src/screen/surah_list_view/model/page_info_model.dart";
@@ -168,9 +166,9 @@ class _QuranScriptViewState extends State<QuranScriptView> {
     _ayahKeyCubitSubscription = context.read<AyahKeyCubit>().stream.listen((
       event,
     ) {
-      if (context.read<PlayerStateCubit>().state.isPlaying) {
-        context.read<AyahToHighlight>().changeAyah(event.current);
-      }
+      // NOTE: We no longer set AyahToHighlight during playback.
+      // AudioAyahHighlightCubit is the sole source of highlight during playback,
+      // and IdrisiumAudioTracker.onPlaybackStopped clears AyahToHighlight on pause/stop.
       if (scrolledAyahOnAudioPlay != null &&
           event.current == scrolledAyahOnAudioPlay) {
         return;

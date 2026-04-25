@@ -3,7 +3,7 @@ String baseOfSegmentsAudioResource =
 
 List<Map<String, dynamic>> recitationsInfoList = [
   {
-    "link": "https://everyayah.com/data/Abdul_Basit_Murattal_64kbps",
+    "link": "https://everyayah.com/data/Abdul_Basit_Murattal_192kbps",
     "name": "Abdul Basit Abdus Samad",
     "style": "Murattal",
     "segments_url":
@@ -27,18 +27,7 @@ List<Map<String, dynamic>> recitationsInfoList = [
     "source": "Quran.com",
   },
   {
-    "link": "https://everyayah.com/data/warsh/warsh_Abdul_Basit_128kbps",
-    "name": "Abdul Basit Abdus Samad",
-    "style": "Warsh",
-    "img":
-        "https://www.assabile.com/media/person/200x256/abdelbasset-abdessamad.png",
-    "bio":
-        "https://www.assabile.com/abdelbasset-abdessamad-2/abdelbasset-abdessamad.htm",
-    "source": "EveryAyah.com",
-  },
-
-  {
-    "link": "https://everyayah.com/data/Abdullah_Basfar_64kbps",
+    "link": "https://everyayah.com/data/Abdullah_Basfar_192kbps",
     "name": "Abdullah Basfar",
     "style": "Mujawwad",
     "img":
@@ -49,7 +38,7 @@ List<Map<String, dynamic>> recitationsInfoList = [
   },
 
   {
-    "link": "https://everyayah.com/data/Abdurrahmaan_As-Sudais_64kbps",
+    "link": "https://everyayah.com/data/Abdurrahmaan_As-Sudais_192kbps",
     "name": "Abdur-Rahman as-Sudais",
     "style": "Murattal",
     "segments_url":
@@ -76,7 +65,7 @@ List<Map<String, dynamic>> recitationsInfoList = [
   },
 
   {
-    "link": "https://everyayah.com/data/ahmed_ibn_ali_al_ajamy_128kbps",
+    "link": "https://everyayah.com/data/Ahmed_ibn_Ali_al-Ajamy_64kbps_QuranExplorer.Com",
     "name": "Ahmed ibn Ali al-Ajamy",
     "style": "Murattal",
     "img": "https://www.assabile.com/media/person/200x256/ahmed-al-ajmi.png",
@@ -85,7 +74,7 @@ List<Map<String, dynamic>> recitationsInfoList = [
   },
 
   {
-    "link": "https://verses.quran.foundation/Alafasy/mp3",
+    "link": "https://everyayah.com/data/Alafasy_128kbps",
     "name": "Mishari Rashid Alafasy",
     "style": "Murattal",
     "segments_url":
@@ -95,7 +84,7 @@ List<Map<String, dynamic>> recitationsInfoList = [
         "https://www.assabile.com/media/person/200x256/mishary-rashid-alafasy.png",
     "bio":
         "https://www.assabile.com/mishary-rashid-alafasy-1/mishary-rashid-alafasy.htm",
-    "source": "Quran.com",
+    "source": "EveryAyah.com",
   },
 
   {
@@ -110,7 +99,7 @@ List<Map<String, dynamic>> recitationsInfoList = [
   },
 
   {
-    "link": "https://everyayah.com/data/Hani_Rifai_64kbps",
+    "link": "https://everyayah.com/data/Hani_Rifai_192kbps",
     "name": "Hani ar-Rifai",
     "style": "Murattal",
     "segments_url":
@@ -121,7 +110,20 @@ List<Map<String, dynamic>> recitationsInfoList = [
   },
 
   {
-    "link": "https://everyayah.com/data/Husary_Mujawwad_64kbps",
+    "link": "https://everyayah.com/data/Husary_128kbps",
+    "name": "Mahmoud Khalil Al-Husary",
+    "style": "Murattal",
+    "segments_url":
+        "$baseOfSegmentsAudioResource-mahmoud-khalil-al-husary-murattal-hafs-957.json.txt",
+
+    "img":
+        "https://www.assabile.com/media/person/200x256/mahmoud-khalil-al-hussary.png",
+    "bio":
+        "https://www.assabile.com/mahmoud-khalil-al-hussary-27/mahmoud-khalil-al-hussary.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Husary_128kbps_Mujawwad",
     "name": "Mahmoud Khalil Al-Husary",
     "style": "Mujawwad",
     "segments_url":
@@ -132,22 +134,9 @@ List<Map<String, dynamic>> recitationsInfoList = [
         "https://www.assabile.com/mahmoud-khalil-al-hussary-27/mahmoud-khalil-al-hussary.htm",
     "source": "EveryAyah.com",
   },
-  {
-    "link": "https://mirrors.quranicaudio.com/everyayah/Husary_64kbps",
-    "name": "Mahmoud Khalil Al-Husary",
-    "style": "Murattal",
-    "segments_url":
-        "$baseOfSegmentsAudioResource-mahmoud-khalil-al-husary-murattal-hafs-957.json.txt",
-
-    "img":
-        "https://www.assabile.com/media/person/200x256/mahmoud-khalil-al-hussary.png",
-    "bio":
-        "https://www.assabile.com/mahmoud-khalil-al-hussary-27/mahmoud-khalil-al-hussary.htm",
-    "source": "Quran.com",
-  },
 
   {
-    "link": "https://everyayah.com/data/Hudhaify_64kbps",
+    "link": "https://everyayah.com/data/Hudhaify_128kbps",
     "name": "Ali Al-Hudhaify",
     "style": "Murattal",
     "img": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Huthaify.jpg",
@@ -156,7 +145,7 @@ List<Map<String, dynamic>> recitationsInfoList = [
   },
 
   {
-    "link": "https://everyayah.com/data/Ibrahim_Akhdar_64kbps",
+    "link": "https://everyayah.com/data/Ibrahim_Akhdar_32kbps",
     "name": "Ibrahim Akhdar",
     "style": "Murattal",
     "img":
@@ -167,7 +156,7 @@ List<Map<String, dynamic>> recitationsInfoList = [
   },
 
   {
-    "link": "https://everyayah.com/data/Maher_AlMuaiqly_64kbps",
+    "link": "https://everyayah.com/data/MaherAlMuaiqly128kbps",
     "name": "Maher Al Muaiqly",
     "style": "Murattal",
     "segments_url":
@@ -201,7 +190,7 @@ List<Map<String, dynamic>> recitationsInfoList = [
   },
 
   {
-    "link": "https://everyayah.com/data/Muhammad_Ayyoub_64kbps",
+    "link": "https://everyayah.com/data/Muhammad_Ayyoub_128kbps",
     "name": "Muhammad Ayyoub",
     "style": "Murattal",
     "img": "https://upload.wikimedia.org/wikipedia/en/4/40/Muhammad_Ayyub.jpeg",
@@ -210,7 +199,7 @@ List<Map<String, dynamic>> recitationsInfoList = [
   },
 
   {
-    "link": "https://everyayah.com/data/Muhammad_Jibreel_64kbps",
+    "link": "https://everyayah.com/data/Muhammad_Jibreel_128kbps",
     "name": "Muhammad Jibreel",
     "style": "Murattal",
     "img": "https://www.assabile.com/media/person/200x256/muhammad-jebril.png",
@@ -228,7 +217,7 @@ List<Map<String, dynamic>> recitationsInfoList = [
   },
 
   {
-    "link": "https://everyayah.com/data/Saood_ash-Shuraym_64kbps",
+    "link": "https://everyayah.com/data/Saood_ash-Shuraym_128kbps",
     "name": "Sa'ud ash-Shuraym",
     "segments_url":
         "$baseOfSegmentsAudioResource-saud-al-shuraim-murattal-hafs-960.json.txt",
@@ -355,7 +344,7 @@ List<Map<String, dynamic>> recitationsInfoList = [
   {
     "link": "https://everyayah.com/data/Khaalid_Abdullaah_al-Qahtaanee_192kbps",
     "name": "Khalid Abdullah al-Qahtani",
-    "style": "Murattal",
+    "style": "Warsh",
     "img":
         "https://www.assabile.com/media/person/200x256/khaled-al-qahtani.png",
     "bio":
@@ -460,35 +449,34 @@ List<Map<String, dynamic>> recitationsInfoList = [
   },
 
   {
-    "link": "https://everyayah.com/data/Bandar_Baleela_128kbps",
-    "name": "Bandar Baleelah",
+    "link": "https://everyayah.com/data/Menshawi_32kbps",
+    "name": "Mohamed Siddiq al-Minshawi",
     "style": "Murattal",
     "img":
-        "https://www.assabile.com/media/person/200x256/bandar-baleela.png",
+        "https://www.assabile.com/media/person/200x256/mohamed-seddik-el-menchaoui.png",
     "bio":
-        "https://www.assabile.com/bandar-baleela-44/bandar-baleela.htm",
+        "https://www.assabile.com/mohamed-siddiq-el-minshawi-3/mohamed-siddiq-el-minshawi.htm",
     "source": "EveryAyah.com",
   },
 
   {
-    "link":
-        "https://everyayah.com/data/warsh/warsh_Omar_Qazabri_128kbps",
-    "name": "Omar Al-Kazabri",
-    "style": "Warsh",
+    "link": "https://everyayah.com/data/Ali_Hajjaj_AlSuesy_128kbps",
+    "name": "Ali Hajjaj Al-Suesy",
+    "style": "Murattal",
     "img":
-        "https://www.assabile.com/media/person/200x256/omar-al-kazabri.png",
+        "https://www.assabile.com/media/person/200x256/ali-hajjaj-alsuesy.png",
     "bio":
-        "https://www.assabile.com/omar-al-kazabri-104/omar-al-kazabri.htm",
+        "https://www.assabile.com/ali-hajjaj-alsuesy-207/ali-hajjaj-alsuesy.htm",
     "source": "EveryAyah.com",
   },
 
   {
-    "link": "https://everyayah.com/data/Idrees_Abkar_128kbps",
-    "name": "Idrees Abkar",
+    "link": "https://everyayah.com/data/Mohammad_al_Tablaway_128kbps",
+    "name": "Mohamed al-Tablawi",
     "style": "Murattal",
     "img":
-        "https://www.assabile.com/media/person/200x256/idris-abkar.png",
-    "bio": "https://www.assabile.com/idris-abkar-74/idris-abkar.htm",
+        "https://www.assabile.com/media/person/200x256/mohamed-tablawi.png",
+    "bio": "https://www.assabile.com/mohamed-tablawi-31/mohamed-tablawi.htm",
     "source": "EveryAyah.com",
   },
 
@@ -504,67 +492,419 @@ List<Map<String, dynamic>> recitationsInfoList = [
   },
 
   {
-    "link": "https://everyayah.com/data/Tawfeeq_As-Sayegh_128kbps",
-    "name": "Tawfeeq As-Sayegh",
+    "link": "https://everyayah.com/data/Husary_64kbps",
+    "name": "Mahmoud Khalil Al-Husary",
     "style": "Murattal",
     "img":
-        "https://www.assabile.com/media/person/200x256/tawfiq-al-sayigh.png",
+        "https://www.assabile.com/media/person/200x256/mahmoud-khalil-al-hussary.png",
     "bio":
-        "https://www.assabile.com/tawfiq-al-sayigh-96/tawfiq-al-sayigh.htm",
+        "https://www.assabile.com/mahmoud-khalil-al-hussary-27/mahmoud-khalil-al-hussary.htm",
     "source": "EveryAyah.com",
   },
 
   {
-    "link": "https://everyayah.com/data/Abdulbari_ath_Thubaity_128kbps",
-    "name": "Abdulbari Ath-Thubaity",
+    "link": "https://everyayah.com/data/AbdulSamad_64kbps_QuranExplorer.Com",
+    "name": "Abdul Basit Abdus Samad",
     "style": "Murattal",
     "img":
-        "https://www.assabile.com/media/person/200x256/abdel-bari-ath-thubaity.png",
+        "https://www.assabile.com/media/person/200x256/abdelbasset-abdessamad.png",
     "bio":
-        "https://www.assabile.com/abdel-bari-ath-thubaity-14/abdel-bari-ath-thubaity.htm",
+        "https://www.assabile.com/abdelbasset-abdessamad-2/abdelbasset-abdessamad.htm",
     "source": "EveryAyah.com",
   },
 
   {
-    "link": "https://everyayah.com/data/Muhammad_Al_Luhaidan_128kbps",
-    "name": "Muhammad Al-Luhaidan",
-    "style": "Murattal",
+    "link": "https://everyayah.com/data/Minshawy_Mujawwad_192kbps",
+    "name": "Mohamed Siddiq al-Minshawi",
+    "style": "Mujawwad",
     "img":
-        "https://www.assabile.com/media/person/200x256/muhammad-al-luhaidan.png",
+        "https://www.assabile.com/media/person/200x256/mohamed-seddik-el-menchaoui.png",
     "bio":
-        "https://www.assabile.com/muhammad-al-luhaidan-55/muhammad-al-luhaidan.htm",
+        "https://www.assabile.com/mohamed-siddiq-el-minshawi-3/mohamed-siddiq-el-minshawi.htm",
     "source": "EveryAyah.com",
   },
 
   {
-    "link": "https://everyayah.com/data/Fatih_Seferagic_64kbps",
-    "name": "Fatih Seferagic",
+    "link": "https://everyayah.com/data/Ahmed_ibn_Ali_al-Ajamy_128kbps_ketaballah.net",
+    "name": "Ahmed ibn Ali al-Ajamy",
     "style": "Murattal",
     "img":
-        "https://way2quran.com/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fway2quran_storage%2Fimgs%2Ffatih-seferagic.png&w=640&q=75",
-    "bio": "https://en.wikipedia.org/wiki/Fatih_Seferagi%C4%87",
+        "https://www.assabile.com/media/person/200x256/ahmed-al-ajmi.png",
+    "bio": "https://www.assabile.com/ahmed-al-ajmi-13/ahmed-al-ajmi.htm",
     "source": "EveryAyah.com",
   },
+
+  // Teaching Reciters
+  {
+    "link": "https://everyayah.com/data/Husary_Muallim_128kbps",
+    "name": "Mahmoud Khalil Al-Husary (Teacher)",
+    "style": "Muallim",
+    "img":
+        "https://www.assabile.com/media/person/200x256/mahmoud-khalil-al-hussary.png",
+    "bio":
+        "https://www.assabile.com/mahmoud-khalil-al-hussary-27/mahmoud-khalil-al-hussary.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Minshawy_Teacher_128kbps",
+    "name": "Mohamed Siddiq al-Minshawi (Teacher)",
+    "style": "Muallim",
+    "img":
+        "https://www.assabile.com/media/person/200x256/mohamed-seddik-el-menchaoui.png",
+    "bio":
+        "https://www.assabile.com/mohamed-siddiq-el-minshawi-3/mohamed-siddiq-el-minshawi.htm",
+    "source": "EveryAyah.com",
+  },
+
+  // New Reciters
+  {
+    "link": "https://everyayah.com/data/Karim_Mansoori_40kbps",
+    "name": "Karim Mansoori",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/karim-mansoori.png",
+    "bio":
+        "https://www.assabile.com/karim-mansoori-142/karim-mansoori.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Nabil_Rifa3i_48kbps",
+    "name": "Nabil Rifa'i",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/nabil-rifai.png",
+    "bio":
+        "https://www.assabile.com/nabil-rifai-90/nabil-rifai.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Parhizgar_48kbps",
+    "name": "Shahriar Parhizgar",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/shahriar-parhizgar.png",
+    "bio":
+        "https://www.assabile.com/shahriar-parhizgar-88/shahriar-parhizgar.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Alafasy_64kbps",
+    "name": "Mishari Rashid Alafasy",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/mishary-rashid-alafasy.png",
+    "bio":
+        "https://www.assabile.com/mishary-rashid-alafasy-1/mishary-rashid-alafasy.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/warsh/warsh_Abdul_Basit_128kbps",
+    "name": "Abdul Basit Abdus Samad",
+    "style": "Warsh",
+    "img":
+        "https://www.assabile.com/media/person/200x256/abdelbasset-abdessamad.png",
+    "bio": "https://www.assabile.com/abdelbasset-abdessamad-2/abdelbasset-abdessamad.htm",
+    "source": "EveryAyah.com",
+  },
+
+  // Additional Reciters
+  {
+    "link": "https://everyayah.com/data/Abdul_Basit_Mujawwad_128kbps",
+    "name": "Abdul Basit Abdus Samad",
+    "style": "Mujawwad",
+    "img":
+        "https://www.assabile.com/media/person/200x256/abdelbasset-abdessamad.png",
+    "bio":
+        "https://www.assabile.com/abdelbasset-abdessamad-2/abdelbasset-abdessamad.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Abdul_Basit_Murattal_64kbps",
+    "name": "Abdul Basit Abdus Samad",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/abdelbasset-abdessamad.png",
+    "bio":
+        "https://www.assabile.com/abdelbasset-abdessamad-2/abdelbasset-abdessamad.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Abdullah_Basfar_64kbps",
+    "name": "Abdullah Basfar",
+    "style": "Mujawwad",
+    "img":
+        "https://www.assabile.com/media/person/200x256/abdullah-ibn-ali-basfar.png",
+    "bio":
+        "https://www.assabile.com/abdullah-ibn-ali-basfar-6/abdullah-ibn-ali-basfar.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Abdurrahmaan_As-Sudais_64kbps",
+    "name": "Abdur-Rahman as-Sudais",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/abdul-rahman-al-sudais.png",
+    "bio":
+        "https://www.assabile.com/abdul-rahman-al-sudais-12/abdul-rahman-al-sudais.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Abu_Bakr_Ash-Shaatree_128kbps",
+    "name": "Abu Bakr al-Shatri",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/abu-bakr-al-shatri.png",
+    "bio":
+        "https://www.assabile.com/abu-bakr-al-shatri-34/abu-bakr-al-shatri.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Hani_Rifai_64kbps",
+    "name": "Hani ar-Rifai",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/hani-ar-rifai.png",
+    "bio":
+        "https://www.assabile.com/hani-ar-rifai-86/hani-ar-rifai.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Hudhaify_64kbps",
+    "name": "Ali Al-Hudhaify",
+    "style": "Murattal",
+    "img": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Huthaify.jpg",
+    "bio": "https://en.wikipedia.org/wiki/Ali_ibn_Abdur-Rahman_al_Hudhaify",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Ibrahim_Akhdar_64kbps",
+    "name": "Ibrahim Akhdar",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/ibrahim-al-akhdar.png",
+    "bio":
+        "https://www.assabile.com/ibrahim-al-akhdar-16/ibrahim-al-akhdar.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Maher_AlMuaiqly_64kbps",
+    "name": "Maher Al Muaiqly",
+    "style": "Murattal",
+    "img": "https://www.assabile.com/media/person/200x256/maher-al-mueaqly.png",
+    "bio": "https://www.assabile.com/maher-al-mueaqly-33/maher-al-mueaqly.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Minshawy_Mujawwad_64kbps",
+    "name": "Mohamed Siddiq al-Minshawi",
+    "style": "Mujawwad",
+    "img":
+        "https://www.assabile.com/media/person/200x256/mohamed-seddik-el-menchaoui.png",
+    "bio":
+        "https://www.assabile.com/mohamed-siddiq-el-minshawi-3/mohamed-siddiq-el-minshawi.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Mohammad_al_Tablaway_64kbps",
+    "name": "Mohamed al-Tablawi",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/mohamed-tablawi.png",
+    "bio": "https://www.assabile.com/mohamed-tablawi-31/mohamed-tablawi.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Muhammad_Ayyoub_64kbps",
+    "name": "Muhammad Ayyoub",
+    "style": "Murattal",
+    "img": "https://upload.wikimedia.org/wikipedia/en/4/40/Muhammad_Ayyub.jpeg",
+    "bio": "https://en.wikipedia.org/wiki/Muhammad_Ayyub",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Muhammad_Jibreel_64kbps",
+    "name": "Muhammad Jibreel",
+    "style": "Murattal",
+    "img": "https://www.assabile.com/media/person/200x256/muhammad-jebril.png",
+    "bio": "https://www.assabile.com/muhammad-jibreel-59/muhammad-jibreel.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Saood_ash-Shuraym_64kbps",
+    "name": "Sa'ud ash-Shuraym",
+    "style": "Murattal",
+    "img": "https://www.assabile.com/media/person/200x256/saoud-shuraim.png",
+    "bio": "https://www.assabile.com/saud-shuraim-11/saud-shuraim.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Husary_Mujawwad_64kbps",
+    "name": "Mahmoud Khalil Al-Husary",
+    "style": "Mujawwad",
+    "img":
+        "https://www.assabile.com/media/person/200x256/mahmoud-khalil-al-hussary.png",
+    "bio":
+        "https://www.assabile.com/mahmoud-khalil-al-hussary-27/mahmoud-khalil-al-hussary.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/ahmed_ibn_ali_al_ajamy_128kbps",
+    "name": "Ahmed ibn Ali al-Ajamy",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/ahmed-al-ajmi.png",
+    "bio": "https://www.assabile.com/ahmed-al-ajmi-13/ahmed-al-ajmi.htm",
+    "source": "EveryAyah.com",
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  //  NEW RECITERS — Added from QuranicAudio & EveryAyah
+  // ═══════════════════════════════════════════════════════════
 
   {
-    "link": "https://everyayah.com/data/Raad_Muhammad_Al_Kurdi_128kbps",
-    "name": "Raad Al-Kurdi",
+    "link": "https://everyayah.com/data/AbdulBari_Al-Thubaity_128kbps",
+    "name": "Abdul Bari Al-Thubaity",
     "style": "Murattal",
     "img":
-        "https://www.assabile.com/media/person/200x256/raad-muhammad-al-kurdi.png",
+        "https://www.assabile.com/media/person/200x256/abdul-bari-al-thubaity.png",
     "bio":
-        "https://www.assabile.com/raad-muhammad-al-kurdi-130/raad-muhammad-al-kurdi.htm",
+        "https://www.assabile.com/abdul-bari-al-thubaity-35/abdul-bari-al-thubaity.htm",
     "source": "EveryAyah.com",
   },
-
+  {
+    "link": "https://everyayah.com/data/Bandar_Baleela_128kbps",
+    "name": "Bandar Baleela",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/bandar-baleela.png",
+    "bio":
+        "https://www.assabile.com/bandar-baleela-108/bandar-baleela.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Khalid_Al_Jalil_128kbps",
+    "name": "Khalid Al-Jalil",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/khalid-al-jalil.png",
+    "bio":
+        "https://www.assabile.com/khalid-al-jalil-127/khalid-al-jalil.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Mohammad_Ismaeel_Al-Muqaddim_128kbps",
+    "name": "Mohammad Ismaeel Al-Muqaddim",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/mohammad-ismaeel-al-muqaddim.png",
+    "bio":
+        "https://www.assabile.com/mohammad-ismaeel-al-muqaddim-110/mohammad-ismaeel-al-muqaddim.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/AbdulKareem_Al-Hazmi_128kbps",
+    "name": "Abdul Kareem Al-Hazmi",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/abdulkareem-al-hazmi.png",
+    "bio":
+        "https://www.assabile.com/abdulkareem-al-hazmi-126/abdulkareem-al-hazmi.htm",
+    "source": "EveryAyah.com",
+  },
   {
     "link": "https://everyayah.com/data/Wadee_Hammadi_Al-Yamani_128kbps",
     "name": "Wadee Hammadi Al-Yamani",
     "style": "Murattal",
     "img":
-        "https://www.assabile.com/media/person/200x256/wadih-al-yamani.jpg",
+        "https://www.assabile.com/media/person/200x256/wadee-hammadi-al-yamani.png",
     "bio":
-        "https://www.assabile.com/wadih-al-yamani-411/wadih-al-yamani.htm",
+        "https://www.assabile.com/wadee-hammadi-al-yamani-129/wadee-hammadi-al-yamani.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Abdul-Munim_Abdul-Mubdi_128kbps",
+    "name": "Abdul-Mun'im Abdul-Mubdi",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/abdul-munim-abdul-mubdi.png",
+    "bio":
+        "https://www.assabile.com/abdul-munim-abdul-mubdi-131/abdul-munim-abdul-mubdi.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Al-Hussayni_Al-Azazy_128kbps",
+    "name": "Al-Hussayni Al-Azazy",
+    "style": "Murattal",
+    "img":
+        "https://www.assabile.com/media/person/200x256/al-hussayni-al-azazy.png",
+    "bio":
+        "https://www.assabile.com/al-hussayni-al-azazy-132/al-hussayni-al-azazy.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Mishari_Al-Afasy_Mujawwad_128kbps",
+    "name": "Mishari Rashid Alafasy",
+    "style": "Mujawwad",
+    "img":
+        "https://www.assabile.com/media/person/200x256/mishary-rashid-alafasy.png",
+    "bio":
+        "https://www.assabile.com/mishary-rashid-alafasy-1/mishary-rashid-alafasy.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Saad_Al-Ghamdi_Mujawwad_128kbps",
+    "name": "Saad Al-Ghamdi",
+    "style": "Mujawwad",
+    "img": "https://www.assabile.com/media/person/200x256/saad-el-ghamidi.png",
+    "bio": "https://www.assabile.com/saad-el-ghamidi-4/saad-el-ghamidi.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Maher_Al_Muaiqly_Mujawwad_128kbps",
+    "name": "Maher Al Muaiqly",
+    "style": "Mujawwad",
+    "img": "https://www.assabile.com/media/person/200x256/maher-al-mueaqly.png",
+    "bio": "https://www.assabile.com/maher-al-mueaqly-33/maher-al-mueaqly.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/warsh/warsh_Abdul_Basit_Mujawwad_64kbps",
+    "name": "Abdul Basit Abdus Samad",
+    "style": "Warsh",
+    "img":
+        "https://www.assabile.com/media/person/200x256/abdelbasset-abdessamad.png",
+    "bio":
+        "https://www.assabile.com/abdelbasset-abdessamad-2/abdelbasset-abdessamad.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/warsh/warsh_Mishari_Al-Afasy_128kbps",
+    "name": "Mishari Rashid Alafasy",
+    "style": "Warsh",
+    "img":
+        "https://www.assabile.com/media/person/200x256/mishary-rashid-alafasy.png",
+    "bio":
+        "https://www.assabile.com/mishary-rashid-alafasy-1/mishary-rashid-alafasy.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/warsh/warsh_Qari_Yacoub_64kbps",
+    "name": "Qari Yacoub",
+    "style": "Warsh",
+    "img":
+        "https://www.assabile.com/media/person/200x256/qari-yacoub.png",
+    "bio":
+        "https://www.assabile.com/qari-yacoub-134/qari-yacoub.htm",
+    "source": "EveryAyah.com",
+  },
+  {
+    "link": "https://everyayah.com/data/Husary_Muallim_Surah_128kbps",
+    "name": "Mahmoud Khalil Al-Husary (Teacher)",
+    "style": "Muallim",
+    "img":
+        "https://www.assabile.com/media/person/200x256/mahmoud-khalil-al-hussary.png",
+    "bio":
+        "https://www.assabile.com/mahmoud-khalil-al-hussary-27/mahmoud-khalil-al-hussary.htm",
     "source": "EveryAyah.com",
   },
 ];

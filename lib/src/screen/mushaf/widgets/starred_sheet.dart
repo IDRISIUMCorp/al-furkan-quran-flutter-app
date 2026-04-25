@@ -5,6 +5,7 @@ import 'package:al_furkan/src/utils/number_localization.dart';
 import 'package:al_furkan/src/utils/quran_ayahs_function/get_page_number.dart';
 import 'package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart';
 import 'package:qcf_quran/qcf_quran.dart' hide getPageNumber;
+import 'package:al_furkan/src/theme/app_colors.dart';
 
 Future<void> showStarredSheet({
   required BuildContext context,
@@ -72,7 +73,7 @@ Future<void> showStarredSheet({
                                   "لا توجد آيات مميزة بنجمة",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w800,
-                                    color: Color(0xFF9C9C9C),
+                                    color: AppColors.ayaTextMuted,
                                   ),
                                 ),
                               )

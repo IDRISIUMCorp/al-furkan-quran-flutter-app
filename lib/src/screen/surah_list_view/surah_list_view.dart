@@ -207,13 +207,30 @@ class _SurahListViewState extends State<SurahListView> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              "surah${filteredSurah[index].id.toString().padLeft(3, '0')}",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: textColor,
-                                fontFamily: "surah-name-v1",
-                              ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  "surah${filteredSurah[index].id.toString().padLeft(3, '0')}",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: textColor,
+                                    fontFamily: "surah-name-v1",
+                                  ),
+                                ),
+                                if (qcf.isSajdaVerse(filteredSurah[index].id, 1) ||
+                                    qcf.allSajdaVerses.any((s) => s.surah == filteredSurah[index].id))
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 4),
+                                    child: Text(
+                                      '۩',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: context.read<ThemeCubit>().state.primary,
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                             Text(
                               l10n.ayahsCount(

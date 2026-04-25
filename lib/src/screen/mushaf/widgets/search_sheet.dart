@@ -1,8 +1,10 @@
 import "dart:async";
 import "dart:math" as math;
 
+import "package:al_furkan/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
 import "package:al_furkan/src/utils/number_localization.dart";
 import "package:flutter/material.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
 import "package:flutter_animate/flutter_animate.dart";
 import "package:qcf_quran/qcf_quran.dart";
 
@@ -45,9 +47,9 @@ class SearchSheetState extends State<SearchSheet> {
 
   bool get _isDark => Theme.of(context).brightness == Brightness.dark;
   Color get _surfaceColor =>
-      _isDark ? Theme.of(context).colorScheme.surface : const Color(0xFFF7F1E6);
+      _isDark ? Theme.of(context).colorScheme.surface : const Color(0xFFEDE4D4);
   Color get _cardColor =>
-      _isDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFFFFBF5);
+      _isDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFF5EBE0);
   Color get _borderColor => _isDark
       ? Colors.white.withValues(alpha: 0.08)
       : Colors.black.withValues(alpha: 0.06);
@@ -405,7 +407,7 @@ class SearchSheetState extends State<SearchSheet> {
                                                         TextOverflow.ellipsis,
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
-                                                      fontFamily: "QPC_Hafs",
+                                                      fontFamily: context.watch<QuranSettingsCubit>().state.fontFamily.flutterFontFamily,
                                                       fontSize: 22,
                                                       height: 1.65,
                                                       color: _textColor,

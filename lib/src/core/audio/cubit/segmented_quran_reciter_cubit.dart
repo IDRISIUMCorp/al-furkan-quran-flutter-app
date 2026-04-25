@@ -12,6 +12,7 @@ class SegmentedQuranReciterCubit extends Cubit<ReciterInfoModel> {
         (() {
           ReciterInfoModel? fromHive;
           try {
+            if (!Hive.isBoxOpen("user")) return getSegmentsSupportedReciters().first;
             final raw = Hive.box(
               "user",
             ).get("last_selected_reciter", defaultValue: null);

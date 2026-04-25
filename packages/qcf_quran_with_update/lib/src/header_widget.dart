@@ -57,9 +57,11 @@ class HeaderWidget extends StatelessWidget {
                   "surah-icon",
                   style: TextStyle(
                     fontFamily: "surah-name-v1",
-                    fontSize: isPortrait
-                        ? (getScreenType(context) == ScreenType.large ? 24.0.sp : 30.0.sp)
-                        : 34.0.sp,
+                    fontSize: (isPortrait
+                        ? (getScreenType(context) == ScreenType.large
+                            ? 24.0.sp
+                            : 30.0.sp)
+                        : 34.0.sp) * effectiveTheme.surahNameScale,
                     color: effectiveTheme.headerTextColor,
                   ),
                 ),
@@ -68,9 +70,11 @@ class HeaderWidget extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: "surah-name-v1",
-                    fontSize: isPortrait
-                        ? (getScreenType(context) == ScreenType.large ? 28.0.sp : 34.0.sp)
-                        : 38.0.sp,
+                    fontSize: (isPortrait
+                        ? (getScreenType(context) == ScreenType.large
+                            ? 28.0.sp
+                            : 34.0.sp)
+                        : 38.0.sp) * effectiveTheme.surahNameScale,
                     color: effectiveTheme.headerTextColor,
                   ),
                 ),

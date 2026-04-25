@@ -1,5 +1,3 @@
-import "dart:ui";
-
 import "package:al_furkan/l10n/app_localizations.dart";
 import "package:al_furkan/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
 import "package:al_furkan/src/core/audio/model/ayahkey_management.dart";
@@ -80,20 +78,6 @@ class QuranScriptSettings extends StatelessWidget {
         ? Scaffold(
             extendBodyBehindAppBar: true,
             appBar: AppBar(
-              flexibleSpace: ClipRRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: context.read<ThemeCubit>().state.mutedGray,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
               title: Text(appLocalizations.quranScriptSettings),
               actions: [themeIconButton(context)],
             ),

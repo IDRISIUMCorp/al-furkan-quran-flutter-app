@@ -115,8 +115,8 @@ class AyahOptionsSheet extends StatelessWidget {
         : _toArabicDigits(verseNum.toString());
     final titleText = "${titleSurah.isEmpty ? "" : titleSurah}: ${titleVerse.isEmpty ? "" : titleVerse}".trim();
 
-    final bg = isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF7F1E6);
-    final card = isDark ? const Color(0xFF252525) : const Color(0xFFFFF9F2);
+    final bg = isDark ? const Color(0xFF1A1A1A) : const Color(0xFFEDE4D4);
+    final card = isDark ? const Color(0xFF252525) : const Color(0xFFF5EBE0);
     final onBg = isDark ? Colors.white : const Color(0xFF1B1B1B);
     final dividerColor = isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.06);
     final subtitleColor = onBg.withValues(alpha: 0.55);

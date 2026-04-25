@@ -8,6 +8,7 @@ enum WahyMushafMenuAction {
   prayerTimes,
   qibla,
   library,
+  offlinePlayer,
   settings,
   about,
   feedback,
@@ -140,49 +141,52 @@ class WahyMushafMoreMenuButton extends StatelessWidget {
     ({WahyMushafMenuAction action, IconData icon, String label})
   >
   _menuItems = [
+    // ── المميزات ──
     (
-      action: WahyMushafMenuAction.quranSettings,
-      icon: Icons.auto_awesome_rounded,
-      label:
-          "\u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0627\u0644\u0645\u0635\u062d\u0641",
-    ),
-    (
-      action: WahyMushafMenuAction.azkar,
-      icon: Icons.auto_stories_rounded,
-      label:
-          "\u0623\u0630\u0643\u0627\u0631 \u0627\u0644\u0645\u0633\u0644\u0645",
-    ),
-    (
-      action: WahyMushafMenuAction.prayerTimes,
-      icon: Icons.access_time_filled_rounded,
-      label:
-          "\u0645\u0648\u0627\u0642\u064a\u062a \u0627\u0644\u0635\u0644\u0627\u0629",
-    ),
-    (
-      action: WahyMushafMenuAction.qibla,
-      icon: Icons.explore_rounded,
-      label: "\u0627\u0644\u0642\u0628\u0644\u0629",
+      action: WahyMushafMenuAction.offlinePlayer,
+      icon: Icons.download_rounded,
+      label: "المشغّل الأوفلاين",
     ),
     (
       action: WahyMushafMenuAction.library,
       icon: Icons.library_books_rounded,
-      label: "\u0627\u0644\u0645\u0643\u062a\u0628\u0629",
+      label: "المكتبة",
     ),
+    (
+      action: WahyMushafMenuAction.quranSettings,
+      icon: Icons.auto_awesome_rounded,
+      label: "إعدادات المصحف",
+    ),
+    (
+      action: WahyMushafMenuAction.azkar,
+      icon: Icons.auto_stories_rounded,
+      label: "أذكار المسلم",
+    ),
+    (
+      action: WahyMushafMenuAction.prayerTimes,
+      icon: Icons.access_time_filled_rounded,
+      label: "مواقيت الصلاة",
+    ),
+    (
+      action: WahyMushafMenuAction.qibla,
+      icon: Icons.explore_rounded,
+      label: "القبلة",
+    ),
+    // ── النظام ──
     (
       action: WahyMushafMenuAction.settings,
       icon: Icons.settings_rounded,
-      label: "\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a",
+      label: "الإعدادات",
     ),
     (
       action: WahyMushafMenuAction.about,
       icon: Icons.info_outline_rounded,
-      label: "\u0639\u0646 \u0627\u0644\u062a\u0637\u0628\u064a\u0642",
+      label: "عن التطبيق",
     ),
     (
       action: WahyMushafMenuAction.feedback,
       icon: Icons.bug_report_rounded,
-      label:
-          "\u0625\u0631\u0633\u0627\u0644 \u0645\u0644\u0627\u062d\u0638\u0629",
+      label: "إرسال ملاحظة",
     ),
   ];
 
@@ -276,15 +280,18 @@ class WahyMushafMoreMenuButton extends StatelessWidget {
             ),
           ),
           itemBuilder: (context) => [
-            _buildMenuItem(_menuItems[0]), // إعدادات المصحف
-            _buildMenuItem(_menuItems[1]), // أذكار المسلم
-            _buildMenuItem(_menuItems[2]), // مواقيت الصلاة
-            _buildMenuItem(_menuItems[3]), // القبلة
-            _buildMenuItem(_menuItems[4]), // المكتبة
+            // ── المميزات ──
+            _buildMenuItem(_menuItems[0]), // المشغل الأوفلاين
+            _buildMenuItem(_menuItems[1]), // المكتبة
+            _buildMenuItem(_menuItems[2]), // إعدادات المصحف
+            _buildMenuItem(_menuItems[3]), // أذكار المسلم
+            _buildMenuItem(_menuItems[4]), // مواقيت الصلاة
+            _buildMenuItem(_menuItems[5]), // القبلة
             const PopupMenuDivider(height: 16),
-            _buildMenuItem(_menuItems[5]), // الإعدادات
-            _buildMenuItem(_menuItems[6]), // عن التطبيق
-            _buildMenuItem(_menuItems[7]), // إرسال ملاحظة
+            // ── النظام ──
+            _buildMenuItem(_menuItems[6]), // الإعدادات
+            _buildMenuItem(_menuItems[7]), // عن التطبيق
+            _buildMenuItem(_menuItems[8]), // إرسال ملاحظة
           ],
           onSelected: onSelected,
         ),

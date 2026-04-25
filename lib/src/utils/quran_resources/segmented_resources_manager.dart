@@ -19,32 +19,81 @@ class SegmentedResourcesManager {
   static Box? _segmentsBox;
 
   static Future<void> init() async {
-    await Hive.openBox("user");
-    String? selectedBox = getSelectedDataBoxName();
-    if (selectedBox != null) {
-      await changeSelectedBox(selectedBox);
+    try {
+      if (!Hive.isBoxOpen("user")) {
+        await Hive.openBox("user").timeout(const Duration(seconds: 5));
+      }
+      String? selectedBox = getSelectedDataBoxName();
+      if (selectedBox != null) {
+        debugPrint("📦 Opening segments box: $selectedBox");
+        await changeSelectedBox(selectedBox).timeout(const Duration(seconds: 8));
+        // Invalidate cache so lookups that previously failed can now succeed.
+        invalidateCache();
+        debugPrint("✅ Segments box opened successfully: $_segmentsBox");
+      } else {
+        debugPrint("⚠️ No selected segments box found in user preferences");
+      }
+    } catch (e) {
+      debugPrint("❌ Error initializing SegmentedResourcesManager: $e");
+      // If the box failed to open, ensure _segmentsBox stays null
+      // so getAyahSegments() doesn't use a broken box.
+      _segmentsBox = null;
     }
   }
 
   static Map segmentsCache = {};
+
+  /// Clear the cache so future lookups retry from the box.
+  static void invalidateCache() {
+    segmentsCache.clear();
+  }
+
+  static int _boxNotOpenLogSuppression = 0;
+
   static List? getAyahSegments(String ayahKey) {
-    if (_segmentsBox?.isOpen == false) return null;
-    final data = segmentsCache[ayahKey];
-    if (data != null) {
-      if (data == -1) return null;
+    if (_segmentsBox == null || _segmentsBox?.isOpen == false) {
+      // Box not ready yet — do NOT cache -1, so we retry next time.
+      // Throttle log to avoid spamming (only log once every 50 calls).
+      _boxNotOpenLogSuppression++;
+      if (_boxNotOpenLogSuppression == 1 || _boxNotOpenLogSuppression % 50 == 0) {
+        debugPrint("⚠️ Segments box is not open for ayahKey: $ayahKey (call #$_boxNotOpenLogSuppression)");
+      }
+      return null;
     }
-    Map? audioTimeStamp =
-        data ?? _segmentsBox?.get(ayahKey, defaultValue: null);
+    _boxNotOpenLogSuppression = 0; // Reset when box is open
 
-    if (!segmentsCache.containsKey(ayahKey)) {
-      segmentsCache[ayahKey] = audioTimeStamp;
+    final cached = segmentsCache[ayahKey];
+    if (cached != null) {
+      if (cached == -1) return null;
+      // cached is a Map — extract segments from it.
+      try {
+        return List<List>.from(cached["segments"]);
+      } catch (e) {
+        debugPrint("❌ Error parsing cached segments for $ayahKey: $e");
+        return null;
+      }
     }
 
-    List<List>? segments;
+    // Read from box and cache the raw Map (not the parsed list).
+    final Map? audioTimeStamp =
+        _segmentsBox?.get(ayahKey, defaultValue: null);
+
     if (audioTimeStamp != null) {
-      segments = List<List>.from(audioTimeStamp["segments"]);
+      segmentsCache[ayahKey] = audioTimeStamp;
+      try {
+        final segments = List<List>.from(audioTimeStamp["segments"]);
+        debugPrint("✅ Found ${segments.length} segments for $ayahKey");
+        return segments;
+      } catch (e) {
+        debugPrint("❌ Error parsing segments for $ayahKey: $e");
+        return null;
+      }
+    } else {
+      // Only cache -1 when the box IS open and the key is genuinely missing.
+      segmentsCache[ayahKey] = -1;
+      debugPrint("⚠️ No segments found for $ayahKey");
+      return null;
     }
-    return segments;
   }
 
   static ReciterInfoModel? getOpenSegmentsReciter() {
@@ -77,17 +126,27 @@ class SegmentedResourcesManager {
   }
 
   static Future<void> changeSelectedBox(String toOpenBox) async {
-    // close all opened boxes
+    // close all opened boxes (with timeout safety)
     List<String> boxesNames = getDownloadedBoxesNames();
     for (String boxName in boxesNames) {
       if (Hive.isBoxOpen(boxName)) {
-        await Hive.box(boxName).close();
+        try {
+          await Hive.box(boxName).close().timeout(const Duration(seconds: 3));
+        } catch (e) {
+          debugPrint("⚠️ Timeout/error closing box $boxName: $e");
+        }
       }
     }
     // save selected box to user DB
     saveSelectedBox(toOpenBox);
-    // open selected box
-    _segmentsBox = await Hive.openBox(toOpenBox);
+    // open selected box (with timeout safety)
+    try {
+      _segmentsBox = await Hive.openBox(toOpenBox).timeout(const Duration(seconds: 5));
+    } catch (e) {
+      debugPrint("❌ Failed to open segments box $toOpenBox: $e");
+      _segmentsBox = null;
+      rethrow;
+    }
   }
 
   static Future<bool> downloadResources(

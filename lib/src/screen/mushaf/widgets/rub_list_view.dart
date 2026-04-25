@@ -15,7 +15,7 @@ class RubListView extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final onBg = isDark ? Colors.white : Colors.black;
     final bg = isDark ? Colors.black : Colors.white;
-    final cardBg = isDark ? const Color(0xFF1B1B1F) : const Color(0xFFFFF9F2);
+    final cardBg = isDark ? const Color(0xFF1B1B1F) : const Color(0xFFF5EBE0);
 
     final q = query.trim().toLowerCase();
     return FutureBuilder<String>(

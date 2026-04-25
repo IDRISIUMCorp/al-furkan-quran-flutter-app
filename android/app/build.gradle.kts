@@ -5,7 +5,7 @@ import java.io.FileInputStream
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
-    // id("com.google.gms.google-services")
+    id("com.google.gms.google-services")
     // END: FlutterFire Configuration
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
@@ -42,6 +42,8 @@ android {
         versionName = flutter.versionName
         multiDexEnabled = true
     }
+
+
 
      packagingOptions {
         jniLibs {
@@ -82,10 +84,6 @@ android {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
-    
-    // Google Play Core for deferred components (optional, but prevents R8 errors)
-    implementation("com.google.android.play:core:1.10.3")
-    implementation("com.google.android.play:core-ktx:1.8.1")
 }
 
 flutter {

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:al_furkan/src/model/ayah_image_settings.dart';
 import 'package:al_furkan/src/resources/quran_resources/quran_pages_info.dart';
+import 'package:al_furkan/src/theme/app_colors.dart';
 import 'package:al_furkan/src/theme/controller/theme_cubit.dart';
 import 'package:al_furkan/src/utils/basic_functions.dart';
 import 'package:al_furkan/src/utils/quran_ayahs_function/get_page_number.dart';
@@ -81,14 +82,14 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
   // ── SearchSheet-style color tokens ──
   bool get _isDark => Theme.of(context).brightness == Brightness.dark;
   Color get _surfaceColor =>
-      _isDark ? Theme.of(context).colorScheme.surface : const Color(0xFFF7F1E6);
+      _isDark ? Theme.of(context).colorScheme.surface : AppColors.ayaSurface;
   Color get _cardColor =>
-      _isDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFFFFBF5);
+      _isDark ? Colors.white.withValues(alpha: 0.05) : AppColors.ayaCard;
   Color get _borderColor => _isDark
       ? Colors.white.withValues(alpha: 0.08)
-      : Colors.black.withValues(alpha: 0.06);
-  Color get _textColor => _isDark ? Colors.white : const Color(0xFF1B1B1B);
-  Color get _mutedColor => _isDark ? Colors.white54 : const Color(0xFF8F8F8F);
+      : AppColors.ayaBorder;
+  Color get _textColor => _isDark ? Colors.white : AppColors.ayaTextMain;
+  Color get _mutedColor => _isDark ? Colors.white54 : AppColors.ayaTextMuted;
 
   // 0 = Image, 1 = Text
   int _shareMode = 0;
@@ -1537,7 +1538,7 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                               fontWeight: FontWeight.w900,
                               color: _isDark
                                   ? const Color(0xFFC09B5A)
-                                  : const Color(0xFF33B18E),
+                                  : AppColors.ayaPrimary,
                             ),
                           ),
                           Text(
@@ -1578,29 +1579,27 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
             headerBackgroundColor: const Color(0xFF111111),
             headerWidthLarge: bannerWidth * 1.25,
             headerWidthSmall: bannerWidth * 1.25,
-            headerFontSizeLarge: 85 * _surahNameScale,
-            headerFontSizeSmall: 85 * _surahNameScale,
+            surahNameScale: 3.5 * _surahNameScale,
             headerTextColor: Colors.white,
             verseTextColor: Colors.white,
             verseNumberColor: Colors.white,
           )
         : QcfThemeData.sepia().copyWith(
-            pageBackgroundColor: const Color(0xFFF7F1E6),
+            pageBackgroundColor: AppColors.ayaBackground,
             headerBackgroundColor: const Color(0xFFEFE3D2),
             headerWidthLarge: bannerWidth * 1.25,
             headerWidthSmall: bannerWidth * 1.25,
-            headerFontSizeLarge: 85 * _surahNameScale,
-            headerFontSizeSmall: 85 * _surahNameScale,
-            headerTextColor: const Color(0xFF1B1B1B),
-            verseTextColor: const Color(0xFF1B1B1B),
-            verseNumberColor: const Color(0xFF1B1B1B),
+            surahNameScale: 3.5 * _surahNameScale,
+            headerTextColor: AppColors.ayaTextMain,
+            verseTextColor: AppColors.ayaTextMain,
+            verseNumberColor: AppColors.ayaTextMain,
           );
 
-    final Color cardBgColor = isDark ? Colors.black : const Color(0xFFF7F1E6);
+    final Color cardBgColor = isDark ? Colors.black : AppColors.ayaBackground;
     final Color tafsirBgColor = isDark
         ? const Color(0xFF111111)
         : const Color(0xFFEFE3D2);
-    final Color textColor = isDark ? Colors.white : const Color(0xFF1B1B1B);
+    final Color textColor = isDark ? Colors.white : AppColors.ayaTextMain;
 
     // Build multi-surah-aware content: group verses by surah for individual banners
     // This enables sharing e.g. Al-Ikhlas + Al-Falaq + Al-Nas together with separate banners
@@ -1842,7 +1841,7 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                           fontWeight: FontWeight.w900,
                           color: isDark
                               ? const Color(0xFFC09B5A)
-                              : const Color(0xFF33B18E),
+                              : AppColors.ayaPrimary,
                         ),
                       ),
                       Text(
@@ -1963,11 +1962,37 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
       return Text(text, style: baseStyle);
     }
 
-    // Match text inside { } or ( ) or [ ] to highlight ayahs
-    final regex = RegExp(r'\{[^\}]+\}|\([^\)]+\)|\[[^\]]+\]|«[^»]+»');
-    final matches = regex.allMatches(text);
+    final isDark = _forceDarkMode;
+    final quranFontFamily = _tafsirFontFamily == 'default'
+        ? "KFGQPC-Uthmanic-HAFS-Regular"
+        : _tafsirFontFamily;
 
-    if (matches.isEmpty) {
+    // Color tokens matching _buildTafsirRichText in ayah_by_ayah_card.dart
+    final curlyColor = isDark ? const Color(0xFFE6B422) : const Color(0xFF9E7C0A);
+    final squareColor = isDark ? const Color(0xFFCD853F) : const Color(0xFF8B5E3C);
+    final quranColor = isDark ? primaryColor : curlyColor;
+
+    // Collect all bracket matches with their kind
+    final quranPattern = RegExp(r'[﴿ﴁ][\s\S]*?[﴾ﴂ]', unicode: true);
+    final curlyPattern = RegExp(r'\{[^\}]+\}');
+    final squarePattern = RegExp(r'\[[^\]]+\]');
+
+    final allMatches = <({int start, int end, String text, _ShareBracketKind kind})>[];
+
+    for (final m in quranPattern.allMatches(text)) {
+      allMatches.add((start: m.start, end: m.end, text: m.group(0)!, kind: _ShareBracketKind.quran));
+    }
+    for (final m in curlyPattern.allMatches(text)) {
+      final overlaps = allMatches.any((e) => m.start < e.end && m.end > e.start);
+      if (!overlaps) allMatches.add((start: m.start, end: m.end, text: m.group(0)!, kind: _ShareBracketKind.curly));
+    }
+    for (final m in squarePattern.allMatches(text)) {
+      final overlaps = allMatches.any((e) => m.start < e.end && m.end > e.start);
+      if (!overlaps) allMatches.add((start: m.start, end: m.end, text: m.group(0)!, kind: _ShareBracketKind.square));
+    }
+    allMatches.sort((a, b) => a.start.compareTo(b.start));
+
+    if (allMatches.isEmpty) {
       return Text(
         text,
         textAlign: TextAlign.right,
@@ -1977,27 +2002,49 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
     }
 
     final spans = <TextSpan>[];
-    int currentIndex = 0;
+    int lastEnd = 0;
 
-    for (final match in matches) {
-      if (match.start > currentIndex) {
-        spans.add(
-          TextSpan(text: text.substring(currentIndex, match.start)),
-        );
+    for (final match in allMatches) {
+      if (match.start > lastEnd) {
+        final before = text.substring(lastEnd, match.start);
+        if (before.isNotEmpty) spans.add(TextSpan(text: before, style: baseStyle));
       }
-      spans.add(
-        TextSpan(
-          text: match.group(0),
-          style: baseStyle.copyWith(
-            color: primaryColor,
-          ),
-        ),
-      );
-      currentIndex = match.end;
+
+      switch (match.kind) {
+        case _ShareBracketKind.quran:
+          spans.add(TextSpan(
+            text: match.text,
+            style: baseStyle.copyWith(
+              color: quranColor,
+              fontFamily: quranFontFamily,
+              fontSize: baseStyle.fontSize! * 1.05,
+              fontWeight: FontWeight.w500,
+            ),
+          ));
+        case _ShareBracketKind.curly:
+          spans.add(TextSpan(
+            text: match.text,
+            style: baseStyle.copyWith(
+              color: curlyColor,
+              fontFamily: quranFontFamily,
+              fontWeight: FontWeight.w500,
+            ),
+          ));
+        case _ShareBracketKind.square:
+          spans.add(TextSpan(
+            text: match.text,
+            style: baseStyle.copyWith(
+              color: squareColor,
+              fontWeight: FontWeight.w700,
+            ),
+          ));
+      }
+      lastEnd = match.end;
     }
 
-    if (currentIndex < text.length) {
-      spans.add(TextSpan(text: text.substring(currentIndex)));
+    if (lastEnd < text.length) {
+      final remaining = text.substring(lastEnd);
+      if (remaining.isNotEmpty) spans.add(TextSpan(text: remaining, style: baseStyle));
     }
 
     return Text.rich(
@@ -2007,6 +2054,8 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
     );
   }
 }
+
+enum _ShareBracketKind { quran, curly, square }
 
 /// Helper class to group verses by surah for multi-surah rendering
 class _SurahVerseGroup {

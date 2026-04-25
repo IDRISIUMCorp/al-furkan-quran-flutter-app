@@ -1973,6 +1973,12 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
       );
     }
 
+    // Bracket-specific colors
+    final yellowColor = const Color(0xFFD4A843); // Warm yellow for {}
+    final tealColor = const Color(0xFF6B8E7B);   // Muted teal for []
+    final roseColor = const Color(0xFF9B6B7B);   // Dusty rose for ()
+    // «» keeps primaryColor
+
     final spans = <TextSpan>[];
     int currentIndex = 0;
 
@@ -1980,15 +1986,43 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
       if (match.start > currentIndex) {
         spans.add(TextSpan(text: text.substring(currentIndex, match.start)));
       }
-      spans.add(
-        TextSpan(
-          text: match.group(0),
-          style: baseStyle.copyWith(
-            color: primaryColor,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      );
+      final matched = match.group(0) ?? '';
+      final firstChar = matched.isNotEmpty ? matched[0] : '';
+
+      Color bracketColor;
+      TextStyle? bracketStyle;
+
+      if (firstChar == '{') {
+        // {} → yellow + othmani/quran font
+        bracketColor = yellowColor;
+        bracketStyle = baseStyle.copyWith(
+          color: bracketColor,
+          fontWeight: FontWeight.w700,
+          fontFamily: 'KFGQPC-Uthmanic-HAFS-Regular',
+        );
+      } else if (firstChar == '[') {
+        // [] → teal
+        bracketColor = tealColor;
+        bracketStyle = baseStyle.copyWith(
+          color: bracketColor,
+          fontWeight: FontWeight.w700,
+        );
+      } else if (firstChar == '(') {
+        // () → dusty rose
+        bracketColor = roseColor;
+        bracketStyle = baseStyle.copyWith(
+          color: bracketColor,
+          fontWeight: FontWeight.w700,
+        );
+      } else {
+        // «» → primary color (default)
+        bracketStyle = baseStyle.copyWith(
+          color: primaryColor,
+          fontWeight: FontWeight.w700,
+        );
+      }
+
+      spans.add(TextSpan(text: matched, style: bracketStyle));
       currentIndex = match.end;
     }
 

@@ -35,7 +35,7 @@ class SunnahTheme {
   
   /// Text colors
   static const Color textPrimary = Color(0xFF2C2C2C);
-  static const Color textPrimaryDark = Color(0xFFF8F9FA);
+  static const Color textPrimaryDark = Color(0xFFEDE4D4);
   static const Color textSecondary = Color(0xFF6B6B6B);
   static const Color textSecondaryDark = Color(0xFFB8BCC2);
   static const Color textMuted = Color(0xFF9B9B9B);

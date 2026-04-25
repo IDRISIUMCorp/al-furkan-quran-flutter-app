@@ -2,6 +2,7 @@ import "dart:async";
 
 import "package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart";
 import "package:al_furkan/src/screen/quran_script_view/cubit/ayah_to_highlight.dart";
+import "package:al_furkan/src/core/audio/services/idrisium_audio_tracker.dart";
 import "package:al_furkan/src/theme/controller/theme_cubit.dart";
 import "package:al_furkan/src/theme/controller/theme_state.dart";
 import "package:al_furkan/src/utils/number_localization.dart";
@@ -220,12 +221,15 @@ class _SearchScreenState extends State<SearchScreen> {
     final page = qcf.getPageNumber(surah, ayah);
 
     context.read<AyahKeyCubit>().changeLastScrolledPage(page);
-    context.read<AyahKeyCubit>().changeCurrentAyahKey(key);
-    context.read<AyahToHighlight>().changeAyah(key);
+    final isAudioPlaying = context.read<AudioAyahHighlightCubit>().state.activeAyahKey != null;
+    if (!isAudioPlaying) {
+      context.read<AyahKeyCubit>().changeCurrentAyahKey(key);
+      context.read<AyahToHighlight>().changeAyah(key);
+    }
 
     Future<void>.delayed(const Duration(seconds: 2), () {
       if (!context.mounted) return;
-      if (context.read<AyahToHighlight>().state == key) {
+      if (!isAudioPlaying && context.read<AyahToHighlight>().state == key) {
         context.read<AyahToHighlight>().changeAyah(null);
       }
     });

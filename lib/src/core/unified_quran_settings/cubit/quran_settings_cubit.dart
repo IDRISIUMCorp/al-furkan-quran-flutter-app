@@ -19,6 +19,8 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
   static const String _kShowSurahHeader = 'show_surah_header';
   static const String _kTajweedEnabled = 'tajweed_enabled';
   static const String _kCustomBackgroundColors = 'custom_background_colors';
+  static const String _kLayoutMode = 'layout_mode';
+  static const String _kFontFamily = 'font_family';
 
   late Box _box;
 
@@ -50,6 +52,16 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
     
     final customColorsData = _box.get(_kCustomBackgroundColors, defaultValue: <int>[]) as List;
     final customBackgroundColors = customColorsData.map((e) => Color(e as int)).toList();
+    final layoutModeString = _box.get(_kLayoutMode, defaultValue: MushafLayoutMode.singlePage.name) as String;
+    final layoutMode = MushafLayoutMode.values.firstWhere(
+      (e) => e.name == layoutModeString,
+      orElse: () => MushafLayoutMode.singlePage,
+    );
+    final fontFamilyString = _box.get(_kFontFamily, defaultValue: QuranFontFamily.qpcHafs.name) as String;
+    final fontFamily = QuranFontFamily.values.firstWhere(
+      (e) => e.name == fontFamilyString,
+      orElse: () => QuranFontFamily.qpcHafs,
+    );
 
     emit(
       QuranSettingsState(
@@ -67,6 +79,8 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
         showSurahHeader: showSurahHeader,
         tajweedEnabled: tajweedEnabled,
         customBackgroundColors: customBackgroundColors,
+        layoutMode: layoutMode,
+        fontFamily: fontFamily,
         isInitialized: true,
       ),
     );
@@ -84,6 +98,8 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
     await _box.put(_kShowSurahHeader, next.showSurahHeader);
     await _box.put(_kTajweedEnabled, next.tajweedEnabled);
     await _box.put(_kCustomBackgroundColors, next.customBackgroundColors.map((c) => c.value).toList());
+    await _box.put(_kLayoutMode, next.layoutMode.name);
+    await _box.put(_kFontFamily, next.fontFamily.name);
   }
 
   void updateFontSize(double size) {
@@ -194,6 +210,20 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
     final item = updatedList.removeAt(oldIndex);
     updatedList.insert(newIndex, item);
     final next = state.copyWith(customBackgroundColors: updatedList);
+    emit(next);
+    _persistState(next);
+  }
+
+  void updateLayoutMode(MushafLayoutMode mode) {
+    if (!state.isInitialized) return;
+    final next = state.copyWith(layoutMode: mode);
+    emit(next);
+    _persistState(next);
+  }
+
+  void updateFontFamily(QuranFontFamily font) {
+    if (!state.isInitialized) return;
+    final next = state.copyWith(fontFamily: font);
     emit(next);
     _persistState(next);
   }

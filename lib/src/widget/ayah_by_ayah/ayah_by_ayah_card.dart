@@ -5,6 +5,7 @@ import "package:al_furkan/src/resources/quran_resources/meta/meta_data_sajda.dar
     show metaDataSajda;
 import "package:al_furkan/src/resources/quran_resources/meta/meta_data_surah.dart";
 import "package:al_furkan/src/core/audio/cubit/audio_ui_cubit.dart";
+import "package:al_furkan/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
 import "package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart";
 import "package:al_furkan/src/core/audio/cubit/player_state_cubit.dart";
 import "package:al_furkan/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
@@ -14,6 +15,7 @@ import "package:al_furkan/src/resources/quran_resources/language_resources.dart"
 import "package:al_furkan/src/resources/quran_resources/models/tafsir_book_model.dart";
 import "package:al_furkan/src/resources/quran_resources/models/translation_book_model.dart";
 import "package:al_furkan/src/screen/quran_script_view/cubit/ayah_to_highlight.dart";
+import "package:al_furkan/src/core/audio/services/idrisium_audio_tracker.dart";
 import "package:al_furkan/src/utils/number_localization.dart";
 import "package:al_furkan/src/utils/quran_resources/get_translation.dart";
 import "package:al_furkan/src/utils/quran_resources/quran_tafsir_function.dart";
@@ -316,6 +318,93 @@ final Map<String, Future<String?>> _defaultTafsirFutureCache =
 final Map<String, String?> _defaultTafsirTextCache = <String, String?>{};
 final Map<String, String> _defaultTafsirBookNameCache = <String, String>{};
 
+/// Parses tafsir text and builds a RichText widget where:
+/// - ﴿...﴾ / ﴁ...ﴂ → Uthmani font + primary color (Quran ayah)
+/// - {...} → Uthmani font + primary color (curly brackets)
+/// - [...] → primary color only (square brackets)
+Widget _buildTafsirRichText(String text, Color baseColor, ThemeState themeState, {bool isDark = false, String quranFontFamily = "QPC_Hafs"}) {
+  // {} → golden yellow, [] → warm amber
+  final curlyColor = isDark ? const Color(0xFFE6B422) : const Color(0xFF9E7C0A);
+  final squareColor = isDark ? const Color(0xFFCD853F) : const Color(0xFF8B5E3C);
+  final quranColor = isDark ? themeState.primary : curlyColor;
+  final baseTextStyle = TextStyle(
+    fontSize: 16,
+    height: 1.9,
+    fontWeight: FontWeight.w600,
+    color: baseColor,
+  );
+
+  // Collect all bracket matches with their kind
+  final quranPattern = RegExp(r'[﴿ﴁ][\s\S]*?[﴾ﴂ]', unicode: true);
+  final curlyPattern = RegExp(r'\{[^\}]+\}');
+  final squarePattern = RegExp(r'\[[^\]]+\]');
+
+  final allMatches = <({int start, int end, String text, _TafsirBracketKind kind})>[];
+
+  for (final m in quranPattern.allMatches(text)) {
+    allMatches.add((start: m.start, end: m.end, text: m.group(0)!, kind: _TafsirBracketKind.quran));
+  }
+  for (final m in curlyPattern.allMatches(text)) {
+    final overlaps = allMatches.any((e) => m.start < e.end && m.end > e.start);
+    if (!overlaps) allMatches.add((start: m.start, end: m.end, text: m.group(0)!, kind: _TafsirBracketKind.curly));
+  }
+  for (final m in squarePattern.allMatches(text)) {
+    final overlaps = allMatches.any((e) => m.start < e.end && m.end > e.start);
+    if (!overlaps) allMatches.add((start: m.start, end: m.end, text: m.group(0)!, kind: _TafsirBracketKind.square));
+  }
+  allMatches.sort((a, b) => a.start.compareTo(b.start));
+
+  if (allMatches.isEmpty) {
+    return RichText(
+      textDirection: TextDirection.rtl,
+      textAlign: TextAlign.right,
+      text: TextSpan(text: text, style: baseTextStyle),
+    );
+  }
+
+  final spans = <TextSpan>[];
+  int lastEnd = 0;
+
+  for (final match in allMatches) {
+    if (match.start > lastEnd) {
+      final before = text.substring(lastEnd, match.start);
+      if (before.isNotEmpty) spans.add(TextSpan(text: before, style: baseTextStyle));
+    }
+
+    switch (match.kind) {
+      case _TafsirBracketKind.quran:
+        spans.add(TextSpan(
+          text: match.text,
+          style: TextStyle(fontSize: 16.5, height: 1.9, fontWeight: FontWeight.w500, fontFamily: quranFontFamily, color: quranColor),
+        ));
+      case _TafsirBracketKind.curly:
+        spans.add(TextSpan(
+          text: match.text,
+          style: TextStyle(fontSize: 16, height: 1.9, fontWeight: FontWeight.w500, fontFamily: quranFontFamily, color: curlyColor),
+        ));
+      case _TafsirBracketKind.square:
+        spans.add(TextSpan(
+          text: match.text,
+          style: baseTextStyle.copyWith(color: squareColor, fontWeight: FontWeight.w700),
+        ));
+    }
+    lastEnd = match.end;
+  }
+
+  if (lastEnd < text.length) {
+    final remaining = text.substring(lastEnd);
+    if (remaining.isNotEmpty) spans.add(TextSpan(text: remaining, style: baseTextStyle));
+  }
+
+  return RichText(
+    textDirection: TextDirection.rtl,
+    textAlign: TextAlign.right,
+    text: TextSpan(children: spans),
+  );
+}
+
+enum _TafsirBracketKind { quran, curly, square }
+
 Widget getAyahByAyahTafsirCard({
   dynamic key,
   required String ayahKey,
@@ -564,17 +653,7 @@ Widget getAyahByAyahTafsirCard({
                                 style: const TextStyle(height: 1.7),
                               );
                             }
-                            return SelectableText(
-                              t,
-                              textDirection: TextDirection.rtl,
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                fontSize: 16,
-                                height: 1.9,
-                                fontWeight: FontWeight.w600,
-                                color: onBg,
-                              ),
-                            );
+                            return _buildTafsirRichText(t, onBg, themeState, isDark: isDark, quranFontFamily: context.read<QuranSettingsCubit>().state.fontFamily.flutterFontFamily);
                           },
                         ),
                       ),
@@ -675,12 +754,17 @@ Widget getAyahByAyahCard({
                 log(e.toString());
               }
             },
-            child: BlocBuilder<AyahToHighlight, String?>(
-              buildWhen: (previous, current) {
-                return current != previous;
-              },
-              builder: (context, ayahToHighlightState) {
-                final bool isHighlighted = ayahToHighlightState == ayahKey;
+            child: BlocBuilder<AudioAyahHighlightCubit, AudioAyahHighlightState>(
+              buildWhen: (p, c) => p.activeAyahKey != c.activeAyahKey,
+              builder: (context, audioHighlight) {
+                return BlocBuilder<AyahToHighlight, String?>(
+                  buildWhen: (previous, current) {
+                    return current != previous;
+                  },
+                  builder: (context, ayahToHighlightState) {
+                    // Audio highlight takes priority over manual highlight
+                    final effectiveHighlight = audioHighlight.activeAyahKey ?? ayahToHighlightState;
+                    final bool isHighlighted = effectiveHighlight == ayahKey;
                 return Material(
                   color: Colors.transparent,
                   child: InkWell(
@@ -1024,6 +1108,8 @@ Widget getAyahByAyahCard({
                       ),
                     ),
                   ),
+                );
+                  },
                 );
               },
             ),

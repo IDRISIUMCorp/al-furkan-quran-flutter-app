@@ -1,5 +1,3 @@
-import "dart:ui";
-
 import "package:al_furkan/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
@@ -55,11 +53,9 @@ class QuranSettingsBottomSheet extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(30),
                 ),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                  child: DecoratedBox(
+                child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: surface.withValues(alpha: 0.96),
+                      color: surface.withValues(alpha: 0.98),
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(30),
                       ),
@@ -175,6 +171,28 @@ class QuranSettingsBottomSheet extends StatelessWidget {
                         ),
                         const Gap(14),
                         _SectionCard(
+                          title: "طريقة العرض",
+                          subtitle: "اختر كيف تظهر صفحات المصحف أثناء القراءة.",
+                          icon: FluentIcons.document_landscape_24_regular,
+                          child: _LayoutModeSection(
+                            state: state,
+                            primary: primary,
+                            isDark: isDarkMode,
+                          ),
+                        ),
+                        const Gap(14),
+                        _SectionCard(
+                          title: "خط القرآن",
+                          subtitle: "اختر خط عرض النص القرآني في وضع الآيات.",
+                          icon: FluentIcons.text_font_24_regular,
+                          child: _FontFamilySection(
+                            state: state,
+                            primary: primary,
+                            isDark: isDarkMode,
+                          ),
+                        ),
+                        const Gap(14),
+                        _SectionCard(
                           title: "أدوات القراءة",
                           subtitle: "كل مفتاح هنا ينعكس مباشرة داخل المصحف.",
                           icon: FluentIcons.book_open_24_regular,
@@ -234,7 +252,6 @@ class QuranSettingsBottomSheet extends StatelessWidget {
                       ].animate(interval: 50.ms).fade(duration: 400.ms, curve: Curves.easeOutCubic).slideY(begin: 0.1, curve: Curves.easeOutCubic),
                     ),
                   ),
-                ),
               );
             },
           );
@@ -907,6 +924,160 @@ class _CustomColorPickerDot extends StatelessWidget {
   }
 }
 
+class _LayoutModeSection extends StatelessWidget {
+  final QuranSettingsState state;
+  final Color primary;
+  final bool isDark;
+
+  const _LayoutModeSection({
+    required this.state,
+    required this.primary,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final modes = MushafLayoutMode.values;
+    return Row(
+      children: modes.map((mode) {
+        final isSelected = state.layoutMode == mode;
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(
+              right: mode != modes.last ? 10 : 0,
+            ),
+            child: InkWell(
+              onTap: () =>
+                  context.read<QuranSettingsCubit>().updateLayoutMode(mode),
+              borderRadius: BorderRadius.circular(16),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? primary.withValues(alpha: 0.15)
+                      : (isDark
+                          ? Colors.white.withValues(alpha: 0.035)
+                          : Colors.black.withValues(alpha: 0.025)),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isSelected
+                        ? primary.withValues(alpha: 0.6)
+                        : (isDark
+                            ? Colors.white.withValues(alpha: 0.08)
+                            : Colors.black.withValues(alpha: 0.04)),
+                    width: isSelected ? 2 : 1,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Icon(
+                      mode.icon,
+                      size: 26,
+                      color: isSelected ? primary : (isDark ? Colors.white60 : Colors.black45),
+                    ),
+                    const Gap(8),
+                    Text(
+                      mode.label,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                        color: isSelected
+                            ? primary
+                            : (isDark ? Colors.white70 : Colors.black54),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _FontFamilySection extends StatelessWidget {
+  final QuranSettingsState state;
+  final Color primary;
+  final bool isDark;
+
+  const _FontFamilySection({
+    required this.state,
+    required this.primary,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final fonts = QuranFontFamily.values;
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: fonts.map((font) {
+        final isSelected = state.fontFamily == font;
+        return InkWell(
+          onTap: () =>
+              context.read<QuranSettingsCubit>().updateFontFamily(font),
+          borderRadius: BorderRadius.circular(12),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutCubic,
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? primary.withValues(alpha: 0.15)
+                  : (isDark
+                      ? Colors.white.withValues(alpha: 0.035)
+                      : Colors.black.withValues(alpha: 0.025)),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isSelected
+                    ? primary.withValues(alpha: 0.6)
+                    : (isDark
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.black.withValues(alpha: 0.04)),
+                width: isSelected ? 2 : 1,
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "بِسْمِ اللَّهِ",
+                  style: TextStyle(
+                    fontFamily: font.flutterFontFamily,
+                    fontSize: 18,
+                    height: 1.6,
+                    color: isSelected
+                        ? primary
+                        : (isDark ? Colors.white70 : Colors.black54),
+                  ),
+                ),
+                const Gap(4),
+                Text(
+                  font.label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                    color: isSelected
+                        ? primary
+                        : (isDark ? Colors.white60 : Colors.black45),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
 class _UnifiedBackgroundsSection extends StatelessWidget {
   final QuranSettingsState state;
   final Color primary;
@@ -1019,6 +1190,7 @@ class _UnifiedBackgroundsSectionContentState extends State<_UnifiedBackgroundsSe
               builder: (context) => Directionality(
                 textDirection: TextDirection.rtl,
                 child: AlertDialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                   title: const Text("تأكيد الحذف"),
                   content: const Text("هل تريد حذف هذه الخلفية؟"),
                   actions: [
@@ -1364,3 +1536,28 @@ final List<(QuranTheme, Color, Color)> _themeOptions = [
   (QuranTheme.paperWhite, Colors.white, const Color(0xFF151515)),
   (QuranTheme.sand, const Color(0xFFF3E7D3), const Color(0xFF2E241B)),
 ];
+
+extension on MushafLayoutMode {
+  String get label {
+    switch (this) {
+      case MushafLayoutMode.singlePage:
+        return "صفحة واحدة";
+      case MushafLayoutMode.doublePage:
+        return "صفحتان";
+      case MushafLayoutMode.continuousScroll:
+        return "سكرول متواصل";
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case MushafLayoutMode.singlePage:
+        return Icons.crop_portrait_rounded;
+      case MushafLayoutMode.doublePage:
+        return Icons.menu_book_rounded;
+      case MushafLayoutMode.continuousScroll:
+        return Icons.view_agenda_rounded;
+    }
+  }
+}
+

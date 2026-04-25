@@ -9,6 +9,7 @@ import "package:al_furkan/src/widget/quran_script_words/cubit/word_playing_state
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:gap/gap.dart";
+import "package:qcf_quran/qcf_quran.dart" as qcf;
 
 import "../../theme/controller/theme_cubit.dart";
 import "../../theme/controller/theme_state.dart";
@@ -123,7 +124,47 @@ class _ShowPopupOfWordState extends State<ShowPopupOfWord> {
                     themeState: context.read<ThemeCubit>().state,
                   ),
                   const Gap(10),
-                  const Gap(15),
+                  // ── Waqf indicator for this ayah ──
+                  Builder(
+                    builder: (context) {
+                      final parts = widget.wordKeys[index].split(':');
+                      final surah = int.tryParse(parts[0]) ?? 0;
+                      final verse = int.tryParse(parts[1]) ?? 0;
+                      final waqf = qcf.getWaqfType(surah, verse);
+                      if (waqf == null) return const SizedBox.shrink();
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: waqf.color.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: waqf.color.withValues(alpha: 0.3)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              waqf.symbol,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: waqf.color,
+                              ),
+                            ),
+                            const Gap(6),
+                            Text(
+                              waqf.description,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: waqf.color,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const Gap(10),
                   BlocBuilder<WordPlayingStateCubit, String?>(
                     builder: (context, state) {
                       return OutlinedButton.icon(

@@ -1,7 +1,3 @@
-import "dart:ui";
-
-import "package:al_furkan/src/theme/controller/theme_state.dart";
-import "package:flex_color_scheme/flex_color_scheme.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:shared_preferences/shared_preferences.dart";
@@ -32,38 +28,6 @@ class ThemeFunctions {
   }
 
   static void systemChromeSetting(ThemeMode themeMode) {
-    if (themeMode == ThemeMode.dark) {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
-    } else if (themeMode == ThemeMode.light) {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
-    } else {
-      if (PlatformDispatcher.instance.platformBrightness == Brightness.dark) {
-        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
-      } else {
-        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
-      }
-    }
-  }
-
-  static FlexScheme getFlexSchemeFromDB() {
-    assert(preferences != null, "Theme Function need to be init first");
-    String? schemeName = preferences!.getString("flex_scheme");
-    if (schemeName == null) return FlexScheme.espresso;
-    return FlexScheme.values.firstWhere(
-      (e) => e.toString() == schemeName,
-      orElse: () => FlexScheme.espresso,
-    );
-  }
-
-  static Future<void> setFlexSchemeToDB(FlexScheme scheme) async {
-    assert(preferences != null, "Theme Function need to be init first");
-    await preferences!.setString("flex_scheme", scheme.toString());
-  }
-
-  static ThemeState getThemeState(FlexScheme scheme, ThemeMode mode) {
-    return ThemeState(
-      themeMode: mode,
-      flexScheme: scheme,
-    );
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   }
 }

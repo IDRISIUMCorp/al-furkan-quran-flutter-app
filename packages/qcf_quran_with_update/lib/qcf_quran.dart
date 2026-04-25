@@ -22,11 +22,20 @@ export 'src/qcf_verses.dart';
 export 'src/data/page_font_size.dart';
 export 'src/data/quran_text.dart';
 export 'src/data/quarters.dart';
+export 'src/data/juzs.dart';
+export 'src/data/sajda_verses.dart';
 export 'src/helpers/convert_to_arabic_number.dart';
 export 'src/quran_pageview.dart';
 export 'src/header_widget.dart';
 export 'src/qcf_page.dart';
 export 'src/qcf_theme_data.dart';
+export 'src/widgets/qcf_surah_info_card.dart';
+export 'src/widgets/qcf_juz_hizb_marker.dart';
+export 'src/widgets/qcf_page_position_indicator.dart';
+export 'src/widgets/classic_mushaf_border.dart';
+export 'src/widgets/classic_mushaf_header_footer.dart';
+export 'src/reading_progress/qcf_reading_progress.dart';
+export 'src/waqf_markers.dart';
 
 List getPageData(int pageNumber) {
   if (pageNumber < 1 || pageNumber > 604) {

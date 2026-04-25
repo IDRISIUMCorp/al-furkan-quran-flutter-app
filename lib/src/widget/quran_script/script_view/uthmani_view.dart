@@ -1,9 +1,5 @@
-import "package:al_furkan/src/core/audio/cubit/audio_ui_cubit.dart";
-import "package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart";
-import "package:al_furkan/src/core/audio/cubit/player_position_cubit.dart";
-import "package:al_furkan/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
-import "package:al_furkan/src/core/audio/model/audio_player_position_model.dart";
-import "package:al_furkan/src/core/audio/model/recitation_info_model.dart";
+import "package:al_furkan/src/core/audio/services/idrisium_audio_tracker.dart";
+import "package:al_furkan/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
 import "package:al_furkan/src/screen/settings/cubit/quran_script_view_cubit.dart";
 import "package:al_furkan/src/utils/quran_resources/quran_script_function.dart";
 import "package:al_furkan/src/utils/quran_word/show_popup_word_function.dart";
@@ -40,11 +36,24 @@ class NonTajweedScriptView extends StatelessWidget {
         words = words.sublist(0, scriptInfo.limitWord);
       }
     }
+    // Use the user-selected font family from settings, fallback to default per script type
+    final settingsFont = context.watch<QuranSettingsCubit>().state.fontFamily;
+    final effectiveFontFamily = isUthmani
+        ? (settingsFont == QuranFontFamily.alQuranNeo ||
+                settingsFont == QuranFontFamily.indopakNastaleeq ||
+                settingsFont == QuranFontFamily.meQuranVolt
+            ? settingsFont.flutterFontFamily
+            : settingsFont.flutterFontFamily)
+        : (settingsFont == QuranFontFamily.alQuranNeo ||
+                settingsFont == QuranFontFamily.indopakNastaleeq ||
+                settingsFont == QuranFontFamily.meQuranVolt
+            ? settingsFont.flutterFontFamily
+            : "AlQuranNeov5x1");
     TextStyle quranStyle = TextStyle(
       fontSize: scriptInfo.textStyle?.fontSize ?? 24,
       height: scriptInfo.textStyle?.height ?? 2,
       color: scriptInfo.textStyle?.color,
-      fontFamily: isUthmani ? "QPC_Hafs" : "AlQuranNeov5x1",
+      fontFamily: effectiveFontFamily,
       letterSpacing: 0,
     );
 
@@ -82,7 +91,6 @@ class NonTajweedScriptView extends StatelessWidget {
 
     String ayahKey = "${scriptInfo.surahNumber}:${scriptInfo.ayahNumber}";
 
-    String? highlightingWordIndex;
     if (scriptInfo.forImage == true) {
       return Text.rich(
         style: quranStyle,
@@ -91,15 +99,6 @@ class NonTajweedScriptView extends StatelessWidget {
         TextSpan(
           children: List<InlineSpan>.generate(words.length, (index) {
             return TextSpan(
-              style:
-                  highlightingWordIndex ==
-                      "${scriptInfo.surahNumber}:${scriptInfo.ayahNumber}:${(index + 1)}"
-                  ? TextStyle(
-                      backgroundColor: scriptInfo.showWordHighlights == false
-                          ? null
-                          : themeState.primaryShade200,
-                    )
-                  : null,
               text: words[index] + " ",
               recognizer: scriptInfo.skipWordTap == true
                   ? null
@@ -126,101 +125,72 @@ class NonTajweedScriptView extends StatelessWidget {
     bool enableWordByWordHighlight =
         context.read<QuranViewCubit>().state.enableWordByWordHighlight == true;
 
-    return BlocBuilder<SegmentedQuranReciterCubit, ReciterInfoModel>(
-      builder: (context, segmentsReciterState) {
-        List<List>? segments = context
-            .read<SegmentedQuranReciterCubit>()
-            .getAyahSegments(ayahKey);
-        return BlocBuilder<PlayerPositionCubit, AudioPlayerPositionModel>(
-          buildWhen: (previous, current) {
-            if (scriptInfo.showWordHighlights == false ||
-                context.read<AudioUiCubit>().state.isInsideQuranPlayer ==
-                    false) {
-              return false;
-            }
-            String? currentAyahKey = context.read<AyahKeyCubit>().state.current;
-            if (currentAyahKey == ayahKey) {
-              if (segments != null) {
-                for (List word in segments) {
-                  word = word.map((e) => e.toInt()).toList();
-                  if (Duration(milliseconds: word[1]) <
-                          (current.currentDuration ?? Duration.zero) &&
-                      Duration(milliseconds: word[2]) >
-                          (current.currentDuration ?? Duration.zero)) {
-                    if (highlightingWordIndex != "$currentAyahKey:${word[0]}") {
-                      highlightingWordIndex = "$currentAyahKey:${word[0]}";
-                      return true;
-                    }
-                    return false;
-                  }
-                }
-              }
-            } else {
-              if (highlightingWordIndex != null) {
-                highlightingWordIndex = null;
-                return true;
-              }
-            }
-            return false;
-          },
-          builder: (context, positionState) {
-            return Text.rich(
-              style: quranStyle,
-              textDirection: TextDirection.rtl,
-              textAlign: scriptInfo.textAlign,
-              TextSpan(
-                children: List<InlineSpan>.generate(words.length, (index) {
-                  String word = words[index];
-                  bool isLastWord =
-                      index == (words.length - 1) && word.length < 3;
-                  bool willHighLight =
-                      highlightingWordIndex == "$ayahKey:${index + 1}";
-
-                  final baseWordStyle = isLastWord
-                      ? const TextStyle(fontFamily: "QPC_Hafs")
-                      : quranStyle;
-
-                  final bg = (enableWordByWordHighlight && willHighLight)
-                      ? themeState.primaryShade200
-                      : null;
-
-                  return WidgetSpan(
-                    alignment: PlaceholderAlignment.baseline,
-                    baseline: TextBaseline.alphabetic,
-                    child: InkWell(
-                      onTap: scriptInfo.skipWordTap == true
-                          ? null
-                          : () async {
-                              List<String> wordsKey = List.generate(
-                                words.length,
-                                (i) =>
-                                    "${scriptInfo.surahNumber}:${scriptInfo.ayahNumber}:${i + 1}",
-                              );
-                              showPopupWordFunction(
-                                context: context,
-                                wordKeys: wordsKey,
-                                initWordIndex: index,
-                                wordByWordList:
-                                    const [],
-                              );
-                            },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 1.5),
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(color: bg),
-                          child: Text(
-                            "$word ",
-                            textDirection: TextDirection.rtl,
-                            style: baseWordStyle,
-                          ),
-                        ),
-                      ),
+    return BlocBuilder<AudioAyahHighlightCubit, AudioAyahHighlightState>(
+      buildWhen: (previous, current) {
+        bool wasInScope = previous.activeAyahKey != null && previous.activeAyahKey == ayahKey;
+        bool isInScope = current.activeAyahKey != null && current.activeAyahKey == ayahKey;
+        if (wasInScope || isInScope) {
+          return previous.activeAyahKey != current.activeAyahKey ||
+              previous.activeWordKey != current.activeWordKey;
+        }
+        return false;
+      },
+      builder: (context, highlightState) {
+        final bool isDark = Theme.of(context).brightness == Brightness.dark;
+        final bool isAyahHighlighted = highlightState.activeAyahKey == ayahKey;
+        final String? highlightingWordIndex = highlightState.activeWordKey;
+        final highlightColor = context.watch<QuranSettingsCubit>().state.highlightColor;
+        return Text.rich(
+          style: quranStyle,
+          textDirection: TextDirection.rtl,
+          textAlign: scriptInfo.textAlign,
+          TextSpan(
+            style: isAyahHighlighted
+                ? TextStyle(
+                    backgroundColor: highlightColor.withValues(
+                      alpha: isDark ? 0.26 : 0.22,
                     ),
-                  );
-                }),
-              ),
-            );
-          },
+                  )
+                : null,
+            children: List<InlineSpan>.generate(words.length, (index) {
+              String word = words[index];
+              bool isLastWord =
+                  index == (words.length - 1) && word.length < 3;
+              bool willHighLight =
+                  enableWordByWordHighlight &&
+                  highlightingWordIndex == "$ayahKey:${index + 1}";
+
+              return TextSpan(
+                style: isLastWord
+                    ? TextStyle(fontFamily: effectiveFontFamily)
+                    : willHighLight
+                        ? TextStyle(
+                            backgroundColor: highlightColor.withValues(
+                              alpha: 0.35,
+                            ),
+                          )
+                        : null,
+
+                text: "$word ",
+                recognizer: scriptInfo.skipWordTap == true
+                    ? null
+                    : (DoubleTapGestureRecognizer()
+                        ..onDoubleTap = () async {
+                          List<String> wordsKey = List.generate(
+                            words.length,
+                            (i) =>
+                                "${scriptInfo.surahNumber}:${scriptInfo.ayahNumber}:${i + 1}",
+                          );
+                          showPopupWordFunction(
+                            context: context,
+                            wordKeys: wordsKey,
+                            initWordIndex: index,
+                            wordByWordList: const [],
+                          );
+                        }),
+              );
+            }),
+          ),
         );
       },
     );

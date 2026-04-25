@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:al_furkan/src/theme/controller/theme_cubit.dart';
+import 'package:al_furkan/src/theme/app_colors.dart';
 import 'package:al_furkan/src/utils/number_localization.dart';
 import 'package:al_furkan/src/utils/quran_ayahs_function/get_page_number.dart';
 import 'package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart';
@@ -98,7 +99,7 @@ Future<void> showNotesSheet({
                                   "لا توجد ملاحظات",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w800,
-                                    color: Color(0xFF9C9C9C),
+                                    color: AppColors.ayaTextMuted,
                                   ),
                                 ),
                               )

@@ -1,18 +1,16 @@
-import "dart:ui";
-
 import "package:al_furkan/l10n/app_localizations.dart";
 import "package:al_furkan/src/resources/translation/language_cubit.dart";
 import "package:al_furkan/src/resources/translation/languages.dart";
 import "package:al_furkan/src/screen/settings/app_language_settings.dart";
 import "package:al_furkan/src/screen/settings/notification_settings_page_enhanced.dart";
-import "package:al_furkan/src/screen/settings/theme_preview_sheet.dart";
-import "package:al_furkan/src/screen/settings/theme_settings_enhanced.dart";
 import "package:al_furkan/src/screen/settings/widgets/home_widget_studio_screen.dart";
 import "package:al_furkan/src/widget/theme/theme_icon_button.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:flutter_screenutil/flutter_screenutil.dart";
 import "package:gap/gap.dart";
+import "package:al_furkan/src/core/hifz/hifz_cubit.dart";
+import "package:al_furkan/src/core/night_mode/night_reading_cubit.dart";
 import "package:google_fonts/google_fonts.dart";
 
 import "../../theme/controller/theme_cubit.dart";
@@ -65,21 +63,6 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
                 ),
                 actions: [themeIconButton(context)],
                 backgroundColor: Colors.transparent,
-                elevation: 0,
-                flexibleSpace: ClipRRect(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
               ),
               body: Container(
                 decoration: BoxDecoration(
@@ -114,24 +97,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
                         isDark: isDark,
                         child: Column(
                           children: [
-                            const ThemeSettingsEnhanced(),
-                            Gap(12.h),
                             _buildThemeModeSelector(context, themeState, isDark),
-                            Gap(10.h),
-                            Align(
-                              alignment: AlignmentDirectional.centerStart,
-                              child: TextButton.icon(
-                                onPressed: () => ThemePreviewSheet.show(context),
-                                icon: Icon(Icons.color_lens_outlined, color: themeState.primary),
-                                label: Text(
-                                  "معاينة جميع السمات",
-                                  style: GoogleFonts.cairo(
-                                    color: themeState.primary,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                            ),
                           ],
                         ),
                       ),
@@ -196,6 +162,60 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
                                   builder: (_) => const NotificationSettingsPageEnhanced(),
                                 ),
                               ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Gap(14.h),
+
+                      // Reading Modes Section
+                      _SettingsSectionCard(
+                        title: "أوضاع القراءة",
+                        icon: Icons.auto_stories_rounded,
+                        themeState: themeState,
+                        isDark: isDark,
+                        child: Column(
+                          children: [
+                            // Hifz Mode
+                            BlocBuilder<HifzCubit, HifzState>(
+                              builder: (context, hifzState) {
+                                return _SettingsShortcutTile(
+                                  icon: Icons.visibility_off_rounded,
+                                  title: "وضع الحفظ",
+                                  subtitle: hifzState.isActive
+                                      ? "نشط — ${hifzState.hideLevel == HifzHideLevel.blurred ? 'ضبابي' : hifzState.hideLevel == HifzHideLevel.hidden ? 'مخفي' : 'مرئي'}"
+                                      : "إخفاء تدريجي للآيات واختبار الحفظ",
+                                  themeState: themeState,
+                                  isDark: isDark,
+                                  trailing: Switch(
+                                    value: hifzState.isActive,
+                                    activeColor: themeState.primary,
+                                    onChanged: (_) => context.read<HifzCubit>().toggleHifz(),
+                                  ),
+                                  onTap: () => _showHifzSettings(context, themeState, isDark),
+                                );
+                              },
+                            ),
+                            Gap(10.h),
+                            // Night Reading Mode
+                            BlocBuilder<NightReadingCubit, NightReadingState>(
+                              builder: (context, nightState) {
+                                return _SettingsShortcutTile(
+                                  icon: Icons.bedtime_rounded,
+                                  title: "وضع القراءة الليلية",
+                                  subtitle: nightState.isActive
+                                      ? "نشط — ألوان دافئة لحماية العين"
+                                      : "ألوان كهرمانية دافئة وتقليل الإضاءة",
+                                  themeState: themeState,
+                                  isDark: isDark,
+                                  trailing: Switch(
+                                    value: nightState.isActive,
+                                    activeColor: themeState.primary,
+                                    onChanged: (_) => context.read<NightReadingCubit>().toggle(),
+                                  ),
+                                  onTap: () => _showNightSettings(context, themeState, isDark),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -454,6 +474,113 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
       ],
     );
   }
+
+  void _showHifzSettings(BuildContext context, ThemeState themeState, bool isDark) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Padding(
+          padding: const EdgeInsets.all(20),
+          child: Directionality(
+          textDirection: TextDirection.rtl,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.circular(2))),
+              ),
+              const Gap(16),
+              Text("إعدادات وضع الحفظ", style: TextStyle(color: isDark ? const Color(0xFFF8F9FA) : const Color(0xFF212529), fontWeight: FontWeight.w800, fontSize: 18)),
+              const Gap(16),
+              Text("مستوى الإخفاء:", style: TextStyle(color: isDark ? const Color(0xFFADB5BD) : const Color(0xFF495057), fontWeight: FontWeight.w600)),
+              const Gap(8),
+              BlocBuilder<HifzCubit, HifzState>(
+                builder: (context, state) => Wrap(
+                  spacing: 8,
+                  children: HifzHideLevel.values.map((level) {
+                    final labels = {HifzHideLevel.visible: "مرئي", HifzHideLevel.blurred: "ضبابي", HifzHideLevel.hidden: "مخفي"};
+                    final isSelected = state.hideLevel == level;
+                    return ChoiceChip(
+                      label: Text(labels[level]!),
+                      selected: isSelected,
+                      selectedColor: themeState.primary.withValues(alpha: 0.2),
+                      side: BorderSide(color: isSelected ? themeState.primary : Colors.grey),
+                      onSelected: (_) => context.read<HifzCubit>().setHideLevel(level),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const Gap(16),
+              BlocBuilder<HifzCubit, HifzState>(
+                builder: (context, state) => SwitchListTile(
+                  title: Text("وضع الاختبار", style: TextStyle(color: isDark ? const Color(0xFFF8F9FA) : const Color(0xFF212529), fontWeight: FontWeight.w600)),
+                  subtitle: Text("اضغط على الآية لإظهارها", style: TextStyle(color: isDark ? const Color(0xFFADB5BD) : const Color(0xFF495057), fontSize: 12)),
+                  value: state.isTestMode,
+                  activeColor: themeState.primary,
+                  onChanged: (_) => context.read<HifzCubit>().toggleTestMode(),
+                ),
+              ),
+              const Gap(20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showNightSettings(BuildContext context, ThemeState themeState, bool isDark) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Padding(
+          padding: const EdgeInsets.all(20),
+          child: Directionality(
+          textDirection: TextDirection.rtl,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.circular(2))),
+              ),
+              const Gap(16),
+              Text("إعدادات الوضع الليلي", style: TextStyle(color: isDark ? const Color(0xFFF8F9FA) : const Color(0xFF212529), fontWeight: FontWeight.w800, fontSize: 18)),
+              const Gap(16),
+              BlocBuilder<NightReadingCubit, NightReadingState>(
+                builder: (context, state) => Column(
+                  children: [
+                    Text("الدفء: ${(state.warmth * 100).round()}%", style: TextStyle(color: isDark ? const Color(0xFFADB5BD) : const Color(0xFF495057), fontWeight: FontWeight.w600)),
+                    Slider(
+                      value: state.warmth,
+                      activeColor: themeState.primary,
+                      onChanged: (v) => context.read<NightReadingCubit>().setWarmth(v),
+                    ),
+                    const Gap(8),
+                    Text("تقليل الإضاءة: ${(state.dimLevel * 100).round()}%", style: TextStyle(color: isDark ? const Color(0xFFADB5BD) : const Color(0xFF495057), fontWeight: FontWeight.w600)),
+                    Slider(
+                      value: state.dimLevel,
+                      activeColor: themeState.primary,
+                      onChanged: (v) => context.read<NightReadingCubit>().setDimLevel(v),
+                    ),
+                    const Gap(8),
+                    SwitchListTile(
+                      title: Text("تفعيل تلقائي عند الغروب", style: TextStyle(color: isDark ? const Color(0xFFF8F9FA) : const Color(0xFF212529), fontWeight: FontWeight.w600)),
+                      value: state.autoAtSunset,
+                      activeColor: themeState.primary,
+                      onChanged: (_) => context.read<NightReadingCubit>().setAutoAtSunset(!state.autoAtSunset),
+                    ),
+                  ],
+                ),
+              ),
+              const Gap(20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _SettingsHero extends StatelessWidget {
@@ -577,19 +704,16 @@ class _SettingsSectionCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(18.w),
       decoration: BoxDecoration(
-        color: isDark ? Theme.of(context).colorScheme.surfaceContainer : Colors.white,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(
-          color: isDark ? Colors.white10 : themeState.primary.withOpacity(0.08),
-          width: 1.5,
-        ),
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         boxShadow: [
           BoxShadow(
-            color: isDark ? Colors.black.withOpacity(0.2) : Colors.black.withOpacity(0.04),
-            blurRadius: 20,
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 18,
             offset: const Offset(0, 8),
           ),
         ],
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

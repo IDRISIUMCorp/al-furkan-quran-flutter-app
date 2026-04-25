@@ -51,6 +51,15 @@ appimagetool-x86_64.AppImage
 /dist
 
 packages/qcf_quran_plus-master/
+
+# Sensitive files — NEVER commit
+lib/core/constants/service_account_key.dart
+android/app/al-furkan-app-firebase-adminsdk-*.json
+android/app/google-services.json
+
+# Screenshot folders
+سكرينات من داخل تطبيق ايه/
+سكرينات من داخل تطبيق وحي/
 android/build/reports/problems/
 linux/flutter/generated_plugin_registrant.h
 linux/flutter/generated_plugin_registrant.cc

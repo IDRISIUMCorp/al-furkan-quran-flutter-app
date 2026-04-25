@@ -43,11 +43,11 @@ dependencies:
   url_launcher: ^6.3.2
   path_provider: ^2.1.5
   share_plus: ^12.0.1
-  clipboard: ^3.0.8
   flutter_html: ^3.0.0
   visibility_detector: ^0.4.0+2
   connectivity_plus: ^6.1.2
   cached_network_image: ^3.4.1
+  flutter_cache_manager: ^3.4.1
   screenshot: ^3.0.0
   device_info_plus: ^12.1.0
   package_info_plus: ^9.0.0
@@ -76,19 +76,35 @@ dependencies:
   camera: ^0.11.4
   sensors_plus: ^7.0.0
   percent_indicator: ^4.2.5
-  flex_color_scheme: ^8.4.0
+
   flutter_screenutil: ^5.9.3
   home_widget: ^0.7.0
   workmanager: ^0.9.0+3
   file_picker: ^10.0.0
   auto_size_text: ^3.0.0
-  flutter_staggered_animations: ^1.1.1
   window_manager: ^0.5.1
+  flutter_compass_v2: ^1.0.3
+
+  # ═══════════════════════════════════════════════
+  # ADMIN SYSTEM — Firebase & Dependencies
+  # ═══════════════════════════════════════════════
+  firebase_core: ^3.13.0
+  cloud_firestore: ^5.6.7
+  firebase_messaging: ^15.2.7
+  firebase_analytics: ^11.4.7
+  firebase_remote_config: ^5.3.7
+  firebase_storage: ^12.4.7
+  firebase_auth: ^5.5.7
+
+  timeago: ^3.7.1
+  fl_chart: ^1.2.0
+  googleapis_auth: ^1.6.0
+  google_sign_in: ^7.2.0
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_to_debian: ^2.0.2
 
 
   flutter_lints: ^6.0.0
@@ -158,6 +174,10 @@ flutter:
     - family: KFGQPC-Uthmanic-HAFS-Regular
       fonts:
         - asset: assets/fonts/Quran/KFGQPC Uthmanic Script HAFS Regular.otf
+
+    - family: me_quran_volt_newmet
+      fonts:
+        - asset: assets/fonts/Quran/me_quran_volt_newmet.ttf
 
     - family: NotoSans
       fonts:

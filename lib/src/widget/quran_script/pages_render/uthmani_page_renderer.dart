@@ -1,9 +1,6 @@
-import "package:al_furkan/src/core/audio/cubit/audio_ui_cubit.dart";
-import "package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart";
-import "package:al_furkan/src/core/audio/cubit/player_position_cubit.dart";
-import "package:al_furkan/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
-import "package:al_furkan/src/core/audio/model/audio_player_position_model.dart";
-import "package:al_furkan/src/core/audio/model/recitation_info_model.dart";
+import "package:al_furkan/src/core/audio/services/idrisium_audio_tracker.dart";
+import "package:al_furkan/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
+import "package:al_furkan/src/screen/quran_script_view/cubit/ayah_to_highlight.dart";
 import "package:al_furkan/src/utils/quran_resources/quran_script_function.dart";
 import "package:al_furkan/src/utils/quran_word/show_popup_word_function.dart";
 import "package:al_furkan/src/widget/quran_script/model/script_info.dart";
@@ -37,156 +34,115 @@ class NonTajweedPageRenderer extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeState themeState = context.read<ThemeCubit>().state;
     bool isDark = Theme.of(context).brightness == Brightness.dark;
-
-    String? highlightingWord;
+    final highlightColor = context.watch<QuranSettingsCubit>().state.highlightColor;
 
     return Padding(
       padding: const EdgeInsets.all(12.0),
-      child: BlocBuilder<SegmentedQuranReciterCubit, ReciterInfoModel>(
-        builder: (context, segmentsReciterState) {
-          Map<String, List> audioSegmentsMap = {};
-
-          for (final ayahKey in ayahsKey) {
-            List<List>? segments = context
-                .read<SegmentedQuranReciterCubit>()
-                .getAyahSegments(ayahKey);
-
-            if (segments != null) {
-              audioSegmentsMap[ayahKey] = segments;
-            }
+      child: BlocBuilder<AudioAyahHighlightCubit, AudioAyahHighlightState>(
+        buildWhen: (previous, current) {
+          bool wasInScope = previous.activeAyahKey != null && ayahsKey.contains(previous.activeAyahKey);
+          bool isInScope = current.activeAyahKey != null && ayahsKey.contains(current.activeAyahKey);
+          if (wasInScope || isInScope) {
+            return previous.activeAyahKey != current.activeAyahKey ||
+                previous.activeWordKey != current.activeWordKey;
           }
-          return BlocBuilder<PlayerPositionCubit, AudioPlayerPositionModel>(
-            buildWhen: (previous, current) {
-              if (enableWordByWordHighlight != true) return false;
+          return false;
+        },
+        builder: (context, highlightState) {
+          final audioAyahKey = highlightState.activeAyahKey;
+          final highlightingWord = highlightState.activeWordKey;
+          final manualAyahKey = context.watch<AyahToHighlight>().state;
+          return Text.rich(
+            TextSpan(
+              children:
+                  ayahsKey.map((ayahKey) {
+                    List words = QuranScriptFunction.getWordListOfAyah(
+                      isUthmani
+                          ? QuranScriptType.uthmani
+                          : QuranScriptType.indopak,
+                      ayahKey.split(":").first,
+                      ayahKey.split(":").last,
+                    );
 
-              if (context.read<AudioUiCubit>().state.isInsideQuranPlayer ==
-                  false) {
-                return false;
-              }
-              String? currentAyahKey =
-                  context.read<AyahKeyCubit>().state.current;
-              if (ayahsKey.contains(currentAyahKey)) {
-                List? segments = audioSegmentsMap[currentAyahKey];
-                if (segments != null) {
-                  for (List word in segments) {
-                    word = word.map((e) => e.toInt()).toList();
-                    if (Duration(milliseconds: word[1]) <
-                            (current.currentDuration ?? Duration.zero) &&
-                        Duration(milliseconds: word[2]) >
-                            (current.currentDuration ?? Duration.zero)) {
-                      if (highlightingWord != "$currentAyahKey:${word[0]}") {
-                        highlightingWord = "$currentAyahKey:${word[0]}";
-                        return true;
-                      }
-                      return false;
-                    }
-                  }
-                }
-              } else {
-                if (highlightingWord != null) {
-                  highlightingWord = null;
-                  return true;
-                }
-              }
-              return false;
-            },
-            builder: (context, positionState) {
-              final highlightingAyahKey =
-                  context.read<AyahKeyCubit>().state.current;
-              return Text.rich(
-                TextSpan(
-                  children:
-                      ayahsKey.map((ayahKey) {
-                        List words = QuranScriptFunction.getWordListOfAyah(
-                          isUthmani
-                              ? QuranScriptType.uthmani
-                              : QuranScriptType.indopak,
-                          ayahKey.split(":").first,
-                          ayahKey.split(":").last,
-                        );
-
-                        return TextSpan(
-                          style: TextStyle(
-                            backgroundColor:
-                                highlightingAyahKey == ayahKey
-                                    ? isDark
-                                        ? Colors.white.withValues(alpha: 0.08)
-                                        : Colors.black.withValues(alpha: 0.08)
-                                    : null,
-                          ),
-                          children:
-                              List.generate(words.length, (index) {
-                                String word = words[index];
-                                bool isLastWord =
-                                    index == (words.length - 1) &&
-                                    word.length < 3;
-                                final baseSpan = TextSpan(
-                                  text: "$word ",
-                                  style:
-                                      (highlightingWord ==
-                                                  "$ayahKey:${index + 1}" &&
-                                              enableWordByWordHighlight == true)
-                                          ? TextStyle(
-                                            backgroundColor:
-                                                themeState.primaryShade300,
-                                            fontFamily:
-                                                isLastWord ? "QPC_Hafs" : null,
-                                          )
-                                          : TextStyle(
-                                            fontFamily:
-                                                isLastWord ? "QPC_Hafs" : null,
-                                          ),
-                                  recognizer:
-                                      TapGestureRecognizer()
-                                        ..onTap = () async {
-                                          final highlightingWord =
-                                              List.generate(
-                                                words.length,
-                                                (index) =>
-                                                    "$ayahKey:${index + 1}",
-                                              );
-                                          showPopupWordFunction(
-                                            context: context,
-                                            initWordIndex: index,
-                                            wordKeys: highlightingWord,
-                                            wordByWordList: const [],
-                                          );
-                                        },
-                                );
-
-                                if (!isLastWord) {
-                                  return baseSpan;
-                                }
-
-                                return TextSpan(
-                                  children: [
-                                    baseSpan,
-                                    WidgetSpan(
-                                      alignment: PlaceholderAlignment.top,
-                                      child: _AyahInlineStatusIndicator(
-                                        ayahKey: ayahKey,
-                                        color: themeState.primary,
+                    return TextSpan(
+                      style: TextStyle(
+                        backgroundColor: audioAyahKey == ayahKey
+                            ? highlightColor.withValues(alpha: isDark ? 0.26 : 0.22)
+                            : (manualAyahKey == ayahKey
+                                ? highlightColor.withValues(alpha: 0.15)
+                                : null),
+                      ),
+                      children:
+                          List.generate(words.length, (index) {
+                            String word = words[index];
+                            bool isLastWord =
+                                index == (words.length - 1) &&
+                                word.length < 3;
+                            final baseSpan = TextSpan(
+                              text: "$word ",
+                              style:
+                                  (highlightingWord ==
+                                              "$ayahKey:${index + 1}" &&
+                                          enableWordByWordHighlight == true)
+                                      ? TextStyle(
+                                        backgroundColor:
+                                            highlightColor.withValues(alpha: 0.35),
+                                        fontFamily:
+                                            isLastWord ? "QPC_Hafs" : null,
+                                      )
+                                      : TextStyle(
+                                        fontFamily:
+                                            isLastWord ? "QPC_Hafs" : null,
                                       ),
-                                    ),
-                                  ],
-                                );
-                              }).toList(),
-                        );
-                      }).toList(),
-                ),
-                style: TextStyle(
-                  fontSize: baseTextStyle?.fontSize ?? 24,
-                  fontFamily:
-                      baseTextStyle?.fontFamily ??
-                      (isUthmani ? "QPC_Hafs" : "AlQuranNeov5x1"),
-                  fontWeight: baseTextStyle?.fontWeight,
-                  height: baseTextStyle?.height,
-                  letterSpacing: 0,
-                ),
-                textAlign: TextAlign.right,
-                textDirection: TextDirection.rtl,
-              );
-            },
+                              recognizer:
+                                  TapGestureRecognizer()
+                                    ..onTap = () async {
+                                      final highlightingWord =
+                                          List.generate(
+                                            words.length,
+                                            (index) =>
+                                                "$ayahKey:${index + 1}",
+                                          );
+                                      showPopupWordFunction(
+                                        context: context,
+                                        initWordIndex: index,
+                                        wordKeys: highlightingWord,
+                                        wordByWordList: const [],
+                                      );
+                                    },
+                            );
+
+                            if (!isLastWord) {
+                              return baseSpan;
+                            }
+
+                            return TextSpan(
+                              children: [
+                                baseSpan,
+                                WidgetSpan(
+                                  alignment: PlaceholderAlignment.top,
+                                  child: _AyahInlineStatusIndicator(
+                                    ayahKey: ayahKey,
+                                    color: themeState.primary,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }).toList(),
+                    );
+                  }).toList(),
+            ),
+            style: TextStyle(
+              fontSize: baseTextStyle?.fontSize ?? 24,
+              fontFamily:
+                  baseTextStyle?.fontFamily ??
+                  (isUthmani ? "QPC_Hafs" : "AlQuranNeov5x1"),
+              fontWeight: baseTextStyle?.fontWeight,
+              height: baseTextStyle?.height,
+              letterSpacing: 0,
+            ),
+            textAlign: TextAlign.right,
+            textDirection: TextDirection.rtl,
           );
         },
       ),

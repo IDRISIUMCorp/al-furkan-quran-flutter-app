@@ -9,6 +9,7 @@ import "package:al_furkan/src/resources/translation/language_cubit.dart";
 import "package:al_furkan/src/utils/quran_resources/quran_translation_function.dart";
 import "package:al_furkan/src/screen/quran_script_view/model/surah_header_info.dart";
 import "package:al_furkan/src/screen/settings/cubit/quran_script_view_cubit.dart";
+import "package:al_furkan/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
 import "package:al_furkan/src/screen/settings/cubit/quran_script_view_state.dart";
 import "package:al_furkan/src/screen/surah_info/surah_info_view.dart";
 import "package:al_furkan/src/theme/values/values.dart";
@@ -280,7 +281,9 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
                         ? "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"
                         : "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ",
                     style: TextStyle(
-                      fontFamily: isUthmani ? "QPC_Hafs" : "AlQuranNeov5x1",
+                      fontFamily: isUthmani
+                          ? context.watch<QuranSettingsCubit>().state.fontFamily.flutterFontFamily
+                          : "AlQuranNeov5x1",
                       fontSize: state.fontSize.clamp(20.0, 36.0),
                       height: state.lineHeight,
                       color: Theme.of(context).brightness == Brightness.dark

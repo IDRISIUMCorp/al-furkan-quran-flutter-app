@@ -1,5 +1,6 @@
 import "dart:async";
 import "dart:developer";
+import "dart:io";
 import "dart:ui";
 
 import "package:al_furkan/l10n/app_localizations.dart";
@@ -8,6 +9,13 @@ import "package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart";
 import "package:al_furkan/src/core/audio/cubit/player_position_cubit.dart";
 import "package:al_furkan/src/core/audio/cubit/player_state_cubit.dart";
 import "package:al_furkan/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
+import "package:al_furkan/src/core/audio/cubit/offline_download_cubit.dart";
+import "package:al_furkan/src/core/audio/cubit/sleep_timer_cubit.dart";
+import "package:al_furkan/src/core/audio/cubit/ayah_repeat_cubit.dart";
+import "package:al_furkan/src/core/reading_stats/reading_stats_cubit.dart";
+import "package:al_furkan/src/core/hifz/hifz_cubit.dart";
+import "package:al_furkan/src/core/night_mode/night_reading_cubit.dart";
+import "package:al_furkan/src/core/audio/cubit/custom_playlist_cubit.dart";
 import "package:al_furkan/src/core/audio/player/audio_player_manager.dart";
 import "package:al_furkan/src/core/audio/services/audio_player_ui_bridge.dart";
 import "package:al_furkan/src/core/bootstrap/app_bootstrap_coordinator.dart";
@@ -35,9 +43,11 @@ import "package:al_furkan/src/screen/quran_script_view/cubit/ayah_to_highlight.d
 import "package:al_furkan/src/screen/quran_script_view/cubit/landscape_scroll_effect.dart";
 import "package:al_furkan/src/screen/settings/cubit/quran_script_view_cubit.dart";
 import "package:al_furkan/src/screen/setup/cubit/resources_progress_cubit_cubit.dart";
+import "package:al_furkan/core/auth/auth_cubit.dart";
 import "package:al_furkan/src/theme/app_theme.dart";
 import "package:al_furkan/src/theme/controller/theme_cubit.dart";
 import "package:al_furkan/src/theme/controller/theme_state.dart";
+import "package:al_furkan/src/core/audio/services/idrisium_audio_tracker.dart";
 import "package:al_furkan/src/widget/history/cubit/quran_history_cubit.dart";
 import "package:al_furkan/src/widget/quran_script_words/cubit/word_playing_state_cubit.dart";
 import "package:flutter/material.dart";
@@ -55,9 +65,67 @@ import "package:shared_preferences/shared_preferences.dart";
 
 import "package:al_furkan/src/screen/prayer_time/sunnah_prayer_page.dart";
 import "package:al_furkan/src/screen/prayer_time/sunnah_wudu_page.dart";
+import "package:al_furkan/core/services/firebase_service.dart";
+import "package:al_furkan/features/analytics/services/analytics_tracker.dart";
+
 
 String? applicationDataPath;
 platform_services.PlatformOwn platformOwn = platform_services.getPlatform();
+
+/// Opens a Hive box with timeout and corruption recovery.
+/// If the box fails to open (corruption, lock, etc.), it deletes and recreates it.
+/// Throws as a last resort so the caller can handle the unrecoverable case.
+Future<void> _safeOpenBox(String name, {Duration timeout = const Duration(seconds: 8)}) async {
+  try {
+    if (Hive.isBoxOpen(name)) return;
+    await Hive.openBox(name).timeout(timeout);
+  } catch (e) {
+    log("⚠️ Failed to open box '$name': $e — attempting recovery", name: "HiveSafeOpen");
+    try {
+      // Close any stale reference first
+      if (Hive.isBoxOpen(name)) {
+        await Hive.box(name).close().timeout(const Duration(seconds: 3));
+      }
+      // Try to delete the corrupted box and recreate it.
+      await Hive.deleteBoxFromDisk(name).timeout(const Duration(seconds: 5));
+      await Hive.openBox(name).timeout(timeout);
+      log("✅ Box '$name' recovered successfully", name: "HiveSafeOpen");
+    } catch (e2) {
+      log("❌ CRITICAL: Box '$name' recovery also failed: $e2 — nuclear reset", name: "HiveSafeOpen");
+      // Nuclear: delete ALL boxes from disk and retry
+      try {
+        await Hive.deleteBoxFromDisk(name).timeout(const Duration(seconds: 5));
+        await Hive.openBox(name).timeout(timeout);
+        log("✅ Box '$name' opened after nuclear reset", name: "HiveSafeOpen");
+      } catch (e3) {
+        log("💥 UNRECOVERABLE: Box '$name' cannot be opened: $e3", name: "HiveSafeOpen");
+        // Don't silently swallow — let the caller know
+        rethrow;
+      }
+    }
+  }
+}
+
+/// Opens a Hive LazyBox with timeout and corruption recovery.
+Future<void> _safeOpenLazyBox(String name, {Duration timeout = const Duration(seconds: 8)}) async {
+  try {
+    if (Hive.isBoxOpen(name)) return;
+    await Hive.openLazyBox(name).timeout(timeout);
+  } catch (e) {
+    log("⚠️ Failed to open lazy box '$name': $e — attempting recovery", name: "HiveSafeOpen");
+    try {
+      if (Hive.isBoxOpen(name)) {
+        await Hive.box(name).close().timeout(const Duration(seconds: 3));
+      }
+      await Hive.deleteBoxFromDisk(name).timeout(const Duration(seconds: 5));
+      await Hive.openLazyBox(name).timeout(timeout);
+      log("✅ Lazy box '$name' recovered", name: "HiveSafeOpen");
+    } catch (_) {
+      // Lazy box corruption is less critical — log and continue
+      log("⚠️ Lazy box '$name' skipped (corrupted)", name: "HiveSafeOpen");
+    }
+  }
+}
 
 Future<void> main() async {
   // تفعيل معالج الأخطاء للـ Release Mode
@@ -77,6 +145,7 @@ Future<void> main() async {
 
   try {
     await platform_services.initializePlatform();
+    await FirebaseService.instance.init();
 
     // تكوين Google Fonts لاستخدام الخطوط المحلية
     GoogleFonts.config.allowRuntimeFetching = false;
@@ -92,9 +161,10 @@ Future<void> main() async {
       await Hive.initFlutter();
     }
 
-    await Hive.openBox(AppBoxes.user);
-    await Hive.openBox(AppBoxes.pinned);
-    await Hive.openBox(AppBoxes.notes);
+    await _safeOpenBox(AppBoxes.user);
+    await _safeOpenBox(AppBoxes.pinned);
+    await _safeOpenBox(AppBoxes.notes);
+    await _safeOpenBox(AppBoxes.readingStats);
 
     if (platformOwn != platform_services.PlatformOwn.isLinux &&
         platformOwn != platform_services.PlatformOwn.isWindows) {
@@ -123,6 +193,9 @@ Future<void> main() async {
     await bootstrapCoordinator.prepareLaunch();
 
     log(bootstrapSnapshot.locationState.madhab.toString(), name: "Madhab");
+
+    // Initialize Analytics Tracker
+    await AnalyticsTracker.instance.init();
 
     runApp(
       MyApp(
@@ -153,42 +226,10 @@ Future<void> main() async {
       FlutterNativeSplash.remove();
     } catch (_) {}
     
-    // في حالة الخطأ الكارثي، نعرض شاشة خطأ بسيطة
+    // في حالة الخطأ الكارثي، نعرض شاشة خطأ مع خيار مسح البيانات
     runApp(
       MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'حدث خطأ أثناء تشغيل التطبيق',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'الرجاء إعادة تشغيل التطبيق',
-                    style: TextStyle(fontSize: 14),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      // محاولة إعادة التشغيل
-                      SystemNavigator.pop();
-                    },
-                    child: const Text('إغلاق'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+        home: _FatalErrorScreen(error: e),
       ),
     );
   }
@@ -235,6 +276,7 @@ class MyApp extends StatelessWidget {
     return _UsageTimeTracker(
       child: MultiBlocProvider(
         providers: [
+          BlocProvider(create: (_) => AuthCubit()),
           BlocProvider(create: (_) => ResourcesProgressCubit()),
           BlocProvider(create: (_) => ThemeCubit()),
           BlocProvider(create: (_) => AudioUiCubit()),
@@ -247,8 +289,16 @@ class MyApp extends StatelessWidget {
             ),
           ),
           BlocProvider(create: (_) => SegmentedQuranReciterCubit()),
+          BlocProvider(create: (_) => OfflineDownloadCubit()),
           BlocProvider(create: (_) => PlayerStateCubit(PlayerState())),
           BlocProvider(create: (_) => WordPlayingStateCubit()),
+          BlocProvider(create: (_) => AudioAyahHighlightCubit()),
+          BlocProvider(create: (_) => SleepTimerCubit()),
+          BlocProvider(create: (_) => AyahRepeatCubit()),
+          BlocProvider(create: (_) => ReadingStatsCubit()),
+          BlocProvider(create: (_) => HifzCubit()),
+          BlocProvider(create: (_) => NightReadingCubit()),
+          BlocProvider(create: (_) => CustomPlaylistCubit()),
           BlocProvider(
             create: (_) => QuranViewCubit(getIt<SettingsRepository>()),
           ),
@@ -285,7 +335,7 @@ class MyApp extends StatelessWidget {
                       ],
                       supportedLocales: AppLocalizations.supportedLocales,
                       onGenerateTitle: (_) => "الفُرقان",
-                      theme: AppTheme.lightTheme(themeState.flexScheme)
+                      theme: AppTheme.lightTheme()
                           .copyWith(
                             pageTransitionsTheme: pageTransitionsTheme,
                             textTheme: getTextTheme(
@@ -293,15 +343,17 @@ class MyApp extends StatelessWidget {
                               false,
                             ),
                           ),
-                      darkTheme: AppTheme.darkTheme(themeState.flexScheme)
+                      darkTheme: AppTheme.darkTheme()
                           .copyWith(
                             pageTransitionsTheme: pageTransitionsTheme,
                             textTheme: getTextTheme(languageState.locale, true),
                           ),
                       themeMode: themeState.themeMode,
                       builder: (context, child) {
-                        return _AudioPlayerBridgeBinder(
-                          child: child ?? const SizedBox.shrink(),
+                        return _FullscreenEnforcer(
+                          child: _AudioPlayerBridgeBinder(
+                            child: child ?? const SizedBox.shrink(),
+                          ),
                         );
                       },
                       scrollBehavior: AppScrollBehavior(),
@@ -340,7 +392,28 @@ class _UsageTimeTrackerState extends State<_UsageTimeTracker>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkPendingSunnahPage();
       _setupHomeWidgetDeepLinks();
+      _connectSleepTimerAndRepeat();
     });
+  }
+
+  void _connectSleepTimerAndRepeat() {
+    final ctx = navigatorKey.currentContext;
+    if (ctx == null) return;
+
+    // Sleep Timer → stop playback when timer expires
+    final sleepCubit = ctx.read<SleepTimerCubit>();
+    sleepCubit.onSleepTimerExpired.listen((_) {
+      AudioPlayerManager.audioPlayer.pause();
+    });
+
+    // Playback completed → notify sleep timer (end-of-surah) & repeat
+    AudioPlayerManager.onPlaybackCompleted = () {
+      sleepCubit.onSurahCompleted();
+      final repeatCubit = ctx.read<AyahRepeatCubit>();
+      if (repeatCubit.state.isActive) {
+        repeatCubit.onRepetitionCompleted();
+      }
+    };
   }
 
   void _setupHomeWidgetDeepLinks() {
@@ -372,10 +445,13 @@ class _UsageTimeTrackerState extends State<_UsageTimeTracker>
             ),
           );
           
-          context.read<AyahToHighlight>().changeAyah("$surah:$verse");
+          final isAudioPlaying = context.read<AudioAyahHighlightCubit>().state.activeAyahKey != null;
+          if (!isAudioPlaying) {
+            context.read<AyahToHighlight>().changeAyah("$surah:$verse");
+          }
           
           Future.delayed(const Duration(seconds: 5), () {
-            if (context.mounted) {
+            if (context.mounted && !isAudioPlaying) {
               context.read<AyahToHighlight>().changeAyah(null);
             }
           });
@@ -459,6 +535,7 @@ class _UsageTimeTrackerState extends State<_UsageTimeTracker>
       final previousValue =
           (box.get(_kUsageSeconds, defaultValue: 0) as int?) ?? 0;
       box.put(_kUsageSeconds, previousValue + seconds);
+      AnalyticsTracker.instance.endSession();
     } catch (_) {}
   }
 
@@ -487,9 +564,13 @@ class _AudioPlayerBridgeBinder extends StatefulWidget {
 }
 
 class _AudioPlayerBridgeBinderState extends State<_AudioPlayerBridgeBinder> {
+  bool _isBound = false;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (_isBound) return;
+    _isBound = true;
     AudioPlayerManager.bindUiBridge(
       BlocAudioPlayerUiBridge(
         context: context,
@@ -499,6 +580,9 @@ class _AudioPlayerBridgeBinderState extends State<_AudioPlayerBridgeBinder> {
         ayahKeyCubit: context.read<AyahKeyCubit>(),
         quranViewCubit: context.read<QuranViewCubit>(),
         wordPlayingStateCubit: context.read<WordPlayingStateCubit>(),
+        highlightCubit: context.read<AudioAyahHighlightCubit>(),
+        reciterCubit: context.read<SegmentedQuranReciterCubit>(),
+        ayahToHighlight: context.read<AyahToHighlight>(),
       ),
     );
   }
@@ -513,6 +597,52 @@ class _AudioPlayerBridgeBinderState extends State<_AudioPlayerBridgeBinder> {
   Widget build(BuildContext context) => widget.child;
 }
 
+/// 🖥️ يفرض وضع ملء الشاشة (immersiveSticky) بشكل دائم
+/// أي تغيير في SystemUiOverlayStyle من أي widget بيخلي الـ bars تظهر
+/// هذا الـ wrapper بيعيد فرض الـ immersive mode كل ما الـ widget يترسم
+class _FullscreenEnforcer extends StatefulWidget {
+  final Widget child;
+  const _FullscreenEnforcer({required this.child});
+
+  @override
+  State<_FullscreenEnforcer> createState() => _FullscreenEnforcerState();
+}
+
+class _FullscreenEnforcerState extends State<_FullscreenEnforcer>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _enforceFullscreen();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Re-enforce fullscreen when app comes back to foreground
+    if (state == AppLifecycleState.resumed) {
+      _enforceFullscreen();
+    }
+  }
+
+  void _enforceFullscreen() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Re-enforce on every build to counter any overlay style changes
+    _enforceFullscreen();
+    return widget.child;
+  }
+}
+
 /// 🏠 معالج الشاشة الافتراضية
 /// دائماً يفتح على شاشة المصحف
 class _DefaultScreenHandler extends StatelessWidget {
@@ -520,7 +650,184 @@ class _DefaultScreenHandler extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // الأدمن والمستخدم كلهم بيفتحوا المصحف.
+    // لوحة التحكم بتتفتح من القائمة الجانبية (WahySideDrawer).
     return const MushafScreen();
+  }
+}
+
+/// شاشة خطأ كارثي مع خيار مسح البيانات
+class _FatalErrorScreen extends StatefulWidget {
+  const _FatalErrorScreen({required this.error});
+  final Object error;
+
+  @override
+  State<_FatalErrorScreen> createState() => _FatalErrorScreenState();
+}
+
+class _FatalErrorScreenState extends State<_FatalErrorScreen> {
+  bool _isResetting = false;
+
+  Future<void> _resetAppAndRestart() async {
+    setState(() => _isResetting = true);
+    try {
+      // Close all open Hive boxes
+      try {
+        await Hive.close();
+      } catch (_) {}
+
+      // Delete all Hive box files from disk
+      try {
+        final dir = await platform_services.getApplicationDataPath();
+        if (platformOwn == platform_services.PlatformOwn.isWindows ||
+            platformOwn == platform_services.PlatformOwn.isLinux) {
+          final dbDir = Directory("$dir/db");
+          if (dbDir.existsSync()) {
+            dbDir.deleteSync(recursive: true);
+          }
+        } else {
+          // On Android/iOS, Hive stores in app documents dir
+          final hiveDir = Directory("$dir/hive");
+          if (hiveDir.existsSync()) {
+            hiveDir.deleteSync(recursive: true);
+          }
+        }
+      } catch (_) {}
+
+      // Clear SharedPreferences too
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
+      } catch (_) {}
+
+      // Restart the app
+      SystemNavigator.pop();
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isResetting = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("فشل المسح: $e")),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor: const Color(0xFF1A1A2E),
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Icon(
+                      Icons.error_outline_rounded,
+                      size: 56,
+                      color: Colors.redAccent,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'حدث خطأ أثناء تشغيل التطبيق',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    '${widget.error}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white.withValues(alpha: 0.5),
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 32),
+                  // Reset button — primary action
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton.icon(
+                      onPressed: _isResetting ? null : _resetAppAndRestart,
+                      icon: _isResetting
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.delete_forever_rounded),
+                      label: Text(
+                        _isResetting ? 'جاري المسح...' : 'مسح البيانات وإعادة التشغيل',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.redAccent,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Close button — secondary action
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      onPressed: () => SystemNavigator.pop(),
+                      icon: const Icon(Icons.close_rounded, size: 18),
+                      label: const Text(
+                        'إغلاق التطبيق',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white54,
+                        side: const BorderSide(color: Colors.white24),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'مسح البيانات هيحل المشكلة لكن هيشيل التفاسير والترجمات المحملة',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.white.withValues(alpha: 0.35),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

@@ -13,6 +13,41 @@ enum QuranTheme {
   sand,
 }
 
+enum MushafLayoutMode {
+  singlePage,
+  doublePage,
+  continuousScroll,
+}
+
+enum QuranFontFamily {
+  qpcHafs,
+  kfgqpcUthmanicHafs,
+  uthmanTahaNaskh,
+  alQuranNeo,
+  indopakNastaleeq,
+  meQuranVolt;
+
+  /// The Flutter font family name as registered in pubspec.yaml
+  String get flutterFontFamily => switch (this) {
+    QuranFontFamily.qpcHafs => "QPC_Hafs",
+    QuranFontFamily.kfgqpcUthmanicHafs => "KFGQPC-Uthmanic-HAFS-Regular",
+    QuranFontFamily.uthmanTahaNaskh => "KFGQPC-Uthmanic-HAFS-Regular", // fallback until font added
+    QuranFontFamily.alQuranNeo => "AlQuranNeov5x1",
+    QuranFontFamily.indopakNastaleeq => "IndopakNastaleeq",
+    QuranFontFamily.meQuranVolt => "me_quran_volt_newmet",
+  };
+
+  /// Arabic display label
+  String get label => switch (this) {
+    QuranFontFamily.qpcHafs => "QPC Hafs",
+    QuranFontFamily.kfgqpcUthmanicHafs => "KFGQPC عثماني",
+    QuranFontFamily.uthmanTahaNaskh => "عثمان طه نسخ",
+    QuranFontFamily.alQuranNeo => "Al Quran Neo",
+    QuranFontFamily.indopakNastaleeq => "إندوباك نستعليق",
+    QuranFontFamily.meQuranVolt => "Me Quran Volt",
+  };
+}
+
 class QuranSettingsState {
   final double fontSize;
   final QuranTheme theme;
@@ -26,6 +61,8 @@ class QuranSettingsState {
   final bool tajweedEnabled;
   final bool isInitialized;
   final List<Color> customBackgroundColors;
+  final MushafLayoutMode layoutMode;
+  final QuranFontFamily fontFamily;
 
   // Hardcoded getters for removed settings to prevent breaking the rest of the app
   double get pageScale => 1.0;
@@ -45,6 +82,8 @@ class QuranSettingsState {
     this.tajweedEnabled = false,
     this.isInitialized = false,
     this.customBackgroundColors = const [],
+    this.layoutMode = MushafLayoutMode.singlePage,
+    this.fontFamily = QuranFontFamily.qpcHafs,
   });
 
   QuranSettingsState copyWith({
@@ -60,6 +99,8 @@ class QuranSettingsState {
     bool? tajweedEnabled,
     bool? isInitialized,
     List<Color>? customBackgroundColors,
+    MushafLayoutMode? layoutMode,
+    QuranFontFamily? fontFamily,
   }) {
     return QuranSettingsState(
       fontSize: fontSize ?? this.fontSize,
@@ -74,6 +115,8 @@ class QuranSettingsState {
       tajweedEnabled: tajweedEnabled ?? this.tajweedEnabled,
       isInitialized: isInitialized ?? this.isInitialized,
       customBackgroundColors: customBackgroundColors ?? this.customBackgroundColors,
+      layoutMode: layoutMode ?? this.layoutMode,
+      fontFamily: fontFamily ?? this.fontFamily,
     );
   }
 
@@ -95,15 +138,17 @@ class QuranSettingsState {
     }
   }
 
-  double get contentScale {
-    final fontInfluence = (fontSize - 23.0) / 22.0;
-    return (1.0 + fontInfluence).clamp(0.85, 1.4);
-  }
+  // contentScale is kept at 1.0 — the QCF glyph rendering system
+  // handles its own scaling via baselineWidth and fontSize parameters.
+  // Overriding this caused the mushaf to become oversized and misaligned.
+  double get contentScale => 1.0;
 
-  double get verseHeightScale {
-    final fontInfluence = (fontSize - 23.0) / 35.0;
-    return (1.0 + fontInfluence).clamp(0.9, 1.3);
-  }
+  double get verseHeightScale => 1.0;
+
+  /// Responsive overlay scale — page info (juz, surah, hizb, page number)
+  /// font sizes are multiplied by this factor so they stay proportional
+  /// to the mushaf content at any font size.
+  double get overlayScale => 1.0;
 
   // --- Helpers for UI Theme mapping ---
 

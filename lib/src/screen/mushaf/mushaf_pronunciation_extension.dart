@@ -71,7 +71,7 @@ extension _MushafPronunciationExtension on _MushafViewState {
                 decoration: BoxDecoration(
                   color: isDark
                       ? const Color(0xFF1E1E1E)
-                      : const Color(0xFFFFF9F2),
+                      : const Color(0xFFF5EBE0),
                   borderRadius: BorderRadius.circular(22),
                   border: Border.all(
                     color: isDark
@@ -198,7 +198,7 @@ extension _MushafPronunciationExtension on _MushafViewState {
               final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
               final surface = isDark
                   ? const Color(0xFF1A1A1C)
-                  : const Color(0xFFFFF9F2);
+                  : const Color(0xFFF5EBE0);
               final cardColor = isDark
                   ? const Color(0xFF2A2A2C)
                   : const Color(0xFFF5EDE0);

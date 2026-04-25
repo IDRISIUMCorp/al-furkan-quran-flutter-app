@@ -205,23 +205,24 @@ class AyahOfTheDayService {
     final lastTime = lastTimeStr != null ? DateTime.tryParse(lastTimeStr) : null;
 
     int? surah, verse;
-    bool shouldGenerateNew = forceRefresh;
+    bool shouldGenerateNew = false;
 
-    if (!forceRefresh && lastTime != null) {
-      if (DateTime.now().difference(lastTime).inMinutes >= frequencyMinutes) {
-        shouldGenerateNew = true;
-      }
-    } else if (lastTime == null) {
+    // Only generate new ayah if explicitly forced OR if timer expired
+    if (forceRefresh) {
+      shouldGenerateNew = true;
+    } else if (lastTime != null && DateTime.now().difference(lastTime).inMinutes >= frequencyMinutes) {
       shouldGenerateNew = true;
     }
 
+    // Custom ayah always takes priority - never generate new
     if (customSurah != null && customVerse != null) {
       shouldGenerateNew = false;
       surah = customSurah;
       verse = customVerse;
     }
 
-    if (!shouldGenerateNew) {
+    // If not generating new, try to get existing ayah from widget data
+    if (!shouldGenerateNew && surah == null) {
       final existingKey = await HomeWidget.getWidgetData<String>('ayah_key');
       if (existingKey != null && existingKey.contains(':')) {
         final parts = existingKey.split(':');

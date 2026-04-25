@@ -1,7 +1,6 @@
 import "dart:ui";
 
 import "package:al_furkan/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
-import "package:al_furkan/src/screen/settings/theme_settings.dart";
 import "package:al_furkan/src/theme/controller/theme_cubit.dart";
 import "package:al_furkan/src/theme/controller/theme_state.dart";
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
@@ -435,12 +434,54 @@ class _PremiumOnboardingScreenState extends State<PremiumOnboardingScreen> {
           ),
           const Gap(24),
 
-          // Flex Scheme Color Picker
+          // App Color Preview
           _sectionLabel("لون التطبيق"),
           const Gap(10),
-          const ThemeSettings(),
+          _buildColorPreview(isDark),
         ],
       ),
+    );
+  }
+
+  Widget _buildColorPreview(bool isDark) {
+    final primary = isDark ? const Color(0xFF839788) : const Color(0xFF5D7263);
+    final secondary = isDark ? const Color(0xFFB8A080) : const Color(0xFF8B7355);
+    final bg = isDark ? const Color(0xFF343A40) : const Color(0xFFF5EBE0);
+    return Row(
+      children: [
+        _colorDot(primary, "الأساسي"),
+        const Gap(12),
+        _colorDot(secondary, "الثانوي"),
+        const Gap(12),
+        _colorDot(bg, "الخلفية"),
+      ],
+    );
+  }
+
+  Widget _colorDot(Color color, String label) {
+    return Column(
+      children: [
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.35),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+        ),
+        const Gap(6),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+        ),
+      ],
     );
   }
 

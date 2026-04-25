@@ -113,7 +113,7 @@ class PrayerThemeColors {
   
   /// Prayer passed
   static const Color prayerPassed = Color(0xFF9B9B9B);
-  static const Color prayerPassedBg = Color(0xFFF5F5F5);
+  static const Color prayerPassedBg = Color(0xFFE3D5CA);
   
   /// Current prayer
   static const Color prayerCurrent = Color(0xFF4A7C59);

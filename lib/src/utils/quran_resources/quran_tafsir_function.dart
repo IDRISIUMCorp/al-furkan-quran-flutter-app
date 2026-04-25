@@ -521,6 +521,27 @@ class QuranTafsirFunction {
         },
       );
 
+      // Detect HTML responses — safety net in case the server returns
+      // an HTML page instead of actual BZip2-compressed data.
+      String? responseData = response.data as String?;
+      final bool isHtml = responseData != null &&
+          (responseData.trimLeft().startsWith('<') ||
+           response.headers.value('content-type')?.contains('text/html') == true);
+
+      if (isHtml) {
+        log(
+          "Server returned HTML instead of Tafsir data for '${tafsirBook.fullPath}'",
+          name: "downloadResources",
+        );
+        cubit.failure(
+          "المورد غير متاح حالياً على السيرفر — جرب لاحقاً",
+          activeResourceId: tafsirBook.fullPath,
+        );
+        if (tafsirBox.isOpen) await tafsirBox.close();
+        await Hive.deleteBoxFromDisk(tafsirBoxName);
+        return false;
+      }
+
       cubit.updateProgress(
         0.5,
         "Processing: ${tafsirBook.name}",

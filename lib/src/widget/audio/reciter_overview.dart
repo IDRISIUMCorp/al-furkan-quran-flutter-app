@@ -1,6 +1,8 @@
 import "package:al_furkan/src/core/audio/model/ayahkey_management.dart";
 import "package:al_furkan/src/core/audio/model/recitation_info_model.dart";
 import "package:al_furkan/src/theme/controller/theme_cubit.dart";
+import "package:al_furkan/src/utils/reciter_name_translations.dart";
+import "package:al_furkan/src/widget/audio/reciter_picker_bottom_sheet.dart";
 import "package:cached_network_image/cached_network_image.dart";
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
@@ -21,6 +23,18 @@ Widget getReciterWidget({
   bool? isWordByWord,
 }) {
   AppLocalizations l10n = AppLocalizations.of(context);
+  final locale = Localizations.localeOf(context).languageCode;
+  
+  // ترجمة اسم القارئ ونوع القراءة للعربية
+  final translatedName = ReciterNameTranslations.getArabicName(
+    audioTabScreenState.name,
+    locale,
+  );
+  final translatedStyle = ReciterNameTranslations.getArabicStyle(
+    audioTabScreenState.style ?? "",
+    locale,
+  );
+  
   return Material(
     color: Colors.transparent,
     child: InkWell(
@@ -40,6 +54,7 @@ Widget getReciterWidget({
                     borderRadius: BorderRadius.circular(roundedRadius),
                     child: CachedNetworkImage(
                       imageUrl: audioTabScreenState.img!,
+                      cacheManager: ReciterImageCacheManager(),
                       errorWidget:
                           (context, url, error) => const Icon(
                             FluentIcons.person_24_regular,
@@ -75,14 +90,14 @@ Widget getReciterWidget({
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  safeSubString(audioTabScreenState.name, 20, replacer: "..."),
+                  safeSubString(translatedName, 20, replacer: "..."),
                   style: const TextStyle(fontSize: 16),
                 ),
                 const Gap(5),
                 const Icon(Icons.arrow_drop_down_rounded, size: 30),
               ],
             ),
-            Text(l10n.style(audioTabScreenState.style ?? "")),
+            Text('أسلوب: $translatedStyle'),
             Text(l10n.source(audioTabScreenState.source ?? "")),
             if (audioTabScreenState.bio != null)
               Row(

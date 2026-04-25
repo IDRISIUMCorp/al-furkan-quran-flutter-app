@@ -60,8 +60,8 @@ extension _MushafShareExtension on _MushafViewState {
       builder: (sheetContext) {
         return StatefulBuilder(
           builder: (sheetContext, setSheetState) {
-            const bg = Color(0xFFF7F1E6);
-            const card = Color(0xFFFFF9F2);
+            const bg = Color(0xFFEDE4D4);
+            const card = Color(0xFFF5EBE0);
             final green = themeState.primary;
 
             Widget section({required Widget child}) {
@@ -205,7 +205,7 @@ extension _MushafShareExtension on _MushafViewState {
                                                         isDense: true,
                                                         filled: true,
                                                         fillColor: Color(
-                                                          0xFFF7F1E6,
+                                                          0xFFEDE4D4,
                                                         ),
                                                         border: OutlineInputBorder(
                                                           borderSide:
@@ -261,7 +261,7 @@ extension _MushafShareExtension on _MushafViewState {
                                                         isDense: true,
                                                         filled: true,
                                                         fillColor: Color(
-                                                          0xFFF7F1E6,
+                                                          0xFFEDE4D4,
                                                         ),
                                                         border: OutlineInputBorder(
                                                           borderSide:
@@ -627,7 +627,7 @@ extension _MushafShareExtension on _MushafViewState {
             decoration: BoxDecoration(
               color: Theme.of(ctx).brightness == Brightness.dark
                   ? const Color(0xFF1E1E1E)
-                  : const Color(0xFFFFF9F2),
+                  : const Color(0xFFF5EBE0),
               borderRadius: BorderRadius.circular(20),
             ),
             margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),

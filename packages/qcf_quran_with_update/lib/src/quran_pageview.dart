@@ -233,7 +233,8 @@ class PageviewQuranState extends State<PageviewQuran> {
           },
           itemBuilder: (context, index) {
             final pageNumber = index + 1; // 1-based page
-            return QcfPage(
+            return RepaintBoundary(
+              child: QcfPage(
               pageNumber: pageNumber,
               fontSize: widget.fontSize,
               // textColor: widget.textColor // Deprecated and unused in modern renderer
@@ -251,6 +252,7 @@ class PageviewQuranState extends State<PageviewQuran> {
               showTajweed: widget.showTajweed,
               tajweedWordsBuilder: widget.tajweedWordsBuilder,
               highlightsBuilder: widget.highlightsBuilder,
+            ),
             );
           },
         ),

@@ -1,8 +1,11 @@
-import "package:al_furkan/l10n/app_localizations.dart";
 import "package:al_furkan/src/core/audio/cubit/audio_ui_cubit.dart";
+import "package:al_furkan/src/theme/app_colors.dart";
 import "package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart";
 import "package:al_furkan/src/core/audio/cubit/player_position_cubit.dart";
 import "package:al_furkan/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
+import "package:al_furkan/src/core/audio/cubit/sleep_timer_cubit.dart";
+import "package:al_furkan/src/widget/audio/sleep_timer_bottom_sheet.dart";
+import "package:al_furkan/src/widget/audio/ayah_repeat_bottom_sheet.dart";
 import "package:al_furkan/src/core/audio/model/audio_controller_ui.dart";
 import "package:al_furkan/src/core/audio/model/audio_player_position_model.dart";
 import "package:al_furkan/src/core/audio/model/ayahkey_management.dart";
@@ -11,7 +14,8 @@ import "package:al_furkan/src/core/audio/services/audio_playback_service_access.
 import "package:al_furkan/src/utils/quran_ayahs_function/gen_ayahs_key.dart";
 import "package:al_furkan/src/resources/quran_resources/quran_ayah_count.dart";
 import "package:al_furkan/src/core/audio/player/audio_player_manager.dart";
-import "package:al_furkan/src/utils/get_segments_supported_reciters.dart";
+import "package:al_furkan/src/utils/basic_functions.dart";
+import "package:al_furkan/src/resources/quran_resources/quran_pages_info.dart";
 import "package:audio_video_progress_bar/audio_video_progress_bar.dart";
 import "package:cached_network_image/cached_network_image.dart";
 import "package:flutter/material.dart";
@@ -19,9 +23,13 @@ import "package:flutter/services.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:gap/gap.dart";
 import "package:just_audio/just_audio.dart" as just_audio;
-
-
+import "package:al_furkan/src/widget/audio/reciter_picker_bottom_sheet.dart";
+import "package:al_furkan/src/utils/reciter_name_translations.dart";
 import "../../core/audio/cubit/player_state_cubit.dart";
+
+// ═══════════════════════════════════════════════════════════════════
+//  IDRISIUM Audio Controller — Quiet Luxury / Organic Minimalism
+// ═══════════════════════════════════════════════════════════════════
 
 class AudioControllerUi extends StatefulWidget {
   const AudioControllerUi({super.key});
@@ -34,9 +42,6 @@ class _AudioControllerUiState extends State<AudioControllerUi>
     with SingleTickerProviderStateMixin {
   AudioUiCubit? _myCubitInstance;
   double _playbackSpeed = 1.0;
-  int _repeatCount = 0; // 0 = no repeat, 1+ = count
-  bool _isRepeatActive = false;
-
   static const List<double> _speedOptions = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
 
   @override
@@ -51,62 +56,80 @@ class _AudioControllerUiState extends State<AudioControllerUi>
     super.dispose();
   }
 
-  // ─── Colors ───────────────────────────────────────────────
-  Color _bg(bool isDark) =>
-      isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF4EAD5);
-  Color _surface(bool isDark) =>
-      isDark ? const Color(0xFF2A2A2A) : const Color(0xFFEDE5D0);
-  Color _onSurface(bool isDark) =>
-      isDark ? Colors.white : const Color(0xFF1A1A1A);
-  Color _muted(bool isDark) =>
-      isDark ? Colors.white54 : const Color(0xFF8B7355);
-  Color get _accent => const Color(0xFF6EAE7E);
+  // ─── Design Tokens (Unified Beige Palette) ─────────────────
+  Color _bg(bool d) => d ? AppColors.darkSurface : AppColors.ayaAudioPlayerBg;
+  Color _card(bool d) => d ? AppColors.darkCard : AppColors.ayaCard;
+  Color _text(bool d) => d ? const Color(0xFFF5F5F7) : AppColors.ayaTextMain;
+  Color _sub(bool d) => d ? const Color(0xFF8E8E93) : AppColors.ayaTextMuted;
+  Color _border(bool d) =>
+      d ? Colors.white.withValues(alpha: 0.06) : AppColors.ayaBorder.withValues(alpha: 0.6);
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final l10n = AppLocalizations.of(context);
+    final accent = Theme.of(context).colorScheme.primary;
 
     return BlocBuilder<AudioUiCubit, AudioControllerUiState>(
       builder: (context, state) {
-        if (!state.showUi || !state.isInsideQuranPlayer) {
-          return const SizedBox.shrink();
-        }
+        final isVisible = state.showUi && state.isInsideQuranPlayer;
+        final radius = state.isExpanded ? 24.0 : 50.0;
+        final content = state.isExpanded
+            ? _expandedPlayer(isDark, accent, state)
+            : _collapsedPlayer(isDark, accent, state);
 
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 350),
-          curve: Curves.easeOutQuart,
-          margin: const EdgeInsets.only(left: 8, right: 8, bottom: 10),
+        final player = AnimatedContainer(
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOutCubic,
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
             color: _bg(isDark),
-            borderRadius: BorderRadius.circular(state.isExpanded ? 20 : 40),
-            border: Border.all(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.08)
-                  : Colors.black.withValues(alpha: 0.06),
-              width: 1,
-            ),
+            borderRadius: BorderRadius.circular(radius),
+            border: Border.all(color: _border(isDark), width: 0.5),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
-                blurRadius: 20,
-                offset: const Offset(0, 4),
+                color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.06),
+                blurRadius: 24,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
-          child: state.isExpanded
-              ? _buildExpandedPlayer(isDark, l10n, state)
-              : _buildCollapsedPlayer(isDark, l10n, state),
+          child: content,
+        );
+
+        // ── Apple-style slide + fade on show/hide ──
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 380),
+          reverseDuration: const Duration(milliseconds: 300),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
+          transitionBuilder: (child, animation) {
+            final offsetAnimation = Tween<Offset>(
+              begin: const Offset(0, 0.35),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            ));
+            return SlideTransition(
+              position: offsetAnimation,
+              child: FadeTransition(
+                opacity: animation,
+                child: child,
+              ),
+            );
+          },
+          child: isVisible
+              ? KeyedSubtree(key: const ValueKey('player_visible'), child: player)
+              : const SizedBox.shrink(key: ValueKey('player_hidden')),
         );
       },
     );
   }
 
   // ═══════════════════════════════════════════════════════════
-  //  COLLAPSED PLAYER — Compact Mini Bar
+  //  COLLAPSED — Minimal Pill
   // ═══════════════════════════════════════════════════════════
-  Widget _buildCollapsedPlayer(
-      bool isDark, AppLocalizations l10n, AudioControllerUiState uiState) {
+  Widget _collapsedPlayer(bool isDark, Color accent, AudioControllerUiState uiState) {
     return BlocBuilder<SegmentedQuranReciterCubit, ReciterInfoModel>(
       builder: (context, reciter) {
         return BlocBuilder<PlayerStateCubit, PlayerState>(
@@ -117,100 +140,100 @@ class _AudioControllerUiState extends State<AudioControllerUi>
 
             return GestureDetector(
               onTap: () => context.read<AudioUiCubit>().expand(true),
+              behavior: HitTestBehavior.opaque,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.fromLTRB(6, 6, 14, 0),
                     child: Row(
                       children: [
-                        // Reciter Avatar
-                        _reciterAvatar(reciter, 38),
+                        // Avatar
+                        _avatar(reciter, 40, accent),
                         const Gap(10),
-                        // Reciter name & status
+                        // Info
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                reciter.name,
+                                ReciterNameTranslations.getArabicName(
+                                  reciter.name,
+                                  Localizations.localeOf(context).languageCode,
+                                ),
                                 style: TextStyle(
-                                  fontWeight: FontWeight.w700,
+                                  fontWeight: FontWeight.w600,
                                   fontSize: 13,
-                                  color: _onSurface(isDark),
+                                  color: _text(isDark),
+                                  letterSpacing: -0.2,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
+                              const Gap(1),
                               Text(
                                 isLoading
                                     ? "جاري التحميل..."
-                                    : (playerState.isPlaying
+                                    : playerState.isPlaying
                                         ? "يتم التشغيل"
-                                        : "متوقف"),
+                                        : "متوقف",
                                 style: TextStyle(
                                   fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: _accent,
+                                  color: isLoading ? _sub(isDark) : accent,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        // Prev
-                        _miniControlBtn(
-                          icon: Icons.skip_previous_rounded,
-                          isDark: isDark,
-                          onTap: uiState.isPlayList
+                        // Controls
+                        _miniBtn(
+                          Icons.skip_previous_rounded,
+                          isDark,
+                          uiState.isPlayList
                               ? () => audioPlaybackService.seekToPrevious()
                               : null,
                         ),
-                        // Play/Pause
-                        _playPauseButton(
-                            isLoading, playerState.isPlaying, isDark, 32),
-                        // Next
-                        _miniControlBtn(
-                          icon: Icons.skip_next_rounded,
-                          isDark: isDark,
-                          onTap: uiState.isPlayList
+                        _playBtn(isLoading, playerState.isPlaying, isDark, 36, accent, tag: "mini"),
+                        _miniBtn(
+                          Icons.skip_next_rounded,
+                          isDark,
+                          uiState.isPlayList
                               ? () => audioPlaybackService.seekToNext()
                               : null,
                         ),
                       ],
                     ),
                   ),
-                  // Mini progress
+                  // Progress line
                   BlocBuilder<PlayerPositionCubit, AudioPlayerPositionModel>(
                     builder: (context, pos) {
                       final total =
                           pos.totalDuration?.inMilliseconds.toDouble() ?? 1.0;
                       final current =
                           pos.currentDuration?.inMilliseconds.toDouble() ?? 0.0;
-                      final fraction =
-                          total > 0 ? (current / total).clamp(0.0, 1.0) : 0.0;
+                      final f = total > 0 ? (current / total).clamp(0.0, 1.0) : 0.0;
                       return Container(
-                        height: 3,
-                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                        height: 2.5,
+                        margin: const EdgeInsets.fromLTRB(20, 6, 20, 8),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(2),
-                          color: _surface(isDark),
+                          color: _border(isDark),
                         ),
                         alignment: Alignment.centerLeft,
                         child: FractionallySizedBox(
-                          widthFactor: fraction,
+                          widthFactor: f,
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(2),
-                              color: _accent,
+                              color: accent,
                             ),
                           ),
                         ),
                       );
                     },
                   ),
-                  const Gap(6),
                 ],
               ),
             );
@@ -221,10 +244,9 @@ class _AudioControllerUiState extends State<AudioControllerUi>
   }
 
   // ═══════════════════════════════════════════════════════════
-  //  EXPANDED PLAYER — Full-Featured
+  //  EXPANDED — Full Player
   // ═══════════════════════════════════════════════════════════
-  Widget _buildExpandedPlayer(
-      bool isDark, AppLocalizations l10n, AudioControllerUiState uiState) {
+  Widget _expandedPlayer(bool isDark, Color accent, AudioControllerUiState uiState) {
     return BlocBuilder<SegmentedQuranReciterCubit, ReciterInfoModel>(
       builder: (context, reciter) {
         return BlocBuilder<PlayerStateCubit, PlayerState>(
@@ -234,22 +256,21 @@ class _AudioControllerUiState extends State<AudioControllerUi>
                     playerState.state == just_audio.ProcessingState.buffering;
 
             return Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+              padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // ─── Top Row: Reciter Info + Collapse ───
+                  // ─── Header: reciter + collapse ───
                   Row(
                     children: [
-                      // Reciter avatar
                       GestureDetector(
-                        onTap: () => _openReciterPicker(isDark),
-                        child: _reciterAvatar(reciter, 44),
+                        onTap: () => _openReciterPicker(),
+                        child: _avatar(reciter, 46, accent),
                       ),
-                      const Gap(10),
+                      const Gap(12),
                       Expanded(
                         child: GestureDetector(
-                          onTap: () => _openReciterPicker(isDark),
+                          onTap: () => _openReciterPicker(),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -257,45 +278,49 @@ class _AudioControllerUiState extends State<AudioControllerUi>
                                 children: [
                                   Flexible(
                                     child: Text(
-                                      reciter.name,
+                                      ReciterNameTranslations.getArabicName(
+                                        reciter.name,
+                                        Localizations.localeOf(context).languageCode,
+                                      ),
                                       style: TextStyle(
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 14,
-                                        color: _onSurface(isDark),
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 15,
+                                        color: _text(isDark),
+                                        letterSpacing: -0.3,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  const Gap(4),
-                                  Icon(Icons.keyboard_arrow_down_rounded,
-                                      size: 18, color: _accent),
+                                  const Gap(2),
+                                  Icon(Icons.unfold_more_rounded,
+                                      size: 16, color: _sub(isDark)),
                                 ],
                               ),
                               if (reciter.style != null)
                                 Text(
-                                  reciter.style!,
+                                  ReciterNameTranslations.getArabicStyle(
+                                    reciter.style!,
+                                    Localizations.localeOf(context).languageCode,
+                                  ),
                                   style: TextStyle(
                                     fontSize: 11,
-                                    color: _muted(isDark),
-                                    fontWeight: FontWeight.w600,
+                                    color: _sub(isDark),
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                             ],
                           ),
                         ),
                       ),
-                      // Collapse
-                      _iconBtn(
-                        icon: Icons.keyboard_arrow_down_rounded,
-                        isDark: isDark,
-                        onTap: () =>
-                            context.read<AudioUiCubit>().expand(false),
-                        size: 22,
+                      _tapIcon(
+                        Icons.keyboard_arrow_down_rounded,
+                        isDark,
+                        () => context.read<AudioUiCubit>().expand(false),
                       ),
                     ],
                   ),
-                  const Gap(14),
+                  const Gap(18),
 
                   // ─── Progress Bar ───
                   BlocBuilder<PlayerPositionCubit, AudioPlayerPositionModel>(
@@ -305,133 +330,149 @@ class _AudioControllerUiState extends State<AudioControllerUi>
                         buffered: pos.bufferDuration ?? Duration.zero,
                         total: pos.totalDuration ?? Duration.zero,
                         thumbCanPaintOutsideBar: false,
-                        barHeight: 5,
-                        thumbRadius: 7,
-                        thumbGlowRadius: 18,
-                        thumbColor: _accent,
-                        baseBarColor: _surface(isDark),
-                        progressBarColor: _accent,
-                        bufferedBarColor: _accent.withValues(alpha: 0.25),
+                        barHeight: 4,
+                        thumbRadius: 6,
+                        thumbGlowRadius: 14,
+                        thumbColor: accent,
+                        baseBarColor: _border(isDark),
+                        progressBarColor: accent,
+                        bufferedBarColor: accent.withValues(alpha: 0.18),
                         timeLabelTextStyle: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: _muted(isDark),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: _sub(isDark),
+                          letterSpacing: 0.2,
                         ),
                         timeLabelLocation: TimeLabelLocation.below,
                         onSeek: (d) => audioPlaybackService.seek(d),
                       );
                     },
                   ),
-                  const Gap(4),
 
-                  // ─── Ayah Slider (if playlist) ───
+                  // ─── Ayah Indicator ───
                   BlocBuilder<AyahKeyCubit, AyahKeyManagement?>(
                     builder: (context, ayahState) {
                       if (ayahState?.current == null) {
                         return const SizedBox.shrink();
                       }
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
+                        padding: const EdgeInsets.only(top: 2, bottom: 4),
                         child: Text(
                           ayahState!.current,
                           style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: _accent,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: accent,
                           ),
                         ),
                       );
                     },
                   ),
 
-                  // ─── Main Controls ───
-                  Row(
+                  // ─── Transport Controls ───
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Speed
-                      _speedButton(isDark),
-                      const Gap(8),
-                      // Rewind 5s
-                      _controlBtn(
-                        icon: Icons.replay_5_rounded,
-                        isDark: isDark,
-                        onTap: () {
-                          final d = audioPlaybackService.currentPosition;
-                          int ms = d.inMilliseconds - 5000;
-                          if (ms < 0) ms = 0;
-                          audioPlaybackService
-                              .seek(Duration(milliseconds: ms));
-                        },
-                      ),
-                      const Gap(4),
-                      // Previous
-                      _controlBtn(
-                        icon: Icons.skip_previous_rounded,
-                        isDark: isDark,
-                        onTap: () => _seekPrevious(context),
-                      ),
-                      const Gap(4),
-                      // Play/Pause (big)
-                      _playPauseButton(
-                          isLoading, playerState.isPlaying, isDark, 48),
-                      const Gap(4),
-                      // Next
-                      _controlBtn(
-                        icon: Icons.skip_next_rounded,
-                        isDark: isDark,
-                        onTap: () => _seekNext(context),
-                      ),
-                      const Gap(4),
-                      // Forward 5s
-                      _controlBtn(
-                        icon: Icons.forward_5_rounded,
-                        isDark: isDark,
-                        onTap: () {
-                          final d = audioPlaybackService.currentPosition;
-                          final max = audioPlaybackService.totalDuration;
-                          int ms = d.inMilliseconds + 5000;
-                          if (max != null && ms > max.inMilliseconds) {
-                            ms = max.inMilliseconds;
-                          }
-                          audioPlaybackService
-                              .seek(Duration(milliseconds: ms));
-                        },
+                      _chipBtn(
+                        "${_playbackSpeed}x",
+                        isDark,
+                        accent,
+                        isActive: _playbackSpeed != 1.0,
+                        onTap: _cycleSpeed,
                       ),
                       const Gap(8),
-                      // Repeat
-                      _repeatButton(isDark),
+                      _ctrlIcon(Icons.replay_5_rounded, isDark, () {
+                        final d = audioPlaybackService.currentPosition;
+                        int ms = (d.inMilliseconds - 5000).clamp(0, 999999999);
+                        audioPlaybackService.seek(Duration(milliseconds: ms));
+                      }),
+                      _ctrlIcon(Icons.skip_previous_rounded, isDark,
+                          () => _seekPrevious(context)),
+                      const Gap(2),
+                      _playBtn(isLoading, playerState.isPlaying, isDark, 52, accent, tag: "full"),
+                      const Gap(2),
+                      _ctrlIcon(Icons.skip_next_rounded, isDark,
+                          () => _seekNext(context)),
+                      _ctrlIcon(Icons.forward_5_rounded, isDark, () {
+                        final d = audioPlaybackService.currentPosition;
+                        final max = audioPlaybackService.totalDuration;
+                        int ms = d.inMilliseconds + 5000;
+                        if (max != null && ms > max.inMilliseconds) {
+                          ms = max.inMilliseconds;
+                        }
+                        audioPlaybackService.seek(Duration(milliseconds: ms));
+                      }),
+                      const Gap(8),
+                      _loopChip(isDark, accent),
                     ],
                   ),
-                  const Gap(8),
+                  ),
+                  const Gap(10),
 
-                  // ─── Bottom Toolbar ───
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      // Playlist mode
-                      _bottomAction(
-                        icon: Icons.playlist_play_rounded,
-                        label: "قائمة",
-                        isDark: isDark,
-                        isActive: uiState.isPlayList,
-                        onTap: () => _togglePlaylist(context),
-                      ),
-                      // Repeat single ayah
-                      _bottomAction(
-                        icon: Icons.repeat_one_rounded,
-                        label: "تكرار: $_repeatCount",
-                        isDark: isDark,
-                        isActive: _isRepeatActive,
-                        onTap: _cycleRepeat,
-                      ),
-                      // Reciter
-                      _bottomAction(
-                        icon: Icons.record_voice_over_rounded,
-                        label: "القارئ",
-                        isDark: isDark,
-                        onTap: () => _openReciterPicker(isDark),
-                      ),
-                    ],
+                  // ─── Bottom Row 1 ───
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _bottomBtn(
+                          icon: Icons.skip_previous_rounded,
+                          label: "السابقة",
+                          isDark: isDark,
+                          accent: accent,
+                          onTap: () => _playPreviousSurah(context),
+                        ),
+                        _bottomBtn(
+                          icon: Icons.playlist_play_rounded,
+                          label: "قائمة",
+                          isDark: isDark,
+                          accent: accent,
+                          isActive: uiState.isPlayList,
+                          onTap: () => _togglePlaylist(context),
+                        ),
+                        _bottomBtn(
+                          icon: Icons.record_voice_over_rounded,
+                          label: "القارئ",
+                          isDark: isDark,
+                          accent: accent,
+                          onTap: () => _openReciterPicker(),
+                        ),
+                        _bottomBtn(
+                          icon: Icons.skip_next_rounded,
+                          label: "التالية",
+                          isDark: isDark,
+                          accent: accent,
+                          onTap: () => _playNextSurah(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Gap(4),
+                  // ─── Bottom Row 2 ───
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _bottomBtn(
+                          icon: Icons.bedtime_rounded,
+                          label: "مؤقت",
+                          isDark: isDark,
+                          accent: accent,
+                          isActive: context.watch<SleepTimerCubit>().state.isActive,
+                          onTap: () => _openSleepTimer(context),
+                        ),
+                        _bottomBtn(
+                          icon: Icons.repeat_rounded,
+                          label: "تكرار",
+                          isDark: isDark,
+                          accent: accent,
+                          onTap: () => _openRepeatPicker(context),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -443,100 +484,72 @@ class _AudioControllerUiState extends State<AudioControllerUi>
   }
 
   // ═══════════════════════════════════════════════════════════
-  //  SHARED WIDGETS
+  //  SHARED COMPONENTS
   // ═══════════════════════════════════════════════════════════
 
-  Widget _reciterAvatar(ReciterInfoModel reciter, double size) {
+  Widget _avatar(ReciterInfoModel r, double size, Color accent) {
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: _accent.withValues(alpha: 0.3), width: 2),
+        border: Border.all(
+            color: accent.withValues(alpha: 0.25), width: 1.5),
       ),
       child: ClipOval(
-        child: reciter.img != null
+        child: r.img != null
             ? CachedNetworkImage(
-                imageUrl: reciter.img!,
+                imageUrl: r.img!,
+                cacheManager: ReciterImageCacheManager(),
                 fit: BoxFit.cover,
-                errorWidget: (_, __, ___) => _defaultAvatar(size),
-                placeholder: (_, __) => _defaultAvatar(size),
+                errorWidget: (_, __, ___) => _defAvatar(size, accent),
+                placeholder: (_, __) => _defAvatar(size, accent),
               )
-            : _defaultAvatar(size),
+            : _defAvatar(size, accent),
       ),
     );
   }
 
-  Widget _defaultAvatar(double size) {
-    return Container(
-      color: _accent.withValues(alpha: 0.15),
-      child: Icon(Icons.person_rounded,
-          size: size * 0.55, color: _accent),
-    );
-  }
+  Widget _defAvatar(double s, Color accent) => Container(
+        color: accent.withValues(alpha: 0.1),
+        child: Icon(Icons.person_rounded, size: s * 0.5, color: accent),
+      );
 
-  Widget _playPauseButton(
-      bool isLoading, bool isPlaying, bool isDark, double size) {
+  Widget _playBtn(bool loading, bool playing, bool isDark, double size, Color accent, {String tag = ""}) {
     return GestureDetector(
-      onTap: () async {
-        if (isLoading) return;
-
-        final hasSource = audioPlaybackService.hasSource;
-        final isIdle = audioPlaybackService.processingState ==
-            just_audio.ProcessingState.idle;
-        final noDuration = audioPlaybackService.totalDuration == null;
-
-        if (!audioPlaybackService.isPlaying &&
-            (!hasSource || isIdle || noDuration)) {
-          final ayahKey = context.read<AyahKeyCubit>().state.current;
-          final reciter = context.read<SegmentedQuranReciterCubit>().state;
-          await audioPlaybackService.playSingleAyah(
-            ayahKey: ayahKey,
-            reciterInfoModel: reciter,
-            instantPlay: true,
-            isInsideQuran: true,
-          );
-          return;
-        }
-
-        if (audioPlaybackService.isPlaying) {
-          await audioPlaybackService.pause();
-        } else {
-          await audioPlaybackService.resume();
-        }
-      },
+      onTap: () => _handlePlayPause(),
       child: Container(
         width: size,
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: _accent,
+          color: accent,
           boxShadow: [
             BoxShadow(
-              color: _accent.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 3),
+              color: accent.withValues(alpha: 0.25),
+              blurRadius: 14,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Center(
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 180),
-            child: isLoading
+            child: loading
                 ? SizedBox(
-                    key: const ValueKey("loading"),
-                    width: size * 0.45,
-                    height: size * 0.45,
+                    key: ValueKey("${tag}loading"),
+                    width: size * 0.4,
+                    height: size * 0.4,
                     child: const CircularProgressIndicator(
-                      strokeWidth: 2.5,
+                      strokeWidth: 2,
                       color: Colors.white,
                     ),
                   )
                 : Icon(
-                    isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                    key: ValueKey(isPlaying),
+                    playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                    key: ValueKey("$tag${playing ? "pause" : "play"}"),
                     color: Colors.white,
-                    size: size * 0.55,
+                    size: size * 0.5,
                   ),
           ),
         ),
@@ -544,135 +557,128 @@ class _AudioControllerUiState extends State<AudioControllerUi>
     );
   }
 
-  Widget _miniControlBtn(
-      {required IconData icon, required bool isDark, VoidCallback? onTap}) {
+  Widget _miniBtn(IconData icon, bool isDark, VoidCallback? onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: Icon(
           icon,
-          size: 24,
+          size: 22,
           color: onTap != null
-              ? _onSurface(isDark).withValues(alpha: 0.7)
-              : _muted(isDark).withValues(alpha: 0.3),
+              ? _text(isDark).withValues(alpha: 0.65)
+              : _sub(isDark).withValues(alpha: 0.25),
         ),
       ),
     );
   }
 
-  Widget _controlBtn(
-      {required IconData icon, required bool isDark, VoidCallback? onTap}) {
+  Widget _ctrlIcon(IconData icon, bool isDark, VoidCallback onTap) {
     return IconButton(
       onPressed: onTap,
-      style: IconButton.styleFrom(padding: EdgeInsets.zero),
-      icon: Icon(icon, color: _onSurface(isDark).withValues(alpha: 0.7), size: 26),
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
+      icon: Icon(icon, color: _text(isDark).withValues(alpha: 0.65), size: 24),
     );
   }
 
-  Widget _iconBtn(
-      {required IconData icon,
-      required bool isDark,
-      VoidCallback? onTap,
-      double size = 20}) {
+  Widget _tapIcon(IconData icon, bool isDark, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.all(4),
-        child: Icon(icon, size: size, color: _muted(isDark)),
+        child: Icon(icon, size: 22, color: _sub(isDark)),
       ),
     );
   }
 
-  // ─── Speed ───
-  Widget _speedButton(bool isDark) {
+  Widget _chipBtn(String label, bool isDark, Color accent,
+      {bool isActive = false, VoidCallback? onTap}) {
     return GestureDetector(
-      onTap: () {
-        int idx = _speedOptions.indexOf(_playbackSpeed);
-        idx = (idx + 1) % _speedOptions.length;
-        setState(() => _playbackSpeed = _speedOptions[idx]);
-        AudioPlayerManager.audioPlayer.setSpeed(_playbackSpeed);
-        HapticFeedback.lightImpact();
-      },
+      onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: _playbackSpeed != 1.0
-              ? _accent.withValues(alpha: 0.15)
-              : _surface(isDark),
+          borderRadius: BorderRadius.circular(10),
+          color: isActive
+              ? accent.withValues(alpha: 0.12)
+              : _card(isDark),
         ),
         child: Text(
-          "${_playbackSpeed}x",
+          label,
           style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w800,
-            color: _playbackSpeed != 1.0 ? _accent : _muted(isDark),
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: isActive ? accent : _sub(isDark),
           ),
         ),
       ),
     );
   }
 
-  // ─── Repeat ───
-  Widget _repeatButton(bool isDark) {
+  Widget _loopChip(bool isDark, Color accent) {
+    final mode = audioPlaybackService.loopMode;
+    final active = mode != just_audio.LoopMode.off;
     return GestureDetector(
       onTap: () {
-        if (audioPlaybackService.loopMode == just_audio.LoopMode.one) {
-          audioPlaybackService.setLoopMode(just_audio.LoopMode.all);
-        } else if (audioPlaybackService.loopMode == just_audio.LoopMode.all) {
-          audioPlaybackService.setLoopMode(just_audio.LoopMode.off);
-        } else {
+        if (mode == just_audio.LoopMode.off) {
           audioPlaybackService.setLoopMode(just_audio.LoopMode.one);
+        } else if (mode == just_audio.LoopMode.one) {
+          audioPlaybackService.setLoopMode(just_audio.LoopMode.all);
+        } else {
+          audioPlaybackService.setLoopMode(just_audio.LoopMode.off);
         }
         setState(() {});
         HapticFeedback.lightImpact();
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: audioPlaybackService.loopMode != just_audio.LoopMode.off
-              ? _accent.withValues(alpha: 0.15)
-              : _surface(isDark),
+          borderRadius: BorderRadius.circular(10),
+          color: active ? accent.withValues(alpha: 0.12) : _card(isDark),
         ),
         child: Icon(
-          audioPlaybackService.loopMode == just_audio.LoopMode.one
+          mode == just_audio.LoopMode.one
               ? Icons.repeat_one_rounded
               : Icons.repeat_rounded,
-          size: 20,
-          color: audioPlaybackService.loopMode != just_audio.LoopMode.off
-              ? _accent
-              : _muted(isDark),
+          size: 18,
+          color: active ? accent : _sub(isDark),
         ),
       ),
     );
   }
 
-  // ─── Bottom Action ───
-  Widget _bottomAction({
+  Widget _bottomBtn({
     required IconData icon,
     required String label,
     required bool isDark,
+    required Color accent,
     bool isActive = false,
     VoidCallback? onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 22, color: isActive ? _accent : _muted(isDark)),
-          const Gap(2),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              color: isActive ? _accent : _muted(isDark),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: isActive ? accent.withValues(alpha: 0.1) : Colors.transparent,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 18, color: isActive ? accent : _sub(isDark)),
+            const Gap(6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: isActive ? accent : _sub(isDark),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -680,6 +686,61 @@ class _AudioControllerUiState extends State<AudioControllerUi>
   // ═══════════════════════════════════════════════════════════
   //  ACTIONS
   // ═══════════════════════════════════════════════════════════
+
+  Future<void> _handlePlayPause() async {
+    final playerState = context.read<PlayerStateCubit>().state;
+    final isLoading =
+        playerState.state == just_audio.ProcessingState.loading ||
+            playerState.state == just_audio.ProcessingState.buffering;
+    if (isLoading) return;
+
+    final hasSource = audioPlaybackService.hasSource;
+    final isIdle = audioPlaybackService.processingState ==
+        just_audio.ProcessingState.idle;
+    final noDuration = audioPlaybackService.totalDuration == null;
+
+    final isCompleted = audioPlaybackService.processingState ==
+        just_audio.ProcessingState.completed;
+
+    if (!audioPlaybackService.isPlaying &&
+        (!hasSource || isIdle || noDuration || isCompleted)) {
+      final ayahKeyState = context.read<AyahKeyCubit>().state;
+      final reciter = context.read<SegmentedQuranReciterCubit>().state;
+
+      // Get current page start ayah → play to end of surah as continuous playlist
+      final currentPage = ayahKeyState.lastScrolledPageNumber ?? 1;
+      final pageIdx = (currentPage - 1).clamp(0, quranPagesInfo.length - 1);
+      final pageInfo = quranPagesInfo[pageIdx];
+      final startKey = convertAyahNumberToKey(pageInfo["s"] ?? 1) ?? "1:1";
+      // Play to end of surah (not just end of page) for continuous playback
+      final surahNum = int.tryParse(startKey.split(":").first) ?? 1;
+      final lastAyah = quranAyahCount[surahNum - 1];
+      final endKey = "$surahNum:$lastAyah";
+
+      await AudioPlayerManager.playMultipleAyahAsPlaylist(
+        startAyahKey: startKey,
+        endAyahKey: endKey,
+        reciterInfoModel: reciter,
+        isInsideQuran: true,
+        instantPlay: true,
+      );
+      return;
+    }
+
+    if (audioPlaybackService.isPlaying) {
+      await audioPlaybackService.pause();
+    } else {
+      await audioPlaybackService.resume();
+    }
+  }
+
+  void _cycleSpeed() {
+    int idx = _speedOptions.indexOf(_playbackSpeed);
+    idx = (idx + 1) % _speedOptions.length;
+    setState(() => _playbackSpeed = _speedOptions[idx]);
+    AudioPlayerManager.audioPlayer.setSpeed(_playbackSpeed);
+    HapticFeedback.lightImpact();
+  }
 
   void _seekPrevious(BuildContext context) {
     final state = context.read<AyahKeyCubit>().state;
@@ -717,7 +778,8 @@ class _AudioControllerUiState extends State<AudioControllerUi>
       ayahList.removeWhere((e) => e.runtimeType == int);
       int idx = ayahList.indexOf(state.current);
       int maxAyah = quranAyahCount[surahNum - 1];
-      if (idx != -1 && idx < ayahList.length - 1 &&
+      if (idx != -1 &&
+          idx < ayahList.length - 1 &&
           int.parse(state.current.split(":").last) < maxAyah) {
         audioPlaybackService.playSingleAyah(
           ayahKey: ayahList[idx + 1],
@@ -749,132 +811,82 @@ class _AudioControllerUiState extends State<AudioControllerUi>
     }
   }
 
-  void _cycleRepeat() {
-    setState(() {
-      if (!_isRepeatActive) {
-        _isRepeatActive = true;
-        _repeatCount = 2;
-      } else if (_repeatCount < 10) {
-        _repeatCount++;
-      } else {
-        _isRepeatActive = false;
-        _repeatCount = 0;
-      }
-    });
-    HapticFeedback.lightImpact();
+  void _playPreviousSurah(BuildContext context) async {
+    final state = context.read<AyahKeyCubit>().state;
+    if (state.current.isEmpty) return;
+    final surahNum = int.tryParse(state.current.split(":").first) ?? 1;
+    if (surahNum <= 1) return;
+    final prevSurah = surahNum - 1;
+    final reciter = context.read<SegmentedQuranReciterCubit>().state;
+    final lastAyah = quranAyahCount[prevSurah - 1];
+    await AudioPlayerManager.playMultipleAyahAsPlaylist(
+      startAyahKey: "$prevSurah:1",
+      endAyahKey: "$prevSurah:$lastAyah",
+      reciterInfoModel: reciter,
+      isInsideQuran: true,
+      instantPlay: true,
+    );
+    if (mounted) {
+      context.read<AyahKeyCubit>().changeCurrentAyahKey("$prevSurah:1");
+    }
   }
 
-  // ═══════════════════════════════════════════════════════════
-  //  RECITER PICKER
-  // ═══════════════════════════════════════════════════════════
-  void _openReciterPicker(bool isDark) {
+  void _playNextSurah(BuildContext context) async {
+    final state = context.read<AyahKeyCubit>().state;
+    if (state.current.isEmpty) return;
+    final surahNum = int.tryParse(state.current.split(":").first) ?? 1;
+    if (surahNum >= 114) return;
+    final nextSurah = surahNum + 1;
+    final reciter = context.read<SegmentedQuranReciterCubit>().state;
+    final lastAyah = quranAyahCount[nextSurah - 1];
+    await AudioPlayerManager.playMultipleAyahAsPlaylist(
+      startAyahKey: "$nextSurah:1",
+      endAyahKey: "$nextSurah:$lastAyah",
+      reciterInfoModel: reciter,
+      isInsideQuran: true,
+      instantPlay: true,
+    );
+    if (mounted) {
+      context.read<AyahKeyCubit>().changeCurrentAyahKey("$nextSurah:1");
+    }
+  }
+
+  void _openReciterPicker() {
     HapticFeedback.mediumImpact();
-    final allReciters = getSegmentsSupportedReciters();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         return DraggableScrollableSheet(
-          initialChildSize: 0.7,
-          minChildSize: 0.4,
-          maxChildSize: 0.9,
+          initialChildSize: 0.85,
+          minChildSize: 0.5,
+          maxChildSize: 1.0,
+          snap: true,
+          snapSizes: const [0.5, 0.85, 1.0],
           builder: (context, scrollController) {
-            return Container(
-              decoration: BoxDecoration(
-                color: _bg(isDark),
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(24)),
-              ),
-              child: Column(
-                children: [
-                  // Handle
-                  Container(
-                    margin: const EdgeInsets.only(top: 12),
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      "اختر القارئ",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: _onSurface(isDark),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Directionality(
-                      textDirection: TextDirection.rtl,
-                      child: ListView.separated(
-                        controller: scrollController,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        itemCount: allReciters.length,
-                        separatorBuilder: (_, __) => Divider(
-                          color: _surface(isDark),
-                          height: 1,
-                        ),
-                        itemBuilder: (context, index) {
-                          final r = allReciters[index];
-                          final currentReciter = this
-                              .context
-                              .read<SegmentedQuranReciterCubit>()
-                              .state;
-                          final isSelected = r.name == currentReciter.name &&
-                              r.link == currentReciter.link;
-
-                          return ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            leading: _reciterAvatar(r, 44),
-                            title: Text(
-                              r.name,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 14,
-                                color: isSelected
-                                    ? _accent
-                                    : _onSurface(isDark),
-                              ),
-                            ),
-                            subtitle: Text(
-                              r.style ?? "",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: _muted(isDark),
-                              ),
-                            ),
-                            trailing: isSelected
-                                ? Icon(Icons.check_circle_rounded,
-                                    color: _accent, size: 22)
-                                : (r.supportWordSegmentation == true
-                                    ? Icon(Icons.graphic_eq_rounded,
-                                        color: _muted(isDark), size: 18)
-                                    : null),
-                            onTap: () {
-                              this
-                                  .context
-                                  .read<SegmentedQuranReciterCubit>()
-                                  .changeReciter(this.context, r);
-                              Navigator.pop(context);
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
+            return const ReciterPickerBottomSheet();
           },
         );
       },
+    );
+  }
+
+  void _openSleepTimer(BuildContext context) {
+    HapticFeedback.lightImpact();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const SleepTimerBottomSheet(),
+    );
+  }
+
+  void _openRepeatPicker(BuildContext context) {
+    HapticFeedback.lightImpact();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const AyahRepeatBottomSheet(),
     );
   }
 }

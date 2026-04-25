@@ -47,8 +47,7 @@ class DefaultOfflineResources {
       await userBox.put(_enforceFlagKey, true);
     }
 
-    // Always ensure I'rab data is installed (idempotent - skips if already loaded)
-    await _installIrabData();
+    // I'rab data installation removed as it is optional and user will download it later.
 
     final bool alreadyInstalled =
         userBox.get(_installFlagKey, defaultValue: false) == true;

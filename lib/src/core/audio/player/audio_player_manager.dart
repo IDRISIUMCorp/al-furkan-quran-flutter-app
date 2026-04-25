@@ -24,6 +24,11 @@ class AudioPlayerManager {
   static AudioPlayer audioPlayer = AudioPlayer();
   static CancelToken? _downloadCancelToken;
 
+  /// Callback when playback completes — used by SleepTimer & Repeat
+  static void Function()? onPlaybackCompleted;
+  /// Callback when sleep timer expires — stops playback
+  static void Function()? onSleepTimerExpired;
+
   static StreamSubscription<Duration>? positionStream;
   static StreamSubscription<PlayerException>? errorStream;
   static StreamSubscription<PlayerEvent>? playerEventStream;
@@ -93,6 +98,11 @@ class AudioPlayerManager {
   }
 
   static void bindUiBridge(AudioPlayerUiBridge? bridge) {
+    // Dispose old bridge's tracker to prevent duplicate subscriptions.
+    final oldBridge = _uiBridge;
+    if (oldBridge is BlocAudioPlayerUiBridge) {
+      oldBridge.disposeTracker();
+    }
     _uiBridge = bridge;
   }
 
@@ -126,9 +136,16 @@ class AudioPlayerManager {
       event,
     ) async {
       if (event == ProcessingState.completed) {
+        // Notify sleep timer (end-of-surah mode)
+        onPlaybackCompleted?.call();
+
         await audioPlayer.pause();
-        await audioPlayer.seek(Duration.zero, index: 0);
+        // Only reset to beginning in single-ayah mode (not playlist)
+        if (!(_uiBridge?.isPlayListState ?? false)) {
+          await audioPlayer.seek(Duration.zero, index: 0);
+        }
         bridge?.setExpanded(false);
+        // Keep UI visible so user can replay — don't hide
       }
 
       bridge?.setPlayerState(processingState: event);
@@ -393,16 +410,23 @@ class AudioPlayerManager {
     final surahInfoModel = SurahInfoModel.fromMap(
       metaDataSurah[ayahKey.split(":").first]!,
     );
-    final audioSource = await getAudioSourceFromAyahKey(
-      ayahKey,
-      surahInfoModel,
-      reciterInfoModel,
-    );
+
+    AudioSource audioSource;
+    try {
+      audioSource = await getAudioSourceFromAyahKey(
+        ayahKey,
+        surahInfoModel,
+        reciterInfoModel,
+      );
+    } catch (e) {
+      debugPrint("❌ Failed to get audio source for $ayahKey: $e");
+      unawaited(_uiBridge?.showPlayerError("فشل تحميل الصوت لهذه الآية. تأكد من اتصال الإنترنت أو جرّب قارئ آخر.") ?? Future<void>.value());
+      return;
+    }
 
     await audioPlayer.stop();
     await audioPlayer.clearAudioSources();
 
-    _uiBridge?.setExpanded(true);
     _uiBridge?.setShowUi(true);
     _uiBridge?.setIsPlayList(false);
     _uiBridge?.setIsInsideQuran(isInsideQuran);
@@ -415,10 +439,15 @@ class AudioPlayerManager {
       ),
     );
 
-    await audioPlayer.setAudioSource(audioSource, initialIndex: 0);
-    await audioPlayer.setSpeed(playbackSpeed);
-    if (instantPlay) {
-      await audioPlayer.play();
+    try {
+      await audioPlayer.setAudioSource(audioSource, initialIndex: 0);
+      await audioPlayer.setSpeed(playbackSpeed);
+      if (instantPlay) {
+        await audioPlayer.play();
+      }
+    } catch (e) {
+      debugPrint("❌ Audio playback error for $ayahKey: $e");
+      unawaited(_uiBridge?.showPlayerError("فشل تشغيل الصوت. تأكد من اتصال الإنترنت أو جرّب قارئ آخر.") ?? Future<void>.value());
     }
   }
 
@@ -501,7 +530,6 @@ class AudioPlayerManager {
     await audioPlayer.clearAudioSources();
 
     _uiBridge?.setShowUi(true);
-    _uiBridge?.setExpanded(true);
     _uiBridge?.setIsPlayList(true);
     _uiBridge?.setIsInsideQuran(isInsideQuran);
     _uiBridge?.setAyahData(
@@ -513,15 +541,20 @@ class AudioPlayerManager {
       ),
     );
 
-    await audioPlayer.setAudioSources(
-      listOfAudioSource,
-      initialIndex: initialIndex,
-      shuffleOrder: DefaultShuffleOrder(),
-    );
+    try {
+      await audioPlayer.setAudioSources(
+        listOfAudioSource,
+        initialIndex: initialIndex,
+        shuffleOrder: DefaultShuffleOrder(),
+      );
 
-    await audioPlayer.setSpeed(playbackSpeed);
-    if (instantPlay) {
-      await audioPlayer.play();
+      await audioPlayer.setSpeed(playbackSpeed);
+      if (instantPlay) {
+        await audioPlayer.play();
+      }
+    } catch (e) {
+      debugPrint("❌ Playlist playback error: $e");
+      unawaited(_uiBridge?.showPlayerError("فشل تشغيل القائمة. تأكد من اتصال الإنترنت أو جرّب قارئ آخر.") ?? Future<void>.value());
     }
   }
 
@@ -608,6 +641,8 @@ class AudioPlayerManager {
         _uiBridge?.localizedSurahName(surahInfoModel.id) ??
         "Surah ${surahInfoModel.id}";
 
+    final artUri = reciter.img != null ? Uri.tryParse(reciter.img!) : null;
+
     if (audioFilePath != null) {
       return (platformOwn == PlatformOwn.isLinux ||
               platformOwn == PlatformOwn.isWindows)
@@ -618,13 +653,19 @@ class AudioPlayerManager {
                 id: ayahKey,
                 album: reciter.name,
                 title: surahTitle,
+                artUri: artUri,
               ),
             );
     }
 
     return AudioSource.uri(
       Uri.parse(getUrlOfAudioFromAyahKey(ayahKey, reciter)),
-      tag: MediaItem(id: ayahKey, album: reciter.name, title: surahTitle),
+      tag: MediaItem(
+        id: ayahKey,
+        album: reciter.name,
+        title: surahTitle,
+        artUri: artUri,
+      ),
     );
   }
 

@@ -1727,6 +1727,15 @@ Map<String, List<Map<String, dynamic>>> translationResources = {
       "full_path":
           "quranic_universal_library/translation/compressed_translation_simple/Dutch/Sofian_S._Siregar.simple.json.txt",
     },
+    {
+      "language": "Dutch",
+      "name": "Malak Faris Abdalsalaam",
+      "file_name": "Malak_Faris_Abdalsalaam.simple.json.txt",
+      "score": 100.0,
+      "type": "simple",
+      "full_path":
+          "quranic_universal_library/translation/compressed_translation_simple/Dutch/Malak_Faris_Abdalsalaam.simple.json.txt",
+    },
   ],
   "albanian": [
     {

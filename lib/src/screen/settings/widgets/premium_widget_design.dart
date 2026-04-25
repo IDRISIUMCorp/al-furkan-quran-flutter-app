@@ -28,7 +28,7 @@ class PremiumWidgetDesign extends StatelessWidget {
       name: "زجاج جرافيتي",
       isDark: true,
       backgroundColor: Color(0xFF1E1E1E), 
-      textColor: Color(0xFFF5F5F5), 
+      textColor: Color(0xFFE3D5CA), 
       surahColor: Color(0xFF9E9E9E), 
       borderColor: Color(0xFF333333),
       accentColor: Color(0xFFE0E0E0),
@@ -163,89 +163,63 @@ class PremiumWidgetDesign extends StatelessWidget {
         
     final textFallback = const ["AmiriQuran-Regular", "KFGQPC-Uthmanic-HAFS-Regular"];
 
-    // Build a subtle radial or linear gradient based on the background color if it's dark
-    final isDark = preset.isDark;
-    final baseColor = preset.backgroundColor;
-    final gradient = isDark 
-        ? LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              baseColor.withValues(alpha: 0.8),
-              baseColor,
-              baseColor.withValues(alpha: 0.95),
-            ],
-          )
-        : null;
-
     return Container(
       width: canvasSize.width,
       height: canvasSize.height,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: gradient == null ? baseColor : null,
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(48), // Smooth rounded corners
+        color: preset.backgroundColor,
+        borderRadius: BorderRadius.circular(32),
         border: preset.borderColor == Colors.transparent 
             ? null 
-            : Border.all(color: preset.borderColor, width: 2), // Remove border if transparent
+            : Border.all(color: preset.borderColor, width: 2),
       ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Optional: Subtle grain or noise effect could go here if needed
-          
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Top: Surah Name / Reference
-                Text(
-                  surahName,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: preset.surahColor.withValues(alpha: 0.85),
-                    fontSize: (26 * fontSizeMultiplier).roundToDouble(),
-                    fontWeight: FontWeight.w700,
-                    fontFamily: "Cairo-Bold",
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                
-                const SizedBox(height: 32),
-                
-                // Bottom: Ayah Text
-                Expanded(
-                  child: Center(
-                    child: AutoSizeText(
-                      ayahText,
-                      textAlign: TextAlign.center,
-                      textDirection: TextDirection.rtl,
-                      minFontSize: 24,
-                      maxFontSize: (65 * fontSizeMultiplier).roundToDouble(),
-                      maxLines: 4,
-                      stepGranularity: 1,
-                      overflow: TextOverflow.visible,
-                      style: TextStyle(
-                        color: preset.textColor,
-                        fontFamily: resolvedFontFamily,
-                        fontFamilyFallback: textFallback,
-                        height: isQuran ? 1.8 : 1.5,
-                        fontWeight: isQuran ? FontWeight.w500 : FontWeight.w700,
-                        fontSize: (isQuran ? 46.0 * fontSizeMultiplier : 42.0 * fontSizeMultiplier).roundToDouble(),
-                      ),
-                    ),
-                  ),
-                ),
-                
-                // Add a small bottom padding to explicitly center the middle chunk
-                const SizedBox(height: 16),
-              ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 36),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Top: Surah Name / Reference
+            Text(
+              surahName,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: preset.surahColor,
+                fontSize: (28 * fontSizeMultiplier).roundToDouble(),
+                fontWeight: FontWeight.w600,
+                fontFamily: "Cairo-SemiBold",
+                letterSpacing: 0.3,
+              ),
             ),
-          ),
-        ],
+            
+            const SizedBox(height: 40),
+            
+            // Center: Ayah Text
+            Expanded(
+              child: Center(
+                child: AutoSizeText(
+                  ayahText,
+                  textAlign: TextAlign.center,
+                  textDirection: TextDirection.rtl,
+                  minFontSize: 28,
+                  maxFontSize: (70 * fontSizeMultiplier).roundToDouble(),
+                  maxLines: 3,
+                  stepGranularity: 2,
+                  overflow: TextOverflow.visible,
+                  style: TextStyle(
+                    color: preset.textColor,
+                    fontFamily: resolvedFontFamily,
+                    fontFamilyFallback: textFallback,
+                    height: isQuran ? 2.0 : 1.6,
+                    fontWeight: isQuran ? FontWeight.w400 : FontWeight.w700,
+                    fontSize: (isQuran ? 52.0 * fontSizeMultiplier : 48.0 * fontSizeMultiplier).roundToDouble(),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

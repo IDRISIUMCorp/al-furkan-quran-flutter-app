@@ -7,6 +7,7 @@ import "package:al_furkan/src/screen/mushaf/widgets/notes_sheet.dart";
 import 'package:al_furkan/src/screen/mushaf/widgets/wahy_feedback_dialog.dart';
 import "package:al_furkan/src/screen/mushaf/widgets/wahy_mushaf_top_header.dart";
 import 'package:al_furkan/src/screen/mushaf/widgets/wahy_index_sheet.dart';
+import 'package:al_furkan/src/screen/mushaf/widgets/mushaf_layout_widgets.dart';
 import "package:al_furkan/src/screen/mushaf/wahy_library_store.dart";
 import 'widgets/library_sheet.dart';
 import "package:al_furkan/src/screen/mushaf/widgets/listen_range_sheet.dart";
@@ -27,13 +28,17 @@ import "package:al_furkan/src/core/audio/cubit/audio_ui_cubit.dart";
 import "package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart";
 import "package:al_furkan/src/core/audio/cubit/player_state_cubit.dart";
 import "package:al_furkan/src/core/audio/cubit/segmented_quran_reciter_cubit.dart";
-import "package:al_furkan/src/core/audio/model/ayahkey_management.dart";
 import "package:al_furkan/src/core/audio/player/audio_player_manager.dart";
 import "package:al_furkan/src/core/audio/services/audio_playback_service_access.dart";
 import "package:al_furkan/src/core/notifications/khatma_notification_service.dart";
+import "package:al_furkan/src/core/reading_stats/reading_stats_cubit.dart";
+import "package:al_furkan/src/core/hifz/hifz_cubit.dart";
+import "package:al_furkan/src/core/night_mode/night_reading_cubit.dart";
 import "package:al_furkan/src/screen/quran_reader/widgets/ayah_options_sheet.dart";
 import "package:al_furkan/src/screen/quran_resources/quran_resources_view.dart";
+import "package:al_furkan/src/screen/offline_player/offline_player_screen.dart";
 import "package:al_furkan/src/widget/audio/audio_controller_ui.dart";
+import "package:al_furkan/src/core/audio/services/idrisium_audio_tracker.dart";
 import "package:al_furkan/src/screen/quran_script_view/cubit/ayah_to_highlight.dart";
 import "package:al_furkan/src/screen/quran_script_view/quran_script_view.dart";
 import "package:al_furkan/src/screen/search/search_screen.dart";
@@ -106,7 +111,7 @@ class _MushafRootState extends State<_MushafRoot> {
   static Color _bg(BuildContext ctx) =>
       Theme.of(ctx).brightness == Brightness.dark
       ? Color(0xFF141414)
-      : Color(0xFFF7F1E6);
+      : Color(0xFFEDE4D4);
   static Color _onBg(BuildContext ctx) =>
       Theme.of(ctx).brightness == Brightness.dark
       ? Colors.white
@@ -149,7 +154,7 @@ class _MushafRootState extends State<_MushafRoot> {
 
   Future<void> _pickBookmarkColorForAyahKey(String ayahKey) async {
     final themeState = context.read<ThemeCubit>().state;
-    const card = Color(0xFFFFF9F2);
+    const card = Color(0xFFF5EBE0);
     final colors = <String, ({String name, Color color})>{
       "red": (name: "الأحمر", color: const Color(0xFFB3261E)),
       "yellow": (name: "الأصفر", color: const Color(0xFFB68A00)),
@@ -166,11 +171,8 @@ class _MushafRootState extends State<_MushafRoot> {
           textDirection: TextDirection.rtl,
           child: Container(
             decoration: BoxDecoration(
-              color: _bg(sheet),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(22),
-                topRight: Radius.circular(22),
-              ),
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(22),
             ),
             child: SafeArea(
               top: false,
@@ -256,15 +258,12 @@ class _MushafRootState extends State<_MushafRoot> {
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(ctx).viewInsets.bottom,
             ),
-            child: Container(
-              decoration: BoxDecoration(
-                color: _bg(ctx),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(22),
-                  topRight: Radius.circular(22),
-                ),
-              ),
-              child: SafeArea(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(22),
+            ),
+            child: SafeArea(
                 top: false,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
@@ -314,7 +313,7 @@ class _MushafRootState extends State<_MushafRoot> {
                           fillColor:
                               Theme.of(context).brightness == Brightness.dark
                               ? const Color(0xFF1E1E1E)
-                              : const Color(0xFFFFF9F2),
+                              : const Color(0xFFF5EBE0),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide(
@@ -438,8 +437,11 @@ class _MushafRootState extends State<_MushafRoot> {
       ayahPreviewForKey: _ayahPreviewForKey,
       onTapNote: (page, key) {
         context.read<AyahKeyCubit>().changeLastScrolledPage(page);
-        context.read<AyahKeyCubit>().changeCurrentAyahKey(key);
-        context.read<AyahToHighlight>().changeAyah(key);
+        final isAudioPlaying = context.read<AudioAyahHighlightCubit>().state.activeAyahKey != null;
+        if (!isAudioPlaying) {
+          context.read<AyahKeyCubit>().changeCurrentAyahKey(key);
+          context.read<AyahToHighlight>().changeAyah(key);
+        }
         if (_isMushafMode && _mushafPageController.hasClients) {
           _mushafPageController.animateToPage(
             page - 1,
@@ -462,11 +464,8 @@ class _MushafRootState extends State<_MushafRoot> {
           textDirection: TextDirection.rtl,
           child: Container(
             decoration: BoxDecoration(
-              color: _bg(ctx),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(22),
-                topRight: Radius.circular(22),
-              ),
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(22),
             ),
             child: SafeArea(
               top: false,
@@ -505,8 +504,11 @@ class _MushafRootState extends State<_MushafRoot> {
 
                     final page = getPageNumber(key) ?? 1;
                     context.read<AyahKeyCubit>().changeLastScrolledPage(page);
-                    context.read<AyahKeyCubit>().changeCurrentAyahKey(key);
-                    context.read<AyahToHighlight>().changeAyah(key);
+                    final isAudioPlaying = context.read<AudioAyahHighlightCubit>().state.activeAyahKey != null;
+                    if (!isAudioPlaying) {
+                      context.read<AyahKeyCubit>().changeCurrentAyahKey(key);
+                      context.read<AyahToHighlight>().changeAyah(key);
+                    }
 
                     if (_isMushafMode && _mushafPageController.hasClients) {
                       _mushafPageController.animateToPage(
@@ -617,6 +619,8 @@ class _MushafRootState extends State<_MushafRoot> {
   }
 
   void _openIndexOverlay(Color backgroundColor) {
+    final ts = context.read<ThemeCubit>().state;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -627,8 +631,11 @@ class _MushafRootState extends State<_MushafRoot> {
         alignment: Alignment.centerRight,
         child: SizedBox(
           width: 340,
-          child: Material(
-            color: backgroundColor,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+            ),
+            padding: EdgeInsets.zero,
             child: AyaIndexPage(
               isEmbedded: true,
               onOpenLocation: (page, ayahKey) {
@@ -637,8 +644,11 @@ class _MushafRootState extends State<_MushafRoot> {
                   rootNavigator: true,
                 ).popUntil((route) => route.isFirst);
                 context.read<AyahKeyCubit>().changeLastScrolledPage(page);
-                context.read<AyahKeyCubit>().changeCurrentAyahKey(ayahKey);
-                context.read<AyahToHighlight>().changeAyah(ayahKey);
+                final isAudioPlaying = context.read<AudioAyahHighlightCubit>().state.activeAyahKey != null;
+                if (!isAudioPlaying) {
+                  context.read<AyahKeyCubit>().changeCurrentAyahKey(ayahKey);
+                  context.read<AyahToHighlight>().changeAyah(ayahKey);
+                }
                 _navigateToMushafPage(page - 1);
               },
             ),
@@ -718,6 +728,12 @@ class _MushafRootState extends State<_MushafRoot> {
           MaterialPageRoute(builder: (_) => const QuranResourcesView()),
         );
         return;
+      case WahyMushafMenuAction.offlinePlayer:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const OfflinePlayerScreen()),
+        );
+        return;
       case WahyMushafMenuAction.settings:
         Navigator.push(
           context,
@@ -762,7 +778,7 @@ class _MushafRootState extends State<_MushafRoot> {
     final bgColor = isDark ? Theme.of(context).colorScheme.surface : AppColors.ayaBackground;
     final topBarColor = isDark
         ? Theme.of(context).colorScheme.surface.withValues(alpha: 0.85)
-        : const Color(0xFFF4EAD5).withValues(alpha: 0.85);
+        : AppColors.ayaSurface.withValues(alpha: 0.85);
     final topBarBorderColor = isDark
         ? Colors.white10
         : AppColors.ayaBorder.withValues(alpha: 0.5);
@@ -776,30 +792,7 @@ class _MushafRootState extends State<_MushafRoot> {
     return Scaffold(
       backgroundColor: bgColor,
       extendBodyBehindAppBar: true,
-      body: MultiBlocListener(
-        listeners: [
-          BlocListener<PlayerStateCubit, PlayerState>(
-            listenWhen: (p, c) => p.isPlaying != c.isPlaying,
-            listener: (context, state) {
-              final highlighter = context.read<AyahToHighlight>();
-              if (!state.isPlaying) {
-                highlighter.changeAyah(null);
-                return;
-              }
-              highlighter.changeAyah(
-                context.read<AyahKeyCubit>().state.current,
-              );
-            },
-          ),
-          BlocListener<AyahKeyCubit, AyahKeyManagement>(
-            listenWhen: (p, c) => p.current != c.current,
-            listener: (context, ayahState) {
-              if (!context.read<PlayerStateCubit>().state.isPlaying) return;
-              context.read<AyahToHighlight>().changeAyah(ayahState.current);
-            },
-          ),
-        ],
-        child: Stack(
+      body: Stack(
           children: [
             Positioned.fill(
               child: GestureDetector(
@@ -816,7 +809,7 @@ class _MushafRootState extends State<_MushafRoot> {
                             key: const ValueKey("mushaf"),
                             useDefaultAppBar: false,
                             initialPageNumber: context
-                                .watch<AyahKeyCubit>()
+                                .read<AyahKeyCubit>()
                                 .state
                                 .lastScrolledPageNumber,
                             controller: _mushafPageController,
@@ -840,6 +833,19 @@ class _MushafRootState extends State<_MushafRoot> {
                   ),
                 ),
               ),
+            ),
+            // Night Reading overlay
+            BlocBuilder<NightReadingCubit, NightReadingState>(
+              builder: (context, nightState) {
+                if (!nightState.isActive) return const SizedBox.shrink();
+                return Positioned.fill(
+                  child: IgnorePointer(
+                    child: Container(
+                      color: Color(nightState.overlayColorValue),
+                    ),
+                  ),
+                );
+              },
             ),
             // Top header (Beige)
             WahyMushafTopHeader(
@@ -901,7 +907,6 @@ class _MushafRootState extends State<_MushafRoot> {
               ),
             ),
           ],
-        ),
       ),
     );
   }
@@ -932,7 +937,7 @@ class _MushafViewState extends State<MushafView> {
   static Color _bg(BuildContext ctx) =>
       Theme.of(ctx).brightness == Brightness.dark
       ? Theme.of(ctx).colorScheme.surface
-      : const Color(0xFFF7F1E6);
+      : const Color(0xFFEDE4D4);
 
   /// Word Info Repository instance for Qiraat/Sarf/Irab
 
@@ -942,6 +947,11 @@ class _MushafViewState extends State<MushafView> {
   StreamSubscription? _ayahKeySub;
   PageController? _internalPageController;
 
+  /// Tracks whether the user is manually dragging the page.
+  /// While dragging, auto-scroll from audio playback is suppressed to avoid conflicts.
+  bool _isUserDragging = false;
+  Timer? _dragCooldownTimer;
+
   PageController get _pageController =>
       widget.controller ?? _internalPageController!;
 
@@ -949,6 +959,8 @@ class _MushafViewState extends State<MushafView> {
 
   void _animateToPage(int pageNumber) {
     if (!_pageController.hasClients) return;
+    // Don't auto-scroll while user is manually dragging
+    if (_isUserDragging) return;
     final targetIndex = (pageNumber - 1).clamp(0, 603);
     final currentIndex = (_pageController.page ?? targetIndex.toDouble())
         .round();
@@ -987,15 +999,12 @@ class _MushafViewState extends State<MushafView> {
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(ctx).viewInsets.bottom,
             ),
-            child: Container(
-              decoration: BoxDecoration(
-                color: _bg(ctx),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(22),
-                  topRight: Radius.circular(22),
-                ),
-              ),
-              child: SafeArea(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(22),
+            ),
+            child: SafeArea(
                 top: false,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
@@ -1031,7 +1040,7 @@ class _MushafViewState extends State<MushafView> {
                         decoration: InputDecoration(
                           hintText: "اكتب ملاحظتك هنا…",
                           filled: true,
-                          fillColor: const Color(0xFFFFF9F2),
+                          fillColor: const Color(0xFFF5EBE0),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide(
@@ -1080,7 +1089,7 @@ class _MushafViewState extends State<MushafView> {
 
   Future<void> _pickBookmarkColorForAyahKey(String ayahKey) async {
     final themeState = context.read<ThemeCubit>().state;
-    const card = Color(0xFFFFF9F2);
+    const card = Color(0xFFF5EBE0);
     final colors = <String, ({String name, Color color})>{
       "red": (name: "الأحمر", color: const Color(0xFFB3261E)),
       "yellow": (name: "الأصفر", color: const Color(0xFFB68A00)),
@@ -1097,11 +1106,8 @@ class _MushafViewState extends State<MushafView> {
           textDirection: TextDirection.rtl,
           child: Container(
             decoration: BoxDecoration(
-              color: _bg(sheet),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(22),
-                topRight: Radius.circular(22),
-              ),
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(22),
             ),
             child: SafeArea(
               top: false,
@@ -1277,6 +1283,10 @@ class _MushafViewState extends State<MushafView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       try {
+        // Don't override AyahKeyCubit if audio is playing —
+        // the tracker already manages the current ayah key during playback
+        final isPlaying = context.read<PlayerStateCubit>().state.isPlaying;
+        if (isPlaying) return;
         final page = (widget.initialPageNumber ?? 1).clamp(1, 604);
         final info =
             quranPagesInfo[(page - 1).clamp(0, quranPagesInfo.length - 1)];
@@ -1414,6 +1424,7 @@ class _MushafViewState extends State<MushafView> {
   @override
   void dispose() {
     _cancelMenuTimer();
+    _dragCooldownTimer?.cancel();
     _ayahKeySub?.cancel();
     _ayahKeySub = null;
     if (_ownsController) {
@@ -1431,37 +1442,45 @@ class _MushafViewState extends State<MushafView> {
     final qSettings = context.watch<QuranSettingsCubit>().state;
 
     // Graceful Auto-Switch Logic with Preference Memory
+    // NOTE: We NEVER override QuranTheme.custom — the user explicitly chose
+    // custom colours and we must respect that regardless of OS dark/light mode.
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final prefs = await SharedPreferences.getInstance();
+      if (!mounted) return;
       final cubit = context.read<QuranSettingsCubit>();
+      final current = cubit.state;
+
+      // Skip auto-switch entirely when user chose a custom theme
+      if (current.theme == QuranTheme.custom) return;
+
+      final prefs = await SharedPreferences.getInstance();
       
       if (isDark) {
-        if (!qSettings.isDarkTheme) {
+        if (!current.isDarkTheme) {
           // OS is Dark, but Settings is Light -> Save Light, Restore Dark
-          await prefs.setInt('wahy_pref_light_mushaf_theme', qSettings.theme.index);
+          await prefs.setInt('wahy_pref_light_mushaf_theme', current.theme.index);
           final savedDarkIndex = prefs.getInt('wahy_pref_dark_mushaf_theme');
           final targetTheme = savedDarkIndex != null 
               ? QuranTheme.values[savedDarkIndex] 
-              : QuranTheme.oled; // User requested OLED as default dark theme!
+              : QuranTheme.oled;
           
-          if (qSettings.theme != targetTheme) cubit.updateTheme(targetTheme);
+          if (current.theme != targetTheme) cubit.updateTheme(targetTheme);
         } else {
           // Update saved dark preference
-          await prefs.setInt('wahy_pref_dark_mushaf_theme', qSettings.theme.index);
+          await prefs.setInt('wahy_pref_dark_mushaf_theme', current.theme.index);
         }
       } else {
-        if (qSettings.isDarkTheme) {
+        if (current.isDarkTheme) {
           // OS is Light, but Settings is Dark -> Save Dark, Restore Light
-          await prefs.setInt('wahy_pref_dark_mushaf_theme', qSettings.theme.index);
+          await prefs.setInt('wahy_pref_dark_mushaf_theme', current.theme.index);
           final savedLightIndex = prefs.getInt('wahy_pref_light_mushaf_theme');
           final targetTheme = savedLightIndex != null 
               ? QuranTheme.values[savedLightIndex] 
               : QuranTheme.cream;
               
-          if (qSettings.theme != targetTheme) cubit.updateTheme(targetTheme);
+          if (current.theme != targetTheme) cubit.updateTheme(targetTheme);
         } else {
           // Update saved light preference
-          await prefs.setInt('wahy_pref_light_mushaf_theme', qSettings.theme.index);
+          await prefs.setInt('wahy_pref_light_mushaf_theme', current.theme.index);
         }
       }
     });
@@ -1498,22 +1517,10 @@ class _MushafViewState extends State<MushafView> {
       }
     }
 
+    // Fullscreen mode is enforced by _FullscreenEnforcer in main.dart
+    // No need to set SystemUiOverlayStyle here — it would cause status bar to reappear
+
     final bg = baseThemeForScaffold().pageBackgroundColor;
-    final bgBrightness = ThemeData.estimateBrightnessForColor(bg);
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        statusBarColor: bg,
-        statusBarIconBrightness: bgBrightness == Brightness.dark
-            ? Brightness.light
-            : Brightness.dark,
-        systemNavigationBarColor: bg,
-        systemNavigationBarIconBrightness: bgBrightness == Brightness.dark
-            ? Brightness.light
-            : Brightness.dark,
-        systemNavigationBarContrastEnforced: false,
-        systemStatusBarContrastEnforced: false,
-      ),
-    );
 
     Widget withSystemBarBackground(Widget child) {
       final padding = MediaQuery.of(context).padding;
@@ -1635,11 +1642,19 @@ class _MushafViewState extends State<MushafView> {
               qSettings.theme == QuranTheme.nightBlue ||
               qSettings.theme == QuranTheme.custom;
 
-          return BlocBuilder<AyahToHighlight, String?>(
-            buildWhen: (p, c) => p != c,
-            builder: (context, highlightedAyahKey) {
-              return BlocBuilder<WordPlayingStateCubit, String?>(
-                builder: (context, highlightedWordKey) {
+          return BlocBuilder<AudioAyahHighlightCubit, AudioAyahHighlightState>(
+            buildWhen: (p, c) => p.activeAyahKey != c.activeAyahKey || p.activeWordKey != c.activeWordKey,
+            builder: (context, audioHighlight) {
+              return BlocBuilder<AyahToHighlight, String?>(
+                buildWhen: (p, c) => p != c,
+                builder: (context, manualAyahKey) {
+                  // Audio highlight takes priority over manual highlight
+                  final highlightedAyahKey = audioHighlight.activeAyahKey ?? manualAyahKey;
+                  final audioWordKey = audioHighlight.activeWordKey;
+                  return BlocBuilder<WordPlayingStateCubit, String?>(
+                    builder: (context, highlightedWordKey) {
+                      // Audio word highlight takes priority over word playing state
+                      final effectiveWordKey = audioWordKey ?? highlightedWordKey;
                   final baseTheme = buildBaseTheme();
                   final pageBg = baseTheme.pageBackgroundColor;
                   final pageBgBrightness = ThemeData.estimateBrightnessForColor(
@@ -1724,269 +1739,385 @@ class _MushafViewState extends State<MushafView> {
                         dynamicScale = 0.5 / ar;
                       }
 
-                      return MediaQuery(
-                    data: MediaQuery.of(
-                      context,
-                    ).copyWith(textScaler: const TextScaler.linear(1)),
-                    child: Container(
-                      color: baseTheme.pageBackgroundColor,
-                      child: PageviewQuran(
-                        controller: _pageController,
-                        initialPageNumber: (widget.initialPageNumber ?? 1)
-                            .clamp(1, 604),
-                        sp: (widget.spOverride ?? 0.86) * dynamicScale,
-                        h: (widget.hOverride ?? 0.86) * dynamicScale,
-                        fontSize: qSettings.fontSize * dynamicScale,
-                        physics: const ClampingScrollPhysics(),
-                        showTajweed: false, // Disabled due to layout corruption with QCF rendering
-                        tajweedWordsBuilder: (surah, verse) {
-                          return QuranScriptFunction.getWordListOfAyah(
-                            QuranScriptType.tajweed,
-                            surah.toString(),
-                            verse.toString(),
-                          );
-                        },
-                        highlightsBuilder: (surah, verse) {
-                          final key = "$surah:$verse";
-
-                          // Support Ayah-level Highlighting
-                          if (key == highlightedAyahKey) {
-                            // Support Word-level Highlighting
-                            if (highlightedWordKey != null &&
-                                highlightedWordKey.startsWith(key)) {
-                              try {
-                                final wordIndex = int.parse(
-                                  highlightedWordKey.split(":").last,
-                                );
-                                return [
-                                  HighlightRange(
-                                    wordIndex: wordIndex,
-                                    color: qSettings.highlightColor.withValues(
-                                      alpha: 0.35,
-                                    ),
+                      // ── Shared callbacks for all layout modes ──
+                      List<HighlightRange> highlightsBuilder(int surah, int verse) {
+                        final key = "$surah:$verse";
+                        if (key == highlightedAyahKey) {
+                          if (effectiveWordKey != null &&
+                              effectiveWordKey.startsWith(key)) {
+                            try {
+                              final wordIndex = int.parse(
+                                effectiveWordKey.split(":").last,
+                              );
+                              return [
+                                HighlightRange(
+                                  wordIndex: wordIndex,
+                                  color: qSettings.highlightColor.withValues(
+                                    alpha: 0.35,
                                   ),
-                                ];
-                              } catch (_) {}
+                                ),
+                              ];
+                            } catch (_) {}
+                          }
+                        }
+                        return [];
+                      }
+
+                      Color? verseBgColor(int surah, int verse) {
+                        final key = "$surah:$verse";
+                        // Hifz mode: hide ayahs with overlay
+                        try {
+                          final hifz = context.read<HifzCubit>().state;
+                          if (hifz.isActive && !hifz.revealedAyahs.contains(key)) {
+                            if (hifz.hideLevel == HifzHideLevel.hidden) {
+                              return pageBgIsDark
+                                  ? const Color(0xFF141414)
+                                  : const Color(0xFFEDE4D4);
+                            }
+                            if (hifz.hideLevel == HifzHideLevel.blurred) {
+                              return pageBgIsDark
+                                  ? const Color(0xFF141414).withValues(alpha: 0.85)
+                                  : const Color(0xFFEDE4D4).withValues(alpha: 0.85);
                             }
                           }
-                          return [];
-                        },
-                        theme: qcfTheme.copyWith(
-                          showBasmala: qSettings.showBasmala,
-                          showHeader: qSettings.showSurahHeader,
-                          contentScale: qSettings.contentScale,
-                          verseHeight:
-                              baseTheme.verseHeight *
-                              qSettings.verseHeightScale,
-                          headerScale: 1.08,
-                          headerWidthSmall: 410,
-                          headerWidthLarge: 290,
-                          firstPagesTopSpacerFactor: 0.0,
-                          pageTopOverlayBuilder:
-                              (pageNumber, surahNumber, startVerse) {
-                                if (!qSettings.showPageInfo) {
-                                  return const SizedBox.shrink();
-                                }
-                                final juzNumber = getJuzNumber(
-                                  surahNumber,
-                                  startVerse,
-                                );
-                                return IgnorePointer(
-                                  ignoring: true,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16.0,
-                                      vertical: 8.0,
-                                    ),
-                                    child: DefaultTextStyle(
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w900,
-                                        fontFamily: "Inter",
-                                        color: pageBgIsDark
-                                            ? Colors.white.withValues(
-                                                alpha: 0.90,
-                                              )
-                                            : const Color(
-                                                0xFF111111,
-                                              ).withValues(alpha: 0.88),
-                                      ),
-                                      child: Directionality(
-                                        textDirection: TextDirection.ltr,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              getSurahNameArabic(surahNumber),
-                                              textDirection: TextDirection.rtl,
-                                            ),
-                                            Text(
-                                              "الجزء ${_arabicOrdinalLocal(context, juzNumber)}",
-                                              textDirection: TextDirection.rtl,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                          pageBottomOverlayBuilder:
-                              (pageNumber, surahNumber, startVerse) {
-                                if (!qSettings.showPageInfo) {
-                                  return const SizedBox.shrink();
-                                }
-                                final pageLabel = localizedNumber(
-                                  context,
-                                  pageNumber,
-                                );
-                                final hizbNumber = _hizbNumberFor(
-                                  surahNumber,
-                                  startVerse,
-                                );
-                                final hizbLabel =
-                                    "الحزب ${localizedNumber(context, hizbNumber)}";
-                                final showHizb = _isHizbStart(
-                                  surahNumber,
-                                  startVerse,
-                                );
+                        } catch (_) {}
+                        if (highlightedAyahKey != key) return null;
+                        return qSettings.highlightColor.withValues(
+                          alpha: pageBgIsDark ? 0.26 : 0.22,
+                        );
+                      }
 
-                                return IgnorePointer(
-                                  ignoring: true,
-                                  child: Directionality(
-                                    textDirection: TextDirection.rtl,
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        if (showHizb) ...[
-                                          Text(
-                                            hizbLabel,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w700,
-                                              color: pageBgIsDark
-                                                  ? Colors.white.withValues(
-                                                      alpha: 0.82,
-                                                    )
-                                                  : const Color(
-                                                      0xFF111111,
-                                                    ).withValues(alpha: 0.78),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 2),
-                                        ],
-                                        Text(
-                                          pageLabel,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w800,
-                                            color: pageBgIsDark
-                                                ? Colors.white.withValues(
-                                                    alpha: 0.90,
-                                                  )
-                                                : const Color(
-                                                    0xFF111111,
-                                                  ).withValues(alpha: 0.88),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                        ),
-                        verseBackgroundColor: (surah, verse) {
-                          final key = "$surah:$verse";
-                          if (highlightedAyahKey != key) return null;
-                          return qSettings.highlightColor.withValues(
-                            alpha: pageBgIsDark ? 0.26 : 0.22,
-                          );
-                        },
-                        onTapDown: (surah, verse, details) {
-                          final key = "$surah:$verse";
-                          context.read<AyahKeyCubit>().changeCurrentAyahKey(
-                            key,
-                          );
+                      void handleTapDown(int surah, int verse, TapDownDetails details) {
+                        final key = "$surah:$verse";
+                        try {
+                          final hifz = context.read<HifzCubit>();
+                          if (hifz.state.isActive && hifz.state.isTestMode) {
+                            if (hifz.state.revealedAyahs.contains(key)) {
+                              hifz.hideAyah(key);
+                            } else {
+                              hifz.revealAyah(key);
+                            }
+                          }
+                        } catch (_) {}
+                        // Don't change AyahKeyCubit while audio is playing —
+                        // the tracker listens to it and would shift highlight
+                        // to the tapped ayah instead of the playing one.
+                        final isAudioPlaying = context.read<AudioAyahHighlightCubit>().state.activeAyahKey != null;
+                        if (!isAudioPlaying) {
+                          context.read<AyahKeyCubit>().changeCurrentAyahKey(key);
                           context.read<AyahToHighlight>().changeAyah(key);
-                        },
-                        onTap: (surah, verse) {
+                        }
+                      }
+
+                      void handleTap(int surah, int verse) {
+                        final isAudioPlaying = context.read<AudioAyahHighlightCubit>().state.activeAyahKey != null;
+                        if (!isAudioPlaying) {
                           context.read<AyahToHighlight>().changeAyah(null);
                           widget.onToggleHeader?.call();
-                        },
-                        onLongPressDown: (surah, verse, details) {
-                          _cancelMenuTimer();
-                          final ayahKey = "$surah:$verse";
-                          context.read<AyahKeyCubit>().changeCurrentAyahKey(
-                            ayahKey,
-                          );
+                        }
+                      }
+
+                      void handleLongPressDown(int surah, int verse, LongPressStartDetails details) {
+                        _cancelMenuTimer();
+                        final ayahKey = "$surah:$verse";
+                        // Don't change AyahKeyCubit while audio is playing —
+                        // the tracker listens to it and would shift highlight.
+                        final isAudioPlaying = context.read<AudioAyahHighlightCubit>().state.activeAyahKey != null;
+                        if (!isAudioPlaying) {
+                          context.read<AyahKeyCubit>().changeCurrentAyahKey(ayahKey);
                           context.read<AyahToHighlight>().changeAyah(ayahKey);
-                        },
-                        onLongPress: (surah, verse) {
-                          _cancelMenuTimer();
-                          HapticFeedback.selectionClick();
-                          _showOptionsSheetForAyah(
-                            context: context,
-                            surah: surah,
-                            verse: verse,
-                          );
-                        },
-                        onLongPressUp: (surah, verse) {
-                          _cancelMenuTimer();
+                        }
+                      }
+
+                      void handleLongPress(int surah, int verse) {
+                        _cancelMenuTimer();
+                        HapticFeedback.selectionClick();
+                        _showOptionsSheetForAyah(
+                          context: context,
+                          surah: surah,
+                          verse: verse,
+                        );
+                      }
+
+                      void handleLongPressUp(int surah, int verse) {
+                        _cancelMenuTimer();
+                        final isAudioPlaying = context.read<AudioAyahHighlightCubit>().state.activeAyahKey != null;
+                        if (!isAudioPlaying) {
                           context.read<AyahToHighlight>().changeAyah(null);
-                        },
-                        onLongPressCancel: (surah, verse) {
-                          _cancelMenuTimer();
+                        }
+                      }
+
+                      void handleLongPressCancel(int surah, int verse) {
+                        _cancelMenuTimer();
+                        final isAudioPlaying = context.read<AudioAyahHighlightCubit>().state.activeAyahKey != null;
+                        if (!isAudioPlaying) {
                           context.read<AyahToHighlight>().changeAyah(null);
-                        },
-                        onDoubleTap: (surah, verse) async {
-                          final ayahKey = "$surah:$verse";
-                          context.read<AyahKeyCubit>().changeCurrentAyahKey(
-                            ayahKey,
-                          );
+                        }
+                      }
 
-                          final wordsKey = List.generate(
-                            QuranScriptFunction.getWordListOfAyah(
-                              context
-                                  .read<QuranViewCubit>()
-                                  .state
-                                  .quranScriptType,
-                              surah.toString(),
-                              verse.toString(),
-                            ).length,
-                            (i) => "$surah:$verse:${i + 1}",
-                          );
+                      void handleDoubleTap(int surah, int verse) async {
+                        final ayahKey = "$surah:$verse";
+                        // Don't change AyahKeyCubit while audio is playing —
+                        // the tracker listens to it and would shift highlight
+                        // to the double-tapped ayah instead of the playing one.
+                        final isAudioPlaying = context.read<AudioAyahHighlightCubit>().state.activeAyahKey != null;
+                        if (!isAudioPlaying) {
+                          context.read<AyahKeyCubit>().changeCurrentAyahKey(ayahKey);
+                        }
+                        final wordsKey = List.generate(
+                          QuranScriptFunction.getWordListOfAyah(
+                            context.read<QuranViewCubit>().state.quranScriptType,
+                            surah.toString(),
+                            verse.toString(),
+                          ).length,
+                          (i) => "$surah:$verse:${i + 1}",
+                        );
+                        if (wordsKey.isEmpty) return;
+                        showPopupWordFunction(
+                          context: context,
+                          wordKeys: wordsKey,
+                          initWordIndex: 0,
+                          wordByWordList: const [],
+                        );
+                      }
 
-                          if (wordsKey.isEmpty) return;
+                      void handlePageChanged(int page) {
+                        _cancelMenuTimer();
+                        context.read<AyahKeyCubit>().changeLastScrolledPage(page);
+                        try {
+                          context.read<ReadingStatsCubit>().recordPages(1);
+                        } catch (_) {}
+                        // Don't update current ayah key during audio playback —
+                        // the audio tracker owns the current ayah while playing.
+                        // Updating it here would steal the highlight from the playing ayah.
+                        final isAudioPlaying = context.read<AudioAyahHighlightCubit>().state.activeAyahKey != null;
+                        if (isAudioPlaying) return;
+                        final info =
+                            quranPagesInfo[(page - 1).clamp(0, quranPagesInfo.length - 1)];
+                        final ayahId = info["s"] ?? 1;
+                        final key = convertAyahNumberToKey(ayahId);
+                        if (key != null) {
+                          context.read<AyahKeyCubit>().changeCurrentAyahKey(key);
+                        }
+                      }
 
-                          showPopupWordFunction(
-                            context: context,
-                            wordKeys: wordsKey,
-                            initWordIndex: 0,
-                            wordByWordList: const [],
-                          );
-                        },
-                        onPageChanged: (page) {
-                          _cancelMenuTimer();
-                          context.read<AyahKeyCubit>().changeLastScrolledPage(
-                            page,
-                          );
+                      // ── Page overlay builders ──
+                      // Scale overlay text proportionally with mushaf content
+                      // so info stays readable and coordinated at any font size.
+                      final overlayScale = qSettings.overlayScale;
+                      final overlayBaseFontSize = 14.0 * overlayScale;
+                      final overlaySmallFontSize = 12.0 * overlayScale;
+                      final overlayPadding = (16.0 * overlayScale).clamp(10.0, 24.0);
+                      final overlayVPadding = (8.0 * overlayScale).clamp(4.0, 14.0);
 
-                          final info =
-                              quranPagesInfo[(page - 1).clamp(
-                                0,
-                                quranPagesInfo.length - 1,
-                              )];
-                          final ayahId = info["s"] ?? 1;
-                          final key = convertAyahNumberToKey(ayahId);
-                          if (key != null) {
-                            context.read<AyahKeyCubit>().changeCurrentAyahKey(
-                              key,
+                      Widget pageTopOverlay(int pageNumber, int surahNumber, int startVerse) {
+                        if (!qSettings.showPageInfo) return const SizedBox.shrink();
+                        final juzNumber = getJuzNumber(surahNumber, startVerse);
+                        return IgnorePointer(
+                          ignoring: true,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: overlayPadding, vertical: overlayVPadding),
+                            child: DefaultTextStyle(
+                              style: TextStyle(
+                                fontSize: overlayBaseFontSize,
+                                fontWeight: FontWeight.w900,
+                                fontFamily: "Inter",
+                                color: pageBgIsDark
+                                    ? Colors.white.withValues(alpha: 0.90)
+                                    : const Color(0xFF111111).withValues(alpha: 0.88),
+                              ),
+                              child: Directionality(
+                                textDirection: TextDirection.ltr,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(getSurahNameArabic(surahNumber), textDirection: TextDirection.rtl),
+                                    Text("الجزء ${_arabicOrdinalLocal(context, juzNumber)}", textDirection: TextDirection.rtl),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+
+                      Widget pageBottomOverlay(int pageNumber, int surahNumber, int startVerse) {
+                        if (!qSettings.showPageInfo) return const SizedBox.shrink();
+                        final pageLabel = localizedNumber(context, pageNumber);
+                        final hizbNumber = _hizbNumberFor(surahNumber, startVerse);
+                        final hizbLabel = "الحزب ${localizedNumber(context, hizbNumber)}";
+                        final showHizb = _isHizbStart(surahNumber, startVerse);
+                        // ── Rub (quarter) info ──
+                        final quarterNum = _quarterNumberFor(surahNumber, startVerse);
+                        final rubInHizb = ((quarterNum - 1) % 4) + 1;
+                        final rubLabels = ["", "الربع", "النصف", "الثلث"];
+                        final rubLabel = rubInHizb >= 1 && rubInHizb <= 3
+                            ? "${rubLabels[rubInHizb]} ${localizedNumber(context, hizbNumber)}"
+                            : null;
+                        return IgnorePointer(
+                          ignoring: true,
+                          child: Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (showHizb) ...[
+                                  Text(hizbLabel, style: TextStyle(
+                                    fontSize: overlaySmallFontSize, fontWeight: FontWeight.w700,
+                                    color: pageBgIsDark
+                                        ? Colors.white.withValues(alpha: 0.82)
+                                        : const Color(0xFF111111).withValues(alpha: 0.78),
+                                  )),
+                                  SizedBox(height: (2 * overlayScale).clamp(1.0, 4.0)),
+                                ],
+                                if (rubLabel != null && rubInHizb > 1) ...[
+                                  Text(rubLabel, style: TextStyle(
+                                    fontSize: overlaySmallFontSize * 0.9, fontWeight: FontWeight.w600,
+                                    color: pageBgIsDark
+                                        ? Colors.white.withValues(alpha: 0.65)
+                                        : const Color(0xFF111111).withValues(alpha: 0.60),
+                                  )),
+                                  SizedBox(height: (1 * overlayScale).clamp(0.5, 3.0)),
+                                ],
+                                Text(pageLabel, style: TextStyle(
+                                  fontSize: overlayBaseFontSize, fontWeight: FontWeight.w800,
+                                  color: pageBgIsDark
+                                      ? Colors.white.withValues(alpha: 0.90)
+                                      : const Color(0xFF111111).withValues(alpha: 0.88),
+                                )),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
+                      // ── Shared QcfThemeData for all modes ──
+                      final effectiveQcfTheme = qcfTheme.copyWith(
+                        showBasmala: qSettings.showBasmala,
+                        showHeader: qSettings.showSurahHeader,
+                        useClassicBorder: false,
+                        contentScale: qSettings.contentScale,
+                        verseHeight: baseTheme.verseHeight * qSettings.verseHeightScale,
+                        verseBackgroundColor: (surah, verse) {
+                          final key = "$surah:$verse";
+                          if (key == highlightedAyahKey) {
+                            return qSettings.highlightColor.withValues(
+                              alpha: pageBgIsDark ? 0.26 : 0.22,
                             );
                           }
+                          return null;
                         },
-                      ),
-                    ),
+                        headerScale: 1.08,
+                        headerWidthSmall: 410,
+                        headerWidthLarge: 290,
+                        firstPagesTopSpacerFactor: 0.0,
+                        pageTopOverlayBuilder: pageTopOverlay,
+                        pageBottomOverlayBuilder: pageBottomOverlay,
+                      );
+
+                      // ── Layout mode switch ──
+                      Widget mushafBody;
+
+                      switch (qSettings.layoutMode) {
+                        // ──────── SINGLE PAGE (default) ────────
+                        case MushafLayoutMode.singlePage:
+                          mushafBody = PageviewQuran(
+                            controller: _pageController,
+                            initialPageNumber: (widget.initialPageNumber ?? 1).clamp(1, 604),
+                            sp: (widget.spOverride ?? 0.86) * dynamicScale,
+                            h: (widget.hOverride ?? 0.86) * dynamicScale,
+                            fontSize: qSettings.fontSize * dynamicScale,
+                            physics: const ClampingScrollPhysics(),
+                            showTajweed: false,
+                            tajweedWordsBuilder: (surah, verse) {
+                              return QuranScriptFunction.getWordListOfAyah(
+                                QuranScriptType.tajweed,
+                                surah.toString(),
+                                verse.toString(),
+                              );
+                            },
+                            highlightsBuilder: highlightsBuilder,
+                            theme: effectiveQcfTheme,
+                            verseBackgroundColor: verseBgColor,
+                            onTapDown: handleTapDown,
+                            onTap: handleTap,
+                            onLongPressDown: handleLongPressDown,
+                            onLongPress: handleLongPress,
+                            onLongPressUp: handleLongPressUp,
+                            onLongPressCancel: handleLongPressCancel,
+                            onDoubleTap: handleDoubleTap,
+                            onPageChanged: handlePageChanged,
+                          );
+
+                        // ──────── DOUBLE PAGE (side-by-side) ────────
+                        case MushafLayoutMode.doublePage:
+                          mushafBody = DoublePageMushaf(
+                            controller: _pageController,
+                            initialPageNumber: (widget.initialPageNumber ?? 1).clamp(1, 604),
+                            sp: (widget.spOverride ?? 0.86) * dynamicScale,
+                            h: (widget.hOverride ?? 0.86) * dynamicScale,
+                            fontSize: qSettings.fontSize * dynamicScale,
+                            theme: effectiveQcfTheme,
+                            verseBackgroundColor: verseBgColor,
+                            highlightsBuilder: highlightsBuilder,
+                            onTapDown: handleTapDown,
+                            onTap: handleTap,
+                            onLongPressDown: handleLongPressDown,
+                            onLongPress: handleLongPress,
+                            onLongPressUp: handleLongPressUp,
+                            onLongPressCancel: handleLongPressCancel,
+                            onDoubleTap: handleDoubleTap,
+                            onPageChanged: handlePageChanged,
+                            pageBgIsDark: pageBgIsDark,
+                          );
+
+                        // ──────── CONTINUOUS SCROLL (vertical) ────────
+                        case MushafLayoutMode.continuousScroll:
+                          mushafBody = ContinuousScrollMushaf(
+                            controller: _pageController,
+                            initialPageNumber: (widget.initialPageNumber ?? 1).clamp(1, 604),
+                            sp: (widget.spOverride ?? 0.86) * dynamicScale,
+                            h: (widget.hOverride ?? 0.86) * dynamicScale,
+                            fontSize: qSettings.fontSize * dynamicScale,
+                            theme: effectiveQcfTheme,
+                            verseBackgroundColor: verseBgColor,
+                            highlightsBuilder: highlightsBuilder,
+                            onTapDown: handleTapDown,
+                            onTap: handleTap,
+                            onLongPressDown: handleLongPressDown,
+                            onLongPress: handleLongPress,
+                            onLongPressUp: handleLongPressUp,
+                            onLongPressCancel: handleLongPressCancel,
+                            onDoubleTap: handleDoubleTap,
+                            onPageChanged: handlePageChanged,
+                            pageBgIsDark: pageBgIsDark,
+                          );
+                      }
+
+                      return MediaQuery(
+                        data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1)),
+                        child: Container(
+                          color: baseTheme.pageBackgroundColor,
+                          child: NotificationListener<ScrollNotification>(
+                            onNotification: (notification) {
+                              if (notification is ScrollStartNotification && notification.dragDetails != null) {
+                                // User started dragging manually — suppress auto-scroll
+                                _isUserDragging = true;
+                                _dragCooldownTimer?.cancel();
+                              } else if (notification is ScrollEndNotification) {
+                                // User stopped dragging — allow auto-scroll after a short cooldown
+                                _dragCooldownTimer?.cancel();
+                                _dragCooldownTimer = Timer(const Duration(seconds: 2), () {
+                                  _isUserDragging = false;
+                                });
+                              }
+                              return false;
+                            },
+                            child: mushafBody,
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               );
@@ -2006,22 +2137,6 @@ class _MushafViewState extends State<MushafView> {
       backgroundColor: bg,
       appBar: AppBar(
         backgroundColor: bg,
-        surfaceTintColor: bg,
-        scrolledUnderElevation: 0,
-        systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: bg,
-          statusBarIconBrightness: bgBrightness == Brightness.dark
-              ? Brightness.light
-              : Brightness.dark,
-          systemNavigationBarColor: bg,
-          systemNavigationBarIconBrightness: bgBrightness == Brightness.dark
-              ? Brightness.light
-              : Brightness.dark,
-          systemNavigationBarContrastEnforced: false,
-          systemStatusBarContrastEnforced: false,
-        ),
-        elevation: 0,
-        iconTheme: IconThemeData(color: themeState.primary),
         title: Text(
           "المصحف",
           style: TextStyle(

@@ -103,7 +103,7 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
 - 🎙️ **56 Reciters with Advanced Audio Controls** — 56 قارئاً بروايات متعددة (حفص، ورش، قالون) مع تحكم صوتي متقدم
 - 🔔 **Smart Notification System** — نظام إشعارات ذكي للختمة والأذكار وآية اليوم
 - 📱 **Customizable Home Widget** — ويدجت قابل للتخصيص بالكامل لآية اليوم
-- 🌙 **Dark/Light Mode with Theme Previews** — وضع داكن/فاتح مع معاينة فورية للثيمات
+- 🌙 **Ayah-Inspired Light/Dark Theme** — وضع داكن/فاتح بألوان مستوحاة من تطبيق آية (Sage Green + Warm Beige)
 - 📐 **3 Mushaf Layout Modes** — 3 تخطيطات مصحف: صفحة واحدة، صفحة مزدوجة، تمرير مستمر
 - 🔤 **6 Quran Fonts** — 6 خطوط قرآنية: QPC Hafs، KFGQPC Uthmanic، Uthman Taha Naskh، AlQuranNeo، Indopak Nastaleeq، MeQuranVolt
 - 🧠 **Hifz/Memorization Mode** — وضع الحفظ مع 3 مستويات إخفاء (مرئي/مضبب/مخفي) + وضع الاختبار
@@ -225,10 +225,13 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
 - **تحديث تلقائي** للموارد عند توفر إصدارات جديدة
 
 ### واجهات منفصلة ومنظمة
+- **شاشة المكتبة المعاد تصميمها** — NestedScrollView مع SliverAppBar + TabBar مدور بـ indicator متحرك
+- **كروت موارد بورقية** — ألوان AppColors + badge "مفعّل" + أنيميشن fade+slide سلسة
 - **شاشة مستقلة للترجمات** مع تصنيف حسب اللغة
 - **شاشة مستقلة للتفاسير** مع معلومات عن كل مفسر
 - **شاشة موارد الكلمات** لإدارة البيانات اللغوية
 - **اختيار متعدد** لتفعيل أكثر من ترجمة أو تفسير في نفس الوقت
+- **نظام Fallback CDN** — تحميل تلقائي من مصادر بديلة لو السيرفر الأساسي مش شغال
 
 ---
 
@@ -344,12 +347,12 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
 - **وضع القراءة الليلي** مع سطوع قابل للتعديل + تفعيل تلقائي عند الغروب
 
 ### الثيمات والمظهر
-- **ثيمات متعددة جاهزة**: كلاسيكي، عصري، داكن، فاتح، أزرق، أخضر، بنفسجي
-- **معاينة فورية** لكل ثيم قبل التطبيق
-- **تخصيص الألوان الأساسية** للتطبيق
+- **ألوان مستوحاة من تطبيق آية**: Light Mode (Warm Beige + Sage Green) و Dark Mode (Deep Slate + Lighter Sage)
+- **نظام ألوان مركزي** — تغيير لون واحد في `AppColors` ينعكس على كل التطبيق
+- **وضع فاتح/داكن/تلقائي** بدون تعقيد FlexScheme — بساطة وأناقة
 - **تأثيرات Glassmorphism** مع شفافية وتمويه
-- **تدرجات لونية** في الخلفيات والبطاقات
-- **رسوم متحركة سلسة** (Flutter Animate) للانتقالات
+- **كروت بورقية ناعمة** مع ظلال خفيفة وborders رفيعة
+- **رسوم متحركة سلسة** (Flutter Animate) للانتقالات — 300-500ms، easeInOut
 
 ### المجموعات والمفضلات
 - **إنشاء مجموعات مخصصة** للآيات (للحفظ، للمراجعة، للتدبر، وغيرها)
@@ -523,19 +526,75 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
 
 ## 📊 إحصائيات المشروع | Project Statistics
 
-- **أكثر من 100 ملف Dart** منظمة في معمارية واضحة
-- **أكثر من 50,000 سطر برمجي** مع توثيق شامل
+- **أكثر من 150 ملف Dart** منظمة في معمارية واضحة
+- **أكثر من 60,000 سطر برمجي** مع توثيق شامل
 - **61 تفسيراً** بـ 25 لغة جاهز للاستخدام
 - **209+ ترجمة** بأكثر من 50 لغة
 - **56 قارئاً** بروايات متعددة (حفص، ورش، قالون)
+- **6 خطوط قرآنية** + 3 تخطيطات مصحف
+- **8 تبويبات تفسير** مع Pinnable Panels + Reorderable Tabs
 - **100+ ويدجت مخصص** قابل لإعادة الاستخدام
-- **10+ شاشة رئيسية** مع تنقل سلس
-- **دعم كامل** للوضع الداكن والفاتح
+- **15+ شاشة رئيسية** مع تنقل سلس
+- **دعم كامل** للوضع الداكن والفاتح (ألوان آية)
 - **290+ مورد قرآني** قابل للتحميل عند الطلب
 
 ---
 
-## 🎯 الجمهور المستهدف | Target Audience
+## � أحدث التحديثات | Recent Changes
+
+### نظام الثيمات الجديد (Ayah-Inspired Theme)
+- **إزالة FlexColorScheme** — استبدال بنظام Light/Dark ثابت بألوان مستوحاة من تطبيق آية
+- **AppColors مركزي** — تغيير لون واحد ينعكس على كل التطبيق
+- **Light Mode**: Warm Beige (#F5EBE0) + Sage Green (#5D7263) + Cream surfaces
+- **Dark Mode**: Deep Slate (#343A40) + Lighter Sage (#839788) + Charcoal cards
+- **AppTheme خالص** — ThemeData مباشر بدون مكتبات خارجية
+
+### إعادة تصميم شاشة المكتبة
+- **NestedScrollView + SliverAppBar** — الهيدر بينقبض عند التمرير
+- **TabBar مدور** — indicator باللون الأساسي مع ظل خفيف
+- **كروت بورقية** — ألوان AppColors + badge "مفعّل" + أنيميشن fade+slide
+- **إزالة الـ chip bar القديم** — TabBar أنظف وأسلس
+
+### نظام تحميل الموارد المتقدم
+- **HTML Detection** — كشف تلقائي لو السيرفر بيرجع HTML بدل البيانات
+- **Fallback CDN** — تحميل تلقائي من مصادر بديلة (GitHub CDN)
+- **Mutashabihat + Transliteration** — fallback شغال من Waqar144 و risan CDN
+- **رسائل خطأ واضحة** بالعربي لو المورد مش متاح
+
+### QCF Package — ميزات جديدة
+- **Sajda Verses Data** — 14+1 سجدة مع نوعها (واجبة/مستحبة)
+- **Surah Info Card** — كروت معلومات السورة مع badge سجدة
+- **Juz/Hizb Marker Overlay** — علامات الجزء والحزب على صفحات المصحف
+- **Page Position Indicator** — Apple-style floating pill مع معلومات الصفحة
+- **Reading Progress Tracker** — تتبع التقدم مع streak و completion %
+- **Waqf (Stop) Markers** — 10 علامات وقف مع وصف عربي ولون مقترح
+
+### تحسينات المصحف
+- **Responsive Rendering** — حساب ديناميكي لأبعاد الصفحة حسب حجم الشاشة
+- **3 تخطيطات**: صفحة واحدة، صفحة مزدوجة، تمرير مستمر
+- **Classic Mushaf Border** — إطار إسلامي كلاسيكي مع زخارف (قابل للتفعيل)
+- **Overlay متجاوب** — معلومات الجزء/الحزب/الربع بتتكبر مع المحتوى
+
+### نظام الصوتيات المتقدم
+- **56 قارئاً** مع روايات متعددة
+- **تتبع كلمة بكلمة** أثناء التشغيل (IdrisiumAudioTracker)
+- **تكرار ذكي** — آية واحدة، نطاق، أو سورة كاملة
+- **مؤقت النوم** — دقائق أو نهاية السورة
+- **تحميل أوفلاين** — تحميل سور كاملة مع إدارة التخزين
+- **قوائم تشغيل مخصصة** — إنشاء/حذف/إعادة تسمية
+
+### وضع الحفظ والقراءة الليلية
+- **3 مستويات إخفاء**: مرئي، مضبب، مخفي + وضع الاختبار
+- **وضع القراءة الليلية** — ألوان كهرمانية + تفعيل تلقائي عند الغروب
+
+### إزالة محتوى مخالف
+- **شيلت أسباب النزول** (الواحدي) — مش موثوق
+- **شيلت الجلالين** من 5 لغات + الوسيط + تنوير المقباس
+- **مراجعة كاملة** للترجمات والتفاسير — إزالة أي تأويل أو مخالفة
+
+---
+
+## �🎯 الجمهور المستهدف | Target Audience
 
 ### للمستخدمين
 - **قراء القرآن اليوميون** الذين يبحثون عن تجربة قراءة مريحة وقريبة من المصحف الورقي
@@ -564,15 +623,17 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
 
 ### 🔧 Tech Stack (مختصر وقوي)
 
-- **Flutter 3.x + Dart**
+- **Flutter 3.x + Dart 3+** (Records, Patterns, Sealed Classes)
 - **flutter_bloc / Cubit** (State Management)
-- **qcf_quran_with_update** (Uthmanic/QCF rendering)
+- **qcf_quran_with_update** (Uthmanic/QCF rendering + Sajda + Waqf + Reading Progress)
 - **hive_ce** (Offline local storage)
 - **just_audio** (Audio engine)
 - **home_widget + workmanager** (Home widget updates)
 - **awesome_notifications** (Notifications)
 - **share_plus** (Sharing)
 - **flutter_animate** (Subtle UI motion)
+- **flutter_screenutil** (Responsive design)
+- **google_fonts / Cairo** (Arabic typography)
 
 ### 🧩 Deep Refactor (معلومة مهمة للمساهمين)
 

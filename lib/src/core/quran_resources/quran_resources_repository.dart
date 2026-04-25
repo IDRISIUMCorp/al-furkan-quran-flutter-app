@@ -22,10 +22,7 @@ abstract class QuranResourcesRepository {
 class LocalQuranResourcesRepository implements QuranResourcesRepository {
   @override
   Future<void> initialize({required Locale locale}) async {
-    await Future.wait([
-      QuranTranslationFunction.init(locale: locale),
-      SegmentedResourcesManager.init(),
-    ]);
+    await QuranTranslationFunction.init(locale: locale);
   }
 
   @override
@@ -33,6 +30,7 @@ class LocalQuranResourcesRepository implements QuranResourcesRepository {
     required QuranScriptType scriptType,
     required bool enableBackgroundUpdates,
   }) async {
+    await SegmentedResourcesManager.init();
     await DefaultOfflineResources.ensureInstalled();
     await QuranTafsirFunction.init();
     await QuranIrabFunction.setDefaultSelected();

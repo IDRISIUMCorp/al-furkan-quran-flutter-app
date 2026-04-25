@@ -22,7 +22,7 @@ class PrayerWidgetDesign extends StatelessWidget {
   Widget build(BuildContext context) {
     // Basic dynamic theme handling
     final Color bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFAFAFA);
-    final Color textColor = isDark ? const Color(0xFFF5F5F5) : const Color(0xFF2C2A29);
+    final Color textColor = isDark ? const Color(0xFFE3D5CA) : const Color(0xFF2C2A29);
     final Color borderColor = isDark ? const Color(0xFF333333) : const Color(0xFFE8E4DF);
     final Color accentColor = isDark ? const Color(0xFF33B18E) : const Color(0xFF5A7063);
     final Color surahColor = isDark ? const Color(0xFF9E9E9E) : const Color(0xFF8B8178);

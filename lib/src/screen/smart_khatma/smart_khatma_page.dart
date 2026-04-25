@@ -6,6 +6,7 @@ import "package:al_furkan/src/screen/mushaf/widgets/wahy_side_drawer.dart";
 import "package:al_furkan/src/core/notifications/khatma_notification_service.dart";
 import "package:al_furkan/src/theme/controller/theme_cubit.dart";
 import "package:al_furkan/src/theme/controller/theme_state.dart";
+import "package:al_furkan/src/theme/app_colors.dart";
 import "package:al_furkan/src/utils/basic_functions.dart";
 import "package:al_furkan/src/utils/number_localization.dart";
 import "package:flutter/material.dart";
@@ -351,7 +352,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 10, 16, 0),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFFF9F2),
+        color: isDark ? const Color(0xFF1E1E1E) : AppColors.ayaCard,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.06),
@@ -973,7 +974,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
 
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF7F1E6),
+      backgroundColor: isDark ? const Color(0xFF0F0F0F) : AppColors.ayaSurface,
       drawer: WahySideDrawer(
         primary: themeState.primary,
         onOpenIndex: () {},
@@ -1242,7 +1243,7 @@ class _PlanPicker extends StatelessWidget {
                   decoration: const InputDecoration(
                     isDense: true,
                     filled: true,
-                    fillColor: Color(0xFFF7F1E6),
+                    fillColor: AppColors.ayaSurface,
                     border: OutlineInputBorder(
                       borderSide: BorderSide.none,
                       borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -1301,7 +1302,7 @@ class _PresetChip extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w900,
-            color: selected ? themeState.primary : const Color(0xFF1B1B1B),
+            color: selected ? themeState.primary : AppColors.ayaTextMain,
           ),
         ),
       ),

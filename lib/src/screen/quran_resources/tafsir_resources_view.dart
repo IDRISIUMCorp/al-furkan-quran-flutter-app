@@ -82,15 +82,6 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
     await _loadData();
   }
 
-  Future<void> _activateAllDownloaded() async {
-    await QuranTafsirFunction.replaceTafsirSelections(_downloadedBooks);
-    await _loadData();
-  }
-
-  Future<void> _clearActiveSelections() async {
-    await QuranTafsirFunction.replaceTafsirSelections([]);
-    await _loadData();
-  }
 
   Future<void> _downloadBook(TafsirBookModel book) async {
     await QuranTafsirFunction.downloadResources(
@@ -128,13 +119,6 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
     await _loadData();
   }
 
-  Future<void> _deleteMany(List<ManagedResourceItem> items) async {
-    for (final item in items) {
-      final book = _allBooks.firstWhere((entry) => entry.fullPath == item.id);
-      await QuranTafsirFunction.removeFromListAlreadyDownloaded(book);
-    }
-    await _loadData();
-  }
 
   List<ManagedResourceItem> _buildItems(ResourcesProgressCubitState state) {
     final orderMap = <String, int>{
@@ -180,18 +164,10 @@ class _TafsirResourcesViewState extends State<TafsirResourcesView> {
           title: "إدارة التفاسير",
           description:
               "فعّل أكثر من تفسير للمقارنة السريعة.",
-          searchHint: "",
-          emptyMessage: "لا توجد تفاسير مطابقة.",
-          deleteModeLabel: "تحديد للحذف",
-          activateAllLabel: "تفعيل الكل",
-          clearActiveLabel: "مسح المختار",
-          deleteSelectionLabel: "حذف المحدد",
+          emptyMessage: "لا توجد تفاسير.",
           activationBehavior: ResourceActivationBehavior.multi,
           items: _buildItems(state),
           onRefresh: _loadData,
-          onActivateAllDownloaded: _activateAllDownloaded,
-          onClearActive: _clearActiveSelections,
-          onDeleteMany: _deleteMany,
           onReorderDownloaded: _saveDownloadedOrder,
         );
       },

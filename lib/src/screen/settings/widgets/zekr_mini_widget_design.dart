@@ -26,7 +26,7 @@ class ZekrMiniWidgetDesign extends StatelessWidget {
   Widget build(BuildContext context) {
     // Custom logic to pick a mini theme based on existing isDark
     final Color bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFFAFAFA);
-    final Color textColor = isDark ? const Color(0xFFF5F5F5) : const Color(0xFF2C2A29);
+    final Color textColor = isDark ? const Color(0xFFE3D5CA) : const Color(0xFF2C2A29);
     final Color borderColor = isDark ? const Color(0xFF333333) : const Color(0xFFE8E4DF);
     final Color refColor = isDark ? const Color(0xFF9E9E9E) : const Color(0xFF8B8178);
 

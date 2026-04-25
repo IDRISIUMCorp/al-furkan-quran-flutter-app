@@ -46,25 +46,23 @@ class AyahImageGenerator {
             headerBackgroundColor: const Color(0xFF111111),
             headerWidthLarge: bannerWidth * 1.25,
             headerWidthSmall: bannerWidth * 1.25,
-            headerFontSizeLarge: 85,
-            headerFontSizeSmall: 85,
+            surahNameScale: 3.5,
             headerTextColor: Colors.white,
             verseTextColor: Colors.white,
             verseNumberColor: Colors.white,
           )
         : QcfThemeData.sepia().copyWith(
-            pageBackgroundColor: const Color(0xFFF7F1E6),
+            pageBackgroundColor: const Color(0xFFEDE4D4),
             headerBackgroundColor: const Color(0xFFEFE3D2),
             headerWidthLarge: bannerWidth * 1.25,
             headerWidthSmall: bannerWidth * 1.25,
-            headerFontSizeLarge: 85,
-            headerFontSizeSmall: 85,
+            surahNameScale: 3.5,
             headerTextColor: const Color(0xFF1B1B1B),
             verseTextColor: const Color(0xFF1B1B1B),
             verseNumberColor: const Color(0xFF1B1B1B),
           );
 
-    final Color cardBgColor = isDark ? Colors.black : const Color(0xFFF7F1E6);
+    final Color cardBgColor = isDark ? Colors.black : const Color(0xFFEDE4D4);
 
     final GlobalKey cardKey = GlobalKey();
 
@@ -236,25 +234,23 @@ class AyahImageGenerator {
             headerBackgroundColor: const Color(0xFF111111),
             headerWidthLarge: bannerWidth * 1.25,
             headerWidthSmall: bannerWidth * 1.25,
-            headerFontSizeLarge: 85,
-            headerFontSizeSmall: 85,
+            surahNameScale: 3.5,
             headerTextColor: Colors.white,
             verseTextColor: Colors.white,
             verseNumberColor: Colors.white,
           )
         : QcfThemeData.sepia().copyWith(
-            pageBackgroundColor: const Color(0xFFF7F1E6),
+            pageBackgroundColor: const Color(0xFFEDE4D4),
             headerBackgroundColor: const Color(0xFFEFE3D2),
             headerWidthLarge: bannerWidth * 1.25,
             headerWidthSmall: bannerWidth * 1.25,
-            headerFontSizeLarge: 85,
-            headerFontSizeSmall: 85,
+            surahNameScale: 3.5,
             headerTextColor: const Color(0xFF1B1B1B),
             verseTextColor: const Color(0xFF1B1B1B),
             verseNumberColor: const Color(0xFF1B1B1B),
           );
 
-    final Color cardBgColor = isDark ? Colors.black : const Color(0xFFF7F1E6);
+    final Color cardBgColor = isDark ? Colors.black : const Color(0xFFEDE4D4);
     final Color tafsirBgColor = isDark
         ? const Color(0xFF111111)
         : const Color(0xFFEFE3D2);
@@ -391,11 +387,11 @@ class AyahImageGenerator {
                   ),
                   child: Align(
                     alignment: Alignment.centerRight,
-                    child: Text(
+                    child: _buildRichTafsirTextForImage(
                       tafsirBody,
-                      textAlign: TextAlign.right,
-                      textDirection: TextDirection.rtl,
-                      style: tafsirStyle,
+                      tafsirStyle,
+                      isDark,
+                      textColor,
                     ),
                   ),
                 ),
@@ -475,4 +471,104 @@ class AyahImageGenerator {
     t = t.trim();
     return t.isEmpty ? null : t;
   }
+
+  /// Rich tafsir text for image generation with bracket-aware styling:
+  /// - ﴿...﴾ / ﴁ...ﴂ → Uthmani font + golden color (Quran ayah)
+  /// - {...} → Uthmani font + golden yellow (curly brackets)
+  /// - [...] → warm amber + bold (square brackets)
+  static Widget _buildRichTafsirTextForImage(
+    String text,
+    TextStyle baseStyle,
+    bool isDark,
+    Color fallbackColor,
+  ) {
+    if (text.isEmpty) return Text(text, style: baseStyle);
+
+    const quranFontFamily = "KFGQPC-Uthmanic-HAFS-Regular";
+    final curlyColor = isDark ? const Color(0xFFE6B422) : const Color(0xFF9E7C0A);
+    final squareColor = isDark ? const Color(0xFFCD853F) : const Color(0xFF8B5E3C);
+    final quranColor = isDark ? fallbackColor : curlyColor;
+
+    final quranPattern = RegExp(r'[﴿ﴁ][\s\S]*?[﴾ﴂ]', unicode: true);
+    final curlyPattern = RegExp(r'\{[^\}]+\}');
+    final squarePattern = RegExp(r'\[[^\]]+\]');
+
+    final allMatches = <({int start, int end, String text, _ImageBracketKind kind})>[];
+
+    for (final m in quranPattern.allMatches(text)) {
+      allMatches.add((start: m.start, end: m.end, text: m.group(0)!, kind: _ImageBracketKind.quran));
+    }
+    for (final m in curlyPattern.allMatches(text)) {
+      final overlaps = allMatches.any((e) => m.start < e.end && m.end > e.start);
+      if (!overlaps) allMatches.add((start: m.start, end: m.end, text: m.group(0)!, kind: _ImageBracketKind.curly));
+    }
+    for (final m in squarePattern.allMatches(text)) {
+      final overlaps = allMatches.any((e) => m.start < e.end && m.end > e.start);
+      if (!overlaps) allMatches.add((start: m.start, end: m.end, text: m.group(0)!, kind: _ImageBracketKind.square));
+    }
+    allMatches.sort((a, b) => a.start.compareTo(b.start));
+
+    if (allMatches.isEmpty) {
+      return Text(
+        text,
+        textAlign: TextAlign.right,
+        textDirection: TextDirection.rtl,
+        style: baseStyle,
+      );
+    }
+
+    final spans = <TextSpan>[];
+    int lastEnd = 0;
+
+    for (final match in allMatches) {
+      if (match.start > lastEnd) {
+        final before = text.substring(lastEnd, match.start);
+        if (before.isNotEmpty) spans.add(TextSpan(text: before, style: baseStyle));
+      }
+
+      switch (match.kind) {
+        case _ImageBracketKind.quran:
+          spans.add(TextSpan(
+            text: match.text,
+            style: baseStyle.copyWith(
+              color: quranColor,
+              fontFamily: quranFontFamily,
+              fontSize: baseStyle.fontSize! * 1.05,
+              fontWeight: FontWeight.w500,
+            ),
+          ));
+        case _ImageBracketKind.curly:
+          spans.add(TextSpan(
+            text: match.text,
+            style: baseStyle.copyWith(
+              color: curlyColor,
+              fontFamily: quranFontFamily,
+              fontWeight: FontWeight.w500,
+            ),
+          ));
+        case _ImageBracketKind.square:
+          spans.add(TextSpan(
+            text: match.text,
+            style: baseStyle.copyWith(
+              color: squareColor,
+              fontWeight: FontWeight.w700,
+            ),
+          ));
+      }
+      lastEnd = match.end;
+    }
+
+    if (lastEnd < text.length) {
+      final remaining = text.substring(lastEnd);
+      if (remaining.isNotEmpty) spans.add(TextSpan(text: remaining, style: baseStyle));
+    }
+
+    return Text.rich(
+      TextSpan(children: spans),
+      textAlign: TextAlign.right,
+      textDirection: TextDirection.rtl,
+    );
+  }
 }
+
+enum _ImageBracketKind { quran, curly, square }

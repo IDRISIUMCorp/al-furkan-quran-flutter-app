@@ -395,6 +395,27 @@ class QuranTranslationFunction {
         },
       );
 
+      // Detect HTML responses — safety net in case the server returns
+      // an HTML page instead of actual BZip2-compressed data.
+      String? responseData = response.data as String?;
+      final bool isHtml = responseData != null &&
+          (responseData.trimLeft().startsWith('<') ||
+           response.headers.value('content-type')?.contains('text/html') == true);
+
+      if (isHtml) {
+        log(
+          "Server returned HTML instead of Translation data for '${translationBook.fullPath}'",
+          name: "downloadResources",
+        );
+        cubit.failure(
+          "المورد غير متاح حالياً على السيرفر — جرب لاحقاً",
+          activeResourceId: translationBook.fullPath,
+        );
+        if (newTranslationBox.isOpen) await newTranslationBox.close();
+        await Hive.deleteBoxFromDisk(translationBoxName);
+        return false;
+      }
+
       cubit.updateProgress(
         0.5,
         "Processing: ${translationBook.name}",
@@ -524,6 +545,10 @@ class QuranTranslationFunction {
 
     List<TranslationBookModel>? selectedBooks =
         await getTranslationSelections() ?? [];
+    // Fallback: if no selections, use all downloaded books
+    if (selectedBooks.isEmpty) {
+      selectedBooks = getDownloadedTranslationBooks();
+    }
 
     for (TranslationBookModel bookModel in selectedBooks) {
       String boxName = getTranslationBoxName(translationBook: bookModel);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:al_furkan/src/utils/number_localization.dart';
 import 'package:al_furkan/src/utils/quran_ayahs_function/get_page_number.dart';
+import 'package:al_furkan/src/theme/app_colors.dart';
 import 'package:al_furkan/src/theme/controller/theme_cubit.dart';
 import 'package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart';
 import 'package:qcf_quran/qcf_quran.dart' hide getPageNumber;
@@ -23,7 +24,7 @@ Future<void> showBookmarksSheet({
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (ctx) {
-      const card = Color(0xFFFFF9F2);
+      const card = AppColors.ayaCard;
       final colors = <String, ({String name, Color color})>{
         "red": (name: "الأحمر", color: const Color(0xFFB3261E)),
         "yellow": (name: "الأصفر", color: const Color(0xFFB68A00)),
@@ -115,7 +116,7 @@ Future<void> showBookmarksSheet({
                               subtitle,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF8F8F8F),
+                                color: AppColors.ayaTextMuted,
                               ),
                             ),
                       trailing: Icon(
@@ -159,7 +160,7 @@ Future<void> showBookmarksSheet({
                                 "لا توجد فواصل",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w800,
-                                  color: Color(0xFF9C9C9C),
+                                  color: AppColors.ayaTextMuted,
                                 ),
                               ),
                             )
