@@ -1,49 +1,63 @@
 {
   "project_info": {
-    "project_number": "562324718404",
-    "project_id": "alquranwithaudio",
-    "storage_bucket": "alquranwithaudio.appspot.com"
+    "project_number": "770442072941",
+    "project_id": "al-furkan-app",
+    "storage_bucket": "al-furkan-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:562324718404:android:edab7cc24328618369cd11",
+        "mobilesdk_app_id": "1:770442072941:android:d6de38f8a8211599fc8064",
         "android_client_info": {
-          "package_name": "com.ismail_hosen_james.al_bayan_quran"
+          "package_name": "com.idrisium.alfurkan"
         }
       },
       "oauth_client": [
         {
-          "client_id": "562324718404-airjj0ovl6jp5nk3g823qmslo0mm71n7.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.ismail_hosen_james.al_bayan_quran",
-            "certificate_hash": "a4570595a20fbed15e8487c9abaccd9b13db479c"
-          }
-        },
-        {
-          "client_id": "562324718404-qcit8fhnjk81cvgj1b6k8sbargh5ohdm.apps.googleusercontent.com",
+          "client_id": "770442072941-gkb264mdbvamave6hqkj9d3q2hv4d56s.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAvNykaA8z6YaQ3wVS1kOLpnOMZI91d8vk"
+          "current_key": "AIzaSyDCXggAwaJB-LHo-hlK_zLDYxSptOMPsog"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "562324718404-qcit8fhnjk81cvgj1b6k8sbargh5ohdm.apps.googleusercontent.com",
+              "client_id": "770442072941-gkb264mdbvamave6hqkj9d3q2hv4d56s.apps.googleusercontent.com",
               "client_type": 3
-            },
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:770442072941:android:a497b4a6fc91271afc8064",
+        "android_client_info": {
+          "package_name": "com.idrisium.alfurkan.admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "770442072941-gkb264mdbvamave6hqkj9d3q2hv4d56s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCXggAwaJB-LHo-hlK_zLDYxSptOMPsog"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
             {
-              "client_id": "562324718404-4s2sokj9dls2qtc2t5ph95vrdgic6obr.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.ismail-hosen-james.al-bayan-quran"
-              }
+              "client_id": "770442072941-gkb264mdbvamave6hqkj9d3q2hv4d56s.apps.googleusercontent.com",
+              "client_type": 3
             }
           ]
         }
