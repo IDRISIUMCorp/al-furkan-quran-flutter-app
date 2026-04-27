@@ -58,7 +58,7 @@ class ColorPickerTile extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -166,7 +166,7 @@ class BackgroundTypeSelector extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
               color: isSelected
-                  ? SunnahTheme.green.withOpacity(0.15)
+                  ? SunnahTheme.green.withValues(alpha: 0.15)
                   : SunnahTheme.getSurfaceColor(isDark),
               borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
               border: Border.all(
@@ -227,7 +227,7 @@ class LayoutStyleSelector extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               color: isSelected
-                  ? SunnahTheme.green.withOpacity(0.15)
+                  ? SunnahTheme.green.withValues(alpha: 0.15)
                   : SunnahTheme.getSurfaceColor(isDark),
               borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
               border: Border.all(
@@ -311,7 +311,7 @@ class PatternSelector extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
               color: isSelected
-                  ? SunnahTheme.green.withOpacity(0.15)
+                  ? SunnahTheme.green.withValues(alpha: 0.15)
                   : SunnahTheme.getSurfaceColor(isDark),
               borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
               border: Border.all(
@@ -387,7 +387,7 @@ class ImageSizeSelector extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? SunnahTheme.green.withOpacity(0.15)
+                    ? SunnahTheme.green.withValues(alpha: 0.15)
                     : SunnahTheme.getSurfaceColor(isDark),
                 borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
                 border: Border.all(
@@ -558,7 +558,7 @@ class FontFamilySelector extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? SunnahTheme.green.withOpacity(0.15)
+                    ? SunnahTheme.green.withValues(alpha: 0.15)
                     : SunnahTheme.getSurfaceColor(isDark),
                 borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
                 border: Border.all(

@@ -154,7 +154,7 @@ class _PrayerTimeListItemState extends State<PrayerTimeListItem>
       height: PrayerDimensions.touchTargetMin,
       decoration: BoxDecoration(
         color: widget.isNext || widget.isCurrent
-            ? PrayerThemeColors.green.withOpacity(0.15)
+            ? PrayerThemeColors.green.withValues(alpha: 0.15)
             : PrayerThemeColors.greenLight,
         borderRadius: BorderRadius.circular(PrayerDimensions.radiusSmall),
       ),

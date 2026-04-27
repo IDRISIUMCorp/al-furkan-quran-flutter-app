@@ -566,7 +566,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
           colors: isDark
               ? [
                   _cardDark,
-                  _cardDark.withOpacity(0.8),
+                  _cardDark.withValues(alpha: 0.8),
                 ]
               : [
                   _cardLight,
@@ -575,11 +575,11 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
         ),
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06),
+          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.08),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -598,13 +598,13 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                     end: Alignment.bottomRight,
                     colors: [
                       _primaryGreen,
-                      _primaryGreen.withOpacity(0.7),
+                      _primaryGreen.withValues(alpha: 0.7),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(18),
                   boxShadow: [
                     BoxShadow(
-                      color: _primaryGreen.withOpacity(0.3),
+                      color: _primaryGreen.withValues(alpha: 0.3),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -679,8 +679,8 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: isDark
-                  ? Colors.white.withOpacity(0.05)
-                  : Colors.black.withOpacity(0.03),
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.black.withValues(alpha: 0.03),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -721,10 +721,10 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.12),
+          color: color.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: color.withOpacity(0.25),
+            color: color.withValues(alpha: 0.25),
             width: 1.5,
           ),
         ),
@@ -768,15 +768,15 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
           colors: [
-            _prayerColor(next, isDark).withOpacity(0.9),
-            _prayerColor(next, isDark).withOpacity(0.7),
-            _prayerColor(next, isDark).withOpacity(0.5),
+            _prayerColor(next, isDark).withValues(alpha: 0.9),
+            _prayerColor(next, isDark).withValues(alpha: 0.7),
+            _prayerColor(next, isDark).withValues(alpha: 0.5),
           ],
         ),
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: _prayerColor(next, isDark).withOpacity(0.3),
+            color: _prayerColor(next, isDark).withValues(alpha: 0.3),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -791,7 +791,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
@@ -800,7 +800,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                   size: 28,
                 ),
               ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-                  .shimmer(duration: 2000.ms, color: Colors.white.withOpacity(0.3)),
+                  .shimmer(duration: 2000.ms, color: Colors.white.withValues(alpha: 0.3)),
               const Gap(12),
               Expanded(
                 child: Column(
@@ -811,7 +811,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                       style: GoogleFonts.cairo(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ).animate().fadeIn(duration: 400.ms).slideX(begin: -0.1),
                     const Gap(2),
@@ -836,10 +836,10 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 width: 1.5,
               ),
             ),
@@ -872,7 +872,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                 child: LinearProgressIndicator(
                   minHeight: 10,
                   value: progress,
-                  backgroundColor: Colors.white.withOpacity(0.2),
+                  backgroundColor: Colors.white.withValues(alpha: 0.2),
                   valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               ).animate().fadeIn(duration: 600.ms, delay: 300.ms).slideX(begin: -0.2),
@@ -915,7 +915,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
           style: GoogleFonts.cairo(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
           ),
         ),
       ],
@@ -928,7 +928,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
       style: GoogleFonts.dmMono(
         fontSize: 32,
         fontWeight: FontWeight.w900,
-        color: Colors.white.withOpacity(0.6),
+        color: Colors.white.withValues(alpha: 0.6),
       ),
     );
   }
@@ -942,7 +942,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
           style: GoogleFonts.cairo(
             fontSize: 12,
             fontWeight: FontWeight.w700,
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withValues(alpha: 0.9),
           ),
         ),
         Text(
@@ -950,7 +950,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
           style: GoogleFonts.dmMono(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
           ),
         ),
       ],
@@ -968,11 +968,11 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
         color: isDark ? _cardDark : _cardLight,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06),
+          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -986,7 +986,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: _primaryGreen.withOpacity(0.15),
+                  color: _primaryGreen.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -1016,11 +1016,11 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.white.withOpacity(0.05)
-                    : Colors.black.withOpacity(0.03),
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.black.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: _primaryGreen.withOpacity(0.2),
+                  color: _primaryGreen.withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
@@ -1028,7 +1028,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: _primaryGreen.withOpacity(0.15),
+                      color: _primaryGreen.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -1082,11 +1082,11 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.white.withOpacity(0.05)
-                    : Colors.black.withOpacity(0.03),
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.black.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: _primaryGreen.withOpacity(0.2),
+                  color: _primaryGreen.withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
@@ -1094,7 +1094,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: _primaryGreen.withOpacity(0.15),
+                      color: _primaryGreen.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -1227,13 +1227,13 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: selected
-              ? _primaryGreen.withOpacity(0.15)
-              : (isDark ? Colors.white.withOpacity(0.03) : Colors.black.withOpacity(0.02)),
+              ? _primaryGreen.withValues(alpha: 0.15)
+              : (isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.02)),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: selected
                 ? _primaryGreen
-                : (isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.08)),
+                : (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08)),
             width: selected ? 2 : 1,
           ),
         ),
@@ -1242,7 +1242,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: selected ? _primaryGreen : (isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05)),
+                color: selected ? _primaryGreen : (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05)),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -1366,13 +1366,13 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: selected
-              ? _primaryGreen.withOpacity(0.15)
-              : (isDark ? Colors.white.withOpacity(0.03) : Colors.black.withOpacity(0.02)),
+              ? _primaryGreen.withValues(alpha: 0.15)
+              : (isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.02)),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: selected
                 ? _primaryGreen
-                : (isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.08)),
+                : (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08)),
             width: selected ? 2 : 1,
           ),
         ),
@@ -1429,11 +1429,11 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
         color: isDark ? _cardDark : _cardLight,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06),
+          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1450,8 +1450,8 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: _notifEnabled
-                        ? [_primaryGreen, _primaryGreen.withOpacity(0.7)]
-                        : [Colors.grey, Colors.grey.withOpacity(0.7)],
+                        ? [_primaryGreen, _primaryGreen.withValues(alpha: 0.7)]
+                        : [Colors.grey, Colors.grey.withValues(alpha: 0.7)],
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -1523,8 +1523,8 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.white.withOpacity(0.05)
-                    : Colors.black.withOpacity(0.03),
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.black.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -1586,8 +1586,8 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.white.withOpacity(0.05)
-                    : Colors.black.withOpacity(0.03),
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.black.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -1666,10 +1666,10 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: _primaryGreen.withOpacity(0.1),
+                color: _primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: _primaryGreen.withOpacity(0.2),
+                  color: _primaryGreen.withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
@@ -1711,11 +1711,11 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
         color: isDark ? _cardDark : _cardLight,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06),
+          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1730,7 +1730,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [const Color(0xFFEC4899), const Color(0xFFEC4899).withOpacity(0.7)],
+                    colors: [const Color(0xFFEC4899), const Color(0xFFEC4899).withValues(alpha: 0.7)],
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -1766,13 +1766,13 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
                   colors: [
-                    const Color(0xFFEC4899).withOpacity(0.15),
-                    const Color(0xFFEC4899).withOpacity(0.08),
+                    const Color(0xFFEC4899).withValues(alpha: 0.15),
+                    const Color(0xFFEC4899).withValues(alpha: 0.08),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: const Color(0xFFEC4899).withOpacity(0.3),
+                  color: const Color(0xFFEC4899).withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
@@ -1784,7 +1784,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFEC4899).withOpacity(0.3),
+                          color: const Color(0xFFEC4899).withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         ),
@@ -1841,11 +1841,11 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.white.withOpacity(0.05)
-                    : Colors.black.withOpacity(0.03),
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.black.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: const Color(0xFF8B5CF6).withOpacity(0.3),
+                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
@@ -1853,7 +1853,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF8B5CF6).withOpacity(0.15),
+                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -1907,11 +1907,11 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.white.withOpacity(0.05)
-                    : Colors.black.withOpacity(0.03),
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.black.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: const Color(0xFF10B981).withOpacity(0.3),
+                  color: const Color(0xFF10B981).withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
@@ -1919,7 +1919,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withOpacity(0.15),
+                      color: const Color(0xFF10B981).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -1983,10 +1983,10 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.12),
+            color: color.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: color.withOpacity(0.25),
+              color: color.withValues(alpha: 0.25),
               width: 1.5,
             ),
           ),
@@ -2044,8 +2044,8 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                 hintText: "مثال: مسجد النور",
                 filled: true,
                 fillColor: isDark
-                    ? Colors.white.withOpacity(0.05)
-                    : Colors.black.withOpacity(0.03),
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.black.withValues(alpha: 0.03),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -2125,7 +2125,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [const Color(0xFFEC4899), const Color(0xFFEC4899).withOpacity(0.7)],
+                      colors: [const Color(0xFFEC4899), const Color(0xFFEC4899).withValues(alpha: 0.7)],
                     ),
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -2170,8 +2170,8 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
             hintText: "مثال: مسجد النور",
             filled: true,
             fillColor: isDark
-                ? Colors.white.withOpacity(0.05)
-                : Colors.black.withOpacity(0.03),
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.black.withValues(alpha: 0.03),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
@@ -2189,8 +2189,8 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
             hintText: "أدخل عنوان المسجد",
             filled: true,
             fillColor: isDark
-                ? Colors.white.withOpacity(0.05)
-                : Colors.black.withOpacity(0.03),
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.black.withValues(alpha: 0.03),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
@@ -2304,7 +2304,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [const Color(0xFF8B5CF6), const Color(0xFF8B5CF6).withOpacity(0.7)],
+                            colors: [const Color(0xFF8B5CF6), const Color(0xFF8B5CF6).withValues(alpha: 0.7)],
                           ),
                           borderRadius: BorderRadius.circular(14),
                         ),
@@ -2365,11 +2365,11 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark
-            ? Colors.white.withOpacity(0.05)
-            : Colors.black.withOpacity(0.03),
+            ? Colors.white.withValues(alpha: 0.05)
+            : Colors.black.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06),
+          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
         ),
       ),
       child: Column(
@@ -2381,7 +2381,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [_primaryGreen, _primaryGreen.withOpacity(0.7)],
+                    colors: [_primaryGreen, _primaryGreen.withValues(alpha: 0.7)],
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -2434,7 +2434,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: _accentGold.withOpacity(0.15),
+                  color: _accentGold.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -2461,7 +2461,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withOpacity(0.15),
+                  color: const Color(0xFF10B981).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -2514,7 +2514,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [_accentGold, _accentGold.withOpacity(0.7)],
+                    colors: [_accentGold, _accentGold.withValues(alpha: 0.7)],
                   ),
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -2635,7 +2635,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [const Color(0xFF10B981), const Color(0xFF10B981).withOpacity(0.7)],
+                            colors: [const Color(0xFF10B981), const Color(0xFF10B981).withValues(alpha: 0.7)],
                           ),
                           borderRadius: BorderRadius.circular(14),
                         ),
@@ -2665,10 +2665,10 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 24),
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03),
+                  color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.08),
+                    color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08),
                   ),
                 ),
                 child: Center(
@@ -2805,8 +2805,8 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
                 colors: [
-                  prayerColor.withOpacity(0.15),
-                  prayerColor.withOpacity(0.08),
+                  prayerColor.withValues(alpha: 0.15),
+                  prayerColor.withValues(alpha: 0.08),
                 ],
               )
             : null,
@@ -2816,21 +2816,21 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: isCurrent
-              ? prayerColor.withOpacity(0.4)
-              : (isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06)),
+              ? prayerColor.withValues(alpha: 0.4)
+              : (isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06)),
           width: isCurrent ? 2 : 1,
         ),
         boxShadow: isCurrent
             ? [
                 BoxShadow(
-                  color: prayerColor.withOpacity(0.2),
+                  color: prayerColor.withValues(alpha: 0.2),
                   blurRadius: 16,
                   offset: const Offset(0, 4),
                 ),
               ]
             : [
                 BoxShadow(
-                  color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+                  color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -2859,14 +2859,14 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              prayerColor.withOpacity(0.9),
-                              prayerColor.withOpacity(0.7),
+                              prayerColor.withValues(alpha: 0.9),
+                              prayerColor.withValues(alpha: 0.7),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
-                              color: prayerColor.withOpacity(0.3),
+                              color: prayerColor.withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                             ),
@@ -2972,7 +2972,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
-                                color: prayerColor.withOpacity(0.15),
+                                color: prayerColor.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Row(
@@ -3068,10 +3068,10 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.12),
+          color: color.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: color.withOpacity(0.2),
+            color: color.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -3171,10 +3171,10 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: color.withOpacity(0.2),
+            color: color.withValues(alpha: 0.2),
             width: 1.5,
           ),
         ),

@@ -85,13 +85,13 @@ class SunnahPrayerPage extends StatelessWidget {
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
           colors: [
-            _primaryGreen.withOpacity(0.15),
-            _primaryGreen.withOpacity(0.08),
+            _primaryGreen.withValues(alpha: 0.15),
+            _primaryGreen.withValues(alpha: 0.08),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: _primaryGreen.withOpacity(0.3),
+          color: _primaryGreen.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -146,7 +146,7 @@ class SunnahPrayerPage extends StatelessWidget {
         color: isDark ? _cardDark : _cardLight,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06),
+          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
         ),
       ),
       child: Column(
@@ -157,7 +157,7 @@ class SunnahPrayerPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: _accentGold.withOpacity(0.15),
+                  color: _accentGold.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -248,11 +248,11 @@ class SunnahPrayerPage extends StatelessWidget {
         color: isDark ? _cardDark : _cardLight,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06),
+          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -268,7 +268,7 @@ class SunnahPrayerPage extends StatelessWidget {
                 height: 40,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [_primaryGreen, _primaryGreen.withOpacity(0.7)],
+                    colors: [_primaryGreen, _primaryGreen.withValues(alpha: 0.7)],
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -299,8 +299,8 @@ class SunnahPrayerPage extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: step.type == 'ركن' 
-                        ? const Color(0xFFDC2626).withOpacity(0.15)
-                        : _accentGold.withOpacity(0.15),
+                        ? const Color(0xFFDC2626).withValues(alpha: 0.15)
+                        : _accentGold.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -370,7 +370,7 @@ class SunnahPrayerPage extends StatelessWidget {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 20,
                 offset: const Offset(0, -5),
               ),
@@ -403,12 +403,12 @@ class SunnahPrayerPage extends StatelessWidget {
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [const Color(0xFF10B981), const Color(0xFF10B981).withOpacity(0.7)],
+                        colors: [const Color(0xFF10B981), const Color(0xFF10B981).withValues(alpha: 0.7)],
                       ),
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF10B981).withOpacity(0.3),
+                          color: const Color(0xFF10B981).withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -536,14 +536,14 @@ class SunnahPrayerPage extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        splashColor: color.withOpacity(0.2),
-        highlightColor: color.withOpacity(0.1),
+        splashColor: color.withValues(alpha: 0.2),
+        highlightColor: color.withValues(alpha: 0.1),
         child: Ink(
           decoration: BoxDecoration(
-            color: color.withOpacity(0.12),
+            color: color.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: color.withOpacity(0.3),
+              color: color.withValues(alpha: 0.3),
               width: 1.5,
             ),
           ),
@@ -558,7 +558,7 @@ class SunnahPrayerPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: color.withOpacity(0.3),
+                        color: color.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -608,10 +608,10 @@ class SunnahPrayerPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: _primaryGreen.withOpacity(0.08),
+        color: _primaryGreen.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: _primaryGreen.withOpacity(0.2),
+          color: _primaryGreen.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -644,11 +644,11 @@ class SunnahPrayerPage extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark
-            ? Colors.white.withOpacity(0.05)
-            : Colors.black.withOpacity(0.03),
+            ? Colors.white.withValues(alpha: 0.05)
+            : Colors.black.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: _accentGold.withOpacity(0.3),
+          color: _accentGold.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -686,7 +686,7 @@ class SunnahPrayerPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: _accentGold.withOpacity(0.15),
+              color: _accentGold.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -721,7 +721,7 @@ class SunnahPrayerPage extends StatelessWidget {
         color: isDark ? _cardDark : _cardLight,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06),
+          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
         ),
       ),
       child: Column(
@@ -732,7 +732,7 @@ class SunnahPrayerPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF8B5CF6).withOpacity(0.15),
+                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -803,7 +803,7 @@ class SunnahPrayerPage extends StatelessWidget {
         color: isDark ? _cardDark : _cardLight,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06),
+          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
         ),
       ),
       child: Row(
@@ -812,7 +812,7 @@ class SunnahPrayerPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: const Color(0xFF10B981).withOpacity(0.15),
+              color: const Color(0xFF10B981).withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(

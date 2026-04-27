@@ -121,7 +121,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
     final textColor = isDark ? Colors.white : const Color(0xFF1B1B1B);
     final subtitleColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
     final primary = context.read<ThemeCubit>().state.primary;
-    final borderColor = isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.06);
+    final borderColor = isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.06);
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -632,7 +632,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [primary, primary.withOpacity(0.7)],
+              colors: [primary, primary.withValues(alpha: 0.7)],
             ),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -673,7 +673,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -689,7 +689,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: iconColor.withOpacity(0.12),
+                    color: iconColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Icon(icon, color: iconColor, size: 22),
@@ -737,7 +737,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                           decoration: BoxDecoration(
-                            color: primary.withOpacity(0.08),
+                            color: primary.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -753,7 +753,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
                                 ),
                               ),
                               const Spacer(),
-                              Icon(Icons.edit_rounded, color: primary.withOpacity(0.5), size: 18),
+                              Icon(Icons.edit_rounded, color: primary.withValues(alpha: 0.5), size: 18),
                             ],
                           ),
                         ),
@@ -787,7 +787,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -801,7 +801,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.12),
+                  color: iconColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: iconColor, size: 20),
@@ -830,10 +830,10 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [primary.withOpacity(0.15), primary.withOpacity(0.08)],
+          colors: [primary.withValues(alpha: 0.15), primary.withValues(alpha: 0.08)],
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: primary.withOpacity(0.3), width: 2),
+        border: Border.all(color: primary.withValues(alpha: 0.3), width: 2),
       ),
       child: Column(
         children: [
@@ -876,7 +876,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -913,7 +913,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -968,7 +968,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -1028,7 +1028,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: primary.withOpacity(0.08),
+          color: primary.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -1065,7 +1065,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -1129,9 +1129,9 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
               child: SliderTheme(
                 data: SliderThemeData(
                   activeTrackColor: primary,
-                  inactiveTrackColor: primary.withOpacity(0.2),
+                  inactiveTrackColor: primary.withValues(alpha: 0.2),
                   thumbColor: primary,
-                  overlayColor: primary.withOpacity(0.2),
+                  overlayColor: primary.withValues(alpha: 0.2),
                 ),
                 child: Slider(
                   value: _notificationVolume,
@@ -1166,7 +1166,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: primary.withOpacity(0.08),
+        color: primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
       ),
       child: DropdownButton<String>(
@@ -1200,7 +1200,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -1269,7 +1269,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -1369,10 +1369,10 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: isSelected ? primary : (isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03)),
+              color: isSelected ? primary : (isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03)),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isSelected ? primary : (isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.1)),
+                color: isSelected ? primary : (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.1)),
               ),
             ),
             child: Text(
@@ -1399,7 +1399,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -1493,7 +1493,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: primary.withOpacity(0.08),
+            color: primary.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(12),
           ),
           child: DropdownButton<int>(
@@ -1612,7 +1612,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: primary.withOpacity(0.08),
+            color: primary.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(12),
           ),
           child: DropdownButton<String>(
@@ -1682,7 +1682,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: primary.withOpacity(0.12),
+                color: primary.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -1700,9 +1700,9 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
         SliderTheme(
           data: SliderThemeData(
             activeTrackColor: primary,
-            inactiveTrackColor: primary.withOpacity(0.2),
+            inactiveTrackColor: primary.withValues(alpha: 0.2),
             thumbColor: primary,
-            overlayColor: primary.withOpacity(0.2),
+            overlayColor: primary.withValues(alpha: 0.2),
           ),
           child: Slider(
             value: value,

@@ -369,8 +369,8 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen>
           width: 32.w,
           height: 32.h,
           decoration: BoxDecoration(
-            color: PrayerThemeColors.green.withOpacity(
-              PrayerDimensions.opacityMedium,
+            color: PrayerThemeColors.green.withValues(
+              alpha: PrayerDimensions.opacityMedium,
             ),
             borderRadius: BorderRadius.circular(PrayerDimensions.radiusSmall),
           ),

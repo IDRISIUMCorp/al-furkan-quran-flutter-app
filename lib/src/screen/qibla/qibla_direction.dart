@@ -360,7 +360,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFF59E0B).withOpacity(0.2),
+                color: const Color(0xFFF59E0B).withValues(alpha: 0.2),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -377,7 +377,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFF59E0B).withOpacity(0.3),
+                          color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
                           blurRadius: 8,
                         ),
                       ],
@@ -419,7 +419,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.5),
+                  color: Colors.white.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -475,12 +475,12 @@ class _QiblaDirectionState extends State<QiblaDirection> {
             color: isDark ? const Color(0xFF1F2937) : Colors.white,
             borderRadius: BorderRadius.circular(32),
             border: Border.all(
-              color: statusColor.withOpacity(0.2),
+              color: statusColor.withValues(alpha: 0.2),
               width: 2,
             ),
             boxShadow: [
               BoxShadow(
-                color: isDark ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.08),
+                color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.08),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -515,7 +515,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.15),
+                        color: statusColor.withValues(alpha: 0.15),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: statusColor,
@@ -523,7 +523,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: statusColor.withOpacity(0.3),
+                            color: statusColor.withValues(alpha: 0.3),
                             blurRadius: 12,
                           ),
                         ],
@@ -551,12 +551,12 @@ class _QiblaDirectionState extends State<QiblaDirection> {
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [statusColor, statusColor.withOpacity(0.85)],
+                    colors: [statusColor, statusColor.withValues(alpha: 0.85)],
                   ),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: statusColor.withOpacity(0.3),
+                      color: statusColor.withValues(alpha: 0.3),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -605,7 +605,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
                     child: LinearProgressIndicator(
                       value: guidance.progress,
                       minHeight: 10,
-                      backgroundColor: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.08),
+                      backgroundColor: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08),
                       valueColor: AlwaysStoppedAnimation<Color>(statusColor),
                     ),
                   ),
@@ -712,7 +712,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
               ),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: themeState.primary.withOpacity(0.2),
+                color: themeState.primary.withValues(alpha: 0.2),
                 width: 1.5,
               ),
             ),
@@ -809,7 +809,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
             ),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: themeState.primary.withOpacity(0.2),
+              color: themeState.primary.withValues(alpha: 0.2),
               width: 1.5,
             ),
           ),
@@ -929,13 +929,13 @@ class _QiblaDirectionState extends State<QiblaDirection> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                const Color(0xFF3B82F6).withOpacity(0.08),
-                const Color(0xFF3B82F6).withOpacity(0.03),
+                const Color(0xFF3B82F6).withValues(alpha: 0.08),
+                const Color(0xFF3B82F6).withValues(alpha: 0.03),
               ],
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: const Color(0xFF3B82F6).withOpacity(0.2),
+              color: const Color(0xFF3B82F6).withValues(alpha: 0.2),
             ),
           ),
           child: Row(
@@ -1012,10 +1012,10 @@ class _QiblaDirectionState extends State<QiblaDirection> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: color.withOpacity(0.2),
+          color: color.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -1112,21 +1112,21 @@ class _QiblaDirectionState extends State<QiblaDirection> {
           colors: isDark
               ? [
                   const Color(0xFF1A1F26),
-                  statusColor.withOpacity(0.15),
+                  statusColor.withValues(alpha: 0.15),
                 ]
               : [
                   Colors.white,
-                  statusColor.withOpacity(0.08),
+                  statusColor.withValues(alpha: 0.08),
                 ],
         ),
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: statusColor.withOpacity(0.25),
+          color: statusColor.withValues(alpha: 0.25),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: statusColor.withOpacity(0.15),
+            color: statusColor.withValues(alpha: 0.15),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -1141,12 +1141,12 @@ class _QiblaDirectionState extends State<QiblaDirection> {
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [statusColor, statusColor.withOpacity(0.8)],
+                    colors: [statusColor, statusColor.withValues(alpha: 0.8)],
                   ),
                   borderRadius: BorderRadius.circular(999),
                   boxShadow: [
                     BoxShadow(
-                      color: statusColor.withOpacity(0.3),
+                      color: statusColor.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
@@ -1199,8 +1199,8 @@ class _QiblaDirectionState extends State<QiblaDirection> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: isDark
-                  ? Colors.white.withOpacity(0.05)
-                  : Colors.black.withOpacity(0.03),
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.black.withValues(alpha: 0.03),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -1251,7 +1251,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: themeState.primary.withOpacity(0.2),
+          color: themeState.primary.withValues(alpha: 0.2),
           width: 1.5,
         ),
       ),
@@ -1264,7 +1264,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [themeState.primary, themeState.primary.withOpacity(0.8)],
+                    colors: [themeState.primary, themeState.primary.withValues(alpha: 0.8)],
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -1344,13 +1344,13 @@ class _QiblaDirectionState extends State<QiblaDirection> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            color.withOpacity(0.08),
-            color.withOpacity(0.03),
+            color.withValues(alpha: 0.08),
+            color.withValues(alpha: 0.03),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: color.withOpacity(0.2),
+          color: color.withValues(alpha: 0.2),
           width: 1.5,
         ),
       ),
@@ -1362,7 +1362,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: color, size: 16),
@@ -1425,13 +1425,13 @@ class _QiblaDirectionState extends State<QiblaDirection> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                color.withOpacity(0.12),
-                color.withOpacity(0.06),
+                color.withValues(alpha: 0.12),
+                color.withValues(alpha: 0.06),
               ],
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: color.withOpacity(0.3),
+              color: color.withValues(alpha: 0.3),
               width: 1.5,
             ),
           ),
@@ -1444,7 +1444,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: color.withOpacity(0.3),
+                      color: color.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
@@ -1612,7 +1612,7 @@ class _CompassPainter extends CustomPainter {
       Offset(maxX, maxY),
       const Offset(0, 0),
       degreeAnglePaint
-        ..color = themeState.primary.withOpacity(0.3)
+        ..color = themeState.primary.withValues(alpha: 0.3)
         ..strokeWidth = 8
         ..strokeCap = StrokeCap.round
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),

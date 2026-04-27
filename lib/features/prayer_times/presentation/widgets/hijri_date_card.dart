@@ -36,13 +36,13 @@ class HijriDateCard extends StatelessWidget {
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
             colors: [
-              PrayerThemeColors.gold.withOpacity(0.15),
+              PrayerThemeColors.gold.withValues(alpha: 0.15),
               PrayerThemeColors.surfaceVariant,
             ],
           ),
           borderRadius: BorderRadius.circular(PrayerDimensions.radiusLarge),
           border: Border.all(
-            color: PrayerThemeColors.gold.withOpacity(0.3),
+            color: PrayerThemeColors.gold.withValues(alpha: 0.3),
             width: PrayerDimensions.borderStandard,
           ),
         ),
@@ -140,9 +140,9 @@ class HijriDateCard extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          PrayerThemeColors.gold.withOpacity(0),
-                          PrayerThemeColors.gold.withOpacity(0.5),
-                          PrayerThemeColors.gold.withOpacity(0),
+                          PrayerThemeColors.gold.withValues(alpha: 0),
+                          PrayerThemeColors.gold.withValues(alpha: 0.5),
+                          PrayerThemeColors.gold.withValues(alpha: 0),
                         ],
                       ),
                     ),
@@ -209,12 +209,12 @@ class HijriDateCard extends StatelessWidget {
                     vertical: PrayerDimensions.space8,
                   ),
                   decoration: BoxDecoration(
-                    color: PrayerThemeColors.gold.withOpacity(0.1),
+                    color: PrayerThemeColors.gold.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(
                       PrayerDimensions.radiusSmall,
                     ),
                     border: Border.all(
-                      color: PrayerThemeColors.gold.withOpacity(0.3),
+                      color: PrayerThemeColors.gold.withValues(alpha: 0.3),
                       width: PrayerDimensions.borderThin,
                     ),
                   ),
@@ -296,7 +296,7 @@ class _HilalPatternPainter extends CustomPainter {
       -1.5,
       3.0,
       false,
-      paint..color = color.withOpacity(0.5),
+      paint..color = color.withValues(alpha: 0.5),
     );
     
     // Draw star

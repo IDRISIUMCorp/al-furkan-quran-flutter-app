@@ -266,10 +266,10 @@ extension ImageCustomizationTabs on State {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: SunnahTheme.green.withOpacity(0.1),
+            color: SunnahTheme.green.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
             border: Border.all(
-              color: SunnahTheme.green.withOpacity(0.3),
+              color: SunnahTheme.green.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
@@ -330,13 +330,13 @@ extension ImageCustomizationTabs on State {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                SunnahTheme.green.withOpacity(0.1),
-                SunnahTheme.gold.withOpacity(0.1),
+                SunnahTheme.green.withValues(alpha: 0.1),
+                SunnahTheme.gold.withValues(alpha: 0.1),
               ],
             ),
             borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
             border: Border.all(
-              color: SunnahTheme.green.withOpacity(0.3),
+              color: SunnahTheme.green.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
@@ -432,7 +432,7 @@ extension ImageCustomizationTabs on State {
           min: min,
           max: max,
           activeColor: SunnahTheme.green,
-          inactiveColor: SunnahTheme.green.withOpacity(0.2),
+          inactiveColor: SunnahTheme.green.withValues(alpha: 0.2),
           onChanged: onChanged,
         ),
       ],
@@ -560,7 +560,7 @@ extension ImageCustomizationTabs on State {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: isSelected
-                ? SunnahTheme.green.withOpacity(0.15)
+                ? SunnahTheme.green.withValues(alpha: 0.15)
                 : SunnahTheme.getSurfaceColor(isDark),
             borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
             border: Border.all(
@@ -597,7 +597,7 @@ extension ImageCustomizationTabs on State {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
               color: isSelected
-                  ? SunnahTheme.green.withOpacity(0.15)
+                  ? SunnahTheme.green.withValues(alpha: 0.15)
                   : SunnahTheme.getSurfaceColor(isDark),
               borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
               border: Border.all(
@@ -639,7 +639,7 @@ extension ImageCustomizationTabs on State {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
               color: isSelected
-                  ? SunnahTheme.green.withOpacity(0.15)
+                  ? SunnahTheme.green.withValues(alpha: 0.15)
                   : SunnahTheme.getSurfaceColor(isDark),
               borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
               border: Border.all(
@@ -681,7 +681,7 @@ extension ImageCustomizationTabs on State {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
               color: isSelected
-                  ? SunnahTheme.green.withOpacity(0.15)
+                  ? SunnahTheme.green.withValues(alpha: 0.15)
                   : SunnahTheme.getSurfaceColor(isDark),
               borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
               border: Border.all(
@@ -723,7 +723,7 @@ extension ImageCustomizationTabs on State {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
               color: isSelected
-                  ? SunnahTheme.green.withOpacity(0.15)
+                  ? SunnahTheme.green.withValues(alpha: 0.15)
                   : SunnahTheme.getSurfaceColor(isDark),
               borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
               border: Border.all(
@@ -765,7 +765,7 @@ extension ImageCustomizationTabs on State {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? SunnahTheme.green.withOpacity(0.15)
+                    ? SunnahTheme.green.withValues(alpha: 0.15)
                     : SunnahTheme.getSurfaceColor(isDark),
                 borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
                 border: Border.all(

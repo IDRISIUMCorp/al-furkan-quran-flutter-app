@@ -69,7 +69,7 @@ class SunnahShareBottomSheet extends StatelessWidget {
                     gradient: LinearGradient(
                       colors: [
                         SunnahTheme.success,
-                        SunnahTheme.success.withOpacity(0.7),
+                        SunnahTheme.success.withValues(alpha: 0.7),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
@@ -323,10 +323,10 @@ class _ShareOptionButton extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.all(SunnahTheme.space20),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.12),
+            color: color.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
             border: Border.all(
-              color: color.withOpacity(0.3),
+              color: color.withValues(alpha: 0.3),
               width: SunnahTheme.borderStandard,
             ),
           ),

@@ -242,13 +242,13 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color(0xFF3B82F6).withOpacity(0.15),
-            const Color(0xFF8B5CF6).withOpacity(0.15),
+            const Color(0xFF3B82F6).withValues(alpha: 0.15),
+            const Color(0xFF8B5CF6).withValues(alpha: 0.15),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFF3B82F6).withOpacity(0.3),
+          color: const Color(0xFF3B82F6).withValues(alpha: 0.3),
           width: 2,
         ),
       ),
@@ -257,7 +257,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
           Container(
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
-              color: const Color(0xFF3B82F6).withOpacity(0.2),
+              color: const Color(0xFF3B82F6).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(14),
             ),
             child: const Icon(
@@ -301,7 +301,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF3B82F6).withOpacity(0.1),
+        color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -323,7 +323,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03),
+        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -450,7 +450,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
           Container(
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
-              color: themeState.primary.withOpacity(0.08),
+              color: themeState.primary.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -603,12 +603,12 @@ class _SettingsHero extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: isDark ? Colors.white10 : themeState.primary.withOpacity(0.08),
+          color: isDark ? Colors.white10 : themeState.primary.withValues(alpha: 0.08),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: themeState.primary.withOpacity(0.1),
+            color: themeState.primary.withValues(alpha: 0.1),
             blurRadius: 30,
             offset: const Offset(0, 12),
           ),
@@ -623,12 +623,12 @@ class _SettingsHero extends StatelessWidget {
                 padding: EdgeInsets.all(14.w),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [themeState.primary, themeState.primary.withOpacity(0.7)],
+                    colors: [themeState.primary, themeState.primary.withValues(alpha: 0.7)],
                   ),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: themeState.primary.withOpacity(0.3),
+                      color: themeState.primary.withValues(alpha: 0.3),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -665,7 +665,7 @@ class _SettingsHero extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
-              color: isDark ? Colors.white.withOpacity(0.05) : themeState.primary.withOpacity(0.05),
+              color: isDark ? Colors.white.withValues(alpha: 0.05) : themeState.primary.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Text(
@@ -726,8 +726,8 @@ class _SettingsSectionCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      themeState.primary.withOpacity(0.15),
-                      themeState.primary.withOpacity(0.08),
+                      themeState.primary.withValues(alpha: 0.15),
+                      themeState.primary.withValues(alpha: 0.08),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(14),
@@ -784,12 +784,12 @@ class _SettingsShortcutTile extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDark
-                ? [Colors.white.withOpacity(0.05), Colors.white.withOpacity(0.02)]
-                : [themeState.primary.withOpacity(0.05), themeState.primary.withOpacity(0.02)],
+                ? [Colors.white.withValues(alpha: 0.05), Colors.white.withValues(alpha: 0.02)]
+                : [themeState.primary.withValues(alpha: 0.05), themeState.primary.withValues(alpha: 0.02)],
           ),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.08) : themeState.primary.withOpacity(0.1),
+            color: isDark ? Colors.white.withValues(alpha: 0.08) : themeState.primary.withValues(alpha: 0.1),
           ),
         ),
         child: Row(
@@ -800,12 +800,12 @@ class _SettingsShortcutTile extends StatelessWidget {
               height: 48.w,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [themeState.primary, themeState.primary.withOpacity(0.8)],
+                  colors: [themeState.primary, themeState.primary.withValues(alpha: 0.8)],
                 ),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: themeState.primary.withOpacity(0.3),
+                    color: themeState.primary.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),

@@ -36,13 +36,13 @@ class SunnahIntroCard extends StatelessWidget {
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
             colors: [
-              SunnahTheme.green.withOpacity(0.15),
-              SunnahTheme.green.withOpacity(0.08),
+              SunnahTheme.green.withValues(alpha: 0.15),
+              SunnahTheme.green.withValues(alpha: 0.08),
             ],
           ),
           borderRadius: BorderRadius.circular(SunnahTheme.radiusXLarge),
           border: Border.all(
-            color: SunnahTheme.green.withOpacity(0.3),
+            color: SunnahTheme.green.withValues(alpha: 0.3),
             width: SunnahTheme.borderStandard,
           ),
         ),
@@ -127,7 +127,7 @@ class SunnahImportanceCard extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(SunnahTheme.space12),
                   decoration: BoxDecoration(
-                    color: SunnahTheme.gold.withOpacity(0.15),
+                    color: SunnahTheme.gold.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
                   ),
                   child: Icon(
@@ -165,10 +165,10 @@ class SunnahImportanceCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(SunnahTheme.space16),
       decoration: BoxDecoration(
-        color: SunnahTheme.gold.withOpacity(0.08),
+        color: SunnahTheme.gold.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
         border: Border.all(
-          color: SunnahTheme.gold.withOpacity(0.3),
+          color: SunnahTheme.gold.withValues(alpha: 0.3),
           width: SunnahTheme.borderStandard,
         ),
       ),
@@ -210,7 +210,7 @@ class SunnahImportanceCard extends StatelessWidget {
               vertical: SunnahTheme.space8,
             ),
             decoration: BoxDecoration(
-              color: SunnahTheme.gold.withOpacity(0.15),
+              color: SunnahTheme.gold.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(SunnahTheme.radiusSmall),
             ),
             child: Text(
@@ -323,7 +323,7 @@ class SunnahStepCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -342,7 +342,7 @@ class SunnahStepCard extends StatelessWidget {
                     gradient: LinearGradient(
                       colors: [
                         SunnahTheme.green,
-                        SunnahTheme.green.withOpacity(0.7),
+                        SunnahTheme.green.withValues(alpha: 0.7),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
@@ -380,7 +380,7 @@ class SunnahStepCard extends StatelessWidget {
                       vertical: SunnahTheme.space4,
                     ),
                     decoration: BoxDecoration(
-                      color: (badgeColor ?? SunnahTheme.gold).withOpacity(0.15),
+                      color: (badgeColor ?? SunnahTheme.gold).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(SunnahTheme.radiusSmall),
                     ),
                     child: Text(
@@ -441,10 +441,10 @@ class SunnahStepCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(SunnahTheme.space12),
       decoration: BoxDecoration(
-        color: SunnahTheme.green.withOpacity(0.08),
+        color: SunnahTheme.green.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
         border: Border.all(
-          color: SunnahTheme.green.withOpacity(0.2),
+          color: SunnahTheme.green.withValues(alpha: 0.2),
           width: SunnahTheme.borderStandard,
         ),
       ),
@@ -514,7 +514,7 @@ class SunnahScholarCard extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(SunnahTheme.space12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF8B5CF6).withOpacity(0.15),
+                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
                   ),
                   child: const Icon(
@@ -603,7 +603,7 @@ class SunnahBenefitCard extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(SunnahTheme.space8),
               decoration: BoxDecoration(
-                color: SunnahTheme.success.withOpacity(0.15),
+                color: SunnahTheme.success.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(SunnahTheme.radiusSmall),
               ),
               child: Icon(

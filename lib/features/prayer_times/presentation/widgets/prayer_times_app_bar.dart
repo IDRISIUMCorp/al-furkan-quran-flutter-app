@@ -39,7 +39,7 @@ class PrayerTimesAppBar extends StatelessWidget {
     return Container(
       height: PrayerDimensions.appBarHeight,
       decoration: BoxDecoration(
-        color: bgColor.withOpacity(opacity),
+        color: bgColor.withValues(alpha: opacity),
         border: isScrolled
             ? Border(
                 bottom: BorderSide(
@@ -81,8 +81,8 @@ class PrayerTimesAppBar extends StatelessWidget {
                             width: 32.w,
                             height: 32.h,
                             decoration: BoxDecoration(
-                              color: PrayerThemeColors.green.withOpacity(
-                                PrayerDimensions.opacityLight,
+                              color: PrayerThemeColors.green.withValues(
+                                alpha: PrayerDimensions.opacityLight,
                               ),
                               borderRadius: BorderRadius.circular(
                                 PrayerDimensions.radiusSmall,

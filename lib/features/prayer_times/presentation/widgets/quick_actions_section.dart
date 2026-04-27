@@ -143,8 +143,8 @@ class _QuickActionButtonState extends State<_QuickActionButton>
                 width: 48.w,
                 height: 48.h,
                 decoration: BoxDecoration(
-                  color: widget.color.withOpacity(
-                    PrayerDimensions.opacityLight,
+                  color: widget.color.withValues(
+                    alpha: PrayerDimensions.opacityLight,
                   ),
                   borderRadius: BorderRadius.circular(
                     PrayerDimensions.radiusMedium,

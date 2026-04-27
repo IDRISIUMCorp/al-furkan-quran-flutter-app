@@ -84,7 +84,7 @@ class NextPrayerHeroCard extends StatelessWidget {
                                 boxShadow: [
                                   BoxShadow(
                                     color: PrayerThemeColors.green
-                                        .withOpacity(pulseAnimation.value),
+                                        .withValues(alpha: pulseAnimation.value),
                                     blurRadius: 8 * pulseAnimation.value,
                                     spreadRadius: 4 * pulseAnimation.value,
                                   ),
@@ -112,8 +112,8 @@ class NextPrayerHeroCard extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(PrayerDimensions.space8),
                           decoration: BoxDecoration(
-                            color: PrayerThemeColors.green.withOpacity(
-                              PrayerDimensions.opacityLight,
+                            color: PrayerThemeColors.green.withValues(
+                              alpha: PrayerDimensions.opacityLight,
                             ),
                             borderRadius: BorderRadius.circular(
                               PrayerDimensions.radiusSmall,
@@ -175,7 +175,7 @@ class NextPrayerHeroCard extends StatelessWidget {
                           PrayerDimensions.radiusMedium,
                         ),
                         border: Border.all(
-                          color: PrayerThemeColors.prayerNext.withOpacity(0.3),
+                          color: PrayerThemeColors.prayerNext.withValues(alpha: 0.3),
                           width: PrayerDimensions.borderThin,
                         ),
                       ),

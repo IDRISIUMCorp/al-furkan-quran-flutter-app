@@ -182,7 +182,7 @@ class SunnahShareService {
     final badgeColorFinal = badgeColor ?? settings.badgeColor;
     final titleColor = const Color(0xFF1A1A1A);
     final descColor = const Color(0xFF9CA3AF);
-    final evidenceBgColor = badgeColorFinal.withOpacity(0.08);
+    final evidenceBgColor = badgeColorFinal.withValues(alpha: 0.08);
     
     // المسافات (متناسبة مع الحجم)
     final outerPadding = 40.0 * scale;
@@ -626,7 +626,7 @@ class SunnahShareService {
   /// رسم نمط الخلفية
   static void _drawBackgroundPattern(Canvas canvas, double width, double height) {
     final paint = Paint()
-      ..color = SunnahTheme.green.withOpacity(0.03)
+      ..color = SunnahTheme.green.withValues(alpha: 0.03)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
     
@@ -667,7 +667,7 @@ class SunnahShareService {
           break;
         case HeaderStyle.gradient:
           iconPaint.shader = LinearGradient(
-            colors: [settings.headerColor, settings.headerColor.withOpacity(0.6)],
+            colors: [settings.headerColor, settings.headerColor.withValues(alpha: 0.6)],
           ).createShader(Rect.fromCircle(center: Offset(x + 30, y + 30), radius: 30));
           break;
         case HeaderStyle.outlined:
@@ -735,7 +735,7 @@ class SunnahShareService {
         break;
     }
     
-    final badgePaint = Paint()..color = color.withOpacity(0.15);
+    final badgePaint = Paint()..color = color.withValues(alpha: 0.15);
     final badgeRect = RRect.fromRectAndRadius(
       Rect.fromLTWH(x, y, 120, 40),
       Radius.circular(badgeRadius),
@@ -852,7 +852,7 @@ class SunnahShareService {
     // صندوق الدليل بارتفاع مناسب (padding صغير جداً)
     final boxPadding = 12.0; // padding 6 من كل جهة
     final boxHeight = textPainter.height + boxPadding;
-    final boxPaint = Paint()..color = settings.evidenceColor.withOpacity(0.1);
+    final boxPaint = Paint()..color = settings.evidenceColor.withValues(alpha: 0.1);
     final boxRect = RRect.fromRectAndRadius(
       Rect.fromLTWH(x - 20, y - 6, maxWidth + 40, boxHeight),
       Radius.circular(settings.cardRadius * 0.6),
@@ -1023,7 +1023,7 @@ class SunnahShareService {
     textPainter.layout(maxWidth: maxWidth - 50);
     
     // صندوق بسيط بدون padding كبير
-    final boxPaint = Paint()..color = settings.evidenceColor.withOpacity(0.08);
+    final boxPaint = Paint()..color = settings.evidenceColor.withValues(alpha: 0.08);
     final boxRect = RRect.fromRectAndRadius(
       Rect.fromLTWH(x - 15, y - 6, maxWidth + 30, textPainter.height + 12), // قللت الـ padding من 16 إلى 12
       Radius.circular(12),
@@ -1049,7 +1049,7 @@ class SunnahShareService {
   ) async {
     // خط فاصل بسيط
     final linePaint = Paint()
-      ..color = settings.borderColor.withOpacity(0.3)
+      ..color = settings.borderColor.withValues(alpha: 0.3)
       ..strokeWidth = 1.5;
     canvas.drawLine(
       Offset(width * 0.3, y),

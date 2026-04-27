@@ -414,7 +414,7 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
             decoration: BoxDecoration(
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
@@ -466,7 +466,7 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -476,7 +476,7 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
         controller: _tabController,
         isScrollable: true,
         indicator: BoxDecoration(
-          color: SunnahTheme.green.withOpacity(0.1),
+          color: SunnahTheme.green.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
@@ -886,7 +886,7 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
         color: isDark ? const Color(0xFF1A1F2E) : Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -918,7 +918,7 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
         ),
       ).animate(target: _isGenerating ? 1 : 0).shimmer(
         duration: 1500.ms,
-        color: Colors.white.withOpacity(0.3),
+        color: Colors.white.withValues(alpha: 0.3),
       ),
     );
   }
@@ -951,7 +951,7 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: SunnahTheme.green.withOpacity(0.1),
+                  color: SunnahTheme.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(icon, color: SunnahTheme.green, size: 18),
@@ -1001,7 +1001,7 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: SunnahTheme.green.withOpacity(0.1),
+                color: SunnahTheme.green.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -1019,9 +1019,9 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
         SliderTheme(
           data: SliderThemeData(
             activeTrackColor: SunnahTheme.green,
-            inactiveTrackColor: SunnahTheme.green.withOpacity(0.2),
+            inactiveTrackColor: SunnahTheme.green.withValues(alpha: 0.2),
             thumbColor: SunnahTheme.green,
-            overlayColor: SunnahTheme.green.withOpacity(0.2),
+            overlayColor: SunnahTheme.green.withValues(alpha: 0.2),
             trackHeight: 4,
           ),
           child: Slider(
@@ -1266,7 +1266,7 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: SunnahTheme.gold.withOpacity(0.1),
+                color: SunnahTheme.gold.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: SunnahTheme.gold, size: 24),
@@ -1360,7 +1360,7 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
       descriptionFontSize: 22,
       evidenceFontSize: 18,
       titleColor: Colors.white,
-      descriptionColor: Colors.white.withOpacity(0.9),
+      descriptionColor: Colors.white.withValues(alpha: 0.9),
       evidenceColor: const Color(0xFFC9A84C),
       layoutStyle: LayoutStyle.modern,
       cardRadius: 24,

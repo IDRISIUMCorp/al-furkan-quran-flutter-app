@@ -40,7 +40,7 @@ class ForbiddenTimesSection extends StatelessWidget {
         color: PrayerThemeColors.errorLight,
         borderRadius: BorderRadius.circular(PrayerDimensions.radiusMedium),
         border: Border.all(
-          color: PrayerThemeColors.error.withOpacity(0.3),
+          color: PrayerThemeColors.error.withValues(alpha: 0.3),
           width: PrayerDimensions.borderStandard,
         ),
       ),
@@ -50,7 +50,7 @@ class ForbiddenTimesSection extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(PrayerDimensions.space16),
             decoration: BoxDecoration(
-              color: PrayerThemeColors.error.withOpacity(0.1),
+              color: PrayerThemeColors.error.withValues(alpha: 0.1),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(PrayerDimensions.radiusMedium),
                 topRight: Radius.circular(PrayerDimensions.radiusMedium),
@@ -183,7 +183,7 @@ class ForbiddenTimesSection extends StatelessWidget {
             width: 48.w,
             height: 48.h,
             decoration: BoxDecoration(
-              color: PrayerThemeColors.error.withOpacity(0.1),
+              color: PrayerThemeColors.error.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(PrayerDimensions.radiusSmall),
             ),
             child: ClipRRect(
