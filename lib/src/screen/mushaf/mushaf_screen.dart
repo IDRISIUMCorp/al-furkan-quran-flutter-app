@@ -1,5 +1,4 @@
 import "dart:async";
-import "dart:convert";
 import "dart:ui";
 import "package:al_furkan/src/screen/mushaf/widgets/bookmarks_sheet.dart";
 import "package:al_furkan/src/screen/mushaf/widgets/starred_sheet.dart";
@@ -16,13 +15,11 @@ import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "package:qcf_quran/qcf_quran.dart" hide getPageNumber;
-import "package:share_plus/share_plus.dart";
 
 import "package:al_furkan/src/core/audio/cubit/player_position_cubit.dart";
 import "package:al_furkan/src/core/audio/model/audio_player_position_model.dart";
 import "package:al_furkan/src/utils/quran_resources/segmented_resources_manager.dart";
 
-import "package:al_furkan/l10n/app_localizations.dart";
 import "package:al_furkan/main.dart";
 import "package:al_furkan/src/core/audio/cubit/audio_ui_cubit.dart";
 import "package:al_furkan/src/core/audio/cubit/ayah_key_cubit.dart";
@@ -43,9 +40,7 @@ import "package:al_furkan/src/screen/quran_script_view/cubit/ayah_to_highlight.d
 import "package:al_furkan/src/screen/quran_script_view/quran_script_view.dart";
 import "package:al_furkan/src/screen/search/search_screen.dart";
 import "package:al_furkan/src/screen/settings/cubit/quran_script_view_cubit.dart";
-import "package:al_furkan/src/resources/quran_resources/models/tafsir_book_model.dart";
 import "package:al_furkan/src/utils/quran_resources/quran_script_function.dart";
-import "package:al_furkan/src/utils/quran_resources/quran_tafsir_function.dart";
 import "package:al_furkan/src/utils/quran_word/show_popup_word_function.dart";
 import "package:hive_ce_flutter/hive_flutter.dart";
 import "package:al_furkan/src/utils/number_localization.dart";
@@ -60,14 +55,12 @@ import "package:al_furkan/src/screen/mushaf/index/aya_index_page.dart";
 // Removed audio_page.dart import
 import "package:al_furkan/src/widget/add_collection_popup/add_note_popup.dart";
 import "package:al_furkan/src/screen/about/about_the_app.dart";
-import "package:al_furkan/src/screen/mushaf/widgets/image_share/ayah_image_generator.dart";
 import "package:al_furkan/src/screen/mushaf/widgets/khatma_sheet.dart";
 import "package:al_furkan/src/screen/azkar/azkar_categories_screen.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:al_furkan/src/theme/controller/theme_cubit.dart";
 import "package:al_furkan/src/theme/controller/theme_state.dart";
 import "package:qcf_quran/qcf_quran.dart" as qcf;
-import "package:al_furkan/src/resources/quran_resources/tafsir_info_with_score.dart";
 import "package:al_furkan/src/utils/quran_ayahs_function/get_page_number.dart";
 import "package:al_furkan/src/resources/quran_resources/quran_pages_info.dart";
 import "package:al_furkan/src/utils/basic_functions.dart";
