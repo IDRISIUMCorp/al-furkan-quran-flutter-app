@@ -57,17 +57,6 @@ class _WordInfoResourcesViewState extends State<WordInfoResourcesView> {
     }
   }
 
-  String _subtitle(WordInfoKind kind) {
-    switch (kind) {
-      case WordInfoKind.eerab:
-        return "تحليل نحوي مباشر للكلمة داخل الآية.";
-      case WordInfoKind.tasreef:
-        return "بيانات صرفية وبنية الكلمة.";
-      case WordInfoKind.recitations:
-        return "اختلافات القراءة والمادة المرتبطة بالكلمة.";
-    }
-  }
-
   bool _isBusy(ResourcesProgressCubitState state, WordInfoKind kind) {
     if (state.onProcess != true) return false;
     return state.progressMap.containsKey(kind.name);
@@ -146,16 +135,6 @@ class _WordInfoResourcesViewState extends State<WordInfoResourcesView> {
 
     if (confirmed != true) return;
     await _wordInfoRepo.deleteKind(kind);
-    if (mounted) setState(() {});
-  }
-
-  Future<void> _deleteMany(List<ManagedResourceItem> items) async {
-    for (final item in items) {
-      final kind = WordInfoKind.values.firstWhere(
-        (entry) => entry.name == item.id,
-      );
-      await _wordInfoRepo.deleteKind(kind);
-    }
     if (mounted) setState(() {});
   }
 

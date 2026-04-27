@@ -85,9 +85,6 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
       _isDark ? Theme.of(context).colorScheme.surface : AppColors.ayaSurface;
   Color get _cardColor =>
       _isDark ? Colors.white.withValues(alpha: 0.05) : AppColors.ayaCard;
-  Color get _borderColor => _isDark
-      ? Colors.white.withValues(alpha: 0.08)
-      : AppColors.ayaBorder;
   Color get _textColor => _isDark ? Colors.white : AppColors.ayaTextMain;
   Color get _mutedColor => _isDark ? Colors.white54 : AppColors.ayaTextMuted;
 
@@ -323,20 +320,6 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
     return buffer.toString();
   }
 
-  String _cleanAyahText(String originalText) {
-    if (originalText.contains(":") && !originalText.contains(" ")) {
-      // Likely a reference key like "2:10" that survived the fallback
-      return "";
-    }
-    var t = originalText.trimRight();
-    t = t.replaceAll(RegExp(r"[\s\u06DD۝]+$"), "");
-    t = t.replaceAll(RegExp(r"[\s0-9\u0660-\u0669]+$"), "");
-
-    // If we stripped too much, return original
-    if (t.trim().isEmpty && originalText.isNotEmpty) return originalText;
-
-    return t.trimRight();
-  }
 
   Future<void> _share() async {
     if (_shareMode == 0) {

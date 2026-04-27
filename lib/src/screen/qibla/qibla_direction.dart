@@ -72,20 +72,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
     _calibrationTimer?.cancel();
     super.dispose();
   }
-  
-  // Exponential Moving Average for instant response
-  double _applyEMA(double value) {
-    if (_emaValue == null) {
-      _emaValue = value;
-      return value;
-    }
-    
-    final double diff = shortestSignedAngleDifference(_emaValue!, value);
-    _emaValue = normalizeDegrees(_emaValue! + _emaAlpha * diff);
-    
-    return _emaValue!;
-  }
-  
+
   // ULTRA-fast smoothing - minimal processing for instant response
   double _advancedSmoothing(double rawHeading) {
     // Only use EMA for instant response
@@ -1222,106 +1209,6 @@ class _QiblaDirectionState extends State<QiblaDirection> {
                   ),
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTipsCard({
-    required bool isDark,
-    required ThemeState themeState,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [
-                  const Color(0xFF1A1F26),
-                  const Color(0xFF0F1419),
-                ]
-              : [
-                  const Color(0xFFFFFCF6),
-                  const Color(0xFFFFF8E7),
-                ],
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: themeState.primary.withValues(alpha: 0.2),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [themeState.primary, themeState.primary.withValues(alpha: 0.8)],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.tips_and_updates_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-              const Gap(12),
-              Text(
-                "نصائح لأفضل دقة",
-                style: GoogleFonts.cairo(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w900,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
-              ),
-            ],
-          ),
-          const Gap(14),
-          _buildTipLine(
-            "🧲 أبعد الهاتف عن المعادن والمغناطيسات",
-            isDark,
-          ),
-          _buildTipLine(
-            "🔄 حرّك الهاتف حركة رقم 8 لمعايرة الحساسات",
-            isDark,
-          ),
-          _buildTipLine(
-            "📱 استخدم زر المعايرة إذا لاحظت اهتزازاً",
-            isDark,
-          ),
-          _buildTipLine(
-            "🎯 وضع AR يوفر إشارة اتجاهية أوضح",
-            isDark,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTipLine(String text, bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Text(
-              text,
-              style: GoogleFonts.cairo(
-                fontSize: 13,
-                height: 1.7,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white70 : Colors.black54,
-              ),
             ),
           ),
         ],
