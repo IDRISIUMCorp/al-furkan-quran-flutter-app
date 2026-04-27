@@ -11,27 +11,10 @@ const _accentGold = Color(0xFFC9A84C);    // من وحي
 const _darkBg = Color(0xFF1A1F26);
 const _cardDark = Color(0xFF242933);
 const _cardLight = Color(0xFFFFFFFF);     // أبيض نقي
-const _bgLight = Color(0xFFF8F6ED);       // من وحي - دافئ
 const _textLight = Color(0xFFF8F9FA);
 const _textDark = Color(0xFF2C2C2C);      // من وحي
 const _mutedLight = Color(0xFFB8BCC2);
 const _mutedDark = Color(0xFF6B6B6B);     // من وحي
-const _border = Color(0xFFDDD9CC);        // من آية - أوضح
-const _borderDark = Color(0xFF3A3F4D);
-
-// Dimensions (من آية - أكثر سخاءً)
-const _space4 = 4.0;
-const _space8 = 8.0;
-const _space12 = 12.0;
-const _space16 = 16.0;
-const _space20 = 20.0;
-const _space24 = 24.0;
-const _radiusSmall = 10.0;
-const _radiusMedium = 14.0;
-const _radiusLarge = 18.0;
-const _radiusXLarge = 24.0;
-const _borderWidth = 1.5;                 // من آية
-const _touchTarget = 44.0;                // من آية
 
 class SunnahPrayerPage extends StatelessWidget {
   const SunnahPrayerPage({super.key});
