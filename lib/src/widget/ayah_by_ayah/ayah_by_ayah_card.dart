@@ -86,10 +86,10 @@ Future<void> _showWahyBookmarkColorSheet({
   final bg = isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF7F1E6);
   final card = isDark ? const Color(0xFF252525) : const Color(0xFFFFF9F2);
   final colors = <String, ({String name, Color color})>{
-    "red": (name: "الأحمر", color: const Color(0xFFB3261E)),
-    "yellow": (name: "الأصفر", color: const Color(0xFFB68A00)),
-    "green": (name: "الأخضر", color: themeState.primary),
-    "blue": (name: "الأزرق", color: const Color(0xFF2962FF)),
+    "red": (name: "Ø§Ù„Ø£Ø­Ù…Ø±", color: const Color(0xFFB3261E)),
+    "yellow": (name: "Ø§Ù„Ø£ØµÙØ±", color: const Color(0xFFB68A00)),
+    "green": (name: "Ø§Ù„Ø£Ø®Ø¶Ø±", color: themeState.primary),
+    "blue": (name: "Ø§Ù„Ø£Ø²Ø±Ù‚", color: const Color(0xFF2962FF)),
   };
 
   await showModalBottomSheet(
@@ -170,148 +170,6 @@ Future<void> _showWahyBookmarkColorSheet({
   );
 }
 
-Future<void> _showWahyAddNoteSheet({
-  required BuildContext context,
-  required ThemeState themeState,
-  required String ayahKey,
-}) async {
-  final isDark = Theme.of(context).brightness == Brightness.dark;
-  final bg = isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF7F1E6);
-  final controller = TextEditingController();
-
-  final result = await showModalBottomSheet<String>(
-    context: context,
-    useRootNavigator: true,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (ctx) {
-      return Directionality(
-        textDirection: TextDirection.rtl,
-        child: Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(ctx).viewInsets.bottom,
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              color: bg,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(22),
-                topRight: Radius.circular(22),
-              ),
-            ),
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.18),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        "ملاحظة جديدة",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                          color: themeState.primary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: controller,
-                      minLines: 3,
-                      maxLines: 7,
-                      textDirection: TextDirection.rtl,
-                      decoration: InputDecoration(
-                        hintText: "اكتب ملاحظتك هنا…",
-                        filled: true,
-                        fillColor: isDark
-                            ? const Color(0xFF252525)
-                            : const Color(0xFFFFF9F2),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(
-                            color: isDark
-                                ? Colors.white12
-                                : Colors.black.withValues(alpha: 0.08),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(
-                            color: isDark
-                                ? Colors.white12
-                                : Colors.black.withValues(alpha: 0.08),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(
-                            color: themeState.primary,
-                            width: 1.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: themeState.primary,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          elevation: 0,
-                        ),
-                        onPressed: () {
-                          Navigator.pop(ctx, controller.text.trim());
-                        },
-                        child: const Text(
-                          "حفظ الملاحظة",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-    },
-  );
-
-  final text = (result ?? "").trim();
-  if (text.isEmpty) return;
-  final box = Hive.box("user");
-  final raw = box.get(_kWahyNotes, defaultValue: const []) as List?;
-  final list = (raw ?? const [])
-      .map((e) => Map<String, dynamic>.from(e as Map))
-      .toList();
-  list.insert(0, {
-    "ayahKey": ayahKey,
-    "text": text,
-    "createdAt": DateTime.now().toIso8601String(),
-  });
-  await box.put(_kWahyNotes, list);
-}
 
 final Map<String, Future<String?>> _defaultTafsirFutureCache =
     <String, Future<String?>>{};
@@ -319,11 +177,11 @@ final Map<String, String?> _defaultTafsirTextCache = <String, String?>{};
 final Map<String, String> _defaultTafsirBookNameCache = <String, String>{};
 
 /// Parses tafsir text and builds a RichText widget where:
-/// - ﴿...﴾ / ﴁ...ﴂ → Uthmani font + primary color (Quran ayah)
-/// - {...} → Uthmani font + primary color (curly brackets)
-/// - [...] → primary color only (square brackets)
+/// - ï´¿...ï´¾ / ï´...ï´‚ â†’ Uthmani font + primary color (Quran ayah)
+/// - {...} â†’ Uthmani font + primary color (curly brackets)
+/// - [...] â†’ primary color only (square brackets)
 Widget _buildTafsirRichText(String text, Color baseColor, ThemeState themeState, {bool isDark = false, String quranFontFamily = "QPC_Hafs"}) {
-  // {} → golden yellow, [] → warm amber
+  // {} â†’ golden yellow, [] â†’ warm amber
   final curlyColor = isDark ? const Color(0xFFE6B422) : const Color(0xFF9E7C0A);
   final squareColor = isDark ? const Color(0xFFCD853F) : const Color(0xFF8B5E3C);
   final quranColor = isDark ? themeState.primary : curlyColor;
@@ -335,7 +193,7 @@ Widget _buildTafsirRichText(String text, Color baseColor, ThemeState themeState,
   );
 
   // Collect all bracket matches with their kind
-  final quranPattern = RegExp(r'[﴿ﴁ][\s\S]*?[﴾ﴂ]', unicode: true);
+  final quranPattern = RegExp(r'[ï´¿ï´][\s\S]*?[ï´¾ï´‚]', unicode: true);
   final curlyPattern = RegExp(r'\{[^\}]+\}');
   final squarePattern = RegExp(r'\[[^\]]+\]');
 
@@ -442,14 +300,14 @@ Widget getAyahByAyahTafsirCard({
 
       TafsirBookModel? book;
       for (final b in selected) {
-        if (b.name.contains("السعدي")) {
+        if (b.name.contains("Ø§Ù„Ø³Ø¹Ø¯ÙŠ")) {
           book = b;
           break;
         }
       }
       for (final b in selected) {
         if (book != null) break;
-        if (b.name.contains("الميسر")) {
+        if (b.name.contains("Ø§Ù„Ù…ÙŠØ³Ø±")) {
           book = b;
           break;
         }
@@ -563,7 +421,7 @@ Widget getAyahByAyahTafsirCard({
                         children: [
                           Expanded(
                             child: Text(
-                              _defaultTafsirBookNameCache[ayahKey] ?? "التفسير",
+                              _defaultTafsirBookNameCache[ayahKey] ?? "Ø§Ù„ØªÙØ³ÙŠØ±",
                               textAlign: TextAlign.right,
                               style: TextStyle(
                                 fontSize: 16,
@@ -580,7 +438,7 @@ Widget getAyahByAyahTafsirCard({
                                 Clipboard.setData(ClipboardData(text: text));
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: const Text("تم نسخ التفسير"),
+                                    content: const Text("ØªÙ… Ù†Ø³Ø® Ø§Ù„ØªÙØ³ÙŠØ±"),
                                     behavior: SnackBarBehavior.floating,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
@@ -939,7 +797,7 @@ Widget getAyahByAyahCard({
                             ),
                           if (isSajdaAyah) const Gap(5),
 
-                          // ─── Per-Ayah Play / Menu Row ───
+                          // â”€â”€â”€ Per-Ayah Play / Menu Row â”€â”€â”€
                           const Gap(10),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -1380,7 +1238,7 @@ Widget getToolbarWidget(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               child: Text(
                 showFullKey == true
-                    ? "${getSurahName(context, surahInfoModel.id)}\nالآية ${localizedNumber(context, ayahNumber)}"
+                    ? "${getSurahName(context, surahInfoModel.id)}\nØ§Ù„Ø¢ÙŠØ© ${localizedNumber(context, ayahNumber)}"
                     : localizedNumber(context, ayahNumber),
                 style: TextStyle(
                   color: Colors.black87,
@@ -1533,7 +1391,7 @@ Widget getToolbarWidget(
                       }
                       await box.put("wahy_starred", list);
                     },
-                    tooltip: isStarred ? "إزالة من المفضلة" : "إضافة للمفضلة",
+                    tooltip: isStarred ? "Ø¥Ø²Ø§Ù„Ø© Ù…Ù† Ø§Ù„Ù…ÙØ¶Ù„Ø©" : "Ø¥Ø¶Ø§ÙØ© Ù„Ù„Ù…ÙØ¶Ù„Ø©",
                     icon: Icon(
                       isStarred
                           ? FluentIcons.star_24_filled
