@@ -449,8 +449,9 @@ class ImageSizeSelector extends StatelessWidget {
   }
 
   void _showCustomSizeDialog(BuildContext context) {
-    final widthController = TextEditingController(text: '1080');
-    final heightController = TextEditingController(text: '1080');
+    final saved = ImageSizeExtension.customSize;
+    final widthController = TextEditingController(text: saved.width.toInt().toString());
+    final heightController = TextEditingController(text: saved.height.toInt().toString());
     
     showDialog(
       context: context,
@@ -490,7 +491,9 @@ class ImageSizeSelector extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              // TODO: حفظ الحجم المخصص
+              final w = int.tryParse(widthController.text) ?? 1080;
+              final h = int.tryParse(heightController.text) ?? 1080;
+              ImageSizeExtension.setCustomSize(w.toDouble(), h.toDouble());
               Navigator.pop(context);
               onChanged(ImageSize.custom);
             },

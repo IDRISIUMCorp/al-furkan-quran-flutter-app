@@ -79,7 +79,7 @@ class TajweedPageRenderer extends StatelessWidget {
                                   wordWithTajweed: words[index],
                                   wordIndex: index,
                                   isLight: !isDark,
-                                  enableTajweed: true, // TODO: Toggle this later
+                                  enableTajweed: context.watch<QuranSettingsCubit>().state.tajweedEnabled,
                                   baseStyle: TextStyle(
                                     fontSize: baseTextStyle?.fontSize ?? 24,
                                     fontFamily:

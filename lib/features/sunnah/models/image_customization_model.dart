@@ -316,6 +316,20 @@ enum ImageQuality {
 // ═══════════════════════════════════════════
 
 extension ImageSizeExtension on ImageSize {
+  // Custom size storage — updated when user enters custom dimensions
+  static Size _customSize = const Size(1080, 1080);
+
+  /// Save custom dimensions entered by the user
+  static void setCustomSize(double width, double height) {
+    _customSize = Size(
+      width.clamp(100, 4096),
+      height.clamp(100, 4096),
+    );
+  }
+
+  /// Get the current custom size
+  static Size get customSize => _customSize;
+
   Size get dimensions {
     switch (this) {
       case ImageSize.square1080:
@@ -331,7 +345,7 @@ extension ImageSizeExtension on ImageSize {
       case ImageSize.twitter:
         return const Size(1200, 675);
       case ImageSize.custom:
-        return const Size(1080, 1080);
+        return _customSize;
     }
   }
   
@@ -350,7 +364,8 @@ extension ImageSizeExtension on ImageSize {
       case ImageSize.twitter:
         return 'تويتر (1200×675)';
       case ImageSize.custom:
-        return 'مخصص';
+        final s = _customSize;
+        return 'مخصص (${s.width.toInt()}×${s.height.toInt()})';
     }
   }
   

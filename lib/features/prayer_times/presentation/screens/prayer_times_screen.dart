@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:adhan_dart/adhan_dart.dart';
+import 'package:intl/intl.dart';
+import 'package:al_furkan/src/screen/qibla/qibla_direction.dart';
+import '../../core/utils/prayer_names.dart';
 import '../widgets/prayer_times_app_bar.dart';
 import '../widgets/next_prayer_hero_card.dart';
 import '../widgets/prayer_time_list_item.dart';
@@ -67,7 +70,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen>
   Duration _timeUntilNext = Duration.zero;
   
   // Location data
-  final String _locationName = 'القاهرة، مصر';
+  String _locationName = 'القاهرة، مصر';
   bool _isLoadingLocation = false;
   
   // Scroll state
@@ -492,8 +495,6 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen>
   // ═══════════════════════════════════════════
 
   void _onLocationTap() {
-    // TODO: Show location picker bottom sheet
-    debugPrint('Location tap');
     _showLocationPicker();
   }
 
@@ -505,70 +506,1262 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen>
   }
 
   void _onPrayerTap(Prayer prayer) {
-    // TODO: Show prayer details bottom sheet
-    debugPrint('Prayer tap: $prayer');
     _showPrayerDetails(prayer);
   }
 
   void _onQiblaTap() {
-    // TODO: Navigate to Qibla screen
-    debugPrint('Qibla tap');
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const QiblaDirection()),
+    );
   }
 
   void _onAdhanTap() {
-    // TODO: Show adhan settings
-    debugPrint('Adhan tap');
     _showAdhanSettings();
   }
 
   void _onSettingsTap() {
-    // TODO: Navigate to prayer settings
-    debugPrint('Settings tap');
     _showPrayerSettings();
   }
 
   void _onCalendarTap() {
-    // TODO: Show Islamic calendar
-    debugPrint('Calendar tap');
     _showIslamicCalendar();
   }
 
   // ═══════════════════════════════════════════
-  // BOTTOM SHEETS & DIALOGS (Placeholders)
+  // BOTTOM SHEETS & DIALOGS
   // ═══════════════════════════════════════════
 
   void _showLocationPicker() {
-    // TODO: Implement location picker bottom sheet
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Location picker - Coming soon')),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(ctx).size.height * 0.7,
+          ),
+          decoration: BoxDecoration(
+            color: isDark ? PrayerThemeColors.bgDark : PrayerThemeColors.surface,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(PrayerDimensions.radiusXLarge),
+            ),
+          ),
+          child: Column(
+            children: [
+              // Drag handle
+              SizedBox(height: PrayerDimensions.dragHandleTop),
+              Container(
+                width: PrayerDimensions.dragHandleWidth,
+                height: PrayerDimensions.dragHandleHeight,
+                decoration: BoxDecoration(
+                  color: PrayerThemeColors.textMuted,
+                  borderRadius: BorderRadius.circular(PrayerDimensions.radiusPill),
+                ),
+              ),
+              SizedBox(height: PrayerDimensions.space20),
+              // Title
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: PrayerDimensions.pagePadding,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.location_on_rounded,
+                      color: PrayerThemeColors.green,
+                      size: PrayerDimensions.iconInline,
+                    ),
+                    SizedBox(width: PrayerDimensions.space12),
+                    Text(
+                      'اختر الموقع',
+                      style: PrayerTextStyles.arabicHeadline(
+                        color: PrayerThemeColors.getTextColor('primary', isDark),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: PrayerDimensions.space16),
+              // Search field
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: PrayerDimensions.pagePadding,
+                ),
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'ابحث عن مدينة...',
+                    hintStyle: PrayerTextStyles.arabicBody(
+                      color: PrayerThemeColors.textMuted,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.search_rounded,
+                      color: PrayerThemeColors.textMuted,
+                    ),
+                    filled: true,
+                    fillColor: isDark
+                        ? PrayerThemeColors.surfaceDark
+                        : PrayerThemeColors.surfaceVariant,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        PrayerDimensions.radiusMedium,
+                      ),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: EdgeInsets.all(PrayerDimensions.space16),
+                  ),
+                  style: PrayerTextStyles.arabicBody(
+                    color: PrayerThemeColors.getTextColor('primary', isDark),
+                  ),
+                ),
+              ),
+              SizedBox(height: PrayerDimensions.space16),
+              // Popular cities
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: PrayerDimensions.pagePadding,
+                ),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    'مدن مشهورة',
+                    style: PrayerTextStyles.arabicLabel(
+                      color: PrayerThemeColors.textSecondary,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: PrayerDimensions.space12),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: PrayerDimensions.pagePadding,
+                  ),
+                  children: _buildCityList(isDark),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
+  List<Widget> _buildCityList(bool isDark) {
+    // Popular Islamic cities with coordinates
+    const cities = [
+      ('القاهرة، مصر', 30.0444, 31.2357),
+      ('مكة المكرمة', 21.4225, 39.8262),
+      ('المدينة المنورة', 24.4672, 39.6024),
+      ('الإسكندرية، مصر', 31.2001, 29.9187),
+      ('جدة، السعودية', 21.5433, 39.1728),
+      ('الرياض، السعودية', 24.7136, 46.6753),
+      ('الدوحة، قطر', 25.2854, 51.5310),
+      ('دبي، الإمارات', 25.2048, 55.2708),
+      ('الكويت، الكويت', 29.3759, 47.9774),
+      ('المنامة، البحرين', 26.2285, 50.5860),
+      ('مسقط، عمان', 23.5880, 58.3829),
+      ('الرباط، المغرب', 34.0209, -6.8416),
+      ('تونس، تونس', 36.8065, 10.1815),
+      ('الجزائر، الجزائر', 36.7538, 3.0588),
+      ('إسطنبول، تركيا', 41.0082, 28.9784),
+      ('جاكرتا، إندونيسيا', -6.2088, 106.8456),
+      ('كوالالمبور، ماليزيا', 3.1390, 101.6869),
+      ('لندن، بريطانيا', 51.5074, -0.1278),
+      ('باريس، فرنسا', 48.8566, 2.3522),
+      ('نيويورك، أمريكا', 40.7128, -74.0060),
+    ];
+
+    return cities.map((city) {
+      return _LocationCityItem(
+        name: city.$1,
+        isDark: isDark,
+        onTap: () {
+          Navigator.pop(context);
+          setState(() {
+            _locationName = city.$1;
+            _isLoadingLocation = true;
+          });
+          _loadPrayerTimesForLocation(city.$2, city.$3);
+        },
+      );
+    }).toList();
+  }
+
+  void _loadPrayerTimesForLocation(double lat, double lon) {
+    try {
+      final coordinates = Coordinates(lat, lon);
+      final now = DateTime.now();
+      setState(() {
+        _prayerTimes = PrayerTimes(
+          coordinates: coordinates,
+          date: now,
+          calculationParameters: _calculationMethod,
+          precision: true,
+        );
+        _updateCurrentAndNextPrayer();
+        _isLoadingLocation = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading prayer times for location: $e');
+      setState(() => _isLoadingLocation = false);
+    }
+  }
+
   void _showPrayerDetails(Prayer prayer) {
-    // TODO: Implement prayer details bottom sheet
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Prayer details for $prayer - Coming soon')),
+    if (_prayerTimes == null) return;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final prayerTime = _prayerTimes!.timeForPrayer(prayer);
+    final isObligatory = PrayerNames.isObligatory(prayer);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(ctx).size.height * 0.65,
+          ),
+          decoration: BoxDecoration(
+            color: isDark ? PrayerThemeColors.bgDark : PrayerThemeColors.surface,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(PrayerDimensions.radiusXLarge),
+            ),
+          ),
+          child: Column(
+            children: [
+              SizedBox(height: PrayerDimensions.dragHandleTop),
+              Container(
+                width: PrayerDimensions.dragHandleWidth,
+                height: PrayerDimensions.dragHandleHeight,
+                decoration: BoxDecoration(
+                  color: PrayerThemeColors.textMuted,
+                  borderRadius: BorderRadius.circular(PrayerDimensions.radiusPill),
+                ),
+              ),
+              SizedBox(height: PrayerDimensions.space24),
+              // Prayer icon
+              Container(
+                width: 64.w,
+                height: 64.h,
+                decoration: BoxDecoration(
+                  color: PrayerThemeColors.greenLight,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  _getPrayerIcon(prayer),
+                  size: 32.sp,
+                  color: PrayerThemeColors.green,
+                ),
+              ),
+              SizedBox(height: PrayerDimensions.space16),
+              // Prayer name
+              Text(
+                PrayerNames.getArabicName(prayer),
+                style: PrayerTextStyles.arabicDisplay(
+                  color: PrayerThemeColors.getTextColor('primary', isDark),
+                ),
+              ),
+              SizedBox(height: PrayerDimensions.space8),
+              // Prayer time
+              Text(
+                DateFormat('hh:mm a', 'ar').format(prayerTime),
+                style: PrayerTextStyles.prayerTime(
+                  color: PrayerThemeColors.green,
+                  isLarge: true,
+                ),
+              ),
+              SizedBox(height: PrayerDimensions.space24),
+              // Details
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: PrayerDimensions.pagePadding,
+                ),
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(PrayerDimensions.cardPadding),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? PrayerThemeColors.surfaceDark
+                        : PrayerThemeColors.surfaceVariant,
+                    borderRadius: BorderRadius.circular(
+                      PrayerDimensions.radiusMedium,
+                    ),
+                    border: Border.all(
+                      color: PrayerThemeColors.getBorderColor(isDark),
+                      width: PrayerDimensions.borderThin,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildDetailRow(
+                        'الوصف',
+                        PrayerNames.getArabicDescription(prayer),
+                        Icons.info_outline_rounded,
+                        isDark,
+                      ),
+                      SizedBox(height: PrayerDimensions.space12),
+                      _buildDetailRow(
+                        'النوع',
+                        isObligatory ? 'فرض - صلاة واجبة' : 'وقت شروق',
+                        Icons.mosque_rounded,
+                        isDark,
+                      ),
+                      SizedBox(height: PrayerDimensions.space12),
+                      _buildDetailRow(
+                        'الترتيب',
+                        '${PrayerNames.getPrayerOrder(prayer)} من 6',
+                        Icons.format_list_numbered_rounded,
+                        isDark,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const Spacer(),
+              // Close button
+              Padding(
+                padding: EdgeInsets.all(PrayerDimensions.pagePadding),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: PrayerDimensions.buttonHeight,
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      backgroundColor: PrayerThemeColors.greenLight,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          PrayerDimensions.radiusMedium,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      'إغلاق',
+                      style: PrayerTextStyles.arabicLabel(
+                        color: PrayerThemeColors.green,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  IconData _getPrayerIcon(Prayer prayer) {
+    switch (prayer) {
+      case Prayer.fajr:
+        return Icons.wb_twilight;
+      case Prayer.sunrise:
+        return Icons.wb_sunny;
+      case Prayer.dhuhr:
+        return Icons.wb_sunny_outlined;
+      case Prayer.asr:
+        return Icons.wb_cloudy;
+      case Prayer.maghrib:
+        return Icons.wb_twilight;
+      case Prayer.isha:
+        return Icons.nightlight_round;
+      default:
+        return Icons.access_time;
+    }
+  }
+
+  Widget _buildDetailRow(
+    String label,
+    String value,
+    IconData icon,
+    bool isDark,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          icon,
+          size: PrayerDimensions.iconSmall,
+          color: PrayerThemeColors.green,
+        ),
+        SizedBox(width: PrayerDimensions.space12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: PrayerTextStyles.arabicCaption(
+                  color: PrayerThemeColors.textMuted,
+                ),
+              ),
+              SizedBox(height: PrayerDimensions.space4),
+              Text(
+                value,
+                style: PrayerTextStyles.arabicBody(
+                  color: PrayerThemeColors.getTextColor('primary', isDark),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
   void _showAdhanSettings() {
-    // TODO: Implement adhan settings bottom sheet
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Adhan settings - Coming soon')),
+    bool adhanEnabled = true;
+    String selectedAdhan = 'أذان مكة';
+    bool fajrOnly = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(ctx).size.height * 0.7,
+              ),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? PrayerThemeColors.bgDark
+                    : PrayerThemeColors.surface,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(PrayerDimensions.radiusXLarge),
+                ),
+              ),
+              child: Column(
+                children: [
+                  SizedBox(height: PrayerDimensions.dragHandleTop),
+                  Container(
+                    width: PrayerDimensions.dragHandleWidth,
+                    height: PrayerDimensions.dragHandleHeight,
+                    decoration: BoxDecoration(
+                      color: PrayerThemeColors.textMuted,
+                      borderRadius: BorderRadius.circular(
+                        PrayerDimensions.radiusPill,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: PrayerDimensions.space20),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: PrayerDimensions.pagePadding,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.volume_up_rounded,
+                          color: PrayerThemeColors.gold,
+                          size: PrayerDimensions.iconInline,
+                        ),
+                        SizedBox(width: PrayerDimensions.space12),
+                        Text(
+                          'إعدادات الأذان',
+                          style: PrayerTextStyles.arabicHeadline(
+                            color: PrayerThemeColors.getTextColor(
+                              'primary',
+                              isDark,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: PrayerDimensions.space20),
+                  // Adhan toggle
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: PrayerDimensions.pagePadding,
+                    ),
+                    child: SwitchListTile(
+                      value: adhanEnabled,
+                      onChanged: (v) => setSheetState(() => adhanEnabled = v),
+                      title: Text(
+                        'تفعيل أذان التنبيه',
+                        style: PrayerTextStyles.arabicBody(
+                          color: PrayerThemeColors.getTextColor(
+                            'primary',
+                            isDark,
+                          ),
+                        ),
+                      ),
+                      secondary: Icon(
+                        Icons.notifications_active_rounded,
+                        color: adhanEnabled
+                            ? PrayerThemeColors.green
+                            : PrayerThemeColors.textMuted,
+                      ),
+                      activeColor: PrayerThemeColors.green,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  // Fajr-only toggle
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: PrayerDimensions.pagePadding,
+                    ),
+                    child: SwitchListTile(
+                      value: fajrOnly,
+                      onChanged: (v) => setSheetState(() => fajrOnly = v),
+                      title: Text(
+                        'أذان الفجر فقط',
+                        style: PrayerTextStyles.arabicBody(
+                          color: PrayerThemeColors.getTextColor(
+                            'primary',
+                            isDark,
+                          ),
+                        ),
+                      ),
+                      secondary: Icon(
+                        Icons.wb_twilight,
+                        color: fajrOnly
+                            ? PrayerThemeColors.gold
+                            : PrayerThemeColors.textMuted,
+                      ),
+                      activeColor: PrayerThemeColors.gold,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  SizedBox(height: PrayerDimensions.space16),
+                  // Adhan sound selection
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: PrayerDimensions.pagePadding,
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        'صوت الأذان',
+                        style: PrayerTextStyles.arabicLabel(
+                          color: PrayerThemeColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: PrayerDimensions.space12),
+                  Expanded(
+                    child: ListView(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: PrayerDimensions.pagePadding,
+                      ),
+                      children: [
+                        _AdhanOption(
+                          title: 'أذان مكة',
+                          isSelected: selectedAdhan == 'أذان مكة',
+                          isDark: isDark,
+                          onTap: () =>
+                              setSheetState(() => selectedAdhan = 'أذان مكة'),
+                        ),
+                        _AdhanOption(
+                          title: 'أذان المدينة',
+                          isSelected: selectedAdhan == 'أذان المدينة',
+                          isDark: isDark,
+                          onTap: () => setSheetState(
+                            () => selectedAdhan = 'أذان المدينة',
+                          ),
+                        ),
+                        _AdhanOption(
+                          title: 'أذان مصر',
+                          isSelected: selectedAdhan == 'أذان مصر',
+                          isDark: isDark,
+                          onTap: () =>
+                              setSheetState(() => selectedAdhan = 'أذان مصر'),
+                        ),
+                        _AdhanOption(
+                          title: 'تنبيه صامت',
+                          isSelected: selectedAdhan == 'تنبيه صامت',
+                          isDark: isDark,
+                          onTap: () => setSheetState(
+                            () => selectedAdhan = 'تنبيه صامت',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Save button
+                  Padding(
+                    padding: EdgeInsets.all(PrayerDimensions.pagePadding),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: PrayerDimensions.buttonHeight,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: PrayerThemeColors.green,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              PrayerDimensions.radiusMedium,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          'حفظ الإعدادات',
+                          style: PrayerTextStyles.arabicLabel(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
   void _showPrayerSettings() {
-    // TODO: Implement prayer settings screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Prayer settings - Coming soon')),
+    int selectedMethodIndex = 0;
+    double fajrAngle = 19.5;
+    double ishaAngle = 17.5;
+
+    final calculationMethods = [
+      ('الهيئة المصرية', CalculationMethod.egyptian),
+      ('أمريكا الشمالية (ISNA)', CalculationMethod.northAmerica),
+      ('الجامعة الإسلامية أم القرى', CalculationMethod.ummAlQura),
+      ('رابطة العالم الإسلامي', CalculationMethod.muslimWorldLeague),
+      ('معهد جاكرتا', CalculationMethod.karachi),
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(ctx).size.height * 0.75,
+              ),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? PrayerThemeColors.bgDark
+                    : PrayerThemeColors.surface,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(PrayerDimensions.radiusXLarge),
+                ),
+              ),
+              child: Column(
+                children: [
+                  SizedBox(height: PrayerDimensions.dragHandleTop),
+                  Container(
+                    width: PrayerDimensions.dragHandleWidth,
+                    height: PrayerDimensions.dragHandleHeight,
+                    decoration: BoxDecoration(
+                      color: PrayerThemeColors.textMuted,
+                      borderRadius: BorderRadius.circular(
+                        PrayerDimensions.radiusPill,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: PrayerDimensions.space20),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: PrayerDimensions.pagePadding,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.settings_rounded,
+                          color: PrayerThemeColors.green,
+                          size: PrayerDimensions.iconInline,
+                        ),
+                        SizedBox(width: PrayerDimensions.space12),
+                        Text(
+                          'إعدادات المواقيت',
+                          style: PrayerTextStyles.arabicHeadline(
+                            color: PrayerThemeColors.getTextColor(
+                              'primary',
+                              isDark,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: PrayerDimensions.space20),
+                  // Calculation method
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: PrayerDimensions.pagePadding,
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        'طريقة الحساب',
+                        style: PrayerTextStyles.arabicLabel(
+                          color: PrayerThemeColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: PrayerDimensions.space12),
+                  Expanded(
+                    child: ListView(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: PrayerDimensions.pagePadding,
+                      ),
+                      children: calculationMethods.asMap().entries.map((e) {
+                        return _CalculationMethodOption(
+                          title: e.value.$1,
+                          isSelected: selectedMethodIndex == e.key,
+                          isDark: isDark,
+                          onTap: () {
+                            setSheetState(() => selectedMethodIndex = e.key);
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  // Angle adjustments
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: PrayerDimensions.pagePadding,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'زاوية الفجر',
+                                style: PrayerTextStyles.arabicCaption(
+                                  color: PrayerThemeColors.textSecondary,
+                                ),
+                              ),
+                              SizedBox(height: PrayerDimensions.space4),
+                              Text(
+                                '$fajrAngle°',
+                                style: PrayerTextStyles.arabicTitle(
+                                  color: PrayerThemeColors.green,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'زاوية العشاء',
+                                style: PrayerTextStyles.arabicCaption(
+                                  color: PrayerThemeColors.textSecondary,
+                                ),
+                              ),
+                              SizedBox(height: PrayerDimensions.space4),
+                              Text(
+                                '$ishaAngle°',
+                                style: PrayerTextStyles.arabicTitle(
+                                  color: PrayerThemeColors.green,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: PrayerDimensions.space16),
+                  // Apply button
+                  Padding(
+                    padding: EdgeInsets.all(PrayerDimensions.pagePadding),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: PrayerDimensions.buttonHeight,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          setState(() => _isLoadingLocation = true);
+                          _loadPrayerTimes();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: PrayerThemeColors.green,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              PrayerDimensions.radiusMedium,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          'تطبيق',
+                          style: PrayerTextStyles.arabicLabel(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
   void _showIslamicCalendar() {
-    // TODO: Implement Islamic calendar view
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Islamic calendar - Coming soon')),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final now = DateTime.now();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(ctx).size.height * 0.75,
+          ),
+          decoration: BoxDecoration(
+            color: isDark ? PrayerThemeColors.bgDark : PrayerThemeColors.surface,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(PrayerDimensions.radiusXLarge),
+            ),
+          ),
+          child: Column(
+            children: [
+              SizedBox(height: PrayerDimensions.dragHandleTop),
+              Container(
+                width: PrayerDimensions.dragHandleWidth,
+                height: PrayerDimensions.dragHandleHeight,
+                decoration: BoxDecoration(
+                  color: PrayerThemeColors.textMuted,
+                  borderRadius: BorderRadius.circular(
+                    PrayerDimensions.radiusPill,
+                  ),
+                ),
+              ),
+              SizedBox(height: PrayerDimensions.space20),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: PrayerDimensions.pagePadding,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_month_rounded,
+                      color: PrayerThemeColors.info,
+                      size: PrayerDimensions.iconInline,
+                    ),
+                    SizedBox(width: PrayerDimensions.space12),
+                    Text(
+                      'التقويم الإسلامي',
+                      style: PrayerTextStyles.arabicHeadline(
+                        color: PrayerThemeColors.getTextColor('primary', isDark),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: PrayerDimensions.space20),
+              // Current date info
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: PrayerDimensions.pagePadding,
+                ),
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(PrayerDimensions.cardPadding),
+                  decoration: BoxDecoration(
+                    color: PrayerThemeColors.greenLight,
+                    borderRadius: BorderRadius.circular(
+                      PrayerDimensions.radiusMedium,
+                    ),
+                    border: Border.all(
+                      color: PrayerThemeColors.green,
+                      width: PrayerDimensions.borderThin,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        'اليوم',
+                        style: PrayerTextStyles.arabicCaption(
+                          color: PrayerThemeColors.green,
+                        ),
+                      ),
+                      SizedBox(height: PrayerDimensions.space8),
+                      Text(
+                        DateFormat('EEEE، d MMMM yyyy', 'ar').format(now),
+                        style: PrayerTextStyles.arabicTitle(
+                          color: PrayerThemeColors.greenDark,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: PrayerDimensions.space4),
+                      Text(
+                        DateFormat('dd/MM/yyyy').format(now),
+                        style: PrayerTextStyles.caption(
+                          color: PrayerThemeColors.greenDark,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: PrayerDimensions.space20),
+              // Islamic months
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: PrayerDimensions.pagePadding,
+                ),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    'الأشهر الهجرية',
+                    style: PrayerTextStyles.arabicLabel(
+                      color: PrayerThemeColors.textSecondary,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: PrayerDimensions.space12),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: PrayerDimensions.pagePadding,
+                  ),
+                  children: const [
+                    'محرم',
+                    'صفر',
+                    'ربيع الأول',
+                    'ربيع الثاني',
+                    'جمادى الأولى',
+                    'جمادى الآخرة',
+                    'رجب',
+                    'شعبان',
+                    'رمضان',
+                    'شوال',
+                    'ذو القعدة',
+                    'ذو الحجة',
+                  ].asMap().entries.map((e) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: PrayerDimensions.space8,
+                      ),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: PrayerDimensions.cardPadding,
+                          vertical: PrayerDimensions.space12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? PrayerThemeColors.surfaceDark
+                              : PrayerThemeColors.surfaceVariant,
+                          borderRadius: BorderRadius.circular(
+                            PrayerDimensions.radiusSmall,
+                          ),
+                          border: Border.all(
+                            color: PrayerThemeColors.getBorderColor(isDark),
+                            width: PrayerDimensions.borderThin,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 32.w,
+                              height: 32.h,
+                              decoration: BoxDecoration(
+                                color: e.key == 8
+                                    ? PrayerThemeColors.goldLight
+                                    : PrayerThemeColors.greenLight,
+                                borderRadius: BorderRadius.circular(
+                                  PrayerDimensions.radiusSmall,
+                                ),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                '${e.key + 1}',
+                                style: PrayerTextStyles.arabicCaption(
+                                  color: e.key == 8
+                                      ? PrayerThemeColors.goldDark
+                                      : PrayerThemeColors.green,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: PrayerDimensions.space12),
+                            Text(
+                              e.value,
+                              style: PrayerTextStyles.arabicBody(
+                                color: PrayerThemeColors.getTextColor(
+                                  'primary',
+                                  isDark,
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+                            if (e.key == 8)
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: PrayerDimensions.space8,
+                                  vertical: PrayerDimensions.space4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: PrayerThemeColors.goldLight,
+                                  borderRadius: BorderRadius.circular(
+                                    PrayerDimensions.radiusPill,
+                                  ),
+                                ),
+                                child: Text(
+                                  'رمضان',
+                                  style: PrayerTextStyles.arabicCaption(
+                                    color: PrayerThemeColors.goldDark,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              // Close button
+              Padding(
+                padding: EdgeInsets.all(PrayerDimensions.pagePadding),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: PrayerDimensions.buttonHeight,
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      backgroundColor: PrayerThemeColors.infoLight,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          PrayerDimensions.radiusMedium,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      'إغلاق',
+                      style: PrayerTextStyles.arabicLabel(
+                        color: PrayerThemeColors.info,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ═══════════════════════════════════════════
+// HELPER WIDGETS
+// ═══════════════════════════════════════════
+
+class _LocationCityItem extends StatelessWidget {
+  final String name;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _LocationCityItem({
+    required this.name,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(PrayerDimensions.radiusSmall),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: PrayerDimensions.cardPadding,
+          vertical: PrayerDimensions.space12,
+        ),
+        margin: EdgeInsets.only(bottom: PrayerDimensions.space4),
+        decoration: BoxDecoration(
+          color: isDark
+              ? PrayerThemeColors.surfaceDark
+              : PrayerThemeColors.surfaceVariant,
+          borderRadius: BorderRadius.circular(PrayerDimensions.radiusSmall),
+          border: Border.all(
+            color: PrayerThemeColors.getBorderColor(isDark),
+            width: PrayerDimensions.borderThin,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.location_on_outlined,
+              size: PrayerDimensions.iconInline,
+              color: PrayerThemeColors.green,
+            ),
+            SizedBox(width: PrayerDimensions.space12),
+            Expanded(
+              child: Text(
+                name,
+                style: PrayerTextStyles.arabicBody(
+                  color: PrayerThemeColors.getTextColor('primary', isDark),
+                ),
+              ),
+            ),
+            Icon(
+              Icons.chevron_left_rounded,
+              size: PrayerDimensions.iconInline,
+              color: PrayerThemeColors.textMuted,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AdhanOption extends StatelessWidget {
+  final String title;
+  final bool isSelected;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _AdhanOption({
+    required this.title,
+    required this.isSelected,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(PrayerDimensions.radiusSmall),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: PrayerDimensions.cardPadding,
+          vertical: PrayerDimensions.space12,
+        ),
+        margin: EdgeInsets.only(bottom: PrayerDimensions.space8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? PrayerThemeColors.greenLight
+              : isDark
+                  ? PrayerThemeColors.surfaceDark
+                  : PrayerThemeColors.surfaceVariant,
+          borderRadius: BorderRadius.circular(PrayerDimensions.radiusSmall),
+          border: Border.all(
+            color: isSelected
+                ? PrayerThemeColors.green
+                : PrayerThemeColors.getBorderColor(isDark),
+            width: isSelected
+                ? PrayerDimensions.borderStandard
+                : PrayerDimensions.borderThin,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              isSelected
+                  ? Icons.radio_button_checked_rounded
+                  : Icons.radio_button_unchecked_rounded,
+              size: PrayerDimensions.iconInline,
+              color: isSelected
+                  ? PrayerThemeColors.green
+                  : PrayerThemeColors.textMuted,
+            ),
+            SizedBox(width: PrayerDimensions.space12),
+            Expanded(
+              child: Text(
+                title,
+                style: PrayerTextStyles.arabicBody(
+                  color: isSelected
+                      ? PrayerThemeColors.green
+                      : PrayerThemeColors.getTextColor('primary', isDark),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CalculationMethodOption extends StatelessWidget {
+  final String title;
+  final bool isSelected;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _CalculationMethodOption({
+    required this.title,
+    required this.isSelected,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(PrayerDimensions.radiusSmall),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: PrayerDimensions.cardPadding,
+          vertical: PrayerDimensions.space12,
+        ),
+        margin: EdgeInsets.only(bottom: PrayerDimensions.space8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? PrayerThemeColors.greenLight
+              : isDark
+                  ? PrayerThemeColors.surfaceDark
+                  : PrayerThemeColors.surfaceVariant,
+          borderRadius: BorderRadius.circular(PrayerDimensions.radiusSmall),
+          border: Border.all(
+            color: isSelected
+                ? PrayerThemeColors.green
+                : PrayerThemeColors.getBorderColor(isDark),
+            width: isSelected
+                ? PrayerDimensions.borderStandard
+                : PrayerDimensions.borderThin,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              isSelected
+                  ? Icons.radio_button_checked_rounded
+                  : Icons.radio_button_unchecked_rounded,
+              size: PrayerDimensions.iconInline,
+              color: isSelected
+                  ? PrayerThemeColors.green
+                  : PrayerThemeColors.textMuted,
+            ),
+            SizedBox(width: PrayerDimensions.space12),
+            Expanded(
+              child: Text(
+                title,
+                style: PrayerTextStyles.arabicBody(
+                  color: isSelected
+                      ? PrayerThemeColors.green
+                      : PrayerThemeColors.getTextColor('primary', isDark),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
