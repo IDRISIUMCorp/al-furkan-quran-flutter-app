@@ -758,7 +758,7 @@ class _PremiumOnboardingScreenState extends State<PremiumOnboardingScreen> {
   }
 
   Widget _colorCircle(Color color, ThemeState themeState) {
-    final isSelected = _highlightColor.value == color.value;
+    final isSelected = _highlightColor.toARGB32() == color.toARGB32();
     return InkWell(
       borderRadius: BorderRadius.circular(999),
       onTap: () => setState(() => _highlightColor = color),

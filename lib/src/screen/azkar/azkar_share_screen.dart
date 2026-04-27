@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -151,10 +151,10 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
       'templateType': _templateType,
       'fontSize': _fontSize,
       'isGradientBg': _isGradientBg,
-      'customBgColor': _customBgColor.value,
-      'customBgColor2': _customBgColor2.value,
-      'customTextColor': _customTextColor.value,
-      'customAccentColor': _customAccentColor.value,
+      'customBgColor': _customBgColor.toARGB32(),
+      'customBgColor2': _customBgColor2.toARGB32(),
+      'customTextColor': _customTextColor.toARGB32(),
+      'customAccentColor': _customAccentColor.toARGB32(),
       'fontFamily': _fontFamily,
       'showBranding': _showBranding,
       'showCategoryHeader': _showCategoryHeader,
@@ -166,10 +166,10 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
       'lineHeight': _lineHeight,
       'verticalAlignment': _verticalAlignment,
       // Element Colors
-      'zekrColor': _zekrColor?.value,
-      'categoryColor': _categoryColor?.value,
-      'descriptionColor': _descriptionColor?.value,
-      'referenceColor': _referenceColor?.value,
+      'zekrColor': _zekrColor?.toARGB32(),
+      'categoryColor': _categoryColor?.toARGB32(),
+      'descriptionColor': _descriptionColor?.toARGB32(),
+      'referenceColor': _referenceColor?.toARGB32(),
       // Element Fonts
       'zekrFont': _zekrFont,
       'categoryFont': _categoryFont,

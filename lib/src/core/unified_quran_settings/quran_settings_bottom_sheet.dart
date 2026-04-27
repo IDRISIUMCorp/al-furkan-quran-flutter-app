@@ -664,7 +664,7 @@ class _HighlightColorSectionState extends State<_HighlightColorSection> {
             ..._highlightColors.map(
               (color) => _HighlightColorDot(
                 color: color,
-                selected: widget.state.highlightColor.value == color.value,
+                selected: widget.state.highlightColor.toARGB32() == color.toARGB32(),
                 primary: widget.primary,
                 onTap: () => context
                     .read<QuranSettingsCubit>()
@@ -1170,7 +1170,7 @@ class _UnifiedBackgroundsSectionContentState extends State<_UnifiedBackgroundsSe
       final color = widget.state.customBackgroundColors[i];
       final textColor = color.computeLuminance() > 0.5 ? Colors.black87 : Colors.white;
       final isSelected = widget.state.theme == QuranTheme.custom && 
-                         widget.state.customBackgroundColor.value == color.value;
+                         widget.state.customBackgroundColor.toARGB32() == color.toARGB32();
 
       allBackgrounds.add(
         _BackgroundCard(

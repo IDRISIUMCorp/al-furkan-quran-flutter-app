@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 
 /// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
@@ -46,7 +46,7 @@ class ElementStyle {
   }
 
   Map<String, dynamic> toJson() => {
-    'color': color?.value,
+    'color': color?.toARGB32(),
     'font': font,
     'fontSize': fontSize,
     'lineHeight': lineHeight,
@@ -162,11 +162,11 @@ class TextEffects {
 
   Map<String, dynamic> toJson() => {
     'shadowBlur': shadowBlur,
-    'shadowColor': shadowColor.value,
+    'shadowColor': shadowColor.toARGB32(),
     'shadowOffsetX': shadowOffset.dx,
     'shadowOffsetY': shadowOffset.dy,
     'outlineWidth': outlineWidth,
-    'outlineColor': outlineColor.value,
+    'outlineColor': outlineColor.toARGB32(),
     'enableGlow': enableGlow,
   };
 
@@ -388,10 +388,10 @@ class AzkarShareSettings {
     'templateType': templateType,
     'fontSize': fontSize,
     'isGradientBg': isGradientBg,
-    'customBgColor': customBgColor.value,
-    'customBgColor2': customBgColor2.value,
-    'customTextColor': customTextColor.value,
-    'customAccentColor': customAccentColor.value,
+    'customBgColor': customBgColor.toARGB32(),
+    'customBgColor2': customBgColor2.toARGB32(),
+    'customTextColor': customTextColor.toARGB32(),
+    'customAccentColor': customAccentColor.toARGB32(),
     'fontFamily': fontFamily,
     
     // Layout

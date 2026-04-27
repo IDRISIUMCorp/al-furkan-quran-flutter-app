@@ -124,7 +124,7 @@ class UpdateConfig {
         'storeUrl': storeUrl,
         'style': style.name,
         'primaryColor':
-            '#${primaryColor.value.toRadixString(16).padLeft(8, '0').substring(2)}',
+            '#${primaryColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}',
         'dismissAfterSeconds': dismissAfterSeconds,
         'dismissible': dismissible,
         'showCountdown': showCountdown,

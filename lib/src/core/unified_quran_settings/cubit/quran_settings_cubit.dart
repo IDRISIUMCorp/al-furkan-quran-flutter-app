@@ -39,7 +39,7 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
     final customText =
         _box.get(_kCustomTextTheme, defaultValue: 0xFFFFFFFF) as int;
     final highlightColorValue =
-        _box.get(_kHighlightColorValue, defaultValue: Colors.amber.value)
+        _box.get(_kHighlightColorValue, defaultValue: Colors.amber.toARGB32())
             as int;
     final showVerseNumbers =
         _box.get(_kShowVerseNumbers, defaultValue: true) as bool;
@@ -89,15 +89,15 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
   Future<void> _persistState(QuranSettingsState next) async {
     await _box.put(_kFontSize, next.fontSize);
     await _box.put(_kTheme, next.theme.name);
-    await _box.put(_kCustomBgTheme, next.customBackgroundColor.value);
-    await _box.put(_kCustomTextTheme, next.customTextColor.value);
-    await _box.put(_kHighlightColorValue, next.highlightColor.value);
+    await _box.put(_kCustomBgTheme, next.customBackgroundColor.toARGB32());
+    await _box.put(_kCustomTextTheme, next.customTextColor.toARGB32());
+    await _box.put(_kHighlightColorValue, next.highlightColor.toARGB32());
     await _box.put(_kShowVerseNumbers, next.showVerseNumbers);
     await _box.put(_kShowPageInfo, next.showPageInfo);
     await _box.put(_kShowBasmala, next.showBasmala);
     await _box.put(_kShowSurahHeader, next.showSurahHeader);
     await _box.put(_kTajweedEnabled, next.tajweedEnabled);
-    await _box.put(_kCustomBackgroundColors, next.customBackgroundColors.map((c) => c.value).toList());
+    await _box.put(_kCustomBackgroundColors, next.customBackgroundColors.map((c) => c.toARGB32()).toList());
     await _box.put(_kLayoutMode, next.layoutMode.name);
     await _box.put(_kFontFamily, next.fontFamily.name);
   }

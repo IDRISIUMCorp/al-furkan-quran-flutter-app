@@ -1027,7 +1027,7 @@ class _TafsirViewState extends State<TafsirView>
     // {} → golden yellow, [] → warm amber
     final curlyHex = isDark ? '#E6B422' : '#9E7C0A';
     final squareHex = isDark ? '#CD853F' : '#8B5E3C';
-    final quranHex = isDark ? '#${primaryColor.value.toRadixString(16).padLeft(8, '').substring(2)}' : curlyHex;
+    final quranHex = isDark ? '#${primaryColor.toARGB32().toRadixString(16).padLeft(8, '').substring(2)}' : curlyHex;
 
     // Wrap ﴿...﴾ and ﴁ...ﴂ patterns (Quran ayah)
     final quranPattern = RegExp(r'[﴿ﴁ][\s\S]*?[﴾ﴂ]', unicode: true);
