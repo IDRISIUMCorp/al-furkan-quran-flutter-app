@@ -90,7 +90,6 @@ class AyahOfTheDayService {
   static Future<void> setupBackgroundUpdates() async {
     await Workmanager().initialize(
       ayahWidgetCallbackDispatcher,
-      isInDebugMode: false,
     );
     final box = Hive.box("user");
     final frequencyMinutes = box.get("widget_update_frequency_minutes", defaultValue: 15) as int;

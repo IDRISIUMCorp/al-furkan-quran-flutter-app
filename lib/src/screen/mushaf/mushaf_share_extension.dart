@@ -199,7 +199,7 @@ extension _MushafShareExtension on _MushafViewState {
                                                 ),
                                                 const SizedBox(height: 8),
                                                 DropdownButtonFormField<int>(
-                                                  value: from,
+                                                  initialValue: from,
                                                   decoration:
                                                       const InputDecoration(
                                                         isDense: true,
@@ -255,7 +255,7 @@ extension _MushafShareExtension on _MushafViewState {
                                                 ),
                                                 const SizedBox(height: 8),
                                                 DropdownButtonFormField<int>(
-                                                  value: to,
+                                                  initialValue: to,
                                                   decoration:
                                                       const InputDecoration(
                                                         isDense: true,

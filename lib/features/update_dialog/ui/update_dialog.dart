@@ -69,8 +69,8 @@ class UpdateDialog extends StatelessWidget {
     final style = config.style;
     final blur = DialogStyleBuilder.blurSigma(style, config);
 
-    return WillPopScope(
-      onWillPop: () async => !isForced,
+    return PopScope(
+      canPop: !isForced,
       child: Center(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),

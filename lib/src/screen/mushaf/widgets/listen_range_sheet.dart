@@ -102,7 +102,7 @@ Future<void> showListenRangeSheet({
                                     ),
                                     const SizedBox(height: 8),
                                     DropdownButtonFormField<int>(
-                                      value: from,
+                                      initialValue: from,
                                       dropdownColor: isDark
                                           ? const Color(0xFF2A2A2A)
                                           : const Color(0xFFF7F1E6),
@@ -162,7 +162,7 @@ Future<void> showListenRangeSheet({
                                     ),
                                     const SizedBox(height: 8),
                                     DropdownButtonFormField<int>(
-                                      value: to,
+                                      initialValue: to,
                                       dropdownColor: isDark
                                           ? const Color(0xFF2A2A2A)
                                           : const Color(0xFFF7F1E6),
