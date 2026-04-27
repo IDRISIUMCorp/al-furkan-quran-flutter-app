@@ -106,27 +106,6 @@ Future<void> _safeOpenBox(String name, {Duration timeout = const Duration(second
   }
 }
 
-/// Opens a Hive LazyBox with timeout and corruption recovery.
-Future<void> _safeOpenLazyBox(String name, {Duration timeout = const Duration(seconds: 8)}) async {
-  try {
-    if (Hive.isBoxOpen(name)) return;
-    await Hive.openLazyBox(name).timeout(timeout);
-  } catch (e) {
-    log("⚠️ Failed to open lazy box '$name': $e — attempting recovery", name: "HiveSafeOpen");
-    try {
-      if (Hive.isBoxOpen(name)) {
-        await Hive.box(name).close().timeout(const Duration(seconds: 3));
-      }
-      await Hive.deleteBoxFromDisk(name).timeout(const Duration(seconds: 5));
-      await Hive.openLazyBox(name).timeout(timeout);
-      log("✅ Lazy box '$name' recovered", name: "HiveSafeOpen");
-    } catch (_) {
-      // Lazy box corruption is less critical — log and continue
-      log("⚠️ Lazy box '$name' skipped (corrupted)", name: "HiveSafeOpen");
-    }
-  }
-}
-
 Future<void> main() async {
   // تفعيل معالج الأخطاء للـ Release Mode
   ReleaseErrorHandler.initialize();
