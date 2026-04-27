@@ -307,38 +307,30 @@ extension _MushafShareExtension on _MushafViewState {
                                         horizontal: 14,
                                         vertical: 10,
                                       ),
-                                      child: Column(
-                                        children: [
-                                          RadioListTile<int>(
-                                            value: 0,
-                                            groupValue: shareType,
-                                            activeColor: Colors.green,
-                                            title: const Text("مشاركة صورة"),
-                                            onChanged: from == to
-                                                ? (v) => setSheetState(
-                                                    () => shareType = v ?? 0,
-                                                  )
-                                                : null,
-                                          ),
-                                          RadioListTile<int>(
-                                            value: 1,
-                                            groupValue: shareType,
-                                            activeColor: Colors.green,
-                                            title: const Text("مشاركة نص"),
-                                            onChanged: (v) => setSheetState(
-                                              () => shareType = v ?? 1,
+                                      child: RadioGroup<int>(
+                                        groupValue: shareType,
+                                        onChanged: (int? value) {
+                                          setSheetState(() => shareType = value ?? 0);
+                                        },
+                                        child: Column(
+                                          children: [
+                                            RadioListTile<int>(
+                                              value: 0,
+                                              activeColor: Colors.green,
+                                              title: const Text("مشاركة صورة"),
                                             ),
-                                          ),
-                                          RadioListTile<int>(
-                                            value: 2,
-                                            groupValue: shareType,
-                                            activeColor: Colors.green,
-                                            title: const Text("نص بدون تشكيل"),
-                                            onChanged: (v) => setSheetState(
-                                              () => shareType = v ?? 2,
+                                            RadioListTile<int>(
+                                              value: 1,
+                                              activeColor: Colors.green,
+                                              title: const Text("مشاركة نص"),
                                             ),
-                                          ),
-                                        ],
+                                            RadioListTile<int>(
+                                              value: 2,
+                                              activeColor: Colors.green,
+                                              title: const Text("نص بدون تشكيل"),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
