@@ -87,18 +87,6 @@ class _MutashabihatResourcesViewState
     await _loadData();
   }
 
-  Future<void> _activateAllDownloaded() async {
-    await QuranMutashabihatFunction.replaceMutashabihatSelections(
-      _downloadedBooks,
-    );
-    await _loadData();
-  }
-
-  Future<void> _clearActiveSelections() async {
-    await QuranMutashabihatFunction.replaceMutashabihatSelections([]);
-    await _loadData();
-  }
-
   Future<void> _downloadBook(MutashabihatBookModel book) async {
     await QuranMutashabihatFunction.downloadResources(
       context: context,
@@ -134,14 +122,6 @@ class _MutashabihatResourcesViewState
 
     if (confirmed != true) return;
     await QuranMutashabihatFunction.removeFromListAlreadyDownloaded(book);
-    await _loadData();
-  }
-
-  Future<void> _deleteMany(List<ManagedResourceItem> items) async {
-    for (final item in items) {
-      final book = _allBooks.firstWhere((entry) => entry.fullPath == item.id);
-      await QuranMutashabihatFunction.removeFromListAlreadyDownloaded(book);
-    }
     await _loadData();
   }
 

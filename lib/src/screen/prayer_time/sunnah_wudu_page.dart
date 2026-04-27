@@ -11,13 +11,10 @@ const _accentGold = Color(0xFFC9A84C);    // من وحي
 const _darkBg = Color(0xFF1A1F26);
 const _cardDark = Color(0xFF242933);
 const _cardLight = Color(0xFFFFFFFF);     // أبيض نقي
-const _bgLight = Color(0xFFF8F6ED);       // من وحي - دافئ
 const _textLight = Color(0xFFF8F9FA);
 const _textDark = Color(0xFF2C2C2C);      // من وحي
 const _mutedLight = Color(0xFFB8BCC2);
 const _mutedDark = Color(0xFF6B6B6B);     // من وحي
-const _border = Color(0xFFDDD9CC);        // من آية - أوضح
-const _borderDark = Color(0xFF3A3F4D);
 
 class SunnahWuduPage extends StatelessWidget {
   const SunnahWuduPage({super.key});

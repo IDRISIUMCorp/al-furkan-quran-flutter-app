@@ -90,18 +90,6 @@ class _TransliterationResourcesViewState
     await _loadData();
   }
 
-  Future<void> _activateAllDownloaded() async {
-    await QuranTransliterationFunction.replaceTransliterationSelections(
-      _downloadedBooks,
-    );
-    await _loadData();
-  }
-
-  Future<void> _clearActiveSelections() async {
-    await QuranTransliterationFunction.replaceTransliterationSelections([]);
-    await _loadData();
-  }
-
   Future<void> _downloadBook(TransliterationBookModel book) async {
     await QuranTransliterationFunction.downloadResources(
       context: context,
@@ -137,15 +125,6 @@ class _TransliterationResourcesViewState
 
     if (confirmed != true) return;
     await QuranTransliterationFunction.removeFromListAlreadyDownloaded(book);
-    await _loadData();
-  }
-
-  Future<void> _deleteMany(List<ManagedResourceItem> items) async {
-    for (final item in items) {
-      final book =
-          _allBooks.firstWhere((entry) => entry.fullPath == item.id);
-      await QuranTransliterationFunction.removeFromListAlreadyDownloaded(book);
-    }
     await _loadData();
   }
 

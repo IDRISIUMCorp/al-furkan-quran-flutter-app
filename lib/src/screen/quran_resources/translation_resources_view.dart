@@ -72,17 +72,6 @@ class _TranslationResourcesViewState extends State<TranslationResourcesView> {
     return state.progressMap.containsKey(book.fullPath);
   }
 
-  String _typeLabel(TranslationResourcesType type) {
-    switch (type) {
-      case TranslationResourcesType.simple:
-        return "ترجمة بسيطة";
-      case TranslationResourcesType.withFootnoteTags:
-        return "مع هوامش";
-      case TranslationResourcesType.wordByWord:
-        return "";
-    }
-  }
-
   Future<void> _toggleSelection(
     TranslationBookModel book,
     bool selected,
@@ -92,18 +81,6 @@ class _TranslationResourcesViewState extends State<TranslationResourcesView> {
     } else {
       await QuranTranslationFunction.removeTranslationSelection(book);
     }
-    await _loadData();
-  }
-
-  Future<void> _activateAllDownloaded() async {
-    await QuranTranslationFunction.replaceTranslationSelections(
-      _downloadedBooks,
-    );
-    await _loadData();
-  }
-
-  Future<void> _clearActiveSelections() async {
-    await QuranTranslationFunction.replaceTranslationSelections([]);
     await _loadData();
   }
 
@@ -140,14 +117,6 @@ class _TranslationResourcesViewState extends State<TranslationResourcesView> {
 
     if (confirmed != true) return;
     await QuranTranslationFunction.removeFromListAlreadyDownloaded(book);
-    await _loadData();
-  }
-
-  Future<void> _deleteMany(List<ManagedResourceItem> items) async {
-    for (final item in items) {
-      final book = _allBooks.firstWhere((entry) => entry.fullPath == item.id);
-      await QuranTranslationFunction.removeFromListAlreadyDownloaded(book);
-    }
     await _loadData();
   }
 

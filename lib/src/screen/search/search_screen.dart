@@ -48,8 +48,6 @@ class _SearchScreenState extends State<SearchScreen> {
       ? Colors.white.withValues(alpha: 0.08)
       : Colors.black.withValues(alpha: 0.06);
   Color get _textPrimary => _isDark ? Colors.white : const Color(0xFF1A1A1A);
-  Color get _textMuted =>
-      _isDark ? Colors.white.withValues(alpha: 0.58) : const Color(0xFF7E7B74);
 
   @override
   void initState() {
@@ -118,14 +116,6 @@ class _SearchScreenState extends State<SearchScreen> {
       _searchHistory = _searchHistory.sublist(0, _maxHistory);
     }
     Hive.box("user").put(_kHistoryKey, _searchHistory);
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  void _clearHistory() {
-    _searchHistory.clear();
-    Hive.box("user").delete(_kHistoryKey);
     if (mounted) {
       setState(() {});
     }
@@ -431,37 +421,6 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHorizontalHistory() {
-    if (_searchHistory.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12, top: 12),
-      child: SizedBox(
-        height: 48,
-        child: ListView.separated(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          scrollDirection: Axis.horizontal,
-          itemCount: _searchHistory.length,
-          separatorBuilder: (_, _) => const Gap(8),
-          itemBuilder: (context, i) {
-            final query = _searchHistory[i];
-            return InputChip(
-              onPressed: () => _applySuggestion(query),
-              onDeleted: () => _removeFromHistory(query),
-              deleteIcon: const Icon(Icons.close, size: 14, color: Color(0xFFB0A89D)),
-              label: Text(
-                query,
-                style: const TextStyle(color: Color(0xFF333333), fontWeight: FontWeight.w700),
-              ),
-              backgroundColor: const Color(0xFFEFE8D6),
-              side: BorderSide.none,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            );
-          },
         ),
       ),
     );
