@@ -64,7 +64,6 @@ class _PrayerTimeListItemState extends State<PrayerTimeListItem>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     // Determine colors based on status
     final bgColor = widget.isNext || widget.isCurrent

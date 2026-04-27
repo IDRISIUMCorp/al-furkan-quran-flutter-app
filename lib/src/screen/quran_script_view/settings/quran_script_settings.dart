@@ -25,10 +25,6 @@ class QuranScriptSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations appLocalizations = AppLocalizations.of(context);
-    final TextStyle titleStyle = const TextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.w500,
-    );
 
     final Widget bodyWidget = BlocBuilder<QuranViewCubit, QuranViewState>(
       builder: (context, quranViewState) {

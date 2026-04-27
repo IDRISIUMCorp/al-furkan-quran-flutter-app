@@ -63,7 +63,6 @@ class _QuranResourcesViewState extends State<QuranResourcesView>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final primary = isDark ? AppColors.darkPrimary : AppColors.lightPrimary;
     final bg = isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final surface = isDark ? AppColors.darkSurface : AppColors.lightSurface;
     final textMain = isDark ? AppColors.darkTextMain : AppColors.lightTextMain;
     final textSub = isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 

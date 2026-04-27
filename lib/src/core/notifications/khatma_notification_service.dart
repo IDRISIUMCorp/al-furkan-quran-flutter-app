@@ -68,10 +68,6 @@ class KhatmaNotificationService {
 
     // Also request exact alarms if possible (Android 12+)
     try {
-      final android = _plugin
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >();
       // On some versions we need to explicitly request it
       final exactStatus = await Permission.scheduleExactAlarm.status;
       if (!exactStatus.isGranted) {

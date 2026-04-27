@@ -1772,19 +1772,6 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
   }
 
   Widget _buildColorPickerChip(String label, Color? currentColor, Function(Color?) onColorPicked, Color primary) {
-    // Small preset palette chip
-    final presetColors = [
-      Colors.white,
-      Colors.black,
-      const Color(0xFFD4A746), // Gold
-      const Color(0xFF33B18E), // Teal
-      const Color(0xFF64B5F6), // Blue
-      const Color(0xFFCE93D8), // Purple
-      const Color(0xFFB76E79), // Rose
-      const Color(0xFF66BB6A), // Green
-      const Color(0xFFFF7043), // Orange
-    ];
-    
     return GestureDetector(
       onTap: () {
         // Toggle: tap again to clear

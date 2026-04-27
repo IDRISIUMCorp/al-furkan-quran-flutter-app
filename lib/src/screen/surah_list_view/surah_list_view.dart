@@ -7,7 +7,6 @@ import "package:al_furkan/src/utils/filter/filter_surah.dart";
 import "package:al_furkan/src/utils/number_localization.dart";
 import "package:al_furkan/src/resources/quran_resources/meaning_of_surah.dart";
 import "package:al_furkan/src/screen/surah_list_view/model/surah_info_model.dart";
-import "package:al_furkan/src/theme/controller/theme_state.dart";
 import "package:al_furkan/src/theme/values/values.dart";
 import "package:al_furkan/src/widget/components/get_surah_index_widget.dart";
 
@@ -60,7 +59,6 @@ class _SurahListViewState extends State<SurahListView> {
       context,
       searchController.text.trim(),
     );
-    final ThemeState themeState = context.read<ThemeCubit>().state;
 
     return (surahNameLocalization.isEmpty || surahMeaningLocalization.isEmpty)
         ? const Center(child: CircularProgressIndicator())

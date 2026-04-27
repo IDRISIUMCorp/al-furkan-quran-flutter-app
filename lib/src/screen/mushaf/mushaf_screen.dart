@@ -619,8 +619,6 @@ class _MushafRootState extends State<_MushafRoot> {
   }
 
   void _openIndexOverlay(Color backgroundColor) {
-    final ts = context.read<ThemeCubit>().state;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -1506,7 +1504,6 @@ class _MushafViewState extends State<MushafView> {
         case QuranTheme.nightBlue:
           return QcfThemeData.nightBlue();
         case QuranTheme.custom:
-          final isLight = qSettings.customBackgroundColor.computeLuminance() > 0.5;
           return QcfThemeData(
             pageBackgroundColor: qSettings.customBackgroundColor,
             verseTextColor: qSettings.customTextColor,
@@ -1636,11 +1633,6 @@ class _MushafViewState extends State<MushafView> {
                 );
             }
           }
-
-          final bool qDark =
-              qSettings.theme == QuranTheme.oled ||
-              qSettings.theme == QuranTheme.nightBlue ||
-              qSettings.theme == QuranTheme.custom;
 
           return BlocBuilder<AudioAyahHighlightCubit, AudioAyahHighlightState>(
             buildWhen: (p, c) => p.activeAyahKey != c.activeAyahKey || p.activeWordKey != c.activeWordKey,

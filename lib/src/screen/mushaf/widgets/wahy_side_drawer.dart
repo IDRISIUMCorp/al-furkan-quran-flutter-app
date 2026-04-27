@@ -90,7 +90,6 @@ class _WahySideDrawerState extends State<WahySideDrawer>
     final bg = isDark ? AppColors.darkBackground : AppColors.ayaSurface;
     final card = isDark ? AppColors.darkCard : const Color(0xFFFFFFFF);
     final onBg = isDark ? const Color(0xFFF0EDE8) : AppColors.ayaTextMain;
-    final subtitleColor = isDark ? Colors.white54 : AppColors.ayaTextSecondary;
     final sectionLabelColor = isDark ? Colors.white38 : AppColors.ayaTextMuted;
     final dividerColor = isDark ? Colors.white.withValues(alpha: 0.06) : AppColors.ayaBorder;
     final chevronColor = isDark ? Colors.white24 : Colors.black.withValues(alpha: 0.15);

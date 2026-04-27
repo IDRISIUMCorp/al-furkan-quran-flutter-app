@@ -41,7 +41,6 @@ class _AboutAppPageState extends State<AboutAppPage> {
     final themeState = context.watch<ThemeCubit>().state;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final cs = Theme.of(context).colorScheme;
     final primary = themeState.primary;
 
     return Scaffold(

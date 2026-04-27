@@ -423,34 +423,6 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
 
   // Share Prayer Times
   Future<void> _sharePrayerTimes(PrayerTimes today, String? locationName) async {
-    final fajr = formatTimeOfDay(context, TimeOfDay.fromDateTime(_timeOf(today, Prayer.fajr)));
-    final dhuhr = formatTimeOfDay(context, TimeOfDay.fromDateTime(_timeOf(today, Prayer.dhuhr)));
-    final asr = formatTimeOfDay(context, TimeOfDay.fromDateTime(_timeOf(today, Prayer.asr)));
-    final maghrib = formatTimeOfDay(context, TimeOfDay.fromDateTime(_timeOf(today, Prayer.maghrib)));
-    final isha = formatTimeOfDay(context, TimeOfDay.fromDateTime(_timeOf(today, Prayer.isha)));
-    
-    final location = locationName ?? "موقعي";
-    final hijri = hijriDate(context);
-    
-    final text = '''
-🕌 مواقيت الصلاة
-📍 $location
-📅 $hijri
-
-🌅 الفجر: $fajr
-☀️ الظهر: $dhuhr
-🌤️ العصر: $asr
-🌆 المغرب: $maghrib
-🌙 العشاء: $isha
-
-تطبيق الفرقان للقرآن الكريم
-    ''';
-    
-    // Note: You'll need to add share_plus package
-    // await Share.share(text);
-    
-    // For now, copy to clipboard
-    // await Clipboard.setData(ClipboardData(text: text));
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -462,18 +434,6 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
 
   // Export Settings
   Future<void> _exportSettings() async {
-    final settings = {
-      'adjustments': {for (final p in _prayers) p.name: _adjustments[p]},
-      'iqamah_times': {for (final p in _prayers) p.name: _iqamahTimes[p]},
-      'notifications': {
-        'enabled': _notifEnabled,
-        'lead_minutes': _leadMinutes,
-        'selected_prayers': _selectedAlerts.map((e) => e.name).toList(),
-      },
-      'mosque_mode': _mosqueMode,
-      'saved_mosque_name': _savedMosqueName,
-    };
-    
     // Convert to JSON string
     // final jsonString = jsonEncode(settings);
     

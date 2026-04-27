@@ -45,7 +45,6 @@ extension _MushafShareExtension on _MushafViewState {
     required int verseNumber,
   }) async {
     final l10n = AppLocalizations.of(context);
-    final themeState = context.read<ThemeCubit>().state;
     final total = getVerseCount(surahNumber);
 
     int from = verseNumber;
@@ -62,7 +61,6 @@ extension _MushafShareExtension on _MushafViewState {
           builder: (sheetContext, setSheetState) {
             const bg = Color(0xFFEDE4D4);
             const card = Color(0xFFF5EBE0);
-            final green = themeState.primary;
 
             Widget section({required Widget child}) {
               return Container(
@@ -492,7 +490,6 @@ extension _MushafShareExtension on _MushafViewState {
     final buffer = StringBuffer();
 
     final surahName = "سورة ${getSurahNameArabic(surahNumber)}";
-    final verseMark = "﴿$verseNumber﴾";
 
     buffer.writeln(surahName);
     buffer.writeln();
@@ -535,7 +532,6 @@ extension _MushafShareExtension on _MushafViewState {
     required String ayahText,
   }) async {
     final themeState = context.read<ThemeCubit>().state;
-    final downloadedBooks = QuranTafsirFunction.getDownloadedTafsirBooks();
     final selectedBooksFuture = QuranTafsirFunction.getTafsirSelections();
     final String ayahKey = "$surahNumber:$verseNumber";
 
@@ -578,35 +574,6 @@ extension _MushafShareExtension on _MushafViewState {
         ayahKey,
       );
     }
-
-    final selectedBooks = await selectedBooksFuture;
-    final selected = (selectedBooks ?? []).toList();
-    final String tafsirTitle = selected.isNotEmpty
-        ? selected.first.name
-        : "التفسير";
-
-    final TafsirBookModel? muyassar = _findTafsirBookByNameContains("الميسر");
-    final TafsirBookModel? mukhtasar = _findTafsirBookByNameContains("المختصر");
-
-    final bool muyassarDownloaded =
-        muyassar != null &&
-        _isDownloadedByFullPath(muyassar.fullPath, downloadedBooks);
-    final bool mukhtasarDownloaded =
-        mukhtasar != null &&
-        _isDownloadedByFullPath(mukhtasar.fullPath, downloadedBooks);
-
-    final bool selectedMuyassar = selected.any(
-      (b) => b.name.contains("الميسر"),
-    );
-    final bool selectedMukhtasar = selected.any(
-      (b) => b.name.contains("المختصر"),
-    );
-    final bool showPickBetweenImageBooks =
-        selectedMuyassar && selectedMukhtasar;
-
-    final bool isAyahDayn = ayahKey == "2:282";
-    final bool isVeryLongAyah =
-        isAyahDayn || ayahText.replaceAll(RegExp(r"\s+"), "").length > 280;
 
     await showModalBottomSheet(
       context: context,

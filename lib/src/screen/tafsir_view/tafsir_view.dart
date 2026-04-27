@@ -1280,7 +1280,6 @@ extension _MutashabihatCard on _TafsirViewState {
   Widget _mutashabihatCard(Map<String, dynamic> entry) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final themeState = context.read<ThemeCubit>().state;
-    final ayahKey = entry['ayah_key']?.toString() ?? entry['key']?.toString() ?? '';
     final text = entry['text']?.toString() ?? entry['ayah_text']?.toString() ?? '';
     final surah = entry['surah']?.toString() ?? entry['surah_name']?.toString() ?? '';
     // Build display from muts (similar ayahs)
