@@ -619,7 +619,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
       final bytes = await _capturePngBytes();
       if (share) {
         final file = await _writeTempPng(bytes);
-        await Share.shareXFiles([XFile(file.path)], text: 'مشاركة من أذكار المسلم');
+        await SharePlus.instance.share(ShareParams(text: 'مشاركة من أذكار المسلم', files: [XFile(file.path)]));
       } else {
         await Gal.putImageBytes(bytes, album: 'AlFurkan');
         if (mounted) {

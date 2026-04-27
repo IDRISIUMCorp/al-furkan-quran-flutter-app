@@ -32,9 +32,8 @@ class SunnahShareService {
     
     try {
       await Clipboard.setData(ClipboardData(text: text));
-      await Share.share(
-        text,
-        subject: title,
+      await SharePlus.instance.share(
+        ShareParams(text: text, subject: title),
       );
     } catch (e) {
       debugPrint('Error sharing as text: $e');
@@ -96,10 +95,8 @@ class SunnahShareService {
       await file.writeAsBytes(imageBytes);
       
       // مشاركة الصورة
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        text: title,
-        subject: type,
+      await SharePlus.instance.share(
+        ShareParams(text: title, subject: type, files: [XFile(file.path)]),
       );
     } catch (e) {
       debugPrint('Error sharing as image: $e');

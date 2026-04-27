@@ -334,7 +334,7 @@ class _AzkarDetailScreenState extends State<AzkarDetailScreen> {
                       final text = zekr['zekr'].toString();
                       final ref = zekr['reference']?.toString() ?? '';
                       final shareText = "$text\n\n${ref.isNotEmpty ? 'المصدر: $ref\n' : ''}— أذكار المسلم";
-                      Share.share(shareText);
+                      SharePlus.instance.share(ShareParams(text: shareText));
                     },
                   ),
                 ],
