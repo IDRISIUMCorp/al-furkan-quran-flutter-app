@@ -128,7 +128,7 @@ class AyahOfTheDayService {
       );
       
       final date = DateTime.now();
-      PrayerTimes prayerTimes = PrayerTimes(
+      final PrayerTimes prayerTimes = PrayerTimes(
         coordinates: coordinates, 
         date: date, 
         calculationParameters: params, 
@@ -152,7 +152,7 @@ class AyahOfTheDayService {
         Prayer.isha: "العشاء",
       };
 
-      Map<String, String> formattedTimes = {
+      final Map<String, String> formattedTimes = {
         "الفجر": formatTime(prayerTimes.fajr),
         "الشروق": formatTime(prayerTimes.sunrise),
         "الظهر": formatTime(prayerTimes.dhuhr),

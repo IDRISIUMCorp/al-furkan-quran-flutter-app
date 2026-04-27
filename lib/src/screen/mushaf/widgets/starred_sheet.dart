@@ -85,7 +85,7 @@ Future<void> showStarredSheet({
                                   90,
                                 ),
                                 itemCount: starred.length,
-                                separatorBuilder: (_, __) => Divider(
+                                separatorBuilder: (_, _) => Divider(
                                   height: 14,
                                   color: Colors.black.withValues(alpha: 0.06),
                                 ),

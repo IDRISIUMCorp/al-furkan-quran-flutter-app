@@ -72,7 +72,7 @@ class QuranMutashabihatFunction {
   static String getMutashabihatBoxName({
     required MutashabihatBookModel mutashabihatBook,
   }) {
-    String sanitizedBook = mutashabihatBook.fullPath
+    final String sanitizedBook = mutashabihatBook.fullPath
         .split("/")
         .last
         .replaceAll(RegExp(r"[^\w\.-]"), "_");
@@ -90,7 +90,7 @@ class QuranMutashabihatFunction {
     required MutashabihatBookModel mutashabihatBook,
   }) async {
     final userBox = Hive.box("user");
-    List<MutashabihatBookModel> downloadedBooks =
+    final List<MutashabihatBookModel> downloadedBooks =
         getDownloadedMutashabihatBooks();
     if (!downloadedBooks
         .any((book) => book.fullPath == mutashabihatBook.fullPath)) {
@@ -117,7 +117,7 @@ class QuranMutashabihatFunction {
     MutashabihatBookModel mutashabihatBook,
   ) async {
     final userBox = Hive.box("user");
-    List<MutashabihatBookModel> downloadedBooks =
+    final List<MutashabihatBookModel> downloadedBooks =
         getDownloadedMutashabihatBooks();
     bool changed = false;
     downloadedBooks.removeWhere((book) {
@@ -154,7 +154,7 @@ class QuranMutashabihatFunction {
     MutashabihatBookModel mutashabihatBook,
   ) async {
     final userBox = Hive.box("user");
-    List<MutashabihatBookModel> selectedList =
+    final List<MutashabihatBookModel> selectedList =
         (await getMutashabihatSelections()) ?? [];
     if (!selectedList.any((b) => b.fullPath == mutashabihatBook.fullPath)) {
       selectedList.add(mutashabihatBook);
@@ -170,7 +170,7 @@ class QuranMutashabihatFunction {
     MutashabihatBookModel mutashabihatBook,
   ) async {
     final userBox = Hive.box("user");
-    List<MutashabihatBookModel> selectedList =
+    final List<MutashabihatBookModel> selectedList =
         (await getMutashabihatSelections()) ?? [];
     selectedList.removeWhere(
       (element) => element.fullPath == mutashabihatBook.fullPath,
@@ -200,7 +200,7 @@ class QuranMutashabihatFunction {
 
   static Future<List<MutashabihatBookModel>?> getMutashabihatSelections() async {
     final userBox = Hive.box("user");
-    List? booksList = userBox.get(selectedMutashabihatListKey);
+    final List? booksList = userBox.get(selectedMutashabihatListKey);
     return booksList
         ?.map((e) =>
             MutashabihatBookModel.fromMap(Map<String, dynamic>.from(e)))
@@ -308,18 +308,18 @@ class QuranMutashabihatFunction {
 
     int? reportedTotalBytes;
     try {
-      String base = ApisUrls.base;
+      final String base = ApisUrls.base;
       cubit.updateProgress(
         0.0,
         "Downloading: ${mutashabihatBook.name}",
         activeResourceId: mutashabihatBook.fullPath,
       );
-      dio.Response response = await dio.Dio().get(
+      final dio.Response response = await dio.Dio().get(
         base + mutashabihatBook.fullPath,
         onReceiveProgress: (received, total) {
           if (total != -1) {
             reportedTotalBytes = total;
-            double progress = received / total;
+            final double progress = received / total;
             cubit.updateProgress(
               progress * 0.5,
               "Downloading: ${mutashabihatBook.name}",
@@ -333,7 +333,7 @@ class QuranMutashabihatFunction {
 
       // Detect HTML responses — the backend sometimes returns an HTML page
       // instead of actual data for resources that aren't hosted yet.
-      String? responseData = response.data as String?;
+      final String? responseData = response.data as String?;
       final bool isHtml = responseData != null &&
           (responseData.trimLeft().startsWith('<') ||
            response.headers.value('content-type')?.contains('text/html') == true);
@@ -602,11 +602,11 @@ class QuranMutashabihatFunction {
   }
 
   static Future<void> close() async {
-    List<MutashabihatBookModel> selectedBooks =
+    final List<MutashabihatBookModel> selectedBooks =
         getDownloadedMutashabihatBooks();
     selectedBooks.addAll(await getMutashabihatSelections() ?? []);
     for (MutashabihatBookModel bookModel in selectedBooks) {
-      String boxName = getMutashabihatBoxName(mutashabihatBook: bookModel);
+      final String boxName = getMutashabihatBoxName(mutashabihatBook: bookModel);
       if (Hive.isBoxOpen(boxName)) {
         await Hive.lazyBox(boxName).close();
       }

@@ -145,7 +145,7 @@ class _QuranScriptViewState extends State<QuranScriptView> {
               if (dropdownAyahKey != null && dropdownAyahKey is String) {
                 final index = ayahsList.indexOf(dropdownAyahKey);
                 if (index != -1) {
-                  bool isVisible = isItemVisible(
+                  final bool isVisible = isItemVisible(
                     itemPositionsListenerAyahList,
                     index,
                   );
@@ -201,9 +201,9 @@ class _QuranScriptViewState extends State<QuranScriptView> {
   bool isLandScape = false;
   @override
   Widget build(BuildContext context) {
-    AppLocalizations l10n = AppLocalizations.of(context);
-    ThemeState themeState = context.read<ThemeCubit>().state;
-    double width = MediaQuery.of(context).size.width;
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final ThemeState themeState = context.read<ThemeCubit>().state;
+    final double width = MediaQuery.of(context).size.width;
     isLandScape = width > 600;
 
     final Widget content = _isMushafMode
@@ -321,7 +321,7 @@ class _QuranScriptViewState extends State<QuranScriptView> {
                           padding: const EdgeInsets.symmetric(horizontal: 5),
                           itemCount: 114,
                           itemBuilder: (context, index) {
-                            bool isCurrent =
+                            final bool isCurrent =
                                 (index + 1) == ayahState.surahInfoModel?.id;
                             return OutlinedButton(
                               style: outlineButtonDesignSidebar(
@@ -388,7 +388,7 @@ class _QuranScriptViewState extends State<QuranScriptView> {
                           padding: const EdgeInsets.symmetric(horizontal: 5),
                           itemCount: ayahsList.length,
                           itemBuilder: (context, index) {
-                            bool isCurrent =
+                            final bool isCurrent =
                                 ayahState.dropdownAyahKey == ayahsList[index];
 
                             return OutlinedButton(
@@ -472,21 +472,21 @@ class _QuranScriptViewState extends State<QuranScriptView> {
         Widget buildAyahItem(BuildContext context, int index) {
           final ayahKey = ayahsList[index];
           final ayahKeySplit = ayahKey.split(":");
-          int surahNumber = ayahKeySplit.first.toInt();
+          final int surahNumber = ayahKeySplit.first.toInt();
 
-          int ayahNumber = ayahKeySplit.last.toInt();
-          String surahEndAyahKey =
+          final int ayahNumber = ayahKeySplit.last.toInt();
+          final String surahEndAyahKey =
               surahNumber == ayahsList.last.split(":").last.toInt()
               ? ayahsList.last
               : getEndAyahKeyFromSurahNumber(surahNumber);
-          bool isSurahHeadingIncluded = ayahNumber == 1;
-          int pageNumber = getPageNumber(ayahKey) ?? 0;
+          final bool isSurahHeadingIncluded = ayahNumber == 1;
+          final int pageNumber = getPageNumber(ayahKey) ?? 0;
           PageInfoModel? pageInfo;
           try {
             pageInfo = PageInfoModel.fromMap(quranPagesInfo[pageNumber - 1]);
           } catch (_) {}
 
-          bool isPageStart = pageInfo?.start == ayahNumber || index == 0;
+          final bool isPageStart = pageInfo?.start == ayahNumber || index == 0;
 
           return Column(
             children: [
@@ -652,9 +652,9 @@ class _QuranScriptViewState extends State<QuranScriptView> {
       ),
       child: BlocBuilder<AyahByAyahInScrollInfoCubit, AyahByAyahInScrollInfoState>(
         builder: (context, ayahScrollInfoState) {
-          List<DropdownMenuItem>
+          final List<DropdownMenuItem>
           dropdownItems = List.generate(ayahsList.length, (index) {
-            List<String> ayahData = ayahsList[index].toString().split(":");
+            final List<String> ayahData = ayahsList[index].toString().split(":");
             return DropdownMenuItem(
               value: ayahsList[index],
               child: SizedBox(

@@ -16,8 +16,8 @@ Future<void> showBugReportDialog(BuildContext context) async {
   final deviceInfo = DeviceInfoPlugin();
   final packageInfo = await PackageInfo.fromPlatform();
 
-  String deviceInfoString = await _getDeviceInfoString(deviceInfo);
-  String appInfoString = _getAppInfoString(packageInfo);
+  final String deviceInfoString = await _getDeviceInfoString(deviceInfo);
+  final String appInfoString = _getAppInfoString(packageInfo);
   await showModalBottomSheet(
     context: context,
     builder: (context) {
@@ -153,23 +153,23 @@ String? _encodeQueryParameters(Map<String, String> params) {
 Future<String> _getDeviceInfoString(DeviceInfoPlugin deviceInfo) async {
   try {
     if (kIsWeb) {
-      WebBrowserInfo webBrowserInfo = await deviceInfo.webBrowserInfo;
+      final WebBrowserInfo webBrowserInfo = await deviceInfo.webBrowserInfo;
       return "Platform: Web\nBrowser: ${webBrowserInfo.browserName}\nUser Agent: ${webBrowserInfo.userAgent}";
     } else {
       if (defaultTargetPlatform == TargetPlatform.android) {
-        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
         return "Platform: Android\nDevice: ${androidInfo.model}\nManufacturer: ${androidInfo.manufacturer}\nOS Version: ${androidInfo.version.release}\nSDK Version: ${androidInfo.version.sdkInt}";
       } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+        final IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
         return "Platform: iOS\nDevice: ${iosInfo.name}\nModel: ${iosInfo.model}\nOS Version: ${iosInfo.systemVersion}";
       } else if (defaultTargetPlatform == TargetPlatform.linux) {
-        LinuxDeviceInfo linuxInfo = await deviceInfo.linuxInfo;
+        final LinuxDeviceInfo linuxInfo = await deviceInfo.linuxInfo;
         return "Platform: Linux\nName: ${linuxInfo.name}\nVersion: ${linuxInfo.version}";
       } else if (defaultTargetPlatform == TargetPlatform.macOS) {
-        MacOsDeviceInfo macOsInfo = await deviceInfo.macOsInfo;
+        final MacOsDeviceInfo macOsInfo = await deviceInfo.macOsInfo;
         return "Platform: macOS\nModel: ${macOsInfo.model}\nOS Version: ${macOsInfo.osRelease}";
       } else if (defaultTargetPlatform == TargetPlatform.windows) {
-        WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
+        final WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
         return "Platform: Windows\nComputer Name: ${windowsInfo.computerName}\nOS Version: ${windowsInfo.productName}";
       }
     }
@@ -180,10 +180,10 @@ Future<String> _getDeviceInfoString(DeviceInfoPlugin deviceInfo) async {
 }
 
 String _getAppInfoString(PackageInfo packageInfo) {
-  String appName = packageInfo.appName;
-  String packageName = packageInfo.packageName;
-  String version = packageInfo.version;
-  String buildNumber = packageInfo.buildNumber;
+  final String appName = packageInfo.appName;
+  final String packageName = packageInfo.packageName;
+  final String version = packageInfo.version;
+  final String buildNumber = packageInfo.buildNumber;
 
   return "App Name: $appName\nPackage Name: $packageName\nVersion: $version\nBuild Number: $buildNumber";
 }

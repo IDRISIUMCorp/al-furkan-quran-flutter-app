@@ -446,7 +446,7 @@ class _SearchScreenState extends State<SearchScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           scrollDirection: Axis.horizontal,
           itemCount: _searchHistory.length,
-          separatorBuilder: (_, __) => const Gap(8),
+          separatorBuilder: (_, _) => const Gap(8),
           itemBuilder: (context, i) {
             final query = _searchHistory[i];
             return InputChip(

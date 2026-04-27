@@ -89,7 +89,7 @@ class QuranTranslationFunction {
     if (!Hive.isBoxOpen("user")) {
       await Hive.openBox("user");
     }
-    List<TranslationBookModel>? booksListToOpen =
+    final List<TranslationBookModel>? booksListToOpen =
         await getTranslationSelections();
     if (booksListToOpen == null) return;
     log(
@@ -99,7 +99,7 @@ class QuranTranslationFunction {
 
     // open surah info box if not already open
     if (locale != null) {
-      String infoBoxName = "surah_info_${locale.languageCode}";
+      final String infoBoxName = "surah_info_${locale.languageCode}";
       if (!Hive.isBoxOpen(infoBoxName)) {
         await Hive.openLazyBox(infoBoxName);
       }
@@ -131,7 +131,7 @@ class QuranTranslationFunction {
   }
 
   static Future<bool> isAlreadyDownloaded(TranslationBookModel book) async {
-    List<TranslationBookModel> downloadedBooks =
+    final List<TranslationBookModel> downloadedBooks =
         getDownloadedTranslationBooks();
 
     for (TranslationBookModel downloadedBook in downloadedBooks) {
@@ -148,7 +148,7 @@ class QuranTranslationFunction {
     TranslationBookModel book,
   ) async {
     final userBox = Hive.box("user");
-    List<TranslationBookModel> downloadedList = getDownloadedTranslationBooks();
+    final List<TranslationBookModel> downloadedList = getDownloadedTranslationBooks();
 
     if (!downloadedList.any((b) => b.fullPath == book.fullPath)) {
       downloadedList.add(book);
@@ -161,7 +161,7 @@ class QuranTranslationFunction {
 
   static List<TranslationBookModel> getDownloadedTranslationBooks() {
     final userBox = Hive.box("user");
-    List<dynamic> downloadedList = userBox.get(
+    final List<dynamic> downloadedList = userBox.get(
       downloadedTranslationBooks,
       defaultValue: [],
     );
@@ -174,7 +174,7 @@ class QuranTranslationFunction {
   static Future<void> removeFromListAlreadyDownloaded(
     TranslationBookModel bookToRemove,
   ) async {
-    List<TranslationBookModel> downloaded = getDownloadedTranslationBooks();
+    final List<TranslationBookModel> downloaded = getDownloadedTranslationBooks();
     downloaded.removeWhere(
       (element) => element.fullPath == bookToRemove.fullPath,
     );
@@ -201,7 +201,7 @@ class QuranTranslationFunction {
   static Future<void> setTranslationSelection(TranslationBookModel book) async {
     clearTranslationCache();
     final userBox = Hive.box("user");
-    List<TranslationBookModel> selectedTranslationList =
+    final List<TranslationBookModel> selectedTranslationList =
         (await getTranslationSelections()) ?? [];
     if (!selectedTranslationList.any((b) => b.fullPath == book.fullPath)) {
       selectedTranslationList.add(book);
@@ -218,7 +218,7 @@ class QuranTranslationFunction {
   ) async {
     clearTranslationCache();
     final userBox = Hive.box("user");
-    List<TranslationBookModel> selectedTranslationList =
+    final List<TranslationBookModel> selectedTranslationList =
         (await getTranslationSelections()) ?? [];
     selectedTranslationList.removeWhere((b) => b.fullPath == book.fullPath);
     await userBox.put(
@@ -252,7 +252,7 @@ class QuranTranslationFunction {
       await userBox.delete("selected_translation");
     }
 
-    List? booksList = userBox.get(selectedTranslationListKey);
+    final List? booksList = userBox.get(selectedTranslationListKey);
     final bookListModel = booksList
         ?.map((e) => TranslationBookModel.fromMap(Map<String, dynamic>.from(e)))
         .toList();
@@ -263,7 +263,7 @@ class QuranTranslationFunction {
     required TranslationBookModel translationBook,
   }) {
     // Using fileName for brevity if available and suitable, otherwise fallback to fullPath's last segment
-    String sanitizedBookIdentifier =
+    final String sanitizedBookIdentifier =
         (translationBook.fileName.isNotEmpty
                 ? translationBook.fileName
                 : translationBook.fullPath.split("/").last)
@@ -273,7 +273,7 @@ class QuranTranslationFunction {
   }
 
   static Future<List<String>?> getSelectedTranslationBoxName() async {
-    List<TranslationBookModel>? translationSelectionList =
+    final List<TranslationBookModel>? translationSelectionList =
         await getTranslationSelections();
     if (translationSelectionList != null) {
       return translationSelectionList
@@ -315,9 +315,9 @@ class QuranTranslationFunction {
       if (isSetupProcess) {
         await setTranslationSelection(translationBook);
       } else {
-        List<TranslationBookModel>? selectedTranslationBook =
+        final List<TranslationBookModel>? selectedTranslationBook =
             await getTranslationSelections();
-        bool isSelected =
+        final bool isSelected =
             selectedTranslationBook?.any(
               (element) =>
                   element.fileName == translationBook.fileName &&
@@ -371,19 +371,19 @@ class QuranTranslationFunction {
 
     int? reportedTotalBytes;
     try {
-      String base = ApisUrls.base;
+      final String base = ApisUrls.base;
       // Using fullPath from the model for the download URL
       cubit.updateProgress(
         0.0,
         "Downloading: ${translationBook.name}",
         activeResourceId: translationBook.fullPath,
       );
-      dio.Response response = await dio.Dio().get(
+      final dio.Response response = await dio.Dio().get(
         base + translationBook.fullPath,
         onReceiveProgress: (received, total) {
           if (total != -1) {
             reportedTotalBytes = total;
-            double progress = received / total;
+            final double progress = received / total;
             cubit.updateProgress(
               progress * 0.5,
               "Downloading: ${translationBook.name}", // Using model's display name
@@ -397,7 +397,7 @@ class QuranTranslationFunction {
 
       // Detect HTML responses — safety net in case the server returns
       // an HTML page instead of actual BZip2-compressed data.
-      String? responseData = response.data as String?;
+      final String? responseData = response.data as String?;
       final bool isHtml = responseData != null &&
           (responseData.trimLeft().startsWith('<') ||
            response.headers.value('content-type')?.contains('text/html') == true);
@@ -421,7 +421,7 @@ class QuranTranslationFunction {
         "Processing: ${translationBook.name}",
         activeResourceId: translationBook.fullPath,
       );
-      Map data = await compute(
+      final Map data = await compute(
         (message) => jsonDecode(decodeBZip2String(message as String)),
         response.data,
       );
@@ -494,7 +494,7 @@ class QuranTranslationFunction {
     );
     // Check if box exists and is not empty
     if (await Hive.boxExists(surahInfoBoxName)) {
-      var box = await Hive.openLazyBox(surahInfoBoxName);
+      final box = await Hive.openLazyBox(surahInfoBoxName);
       if (box.isNotEmpty) {
         log(
           "Surah info for ${locale.languageCode} already exists and is not empty.",
@@ -513,7 +513,7 @@ class QuranTranslationFunction {
       if (response.statusCode == 200) {
         log(surahInfoBoxName);
         final box = await Hive.openLazyBox(surahInfoBoxName);
-        Map data = await compute(
+        final Map data = await compute(
           (message) => jsonDecode(decodeBZip2String(message as String)),
           response.data,
         );
@@ -551,7 +551,7 @@ class QuranTranslationFunction {
     }
 
     for (TranslationBookModel bookModel in selectedBooks) {
-      String boxName = getTranslationBoxName(translationBook: bookModel);
+      final String boxName = getTranslationBoxName(translationBook: bookModel);
       LazyBox? translationBox;
       if (!Hive.isBoxOpen(boxName)) {
         translationBox = await Hive.openLazyBox(boxName);
@@ -586,7 +586,7 @@ class QuranTranslationFunction {
     }
 
     for (TranslationBookModel bookModel in targetBooks) {
-      String boxName = getTranslationBoxName(translationBook: bookModel);
+      final String boxName = getTranslationBoxName(translationBook: bookModel);
       LazyBox? translationBox;
       if (!Hive.isBoxOpen(boxName)) {
         translationBox = await Hive.openLazyBox(boxName);
@@ -610,10 +610,10 @@ class QuranTranslationFunction {
 
   static Future<void> close() async {
     clearTranslationCache();
-    List<TranslationBookModel> selectedBooks = getDownloadedTranslationBooks();
+    final List<TranslationBookModel> selectedBooks = getDownloadedTranslationBooks();
     selectedBooks.addAll(await getTranslationSelections() ?? []);
     for (TranslationBookModel bookModel in selectedBooks) {
-      String boxName = getTranslationBoxName(translationBook: bookModel);
+      final String boxName = getTranslationBoxName(translationBook: bookModel);
       if (Hive.isBoxOpen(boxName)) {
         await Hive.lazyBox(boxName).close();
       }

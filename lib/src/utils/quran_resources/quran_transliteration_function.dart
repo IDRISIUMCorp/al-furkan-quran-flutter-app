@@ -72,7 +72,7 @@ class QuranTransliterationFunction {
   static String getTransliterationBoxName({
     required TransliterationBookModel transliterationBook,
   }) {
-    String sanitizedBook = transliterationBook.fullPath
+    final String sanitizedBook = transliterationBook.fullPath
         .split("/")
         .last
         .replaceAll(RegExp(r"[^\w\.-]"), "_");
@@ -91,7 +91,7 @@ class QuranTransliterationFunction {
     required TransliterationBookModel transliterationBook,
   }) async {
     final userBox = Hive.box("user");
-    List<TransliterationBookModel> downloadedBooks =
+    final List<TransliterationBookModel> downloadedBooks =
         getDownloadedTransliterationBooks();
     if (!downloadedBooks
         .any((book) => book.fullPath == transliterationBook.fullPath)) {
@@ -119,7 +119,7 @@ class QuranTransliterationFunction {
     TransliterationBookModel transliterationBook,
   ) async {
     final userBox = Hive.box("user");
-    List<TransliterationBookModel> downloadedBooks =
+    final List<TransliterationBookModel> downloadedBooks =
         getDownloadedTransliterationBooks();
     bool changed = false;
     downloadedBooks.removeWhere((book) {
@@ -156,7 +156,7 @@ class QuranTransliterationFunction {
     TransliterationBookModel transliterationBook,
   ) async {
     final userBox = Hive.box("user");
-    List<TransliterationBookModel> selectedList =
+    final List<TransliterationBookModel> selectedList =
         (await getTransliterationSelections()) ?? [];
     if (!selectedList
         .any((b) => b.fullPath == transliterationBook.fullPath)) {
@@ -173,7 +173,7 @@ class QuranTransliterationFunction {
     TransliterationBookModel transliterationBook,
   ) async {
     final userBox = Hive.box("user");
-    List<TransliterationBookModel> selectedList =
+    final List<TransliterationBookModel> selectedList =
         (await getTransliterationSelections()) ?? [];
     selectedList.removeWhere(
       (element) => element.fullPath == transliterationBook.fullPath,
@@ -204,7 +204,7 @@ class QuranTransliterationFunction {
   static Future<List<TransliterationBookModel>?>
       getTransliterationSelections() async {
     final userBox = Hive.box("user");
-    List? booksList = userBox.get(selectedTransliterationListKey);
+    final List? booksList = userBox.get(selectedTransliterationListKey);
     return booksList
         ?.map((e) =>
             TransliterationBookModel.fromMap(Map<String, dynamic>.from(e)))
@@ -313,18 +313,18 @@ class QuranTransliterationFunction {
 
     int? reportedTotalBytes;
     try {
-      String base = ApisUrls.base;
+      final String base = ApisUrls.base;
       cubit.updateProgress(
         0.0,
         "Downloading: ${transliterationBook.name}",
         activeResourceId: transliterationBook.fullPath,
       );
-      dio.Response response = await dio.Dio().get(
+      final dio.Response response = await dio.Dio().get(
         base + transliterationBook.fullPath,
         onReceiveProgress: (received, total) {
           if (total != -1) {
             reportedTotalBytes = total;
-            double progress = received / total;
+            final double progress = received / total;
             cubit.updateProgress(
               progress * 0.5,
               "Downloading: ${transliterationBook.name}",
@@ -338,7 +338,7 @@ class QuranTransliterationFunction {
 
       // Detect HTML responses — the backend sometimes returns an HTML page
       // instead of actual data for resources that aren't hosted yet.
-      String? responseData = response.data as String?;
+      final String? responseData = response.data as String?;
       final bool isHtml = responseData != null &&
           (responseData.trimLeft().startsWith('<') ||
            response.headers.value('content-type')?.contains('text/html') == true);
@@ -465,11 +465,11 @@ class QuranTransliterationFunction {
   }
 
   static Future<void> close() async {
-    List<TransliterationBookModel> selectedBooks =
+    final List<TransliterationBookModel> selectedBooks =
         getDownloadedTransliterationBooks();
     selectedBooks.addAll(await getTransliterationSelections() ?? []);
     for (TransliterationBookModel bookModel in selectedBooks) {
-      String boxName =
+      final String boxName =
           getTransliterationBoxName(transliterationBook: bookModel);
       if (Hive.isBoxOpen(boxName)) {
         await Hive.lazyBox(boxName).close();

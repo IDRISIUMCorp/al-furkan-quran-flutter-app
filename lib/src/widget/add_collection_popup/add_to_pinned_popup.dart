@@ -118,7 +118,7 @@ class _AddToPinnedWidgetState extends State<AddToPinnedWidget> {
 
   void _handleSavePinned() {
     final now = DateTime.now();
-    String newPinnedId = uuid.v4();
+    final String newPinnedId = uuid.v4();
 
     final newPinned = PinnedModel(
       id: newPinnedId,
@@ -129,7 +129,7 @@ class _AddToPinnedWidgetState extends State<AddToPinnedWidget> {
 
     final pinnedBox = Hive.box(CollectionType.pinned.name);
     for (String collectionID in _selectedPinnedCollectionIds) {
-      PinnedCollectionModel collection = PinnedCollectionModel.fromJson(
+      final PinnedCollectionModel collection = PinnedCollectionModel.fromJson(
         Map<String, dynamic>.from(pinnedBox.get(collectionID)),
       );
       collection.updatedAt = now;
@@ -151,8 +151,8 @@ class _AddToPinnedWidgetState extends State<AddToPinnedWidget> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeState themeState = context.read<ThemeCubit>().state;
-    AppLocalizations l10n = AppLocalizations.of(context);
+    final ThemeState themeState = context.read<ThemeCubit>().state;
+    final AppLocalizations l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Column(
@@ -351,7 +351,7 @@ class _AddToPinnedWidgetState extends State<AddToPinnedWidget> {
 Future<void> saveDemoPinnedCollection() async {
   final box = Hive.box(CollectionType.pinned.name);
   if (box.values.isEmpty) {
-    List<PinnedCollectionModel> collections = [
+    final List<PinnedCollectionModel> collections = [
       PinnedCollectionModel(
         id: "col1",
         name: "Reflections",

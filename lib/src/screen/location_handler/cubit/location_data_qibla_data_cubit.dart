@@ -16,7 +16,7 @@ class LocationQiblaPrayerDataCubit extends Cubit<LocationQiblaPrayerDataState> {
   Future<void> getLocation() async {
     emit(state.copyWith(isGettingLocation: true));
     try {
-      Position position = await Geolocator.getCurrentPosition();
+      final Position position = await Geolocator.getCurrentPosition();
       await saveLocationData(
         LatLon(latitude: position.latitude, longitude: position.longitude),
         save: true,
@@ -32,7 +32,7 @@ class LocationQiblaPrayerDataCubit extends Cubit<LocationQiblaPrayerDataState> {
   }
 
   Future<void> saveLocationData(LatLon latLon, {bool save = true}) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     if (save) {
       await sharedPreferences.setString("user_location", latLon.toJson());
     }
@@ -49,7 +49,7 @@ class LocationQiblaPrayerDataCubit extends Cubit<LocationQiblaPrayerDataState> {
     bool save = true,
   }) async {
     if (save) {
-      SharedPreferences sharedPreferences =
+      final SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
       sharedPreferences.setString(
         "selected_calculation_method",
@@ -61,7 +61,7 @@ class LocationQiblaPrayerDataCubit extends Cubit<LocationQiblaPrayerDataState> {
 
   Future<void> saveMadhab(Madhab madhab, {bool save = true}) async {
     if (save) {
-      SharedPreferences sharedPreferences =
+      final SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
       sharedPreferences.setString("selected_madhab", madhab.name);
     }
@@ -73,7 +73,7 @@ class LocationQiblaPrayerDataCubit extends Cubit<LocationQiblaPrayerDataState> {
   }
 
   static Future<LocationQiblaPrayerDataState> getSavedState() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String? jsonLocation = sharedPreferences.getString("user_location");
     if (jsonLocation == null) {
       jsonLocation = Hive.box("user").get("user_location", defaultValue: null);

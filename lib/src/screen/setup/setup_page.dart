@@ -46,7 +46,7 @@ class _AppSetupPageState extends State<AppSetupPage> {
 
   void changeAppLanguage(MyAppLocalization localeInfo) {
     appLanguage = localeInfo.locale.languageCode;
-    String? languageName = codeToLanguageMap[appLanguage];
+    final String? languageName = codeToLanguageMap[appLanguage];
     context.read<LanguageCubit>().changeLanguage(localeInfo);
 
     if (translationResources.keys.contains(languageName)) {
@@ -167,9 +167,9 @@ class _AppSetupPageState extends State<AppSetupPage> {
 
   @override
   Widget build(BuildContext context) {
-    AppLocalizations appLocalizations = AppLocalizations.of(context);
-    bool isLandscape = MediaQuery.of(context).size.width > 600;
-    bool isSmallScreen = MediaQuery.of(context).size.height < 450;
+    final AppLocalizations appLocalizations = AppLocalizations.of(context);
+    final bool isLandscape = MediaQuery.of(context).size.width > 600;
+    final bool isSmallScreen = MediaQuery.of(context).size.height < 450;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar:
@@ -453,7 +453,7 @@ class _AppSetupPageState extends State<AppSetupPage> {
   Future<void> downloadResources(
     ResourcesProgressCubitState processState,
   ) async {
-    AppLocalizations appLocalizations = AppLocalizations.of(context);
+    final AppLocalizations appLocalizations = AppLocalizations.of(context);
     if (translationLanguageCode == null ||
         tafsirLanguageCode == null ||
         processState.translationBookModel == null ||
@@ -472,17 +472,17 @@ class _AppSetupPageState extends State<AppSetupPage> {
       fullscreenDialog: true,
       builder: (context) => dialogForShowDownloadProcess(),
     );
-    bool success1 = await QuranTranslationFunction.downloadResources(
+    final bool success1 = await QuranTranslationFunction.downloadResources(
       context: context,
       translationBook: processState.translationBookModel!,
       isSetupProcess: true,
     );
-    bool success2 = await QuranTafsirFunction.downloadResources(
+    final bool success2 = await QuranTafsirFunction.downloadResources(
       context: context,
       tafsirBook: processState.tafsirBookModel!,
       isSetupProcess: true,
     );
-    bool success3 = await SegmentedResourcesManager.downloadResources(
+    final bool success3 = await SegmentedResourcesManager.downloadResources(
       context,
       context.read<SegmentedQuranReciterCubit>().state.segmentsUrl!,
     );
@@ -512,7 +512,7 @@ class _AppSetupPageState extends State<AppSetupPage> {
   }
 
   Widget dialogForShowDownloadProcess() {
-    AppLocalizations appLocalizations = AppLocalizations.of(context);
+    final AppLocalizations appLocalizations = AppLocalizations.of(context);
     return PopScope(
       canPop: false,
       child: Dialog(
@@ -593,7 +593,7 @@ class _AppSetupPageState extends State<AppSetupPage> {
 
   double? getProgressValue(ResourcesProgressCubitState state) {
     try {
-      double? value =
+      final double? value =
           (state.percentage == null ||
                   state.percentage == 0.0 ||
                   state.percentage == 1.0)

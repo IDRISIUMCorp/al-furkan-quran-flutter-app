@@ -780,7 +780,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         itemCount: filters.length,
-        separatorBuilder: (_, __) => const Gap(8),
+        separatorBuilder: (_, _) => const Gap(8),
         itemBuilder: (ctx, i) {
           final (id, label, color) = filters[i];
           final isSelected = _imageFilter == id;
@@ -1601,7 +1601,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: fonts.length,
-            separatorBuilder: (_, __) => const Gap(6),
+            separatorBuilder: (_, _) => const Gap(6),
             itemBuilder: (context, index) {
               final font = fonts[index];
               final isSelected = currentFont == font;
@@ -1944,7 +1944,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: allFonts.length + 1, // +1 = add font button
-            separatorBuilder: (_, __) => const Gap(6),
+            separatorBuilder: (_, _) => const Gap(6),
             itemBuilder: (context, index) {
               // Add font button
               if (index == allFonts.length) {
@@ -2998,13 +2998,13 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
       ? {'classic': 'كلاسيكي', 'pill': 'كبسولة', 'modern': 'مودرن'}
       : {'classic': 'كلاسيكي', 'soft_pill': 'كبسولة ناعمة', 'quote': 'اقتباس', 'underline': 'خط سفلي'};
 
-    String currentId = field == CustomizationField.category ? _categoryStyleId : _descriptionStyleId;
+    final String currentId = field == CustomizationField.category ? _categoryStyleId : _descriptionStyleId;
 
     return Wrap(
       spacing: 10,
       runSpacing: 10,
       children: styles.entries.map((e) {
-        bool isSelected = currentId == e.key;
+        final bool isSelected = currentId == e.key;
         return InkWell(
           onTap: () => setState(() {
             if (field == CustomizationField.category) _categoryStyleId = e.key;

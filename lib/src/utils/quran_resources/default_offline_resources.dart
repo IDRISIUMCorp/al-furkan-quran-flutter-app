@@ -74,7 +74,7 @@ class DefaultOfflineResources {
     required String boxName,
     required Future<void> Function() reinstall,
   }) async {
-    bool exists = await Hive.boxExists(boxName);
+    final bool exists = await Hive.boxExists(boxName);
     if (!exists) {
       await reinstall();
       return;

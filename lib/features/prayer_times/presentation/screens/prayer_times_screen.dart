@@ -1122,8 +1122,8 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen>
 
   void _showPrayerSettings() {
     int selectedMethodIndex = 0;
-    double fajrAngle = 19.5;
-    double ishaAngle = 17.5;
+    final double fajrAngle = 19.5;
+    final double ishaAngle = 17.5;
 
     final calculationMethods = [
       ('الهيئة المصرية', CalculationMethod.egyptian),

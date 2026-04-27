@@ -24,13 +24,13 @@ class HizbListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppLocalizations appLocalizations = AppLocalizations.of(context);
-    Brightness brightness = Theme.of(context).brightness;
-    Color textColor =
+    final AppLocalizations appLocalizations = AppLocalizations.of(context);
+    final Brightness brightness = Theme.of(context).brightness;
+    final Color textColor =
         brightness == Brightness.light ? Colors.black : Colors.white;
-    QuranScriptType quranScriptType =
+    final QuranScriptType quranScriptType =
         context.read<QuranViewCubit>().state.quranScriptType;
-    ScrollController scrollController = ScrollController();
+    final ScrollController scrollController = ScrollController();
 
     return Scrollbar(
       controller: scrollController,
@@ -44,8 +44,8 @@ class HizbListView extends StatelessWidget {
           if (asyncSnapshot.connectionState != ConnectionState.done) {
             return const SizedBox();
           }
-          Map hizbData = jsonDecode(asyncSnapshot.data!);
-          List<HizbModel> hizbInfoList =
+          final Map hizbData = jsonDecode(asyncSnapshot.data!);
+          final List<HizbModel> hizbInfoList =
               hizbData.values
                   .map((e) => HizbModel.fromMap(Map<String, dynamic>.from(e)))
                   .toList();
@@ -58,11 +58,11 @@ class HizbListView extends StatelessWidget {
             controller: scrollController,
             itemCount: hizbInfoList.length,
             itemBuilder: (context, index) {
-              HizbModel current = hizbInfoList[index];
-              String firstKey = current.firstVerseKey;
+              final HizbModel current = hizbInfoList[index];
+              final String firstKey = current.firstVerseKey;
 
-              int surahNumber = firstKey.split(":").first.toInt();
-              int ayahNumber = firstKey.split(":").last.toInt();
+              final int surahNumber = firstKey.split(":").first.toInt();
+              final int ayahNumber = firstKey.split(":").last.toInt();
               return Padding(
                 padding: const EdgeInsets.only(top: 5, right: 5, left: 5),
                 child: TextButton(

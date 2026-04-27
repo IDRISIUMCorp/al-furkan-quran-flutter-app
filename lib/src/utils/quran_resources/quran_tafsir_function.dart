@@ -155,7 +155,7 @@ class QuranTafsirFunction {
           if (rawJson is Map && rawJson.containsKey("tafsir")) {
             // Uncompress array of arrays into "surah:verse" -> {"text": ...}
             final List tafsirList = rawJson["tafsir"];
-            Map<String, dynamic> converted = {};
+            final Map<String, dynamic> converted = {};
             for (int s = 0; s < tafsirList.length; s++) {
                final verses = tafsirList[s] as List;
                for (int v = 0; v < verses.length; v++) {
@@ -194,7 +194,7 @@ class QuranTafsirFunction {
   }
 
   static String getTafsirBoxName({required TafsirBookModel tafsirBook}) {
-    String sanitizedBook = tafsirBook.fullPath
+    final String sanitizedBook = tafsirBook.fullPath
         .split("/")
         .last
         .replaceAll(RegExp(r"[^\w\.-]"), "_");
@@ -203,7 +203,7 @@ class QuranTafsirFunction {
   }
 
   static Future<List<String>?> getSelectedTafsirBoxName() async {
-    List<TafsirBookModel>? tafsirSelectionList = await getTafsirSelections();
+    final List<TafsirBookModel>? tafsirSelectionList = await getTafsirSelections();
     if (tafsirSelectionList != null) {
       return tafsirSelectionList
           .map((e) => getTafsirBoxName(tafsirBook: e))
@@ -261,7 +261,7 @@ class QuranTafsirFunction {
     required TafsirBookModel tafsirBook,
   }) async {
     final userBox = Hive.box("user");
-    List<TafsirBookModel> downloadedBooks = getDownloadedTafsirBooks();
+    final List<TafsirBookModel> downloadedBooks = getDownloadedTafsirBooks();
     if (!downloadedBooks.any((book) => book.fullPath == tafsirBook.fullPath)) {
       downloadedBooks.add(tafsirBook);
       await userBox.put(
@@ -300,7 +300,7 @@ class QuranTafsirFunction {
     TafsirBookModel tafsirBook,
   ) async {
     final userBox = Hive.box("user");
-    List<TafsirBookModel> downloadedBooks = getDownloadedTafsirBooks();
+    final List<TafsirBookModel> downloadedBooks = getDownloadedTafsirBooks();
     bool changed = false;
     downloadedBooks.removeWhere((book) {
       if (tafsirBook.fullPath == book.fullPath) {
@@ -335,7 +335,7 @@ class QuranTafsirFunction {
 
   static Future<void> setTafsirSelection(TafsirBookModel tafsirBook) async {
     final userBox = Hive.box("user");
-    List<TafsirBookModel> selectedTafsirList =
+    final List<TafsirBookModel> selectedTafsirList =
         (await getTafsirSelections()) ?? [];
     if (!selectedTafsirList.any((b) => b.fullPath == tafsirBook.fullPath)) {
       selectedTafsirList.add(tafsirBook);
@@ -349,7 +349,7 @@ class QuranTafsirFunction {
 
   static Future<void> removeTafsirSelection(TafsirBookModel tafsirBook) async {
     final userBox = Hive.box("user");
-    List<TafsirBookModel> selectedTafsirList =
+    final List<TafsirBookModel> selectedTafsirList =
         (await getTafsirSelections()) ?? [];
     selectedTafsirList.removeWhere(
       (element) => element.fullPath == tafsirBook.fullPath,
@@ -384,7 +384,7 @@ class QuranTafsirFunction {
       await userBox.delete("selected_tafsir");
     }
 
-    List? booksList = userBox.get(selectedTafsirListKey);
+    final List? booksList = userBox.get(selectedTafsirListKey);
     final parsed = booksList
         ?.map((e) => TafsirBookModel.fromMap(Map<String, dynamic>.from(e)))
         .toList();
@@ -498,18 +498,18 @@ class QuranTafsirFunction {
 
     int? reportedTotalBytes;
     try {
-      String base = ApisUrls.base;
+      final String base = ApisUrls.base;
       cubit.updateProgress(
         0.0,
         "Downloading: ${tafsirBook.name}",
         activeResourceId: tafsirBook.fullPath,
       );
-      dio.Response response = await dio.Dio().get(
+      final dio.Response response = await dio.Dio().get(
         base + tafsirBook.fullPath,
         onReceiveProgress: (received, total) {
           if (total != -1) {
             reportedTotalBytes = total;
-            double progress = received / total;
+            final double progress = received / total;
             cubit.updateProgress(
               progress * 0.5,
               "Downloading: ${tafsirBook.name}",
@@ -523,7 +523,7 @@ class QuranTafsirFunction {
 
       // Detect HTML responses — safety net in case the server returns
       // an HTML page instead of actual BZip2-compressed data.
-      String? responseData = response.data as String?;
+      final String? responseData = response.data as String?;
       final bool isHtml = responseData != null &&
           (responseData.trimLeft().startsWith('<') ||
            response.headers.value('content-type')?.contains('text/html') == true);
@@ -547,7 +547,7 @@ class QuranTafsirFunction {
         "Processing: ${tafsirBook.name}",
         activeResourceId: tafsirBook.fullPath,
       );
-      Map data = await compute(
+      final Map data = await compute(
         (message) => jsonDecode(decodeBZip2String(message)),
         response.data,
       );
@@ -601,7 +601,7 @@ class QuranTafsirFunction {
 
   static Future<List<TafsirOfAyah>> getTafsir(String ayahKey) async {
     final List<TafsirOfAyah> toReturn = [];
-    List<TafsirBookModel>? selectedBooks = await getTafsirSelections() ?? [];
+    final List<TafsirBookModel> selectedBooks = await getTafsirSelections() ?? [];
 
     final orderIds = getDownloadedTafsirOrderIds();
     if (orderIds.isNotEmpty) {
@@ -616,7 +616,7 @@ class QuranTafsirFunction {
     }
 
     for (TafsirBookModel bookModel in selectedBooks) {
-      String boxName = getTafsirBoxName(tafsirBook: bookModel);
+      final String boxName = getTafsirBoxName(tafsirBook: bookModel);
       LazyBox? tafsirBox;
       if (!Hive.isBoxOpen(boxName)) {
         tafsirBox = await Hive.openLazyBox(boxName);
@@ -639,7 +639,7 @@ class QuranTafsirFunction {
   static Future<List<TafsirOfAyah>> getDownloadedTafsirs(String ayahKey) async {
     final List<TafsirOfAyah> toReturn = [];
 
-    List<TafsirBookModel> targetBooks = await getTafsirSelections() ?? [];
+    final List<TafsirBookModel> targetBooks = await getTafsirSelections() ?? [];
 
     // Sort targetBooks according to downloadedTafsirOrderKey
     final orderIds = getDownloadedTafsirOrderIds();
@@ -668,7 +668,7 @@ class QuranTafsirFunction {
     TafsirBookModel tafsirBook,
     String ayahKey,
   ) async {
-    String boxName = getTafsirBoxName(tafsirBook: tafsirBook);
+    final String boxName = getTafsirBoxName(tafsirBook: tafsirBook);
     LazyBox? tafsirBox;
     if (!Hive.isBoxOpen(boxName)) {
       tafsirBox = await Hive.openLazyBox(boxName);
@@ -707,10 +707,10 @@ class QuranTafsirFunction {
   }
 
   static Future<void> close() async {
-    List<TafsirBookModel> selectedBooks = getDownloadedTafsirBooks();
+    final List<TafsirBookModel> selectedBooks = getDownloadedTafsirBooks();
     selectedBooks.addAll(await getTafsirSelections() ?? []);
     for (TafsirBookModel bookModel in selectedBooks) {
-      String boxName = getTafsirBoxName(tafsirBook: bookModel);
+      final String boxName = getTafsirBoxName(tafsirBook: bookModel);
       if (Hive.isBoxOpen(boxName)) {
         await Hive.lazyBox(boxName).close();
       }

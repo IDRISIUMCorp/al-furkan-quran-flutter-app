@@ -2,7 +2,7 @@ import "package:al_furkan/src/utils/basic_functions.dart";
 import "package:al_furkan/src/resources/quran_resources/quran_pages_info.dart";
 
 int? getPageNumber(String ayahKey) {
-  int? ayahID = convertKeyToAyahNumber(ayahKey);
+  final int? ayahID = convertKeyToAyahNumber(ayahKey);
   if (ayahID == null) {
     return null;
   }

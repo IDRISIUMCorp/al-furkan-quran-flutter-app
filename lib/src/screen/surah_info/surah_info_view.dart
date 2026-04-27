@@ -32,16 +32,16 @@ class SurahInfoView extends StatelessWidget {
             log(url.toString());
             try {
               url ??= "";
-              int countOfSlash = url.characters.count(
+              final int countOfSlash = url.characters.count(
                 (element) => element == "/",
               );
-              int countOfDash = url.characters.count(
+              final int countOfDash = url.characters.count(
                 (element) => element == "-",
               );
               log(countOfSlash.toString());
               log(countOfDash.toString());
               if (countOfSlash == 1) {
-                int? surahNumber = int.tryParse(url.split("/").last);
+                final int? surahNumber = int.tryParse(url.split("/").last);
                 if (surahNumber != null) {
                   Navigator.push(
                     context,
@@ -55,10 +55,10 @@ class SurahInfoView extends StatelessWidget {
                   );
                 }
               } else if (countOfSlash == 2) {
-                String surahNumber = url.split("/")[1];
-                List<String> ayahsRange = url.split("/").last.split("-");
-                String startAyahKey = "$surahNumber:${ayahsRange.first}";
-                String endAyahKey = "$surahNumber:${ayahsRange.last}";
+                final String surahNumber = url.split("/")[1];
+                final List<String> ayahsRange = url.split("/").last.split("-");
+                final String startAyahKey = "$surahNumber:${ayahsRange.first}";
+                final String endAyahKey = "$surahNumber:${ayahsRange.last}";
                 Navigator.push(
                   context,
                   MaterialPageRoute(

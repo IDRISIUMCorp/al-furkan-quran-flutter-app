@@ -309,7 +309,7 @@ class SearchSheetState extends State<SearchSheet> {
                                 child: ListView.separated(
                                   padding: const EdgeInsets.only(bottom: 10),
                                   itemCount: results.length,
-                                  separatorBuilder: (_, __) =>
+                                  separatorBuilder: (_, _) =>
                                       const SizedBox(height: 10),
                                   itemBuilder: (context, index) {
                                     final result = results[index];

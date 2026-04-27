@@ -112,7 +112,7 @@ extension _MushafShareExtension on _MushafViewState {
               }
 
               final buffer = StringBuffer();
-              buffer.writeln("${getSurahNameArabic(surahNumber)}");
+              buffer.writeln(getSurahNameArabic(surahNumber));
               buffer.writeln();
 
               for (int v = from; v <= to; v++) {
@@ -585,10 +585,10 @@ extension _MushafShareExtension on _MushafViewState {
         ? selected.first.name
         : "التفسير";
 
-    TafsirBookModel? muyassar = _findTafsirBookByNameContains("الميسر");
+    final TafsirBookModel? muyassar = _findTafsirBookByNameContains("الميسر");
     final TafsirBookModel? mukhtasar = _findTafsirBookByNameContains("المختصر");
 
-    bool muyassarDownloaded =
+    final bool muyassarDownloaded =
         muyassar != null &&
         _isDownloadedByFullPath(muyassar.fullPath, downloadedBooks);
     final bool mukhtasarDownloaded =

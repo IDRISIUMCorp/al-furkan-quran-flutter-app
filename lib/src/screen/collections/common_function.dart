@@ -14,17 +14,17 @@ import "models/sorting_methods_type.dart";
 Future<List<PinnedCollectionModel>> fetchPinnedCollections() async {
   final box = Hive.box(CollectionType.pinned.name);
   await saveDemoPinnedCollection();
-  List<PinnedCollectionModel> availablePinnedCollections =
+  final List<PinnedCollectionModel> availablePinnedCollections =
       box.values
           .map(
             (e) => PinnedCollectionModel.fromJson(Map<String, dynamic>.from(e)),
           )
           .toList();
-  String sortMethod = Hive.box("user").get(
+  final String sortMethod = Hive.box("user").get(
     "selected_sorting_method",
     defaultValue: SortingMethodsType.values.first.name,
   );
-  SortingMethodsType sortingMethodsType = SortingMethodsType.values.firstWhere(
+  final SortingMethodsType sortingMethodsType = SortingMethodsType.values.firstWhere(
     (element) => element.name == sortMethod,
   );
   switch (sortingMethodsType) {
@@ -67,17 +67,17 @@ Future<List<PinnedCollectionModel>> fetchPinnedCollections() async {
 Future<List<NoteCollectionModel>> fetchNoteCollections() async {
   final box = Hive.box(CollectionType.notes.name);
   await saveDemoNoteCollection();
-  List<NoteCollectionModel> availableNoteCollections =
+  final List<NoteCollectionModel> availableNoteCollections =
       box.values
           .map(
             (e) => NoteCollectionModel.fromJson(Map<String, dynamic>.from(e)),
           )
           .toList();
-  String sortMethod = Hive.box("user").get(
+  final String sortMethod = Hive.box("user").get(
     "selected_sorting_method",
     defaultValue: SortingMethodsType.values.first.name,
   );
-  SortingMethodsType sortingMethodsType = SortingMethodsType.values.firstWhere(
+  final SortingMethodsType sortingMethodsType = SortingMethodsType.values.firstWhere(
     (element) => element.name == sortMethod,
   );
   switch (sortingMethodsType) {
@@ -126,7 +126,7 @@ Future<NoteCollectionModel?> handleAddNewNoteCollection(
     return null;
   }
   final now = DateTime.now();
-  String newId = uuid.v4();
+  final String newId = uuid.v4();
 
   final newCollection = NoteCollectionModel(
     id: newId,
@@ -151,7 +151,7 @@ Future<PinnedCollectionModel?> handleAddNewCollection(
     return null;
   }
   final now = DateTime.now();
-  String newId = uuid.v4();
+  final String newId = uuid.v4();
 
   final newCollection = PinnedCollectionModel(
     id: newId,

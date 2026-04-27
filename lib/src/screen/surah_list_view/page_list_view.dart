@@ -24,13 +24,13 @@ class PageListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppLocalizations appLocalizations = AppLocalizations.of(context);
-    Brightness brightness = Theme.of(context).brightness;
-    Color textColor =
+    final AppLocalizations appLocalizations = AppLocalizations.of(context);
+    final Brightness brightness = Theme.of(context).brightness;
+    final Color textColor =
         brightness == Brightness.light ? Colors.black : Colors.white;
-    QuranScriptType quranScriptType =
+    final QuranScriptType quranScriptType =
         context.read<QuranViewCubit>().state.quranScriptType;
-    ScrollController scrollController = ScrollController();
+    final ScrollController scrollController = ScrollController();
 
     return Scrollbar(
       controller: scrollController,
@@ -46,10 +46,10 @@ class PageListView extends StatelessWidget {
         itemCount: pageInfoList.length,
         controller: scrollController,
         itemBuilder: (context, index) {
-          PageInfoModel pageInfo = pageInfoList[index];
+          final PageInfoModel pageInfo = pageInfoList[index];
           final ayahKey = convertAyahNumberToKey(pageInfo.start);
 
-          int surahNumber = ayahKey!.split(":").first.toInt();
+          final int surahNumber = ayahKey!.split(":").first.toInt();
           // int ayahNumber = ayahKey.split(":").last.toInt();
           return Padding(
             padding: const EdgeInsets.only(top: 5, right: 5, left: 5),

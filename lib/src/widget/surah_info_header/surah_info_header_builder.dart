@@ -30,14 +30,14 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ThemeState themeState = context.read<ThemeCubit>().state;
-    AppLocalizations l10n = AppLocalizations.of(context);
+    final ThemeState themeState = context.read<ThemeCubit>().state;
+    final AppLocalizations l10n = AppLocalizations.of(context);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final onSurface = isDark ? Colors.white : const Color(0xFF1B1B1B);
     final onSurfaceMuted = onSurface.withValues(alpha: 0.65);
 
-    Widget surahInfoHeader = Container(
+    final Widget surahInfoHeader = Container(
       margin: const EdgeInsets.only(left: 5, top: 5, bottom: 5, right: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(roundedRadius),
@@ -156,11 +156,11 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
               builder: (context, playerState) {
                 return BlocBuilder<AyahKeyCubit, AyahKeyManagement>(
                   builder: (context, ayahKeyManagement) {
-                    bool isPlaying = playerState.isPlaying;
-                    bool isCurrentSurah =
+                    final bool isPlaying = playerState.isPlaying;
+                    final bool isCurrentSurah =
                         int.tryParse(ayahKeyManagement.current.split(":")[0]) ==
                         headerInfoModel.surahInfoModel.id;
-                    bool isCurrentPlaying =
+                    final bool isCurrentPlaying =
                         isPlaying &&
                         isCurrentSurah &&
                         context
@@ -181,11 +181,11 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
                               foregroundColor: Colors.white,
                             ),
                             onPressed: () {
-                              bool isPlayList = context
+                              final bool isPlayList = context
                                   .read<AudioUiCubit>()
                                   .state
                                   .isPlayList;
-                              bool isCompleted =
+                              final bool isCompleted =
                                   playerState.state ==
                                   just_audio.ProcessingState.completed;
 
@@ -194,9 +194,9 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
                                       .state
                                       .isInsideQuranPlayer ==
                                   false) {
-                                String startAyahKey =
+                                final String startAyahKey =
                                     headerInfoModel.startAyahKey;
-                                String endAyahKey = headerInfoModel.endAyahKey;
+                                final String endAyahKey = headerInfoModel.endAyahKey;
 
                                 audioPlaybackService.playPlaylist(
                                   startAyahKey: startAyahKey,
@@ -215,9 +215,9 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
                                   !isCompleted) {
                                 audioPlaybackService.resume();
                               } else {
-                                String startAyahKey =
+                                final String startAyahKey =
                                     headerInfoModel.startAyahKey;
-                                String endAyahKey = headerInfoModel.endAyahKey;
+                                final String endAyahKey = headerInfoModel.endAyahKey;
 
                                 audioPlaybackService.playPlaylist(
                                   startAyahKey: startAyahKey,
@@ -271,7 +271,7 @@ class SurahInfoHeaderBuilder extends StatelessWidget {
             margin: const EdgeInsets.all(10),
             child: BlocBuilder<QuranViewCubit, QuranViewState>(
               builder: (context, state) {
-                bool isUthmani =
+                final bool isUthmani =
                     state.quranScriptType == QuranScriptType.uthmani ||
                     state.quranScriptType == QuranScriptType.tajweed;
                 return Padding(

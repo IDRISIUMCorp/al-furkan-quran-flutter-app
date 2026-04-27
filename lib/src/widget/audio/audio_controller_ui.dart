@@ -385,7 +385,7 @@ class _AudioControllerUiState extends State<AudioControllerUi>
                       const Gap(8),
                       _ctrlIcon(Icons.replay_5_rounded, isDark, () {
                         final d = audioPlaybackService.currentPosition;
-                        int ms = (d.inMilliseconds - 5000).clamp(0, 999999999);
+                        final int ms = (d.inMilliseconds - 5000).clamp(0, 999999999);
                         audioPlaybackService.seek(Duration(milliseconds: ms));
                       }),
                       _ctrlIcon(Icons.skip_previous_rounded, isDark,
@@ -502,8 +502,8 @@ class _AudioControllerUiState extends State<AudioControllerUi>
                 imageUrl: r.img!,
                 cacheManager: ReciterImageCacheManager(),
                 fit: BoxFit.cover,
-                errorWidget: (_, __, ___) => _defAvatar(size, accent),
-                placeholder: (_, __) => _defAvatar(size, accent),
+                errorWidget: (_, _, _) => _defAvatar(size, accent),
+                placeholder: (_, _) => _defAvatar(size, accent),
               )
             : _defAvatar(size, accent),
       ),
@@ -745,14 +745,14 @@ class _AudioControllerUiState extends State<AudioControllerUi>
   void _seekPrevious(BuildContext context) {
     final state = context.read<AyahKeyCubit>().state;
     if (state.ayahList.length == 1) {
-      int? surahNum = int.tryParse(state.current.split(":").first);
+      final int? surahNum = int.tryParse(state.current.split(":").first);
       if (surahNum == null) return;
-      List ayahList = getListOfAyahKey(
+      final List ayahList = getListOfAyahKey(
         startAyahKey: "$surahNum:1",
         endAyahKey: getEndAyahKeyFromSurahNumber(surahNum),
       );
       ayahList.removeWhere((e) => e.runtimeType == int);
-      int idx = ayahList.indexOf(state.current);
+      final int idx = ayahList.indexOf(state.current);
       if (idx > 0) {
         audioPlaybackService.playSingleAyah(
           ayahKey: ayahList[idx - 1],
@@ -769,15 +769,15 @@ class _AudioControllerUiState extends State<AudioControllerUi>
   void _seekNext(BuildContext context) {
     final state = context.read<AyahKeyCubit>().state;
     if (state.ayahList.length == 1) {
-      int? surahNum = int.tryParse(state.current.split(":").first);
+      final int? surahNum = int.tryParse(state.current.split(":").first);
       if (surahNum == null) return;
-      List ayahList = getListOfAyahKey(
+      final List ayahList = getListOfAyahKey(
         startAyahKey: "$surahNum:1",
         endAyahKey: getEndAyahKeyFromSurahNumber(surahNum),
       );
       ayahList.removeWhere((e) => e.runtimeType == int);
-      int idx = ayahList.indexOf(state.current);
-      int maxAyah = quranAyahCount[surahNum - 1];
+      final int idx = ayahList.indexOf(state.current);
+      final int maxAyah = quranAyahCount[surahNum - 1];
       if (idx != -1 &&
           idx < ayahList.length - 1 &&
           int.parse(state.current.split(":").last) < maxAyah) {
@@ -796,9 +796,9 @@ class _AudioControllerUiState extends State<AudioControllerUi>
   void _togglePlaylist(BuildContext context) {
     final state = context.read<AyahKeyCubit>().state;
     if (state.ayahList.length <= 1) {
-      int surahNumber = int.parse(state.current.split(":").first);
-      int currentAyah = int.parse(state.current.split(":").last);
-      String endAyahKey = getEndAyahKeyFromSurahNumber(surahNumber);
+      final int surahNumber = int.parse(state.current.split(":").first);
+      final int currentAyah = int.parse(state.current.split(":").last);
+      final String endAyahKey = getEndAyahKeyFromSurahNumber(surahNumber);
       audioPlaybackService.playPlaylist(
         startAyahKey: "$surahNumber:1",
         endAyahKey: endAyahKey,

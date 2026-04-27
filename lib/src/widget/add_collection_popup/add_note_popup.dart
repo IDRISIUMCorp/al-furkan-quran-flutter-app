@@ -78,7 +78,7 @@ class _AddNoteWidgetState extends State<AddNoteWidget> {
     }
 
     final now = DateTime.now();
-    String newNoteId = uuid.v4();
+    final String newNoteId = uuid.v4();
 
     final newNote = NoteModel(
       id: newNoteId,
@@ -90,7 +90,7 @@ class _AddNoteWidgetState extends State<AddNoteWidget> {
 
     final notesBox = Hive.box(CollectionType.notes.name);
     for (String collectionID in _selectedNoteCollectionIds) {
-      NoteCollectionModel collection = NoteCollectionModel.fromJson(
+      final NoteCollectionModel collection = NoteCollectionModel.fromJson(
         Map<String, dynamic>.from(notesBox.get(collectionID)),
       );
       collection.updatedAt = now;
@@ -225,7 +225,7 @@ class _AddNoteWidgetState extends State<AddNoteWidget> {
                               ),
                               child: IconButton(
                                 onPressed: () async {
-                                  NoteCollectionModel? newCollection = await handleAddNewNoteCollection(
+                                  final NoteCollectionModel? newCollection = await handleAddNewNoteCollection(
                                     _newCollectionNameController.text.trim(),
                                     l10n,
                                   );
@@ -249,7 +249,7 @@ class _AddNoteWidgetState extends State<AddNoteWidget> {
                         child: (_availableNoteCollections.isEmpty && !_addNewNoteCollectionStep && _addNewNoteCollectionStep)
                             ? Center(child: Text(l10n.noCollectionsYetAddANewOne, style: TextStyle(color: subtitleColor)))
                             : ListView.separated(
-                                separatorBuilder: (_, __) => const Gap(8),
+                                separatorBuilder: (_, _) => const Gap(8),
                                 itemCount: _availableNoteCollections.length,
                                 itemBuilder: (context, index) {
                                   final collection = _availableNoteCollections[index];
@@ -415,7 +415,7 @@ class _AddNoteWidgetState extends State<AddNoteWidget> {
 Future<void> saveDemoNoteCollection() async {
   final box = Hive.box(CollectionType.notes.name);
   if (box.values.isEmpty) {
-    List<NoteCollectionModel> collections = [
+    final List<NoteCollectionModel> collections = [
       NoteCollectionModel(
         id: "col1",
         name: "Reflections",

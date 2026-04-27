@@ -10,7 +10,7 @@ void showPopupWordFunction({
   required int initWordIndex,
   required List wordByWordList,
 }) {
-  SurahInfoModel surahInfoModel = SurahInfoModel.fromMap(
+  final SurahInfoModel surahInfoModel = SurahInfoModel.fromMap(
     metaDataSurah[wordKeys.first.split(":").first]!,
   );
   showModalBottomSheet(

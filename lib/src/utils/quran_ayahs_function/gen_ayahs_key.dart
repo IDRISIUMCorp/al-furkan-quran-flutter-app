@@ -4,11 +4,11 @@ List getListOfAyahKey({
   required String startAyahKey,
   required String endAyahKey,
 }) {
-  List ayahKeysList = [];
-  int startSurahNumber = int.parse(startAyahKey.split(":")[0]);
-  int startAyahNumber = int.parse(startAyahKey.split(":")[1]);
-  int endSurahNumber = int.parse(endAyahKey.split(":")[0]);
-  int endAyahNumber = int.parse(endAyahKey.split(":")[1]);
+  final List ayahKeysList = [];
+  final int startSurahNumber = int.parse(startAyahKey.split(":")[0]);
+  final int startAyahNumber = int.parse(startAyahKey.split(":")[1]);
+  final int endSurahNumber = int.parse(endAyahKey.split(":")[0]);
+  final int endAyahNumber = int.parse(endAyahKey.split(":")[1]);
 
   for (int surah = startSurahNumber; surah <= endSurahNumber; surah++) {
     int startAyah = 1;
@@ -31,11 +31,11 @@ List<String> getListOfAyahKeyExperimental({
   required String startAyahKey,
   required String endAyahKey,
 }) {
-  List<String> ayahKeysList = [];
-  int startSurahNumber = int.parse(startAyahKey.split(":")[0]);
-  int startAyahNumber = int.parse(startAyahKey.split(":")[1]);
-  int endSurahNumber = int.parse(endAyahKey.split(":")[0]);
-  int endAyahNumber = int.parse(endAyahKey.split(":")[1]);
+  final List<String> ayahKeysList = [];
+  final int startSurahNumber = int.parse(startAyahKey.split(":")[0]);
+  final int startAyahNumber = int.parse(startAyahKey.split(":")[1]);
+  final int endSurahNumber = int.parse(endAyahKey.split(":")[0]);
+  final int endAyahNumber = int.parse(endAyahKey.split(":")[1]);
 
   for (int surah = startSurahNumber; surah <= endSurahNumber; surah++) {
     int startAyah = 1;

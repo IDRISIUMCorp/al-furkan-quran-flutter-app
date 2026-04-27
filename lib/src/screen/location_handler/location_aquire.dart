@@ -87,7 +87,7 @@ class _LocationAcquireState extends State<LocationAcquire> {
                       onPressed: () async {
                         setState(() => isGPSLocationLoading = true);
                         try {
-                          bool isServiceAvailable = await Geolocator.isLocationServiceEnabled();
+                          final bool isServiceAvailable = await Geolocator.isLocationServiceEnabled();
                           if (!isServiceAvailable) {
                             Fluttertoast.showToast(msg: l10n.pleaseEnableLocationService);
                             await Geolocator.openLocationSettings();
@@ -97,7 +97,7 @@ class _LocationAcquireState extends State<LocationAcquire> {
                             permission = await Geolocator.requestPermission();
                           }
                           if (permission == LocationPermission.whileInUse || permission == LocationPermission.always) {
-                            Position position = await Geolocator.getCurrentPosition();
+                            final Position position = await Geolocator.getCurrentPosition();
                             if (!mounted) return;
                             context.read<LocationQiblaPrayerDataCubit>().saveLocationData(
                               LatLon(latitude: position.latitude, longitude: position.longitude),

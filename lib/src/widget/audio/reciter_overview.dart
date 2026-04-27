@@ -22,7 +22,7 @@ Widget getReciterWidget({
   int? currentIndex,
   bool? isWordByWord,
 }) {
-  AppLocalizations l10n = AppLocalizations.of(context);
+  final AppLocalizations l10n = AppLocalizations.of(context);
   final locale = Localizations.localeOf(context).languageCode;
   
   // ترجمة اسم القارئ ونوع القراءة للعربية

@@ -21,8 +21,8 @@ class _AppLanguageSettingsState extends State<AppLanguageSettings> {
 
   @override
   Widget build(BuildContext context) {
-    AppLocalizations l10n = AppLocalizations.of(context);
-    ThemeState themeState = context.read<ThemeCubit>().state;
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final ThemeState themeState = context.read<ThemeCubit>().state;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -49,7 +49,7 @@ class _AppLanguageSettingsState extends State<AppLanguageSettings> {
               controller: scrollController,
               itemCount: usedAppLanguageMap.length,
               itemBuilder: (context, index) {
-                MyAppLocalization current = usedAppLanguageMap[index];
+                final MyAppLocalization current = usedAppLanguageMap[index];
                 return Container(
                   color:
                       index % 2 == 1

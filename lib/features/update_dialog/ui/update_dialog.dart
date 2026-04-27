@@ -47,7 +47,7 @@ class UpdateDialog extends StatelessWidget {
           child: FadeTransition(opacity: curve, child: child),
         );
       },
-      pageBuilder: (context, _, __) => UpdateDialog(
+      pageBuilder: (context, _, _) => UpdateDialog(
         config: result.config,
         isForced: result.isForced,
         onDismiss: () => Navigator.of(context).pop(),

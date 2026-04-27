@@ -3225,7 +3225,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
   }
 
   Future<void> _editPrayerAdjustment(Prayer prayer, bool isDark, ThemeState themeState) async {
-    int currentAdj = _adjustments[prayer] ?? 0;
+    final int currentAdj = _adjustments[prayer] ?? 0;
     final res = await showDialog<int>(
       context: context,
       builder: (ctx) {
@@ -3278,7 +3278,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
   }
 
   Future<void> _editIqamahTime(Prayer prayer, bool isDark, ThemeState themeState) async {
-    int currentIqamah = _iqamahTimes[prayer] ?? 0;
+    final int currentIqamah = _iqamahTimes[prayer] ?? 0;
     final res = await showDialog<int>(
       context: context,
       builder: (ctx) {

@@ -73,12 +73,12 @@ class _AdministratorSelectionState extends State<AdministratorSelection> {
                 if (state.adminMap == null) {
                   return Text(l10n.somethingWentWrong);
                 }
-                List listOfCountry = state.adminMap!.keys.toList();
+                final List listOfCountry = state.adminMap!.keys.toList();
                 return ListView.builder(
                   padding: const EdgeInsets.all(20),
                   itemCount: listOfCountry.length,
                   itemBuilder: (context, index) {
-                    String adminName = listOfCountry[index];
+                    final String adminName = listOfCountry[index];
 
                     if (adminName.toLowerCase().contains(
                       controller.text.toLowerCase().trim(),

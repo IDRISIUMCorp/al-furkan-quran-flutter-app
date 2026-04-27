@@ -40,7 +40,7 @@ class _AddressSelectionState extends State<AddressSelection> {
       );
 
       if (response.statusCode == 200) {
-        Map locationResources = jsonDecode(decodeBZip2String(response.body));
+        final Map locationResources = jsonDecode(decodeBZip2String(response.body));
         context.read<ManualLocationSelectionCubit>().changeData(
           locationData: locationResources,
           isLoading: false,

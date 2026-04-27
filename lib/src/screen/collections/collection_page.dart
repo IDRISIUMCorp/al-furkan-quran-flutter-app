@@ -152,7 +152,7 @@ class _CollectionPageState extends State<CollectionPage> {
                 ),
               ),
               onPressed: () {
-                String sortMethod = Hive.box("user").get(
+                final String sortMethod = Hive.box("user").get(
                   "selected_sorting_method",
                   defaultValue: SortingMethodsType.values.first.name,
                 );
@@ -178,7 +178,7 @@ class _CollectionPageState extends State<CollectionPage> {
                             child: ListView.builder(
                               itemCount: SortingMethodsType.values.length,
                               itemBuilder: (context, index) {
-                                SortingMethodsType current =
+                                final SortingMethodsType current =
                                     SortingMethodsType.values[index];
                                 return ListTile(
                                   onTap: () async {
@@ -260,7 +260,7 @@ class _CollectionPageState extends State<CollectionPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    Color svgColor =
+    final Color svgColor =
         Theme.of(context).brightness == Brightness.dark
             ? Colors.grey.shade100
             : Colors.grey.shade900;
@@ -368,7 +368,7 @@ class _CollectionPageState extends State<CollectionPage> {
             return [
               PopupMenuItem(
                 onTap: () async {
-                  TextEditingController nameController = TextEditingController(
+                  final TextEditingController nameController = TextEditingController(
                     text: pinnedCollectionModel.name,
                   );
                   showDialog(
@@ -430,7 +430,7 @@ class _CollectionPageState extends State<CollectionPage> {
               ),
               PopupMenuItem(
                 onTap: () async {
-                  Color selectedColor = await showColorPickerDialog(
+                  final Color selectedColor = await showColorPickerDialog(
                     context,
                     safeParseColor(pinnedCollectionModel.colorHex),
                   );
@@ -519,7 +519,7 @@ class _CollectionPageState extends State<CollectionPage> {
             return [
               PopupMenuItem(
                 onTap: () async {
-                  TextEditingController nameController = TextEditingController(
+                  final TextEditingController nameController = TextEditingController(
                     text: noteCollectionModel.name,
                   );
                   showDialog(
@@ -581,7 +581,7 @@ class _CollectionPageState extends State<CollectionPage> {
               ),
               PopupMenuItem(
                 onTap: () async {
-                  Color selectedColor = await showColorPickerDialog(
+                  final Color selectedColor = await showColorPickerDialog(
                     context,
                     safeParseColor(noteCollectionModel.colorHex),
                   );

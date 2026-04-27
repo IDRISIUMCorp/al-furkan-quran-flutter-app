@@ -34,14 +34,14 @@ class TajweedView extends StatelessWidget {
     // Use the user-selected font family from settings
     final settingsFont = context.watch<QuranSettingsCubit>().state.fontFamily;
     final effectiveFont = settingsFont.flutterFontFamily;
-    TextStyle quranStyle =
+    final TextStyle quranStyle =
         scriptInfo.textStyle?.copyWith(
           fontFamily: effectiveFont,
           letterSpacing: 0,
         ) ??
         TextStyle(letterSpacing: 0, fontFamily: effectiveFont);
 
-    String ayahKey = "${scriptInfo.surahNumber}:${scriptInfo.ayahNumber}";
+    final String ayahKey = "${scriptInfo.surahNumber}:${scriptInfo.ayahNumber}";
 
     if (words.isEmpty) {
       final pageNumber = getPageNumber(ayahKey) ?? 1;
@@ -96,13 +96,13 @@ class TajweedView extends StatelessWidget {
         ),
       );
     }
-    bool enableWordByWordHighlight =
+    final bool enableWordByWordHighlight =
         context.read<QuranViewCubit>().state.enableWordByWordHighlight == true;
 
     return BlocBuilder<AudioAyahHighlightCubit, AudioAyahHighlightState>(
       buildWhen: (previous, current) {
-        bool wasInScope = previous.activeAyahKey != null && previous.activeAyahKey == ayahKey;
-        bool isInScope = current.activeAyahKey != null && current.activeAyahKey == ayahKey;
+        final bool wasInScope = previous.activeAyahKey != null && previous.activeAyahKey == ayahKey;
+        final bool isInScope = current.activeAyahKey != null && current.activeAyahKey == ayahKey;
         if (wasInScope || isInScope) {
           return previous.activeAyahKey != current.activeAyahKey ||
               previous.activeWordKey != current.activeWordKey;
@@ -127,7 +127,7 @@ class TajweedView extends StatelessWidget {
                   )
                 : null,
             children: List<InlineSpan>.generate(words.length, (index) {
-              bool willHighLight =
+              final bool willHighLight =
                   enableWordByWordHighlight &&
                   highlightingWordIndex == "$ayahKey:${index + 1}";
 

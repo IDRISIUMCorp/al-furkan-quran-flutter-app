@@ -674,8 +674,8 @@ class _OfflinePlayerScreenState extends State<OfflinePlayerScreen>
             ? CachedNetworkImage(
                 imageUrl: r.img!,
                 fit: BoxFit.cover,
-                errorWidget: (_, __, ___) => _defAvatar(size, accent),
-                placeholder: (_, __) => _defAvatar(size, accent),
+                errorWidget: (_, _, _) => _defAvatar(size, accent),
+                placeholder: (_, _) => _defAvatar(size, accent),
               )
             : _defAvatar(size, accent),
       ),

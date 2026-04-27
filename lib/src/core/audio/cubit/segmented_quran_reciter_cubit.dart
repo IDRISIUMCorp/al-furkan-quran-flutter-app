@@ -47,9 +47,9 @@ class SegmentedQuranReciterCubit extends Cubit<ReciterInfoModel> {
       return true;
     }
 
-    ReciterInfoModel previousReciter = state.copyWith(isDownloading: false);
+    final ReciterInfoModel previousReciter = state.copyWith(isDownloading: false);
     emit(reciter.copyWith(isDownloading: true));
-    bool isSuccess = await SegmentedResourcesManager.downloadResources(
+    final bool isSuccess = await SegmentedResourcesManager.downloadResources(
       context,
       reciter.segmentsUrl!,
     );
@@ -69,7 +69,7 @@ class SegmentedQuranReciterCubit extends Cubit<ReciterInfoModel> {
   }
 
   List<List>? getAyahSegments(String ayahKey) {
-    List? segments = SegmentedResourcesManager.getAyahSegments(ayahKey);
+    final List? segments = SegmentedResourcesManager.getAyahSegments(ayahKey);
     return segments == null ? null : List<List>.from(segments);
   }
 

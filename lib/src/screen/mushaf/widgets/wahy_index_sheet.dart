@@ -113,7 +113,7 @@ class WahyIndexSheetState extends State<WahyIndexSheet>
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 110),
       itemCount: filtered.length,
-      separatorBuilder: (_, __) =>
+      separatorBuilder: (_, _) =>
           Divider(height: 10, color: Colors.black.withValues(alpha: 0.06)),
       itemBuilder: (context, index) {
         final s = filtered[index];
@@ -368,7 +368,7 @@ class RubListView extends StatelessWidget {
         return ListView.separated(
           padding: const EdgeInsets.fromLTRB(16, 10, 16, 110),
           itemCount: filtered.length,
-          separatorBuilder: (_, __) =>
+          separatorBuilder: (_, _) =>
               Divider(height: 10, color: Colors.black.withValues(alpha: 0.06)),
           itemBuilder: (context, index) {
             final m = filtered[index];

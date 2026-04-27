@@ -97,10 +97,10 @@ double searchPatternInText(String pattern, String text) {
   // A substring can be from length 1 up to text.length
   for (int i = 0; i < text.length; i++) {
     for (int j = i + 1; j <= text.length; j++) {
-      String currentSubText = text.substring(i, j);
+      final String currentSubText = text.substring(i, j);
 
       // Calculate similarity between the pattern and the current substring of text
-      double currentMatch = _calculateSimilarityPercentage(
+      final double currentMatch = _calculateSimilarityPercentage(
         pattern,
         currentSubText,
       );

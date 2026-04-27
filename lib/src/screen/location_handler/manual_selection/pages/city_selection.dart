@@ -75,7 +75,7 @@ class _CitySelectionState extends State<CitySelection> {
                       padding: const EdgeInsets.all(20),
                       itemCount: state.cityList!.length,
                       itemBuilder: (context, index) {
-                        String cityName = state.cityList![index]["city"];
+                        final String cityName = state.cityList![index]["city"];
 
                         if (cityName.toLowerCase().contains(
                           controller.text.toLowerCase().trim(),
@@ -83,7 +83,7 @@ class _CitySelectionState extends State<CitySelection> {
                           return ListTile(
                             title: Text(cityName),
                             onTap: () {
-                              LatLon latLon = LatLon(
+                              final LatLon latLon = LatLon(
                                 latitude: double.parse(
                                   state.cityList![index]["lat"],
                                 ),

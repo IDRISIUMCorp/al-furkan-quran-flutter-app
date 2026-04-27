@@ -143,7 +143,7 @@ class CategoryChipsShimmer extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         itemCount: 5,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (_, index) => Shimmer.fromColors(
           baseColor: baseColor,
           highlightColor: highlightColor,

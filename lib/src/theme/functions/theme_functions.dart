@@ -17,7 +17,7 @@ class ThemeFunctions {
   static ThemeMode loadThemeMode() {
     assert(preferences != null, "Theme Function need to be init first");
     final String? savedThemeName = preferences!.getString("app_theme_mode");
-    ThemeMode themeMode =
+    final ThemeMode themeMode =
         savedThemeName == null
             ? ThemeMode.system
             : ThemeMode.values.firstWhere(

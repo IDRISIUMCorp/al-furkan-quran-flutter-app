@@ -14,12 +14,12 @@ String? convertAyahNumberToKey(int ayahNumber) {
 
 int? convertKeyToAyahNumber(String ayahKey) {
   // ayah Key example 1:1, 1:7, 2:100
-  List<String> parts = ayahKey.split(":");
+  final List<String> parts = ayahKey.split(":");
   if (parts.length != 2) {
     return null;
   }
-  int surahNumber = int.parse(parts[0]);
-  int ayahNumber = int.parse(parts[1]);
+  final int surahNumber = int.parse(parts[0]);
+  final int ayahNumber = int.parse(parts[1]);
   if (surahNumber < 1 || surahNumber > quranAyahCount.length) {
     return null;
   }
@@ -34,7 +34,7 @@ int? convertKeyToAyahNumber(String ayahKey) {
 }
 
 String safeSubString(String str, int len, {String replacer = ""}) {
-  int strLen = str.length;
+  final int strLen = str.length;
   if (strLen > len) {
     return str.substring(0, len) + replacer;
   } else {

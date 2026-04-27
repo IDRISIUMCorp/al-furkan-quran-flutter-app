@@ -29,18 +29,18 @@ class TajweedPageRenderer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ThemeState themeState = context.read<ThemeCubit>().state;
+    final ThemeState themeState = context.read<ThemeCubit>().state;
 
     String? highlightingWord;
 
-    bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: BlocBuilder<AudioAyahHighlightCubit, AudioAyahHighlightState>(
         buildWhen: (previous, current) {
-          bool wasInScope = previous.activeAyahKey != null && ayahsKey.contains(previous.activeAyahKey);
-          bool isInScope = current.activeAyahKey != null && ayahsKey.contains(current.activeAyahKey);
+          final bool wasInScope = previous.activeAyahKey != null && ayahsKey.contains(previous.activeAyahKey);
+          final bool isInScope = current.activeAyahKey != null && ayahsKey.contains(current.activeAyahKey);
           
           if (wasInScope || isInScope) {
             highlightingWord = current.activeWordKey;
@@ -56,7 +56,7 @@ class TajweedPageRenderer extends StatelessWidget {
                 TextSpan(
                   children:
                       ayahsKey.map((ayahKey) {
-                        List words = QuranScriptFunction.getWordListOfAyah(
+                        final List words = QuranScriptFunction.getWordListOfAyah(
                           QuranScriptType.tajweed,
                           ayahKey.split(":").first,
                           ayahKey.split(":").last,
@@ -174,11 +174,11 @@ class _AyahInlineStatusIndicator extends StatelessWidget {
 
     return ValueListenableBuilder(
       valueListenable: pinnedBox.listenable(),
-      builder: (context, _, __) {
+      builder: (context, _, _) {
         final isPinned = _isPinned(pinnedBox.values);
         return ValueListenableBuilder(
           valueListenable: notesBox.listenable(),
-          builder: (context, __, ___) {
+          builder: (context, _, _) {
             final isNoted = _isNoted(notesBox.values);
             if (!isPinned && !isNoted) return const SizedBox.shrink();
             return Transform.translate(

@@ -32,11 +32,11 @@ class _PrayerSettingsState extends State<PrayerSettings> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    TextStyle titleStyle = const TextStyle(
+    final TextStyle titleStyle = const TextStyle(
       fontSize: 20,
       fontWeight: FontWeight.w500,
     );
-    ThemeState themeState = context.read<ThemeCubit>().state;
+    final ThemeState themeState = context.read<ThemeCubit>().state;
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.prayerSettings)),
@@ -181,13 +181,13 @@ class _PrayerSettingsState extends State<PrayerSettings> {
       builder: (context, prayerReminderState) {
         return Column(
           children: List.generate(Prayer.values.length, (index) {
-            Prayer currentPrayerType = Prayer.values[index];
+            final Prayer currentPrayerType = Prayer.values[index];
 
-            int currentTimeInMinutes =
+            final int currentTimeInMinutes =
                 prayerReminderState.reminderTimeAdjustment[currentPrayerType] ??
                 0;
-            DateTime? prayerTime = prayerTimes.timeForCustomPrayer(currentPrayerType);
-            TimeOfDay actualPrayerTime = TimeOfDay.fromDateTime(
+            final DateTime? prayerTime = prayerTimes.timeForCustomPrayer(currentPrayerType);
+            final TimeOfDay actualPrayerTime = TimeOfDay.fromDateTime(
               prayerTime ?? DateTime.now(), // better than crash
             );
 
@@ -369,9 +369,9 @@ class _PrayerSettingsState extends State<PrayerSettings> {
       builder: (context, prayerReminderState) {
         return Column(
           children: List.generate(Prayer.values.length, (index) {
-            Prayer currentPrayerType = Prayer.values[index];
+            final Prayer currentPrayerType = Prayer.values[index];
 
-            PrayerReminderType currentReminderType =
+            final PrayerReminderType currentReminderType =
                 prayerReminderState.previousReminderModes[currentPrayerType] ??
                 PrayerReminderType.alarm;
 
@@ -549,8 +549,8 @@ class _PrayerSettingsState extends State<PrayerSettings> {
                           }).toList(),
                           onChanged: (value) {
                             if (value != null) {
-                              var cubit = context.read<PrayerReminderCubit>();
-                              var data = ReminderTypeWithPrayModel(
+                              final cubit = context.read<PrayerReminderCubit>();
+                              final data = ReminderTypeWithPrayModel(
                                 prayerTimesType: currentPrayerType,
                                 reminderType: value,
                               );

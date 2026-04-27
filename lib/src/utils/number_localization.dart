@@ -4,7 +4,7 @@ import "package:flutter_bloc/flutter_bloc.dart";
 import "package:intl/intl.dart";
 
 String localizedNumber(BuildContext context, dynamic number) {
-  Locale currentLocale = context.read<LanguageCubit>().state.locale;
+  final Locale currentLocale = context.read<LanguageCubit>().state.locale;
   if (number.runtimeType == double) {
     return NumberFormat.decimalPattern(
       currentLocale.languageCode,

@@ -66,12 +66,12 @@ class _CountriesSelectionState extends State<CountriesSelection> {
                 if (state.locationData == null) {
                   return Text(l10n.somethingWentWrong);
                 }
-                List listOfCountry = state.locationData!.keys.toList();
+                final List listOfCountry = state.locationData!.keys.toList();
                 return ListView.builder(
                   padding: const EdgeInsets.all(20),
                   itemCount: listOfCountry.length,
                   itemBuilder: (context, index) {
-                    String countryName = listOfCountry[index];
+                    final String countryName = listOfCountry[index];
 
                     if (countryName.toLowerCase().contains(
                       controller.text.toLowerCase().trim(),

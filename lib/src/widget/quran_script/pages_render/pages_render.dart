@@ -21,7 +21,7 @@ class QuranPagesRenderer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle copyBaseStyle = (baseStyle ?? const TextStyle(fontSize: 24))
+    final TextStyle copyBaseStyle = (baseStyle ?? const TextStyle(fontSize: 24))
         .copyWith(height: context.read<QuranViewCubit>().state.lineHeight);
     return switch (quranScriptType) {
       QuranScriptType.tajweed => TajweedPageRenderer(

@@ -264,7 +264,7 @@ class _ReciterPickerBottomSheetState extends State<ReciterPickerBottomSheet>
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     scrollDirection: Axis.horizontal,
                     itemCount: _categories.length,
-                    separatorBuilder: (_, __) => const Gap(8),
+                    separatorBuilder: (_, _) => const Gap(8),
                     itemBuilder: (_, i) {
                       final selected = _categoryIdx == i;
                       return GestureDetector(
@@ -391,9 +391,9 @@ class _ReciterPickerBottomSheetState extends State<ReciterPickerBottomSheet>
                                                     imageUrl: r.img!,
                                                     cacheManager: ReciterImageCacheManager(),
                                                     fit: BoxFit.cover,
-                                                    errorWidget: (_, __, ___) =>
+                                                    errorWidget: (_, _, _) =>
                                                         _defAvatar(accent),
-                                                    placeholder: (_, __) =>
+                                                    placeholder: (_, _) =>
                                                         _defAvatar(accent),
                                                   )
                                                 : _defAvatar(accent),

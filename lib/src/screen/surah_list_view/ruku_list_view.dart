@@ -24,13 +24,13 @@ class RukuListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppLocalizations appLocalizations = AppLocalizations.of(context);
-    Brightness brightness = Theme.of(context).brightness;
-    Color textColor =
+    final AppLocalizations appLocalizations = AppLocalizations.of(context);
+    final Brightness brightness = Theme.of(context).brightness;
+    final Color textColor =
         brightness == Brightness.light ? Colors.black : Colors.white;
-    QuranScriptType quranScriptType =
+    final QuranScriptType quranScriptType =
         context.read<QuranViewCubit>().state.quranScriptType;
-    ScrollController scrollController = ScrollController();
+    final ScrollController scrollController = ScrollController();
 
     return FutureBuilder(
       future: rootBundle.loadString("assets/meta_data/Ruku.json"),
@@ -39,9 +39,9 @@ class RukuListView extends StatelessWidget {
         if (asyncSnapshot.connectionState != ConnectionState.done) {
           return const SizedBox(height: 250);
         }
-        Map metaDataRuku = jsonDecode(asyncSnapshot.data!);
+        final Map metaDataRuku = jsonDecode(asyncSnapshot.data!);
 
-        List<RukuInfoModel> rukuInfoList =
+        final List<RukuInfoModel> rukuInfoList =
             metaDataRuku.values
                 .map((e) => RukuInfoModel.fromMap(Map<String, dynamic>.from(e)))
                 .toList();
@@ -60,11 +60,11 @@ class RukuListView extends StatelessWidget {
             controller: scrollController,
             itemCount: rukuInfoList.length,
             itemBuilder: (context, index) {
-              RukuInfoModel current = rukuInfoList[index];
-              String firstKey = current.firstVerseKey;
+              final RukuInfoModel current = rukuInfoList[index];
+              final String firstKey = current.firstVerseKey;
 
-              int surahNumber = firstKey.split(":").first.toInt();
-              int ayahNumber = firstKey.split(":").last.toInt();
+              final int surahNumber = firstKey.split(":").first.toInt();
+              final int ayahNumber = firstKey.split(":").last.toInt();
 
               return Padding(
                 padding: const EdgeInsets.only(top: 5, right: 5, left: 5),

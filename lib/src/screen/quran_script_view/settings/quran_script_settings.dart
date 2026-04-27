@@ -24,13 +24,13 @@ class QuranScriptSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppLocalizations appLocalizations = AppLocalizations.of(context);
-    TextStyle titleStyle = const TextStyle(
+    final AppLocalizations appLocalizations = AppLocalizations.of(context);
+    final TextStyle titleStyle = const TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w500,
     );
 
-    Widget bodyWidget = BlocBuilder<QuranViewCubit, QuranViewState>(
+    final Widget bodyWidget = BlocBuilder<QuranViewCubit, QuranViewState>(
       builder: (context, quranViewState) {
         return Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -99,17 +99,17 @@ class QuranScriptSettings extends StatelessWidget {
     ReciterInfoModel reciter,
     AyahKeyManagement ayahState,
   ) {
-    AppLocalizations l10n = AppLocalizations.of(context);
+    final AppLocalizations l10n = AppLocalizations.of(context);
     return BlocBuilder<SegmentedQuranReciterCubit, ReciterInfoModel>(
       builder: (context, state) {
-        Widget toReturn = getReciterWidget(
+        final Widget toReturn = getReciterWidget(
           context: context,
           audioTabScreenState: reciter,
           ayahKeyState: ayahState,
           isWordByWord: true,
           onReciterChanged: (reciterInfoModel) async {
             Navigator.pop(context);
-            bool isSuccess = await context
+            final bool isSuccess = await context
                 .read<SegmentedQuranReciterCubit>()
                 .changeReciter(context, reciterInfoModel);
 

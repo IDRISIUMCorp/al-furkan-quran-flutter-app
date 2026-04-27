@@ -681,11 +681,11 @@ Widget getAyahByAyahCard({
   required List<TranslationOfAyah> translationListWithInfo,
   required List wordByWord,
 }) {
-  AppLocalizations? l10n = AppLocalizations.of(context);
+  final AppLocalizations l10n = AppLocalizations.of(context);
 
-  int surahNumber = int.parse(ayahKey.toString().split(":")[0]);
-  int ayahNumber = int.parse(ayahKey.toString().split(":")[1]);
-  List<TranslationBookModel?> translationBookInfoList = translationListWithInfo
+  final int surahNumber = int.parse(ayahKey.toString().split(":")[0]);
+  final int ayahNumber = int.parse(ayahKey.toString().split(":")[1]);
+  final List<TranslationBookModel?> translationBookInfoList = translationListWithInfo
       .map<TranslationBookModel?>((e) => e.bookInfo)
       .toList();
   List<String> translationList = translationListWithInfo
@@ -694,12 +694,12 @@ Widget getAyahByAyahCard({
   translationList = translationList
       .map((e) => e.replaceAll(">", "> "))
       .toList();
-  List<Map> footNoteList = translationListWithInfo
+  final List<Map> footNoteList = translationListWithInfo
       .map<Map>((e) => e.translation?["f"] ?? {})
       .toList();
-  List<Map<int, String>> footNoteAsStringMap = [];
+  final List<Map<int, String>> footNoteAsStringMap = [];
   for (int index = 0; index < footNoteList.length; index++) {
-    Map footNote = footNoteList[index];
+    final Map footNote = footNoteList[index];
     String footNoteAsString = "\n";
     if (footNote.isNotEmpty) {
       footNote.forEach((key, value) {
@@ -713,7 +713,7 @@ Widget getAyahByAyahCard({
     }
   }
 
-  SurahInfoModel surahInfoModel = SurahInfoModel.fromMap(
+  final SurahInfoModel surahInfoModel = SurahInfoModel.fromMap(
     metaDataSurah["$surahNumber"]!,
   );
 
@@ -742,7 +742,7 @@ Widget getAyahByAyahCard({
               }
               context.read<QuranHistoryCubit>().addHistory(ayahKey: ayahKey);
               try {
-                SurahInfoModel surahInfoModel = SurahInfoModel.fromMap(
+                final SurahInfoModel surahInfoModel = SurahInfoModel.fromMap(
                   metaDataSurah[ayahKey.split(":").first]!,
                 );
 
@@ -1147,7 +1147,7 @@ class _AyahStatusIndicators extends StatelessWidget {
 
     return ValueListenableBuilder(
       valueListenable: userBox.listenable(),
-      builder: (context, _, __) {
+      builder: (context, _, _) {
         final rawBookmarks =
             userBox.get(_kWahyBookmarks, defaultValue: const []) as List?;
         final rawNotes =
@@ -1253,9 +1253,9 @@ Widget getTranslationWithFootNoteWidget(
 ) {
   return Column(
     children: List.generate(translationBookInfoList.length, (index) {
-      String translation = translationList[index];
-      Map<int, String> footNote = footNoteAsStringMap[index];
-      TranslationBookModel? bookModel = translationBookInfoList[index];
+      final String translation = translationList[index];
+      final Map<int, String> footNote = footNoteAsStringMap[index];
+      final TranslationBookModel? bookModel = translationBookInfoList[index];
 
       return Column(
         children: [
@@ -1552,8 +1552,8 @@ Widget getToolbarWidget(
                 builder: (context, playerState) {
                   return BlocBuilder<AyahKeyCubit, AyahKeyManagement>(
                     builder: (context, ayahKeyManagement) {
-                      bool isPlaying = playerState.isPlaying;
-                      bool isCurrent =
+                      final bool isPlaying = playerState.isPlaying;
+                      final bool isCurrent =
                           ayahKeyManagement.current == ayahKey &&
                           context
                                   .read<AudioUiCubit>()
@@ -1589,7 +1589,7 @@ IconButton getPlayButtonWidget(
   AyahKeyManagement ayahKeyManagement,
   PlayerState playerState,
 ) {
-  ThemeState themeState = context.read<ThemeCubit>().state;
+  final ThemeState themeState = context.read<ThemeCubit>().state;
   return IconButton(
     style: IconButton.styleFrom(
       padding: EdgeInsets.zero,
@@ -1613,7 +1613,7 @@ IconButton getPlayButtonWidget(
         audioPlaybackService.resume();
       } else {
         log("Current Ayah: $ayahKey");
-        bool isPlayList = context.read<AudioUiCubit>().state.isPlayList;
+        final bool isPlayList = context.read<AudioUiCubit>().state.isPlayList;
         if (isPlayList &&
             ayahKeyManagement.current.split(":").first ==
                 ayahKey.split(":").first) {

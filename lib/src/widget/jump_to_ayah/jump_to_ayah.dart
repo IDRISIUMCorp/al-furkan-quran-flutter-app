@@ -59,15 +59,15 @@ class _JumpToAyahViewState extends State<JumpToAyahView> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeState themeState = context.read<ThemeCubit>().state;
+    final ThemeState themeState = context.read<ThemeCubit>().state;
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final Color headerColor = isDark ? const Color(0xFF2A2A2A) : themeState.primaryShade100;
 
-    List<SurahInfoModel> filteredSurah = getFilteredSurah(
+    final List<SurahInfoModel> filteredSurah = getFilteredSurah(
       context,
       surahSearchController.text.trim(),
     );
-    AppLocalizations l10n = AppLocalizations.of(context);
+    final AppLocalizations l10n = AppLocalizations.of(context);
 
     return Container(
       decoration: BoxDecoration(
@@ -213,7 +213,7 @@ class _JumpToAyahViewState extends State<JumpToAyahView> {
                             itemCount: filteredSurah.length,
                             padding: const EdgeInsets.all(10),
                             itemBuilder: (context, index) {
-                              SurahInfoModel surah = filteredSurah[index];
+                              final SurahInfoModel surah = filteredSurah[index];
                               return SizedBox(
                                 height: surah.id == surahNumber ? 40 : 30,
                                 child: TextButton(
@@ -346,13 +346,13 @@ class _JumpToAyahViewState extends State<JumpToAyahView> {
                 onPressed: () async {
                   String text = "";
                   for (String ayahKey in selectedAyahKeys) {
-                    SurahInfoModel surahInfoModel = SurahInfoModel.fromMap(
+                    final SurahInfoModel surahInfoModel = SurahInfoModel.fromMap(
                       metaDataSurah[ayahKey.split(":").first]!,
                     );
-                    List<TranslationOfAyah> translationsListWithInfoList =
+                    final List<TranslationOfAyah> translationsListWithInfoList =
                         await QuranTranslationFunction.getTranslation(ayahKey);
 
-                    List<TranslationBookModel?> translationBookInfoList =
+                    final List<TranslationBookModel?> translationBookInfoList =
                         translationsListWithInfoList
                             .map<TranslationBookModel?>((e) => e.bookInfo)
                             .toList();
@@ -364,10 +364,10 @@ class _JumpToAyahViewState extends State<JumpToAyahView> {
                     translationList = translationList
                         .map((e) => e.replaceAll(">", "> "))
                         .toList();
-                    List<Map> footNoteList = translationsListWithInfoList
+                    final List<Map> footNoteList = translationsListWithInfoList
                         .map<Map>((e) => e.translation?["f"] ?? {})
                         .toList();
-                    List<Map<int, String>> footNoteAsStringMap = [];
+                    final List<Map<int, String>> footNoteAsStringMap = [];
                     footNoteList.mapIndexed((index, footNote) {
                       String footNoteAsString = "\n";
                       if (footNote.isNotEmpty) {
@@ -378,7 +378,7 @@ class _JumpToAyahViewState extends State<JumpToAyahView> {
                       footNoteAsStringMap.add({index: footNoteAsString});
                     });
 
-                    List quranScriptWord =
+                    final List quranScriptWord =
                         QuranScriptFunction.getWordListOfAyah(
                           context.read<QuranViewCubit>().state.quranScriptType,
                           ayahKey.split(":").first,

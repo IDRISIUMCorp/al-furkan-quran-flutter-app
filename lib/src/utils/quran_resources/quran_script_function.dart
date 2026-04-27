@@ -36,7 +36,7 @@ class QuranScriptFunction {
       }
       final quranBox = await Hive.openBox("script_${scriptType.name}");
       for (String surahKey in quranScriptMap.keys) {
-        Map surahMap = quranScriptMap[surahKey] as Map;
+        final Map surahMap = quranScriptMap[surahKey] as Map;
         for (final ayahKey in surahMap.keys) {
           await quranBox.put("$surahKey:$ayahKey", surahMap[ayahKey]);
           processed++;
@@ -76,7 +76,7 @@ class QuranScriptFunction {
     String surah,
     String ayah,
   ) {
-    String ayahKey = "$surah:$ayah";
+    final String ayahKey = "$surah:$ayah";
     final fromCache = cacheOfAyah[ayahKey + type.name];
     if (fromCache != null) return fromCache;
 
@@ -90,7 +90,7 @@ class QuranScriptFunction {
 
     switch (type) {
       case QuranScriptType.tajweed:
-        List<String> compressed = List<String>.from(rawData);
+        final List<String> compressed = List<String>.from(rawData);
         for (int i = 0; i < compressed.length; i++) {
           for (int j = tajweedRulesList.length - 1; 0 <= j; j--) {
             compressed[i] = compressed[i].replaceAll(

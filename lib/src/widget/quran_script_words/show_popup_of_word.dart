@@ -37,8 +37,8 @@ class _ShowPopupOfWordState extends State<ShowPopupOfWord> {
   late int currentWordIndex = widget.initWordIndex;
   @override
   Widget build(BuildContext context) {
-    ThemeState themeState = context.read<ThemeCubit>().state;
-    QuranScriptType scriptType = context
+    final ThemeState themeState = context.read<ThemeCubit>().state;
+    final QuranScriptType scriptType = context
         .read<QuranViewCubit>()
         .state
         .quranScriptType;

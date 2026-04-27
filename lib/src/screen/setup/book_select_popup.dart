@@ -91,16 +91,16 @@ class _BookSelectPopupState extends State<BookSelectPopup> {
   void _filterBooks(String query) {
     final lowerCaseQuery = query.toLowerCase();
 
-    List<ScoreDetails> scoreDetails = [];
+    final List<ScoreDetails> scoreDetails = [];
 
     for (int index = 0; index < _allBooks.length; index++) {
-      String language = _allBooks.keys.elementAt(index);
-      List<Map<String, dynamic>> books = _allBooks.values.elementAt(index);
+      final String language = _allBooks.keys.elementAt(index);
+      final List<Map<String, dynamic>> books = _allBooks.values.elementAt(index);
 
       final languageNative = languageNativeNames[language] ?? "";
 
       for (final bookMap in books) {
-        String searchableText =
+        final String searchableText =
             widget.isTafsir
                 ? TafsirBookModel.fromMap(bookMap).name
                 : TranslationBookModel.fromMap(bookMap).name;
@@ -116,11 +116,11 @@ class _BookSelectPopupState extends State<BookSelectPopup> {
 
     scoreDetails.sort((a, b) => b.score.compareTo(a.score));
 
-    String language =
+    final String language =
         widget.isTafsir
             ? TafsirBookModel.fromMap(scoreDetails.first.data).language
             : TranslationBookModel.fromMap(scoreDetails.first.data).language;
-    int index = _allBooks.keys.toList().indexOf(language.toLowerCase());
+    final int index = _allBooks.keys.toList().indexOf(language.toLowerCase());
     if (index != -1) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _itemScrollController.scrollTo(
@@ -133,8 +133,8 @@ class _BookSelectPopupState extends State<BookSelectPopup> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeState themeState = context.read<ThemeCubit>().state;
-    AppLocalizations appLocalizations = AppLocalizations.of(context);
+    final ThemeState themeState = context.read<ThemeCubit>().state;
+    final AppLocalizations appLocalizations = AppLocalizations.of(context);
     return ClipRRect(
       borderRadius: const BorderRadiusGeometry.only(
         topRight: Radius.circular(10),
@@ -198,8 +198,8 @@ class _BookSelectPopupState extends State<BookSelectPopup> {
             padding: const EdgeInsets.all(15),
             itemCount: _allBooks.length,
             itemBuilder: (context, index) {
-              String language = _allBooks.keys.elementAt(index);
-              List<Map<String, dynamic>> books = _allBooks.values.elementAt(
+              final String language = _allBooks.keys.elementAt(index);
+              final List<Map<String, dynamic>> books = _allBooks.values.elementAt(
                 index,
               );
               if (widget.isTafsir) {
@@ -233,7 +233,7 @@ class _BookSelectPopupState extends State<BookSelectPopup> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: List.generate(books.length, (i) {
-                      var book =
+                      final book =
                           widget.isTafsir
                               ? TafsirBookModel.fromMap(books[i])
                               : TranslationBookModel.fromMap(books[i]);

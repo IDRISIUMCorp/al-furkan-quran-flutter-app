@@ -28,7 +28,7 @@ Future<void> loadMetaSurah() async {
 
 String getSurahName(BuildContext context, int index) {
   if (surahNameLocalization.isEmpty) return "سورة $index";
-  Locale locale = context.read<LanguageCubit>().state.locale;
+  final Locale locale = context.read<LanguageCubit>().state.locale;
   final data =
       surahNameLocalization[locale.languageCode] ??
       surahNameLocalization["en"] ??
@@ -50,7 +50,7 @@ String getSurahNameArabic(int index) {
 
 String getSurahMeaning(BuildContext context, int index) {
   if (surahMeaningLocalization.isEmpty) return "";
-  Locale locale = context.read<LanguageCubit>().state.locale;
+  final Locale locale = context.read<LanguageCubit>().state.locale;
   final data =
       surahMeaningLocalization[locale.languageCode] ??
       surahNameLocalization["en"];

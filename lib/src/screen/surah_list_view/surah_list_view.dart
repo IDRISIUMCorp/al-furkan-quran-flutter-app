@@ -52,15 +52,15 @@ class _SurahListViewState extends State<SurahListView> {
 
   @override
   Widget build(BuildContext context) {
-    AppLocalizations l10n = AppLocalizations.of(context);
-    Brightness brightness = Theme.of(context).brightness;
-    Color textColor =
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final Brightness brightness = Theme.of(context).brightness;
+    final Color textColor =
         brightness == Brightness.light ? Colors.black : Colors.white;
-    List<SurahInfoModel> filteredSurah = getFilteredSurah(
+    final List<SurahInfoModel> filteredSurah = getFilteredSurah(
       context,
       searchController.text.trim(),
     );
-    ThemeState themeState = context.read<ThemeCubit>().state;
+    final ThemeState themeState = context.read<ThemeCubit>().state;
 
     return (surahNameLocalization.isEmpty || surahMeaningLocalization.isEmpty)
         ? const Center(child: CircularProgressIndicator())

@@ -108,7 +108,7 @@ class _ARQiblaScreenState extends State<ARQiblaScreen> {
     _kalmanK = _kalmanP / (_kalmanP + _kalmanR);
     
     // Handle circular angle wrapping (0-360 degrees)
-    double delta = shortestSignedAngleDifference(_kalmanX!, measurement);
+    final double delta = shortestSignedAngleDifference(_kalmanX!, measurement);
     _kalmanX = normalizeDegrees(_kalmanX! + _kalmanK * delta);
     
     _kalmanP = (1 - _kalmanK) * _kalmanP;
@@ -129,12 +129,12 @@ class _ARQiblaScreenState extends State<ARQiblaScreen> {
     double sum = 0;
     double weightSum = 0;
     for (int i = 0; i < _headingHistory.length; i++) {
-      double weight = (i + 1).toDouble(); // Linear weight increase
+      final double weight = (i + 1).toDouble(); // Linear weight increase
       double angle = _headingHistory[i];
       
       // Handle circular averaging
       if (i > 0) {
-        double delta = shortestSignedAngleDifference(_headingHistory[i - 1], angle);
+        final double delta = shortestSignedAngleDifference(_headingHistory[i - 1], angle);
         angle = normalizeDegrees(_headingHistory[i - 1] + delta);
       }
       
@@ -149,7 +149,7 @@ class _ARQiblaScreenState extends State<ARQiblaScreen> {
   double _applyDeadZone(double newValue, double? oldValue) {
     if (oldValue == null) return newValue;
     
-    double delta = shortestSignedAngleDifference(oldValue, newValue).abs();
+    final double delta = shortestSignedAngleDifference(oldValue, newValue).abs();
     if (delta < _deadZone) {
       return oldValue; // Stay at old value if change is too small
     }
@@ -160,13 +160,13 @@ class _ARQiblaScreenState extends State<ARQiblaScreen> {
   /// Master smoothing function combining all filters
   double _smoothHeadingForAR(double rawHeading) {
     // Step 1: Apply Kalman Filter (primary smoothing)
-    double kalmanFiltered = _applyKalmanFilter(rawHeading);
+    final double kalmanFiltered = _applyKalmanFilter(rawHeading);
     
     // Step 2: Apply Complementary Filter (secondary smoothing)
-    double complementaryFiltered = _applyComplementaryFilter(kalmanFiltered);
+    final double complementaryFiltered = _applyComplementaryFilter(kalmanFiltered);
     
     // Step 3: Apply Dead Zone (prevent micro-jitters)
-    double finalValue = _applyDeadZone(complementaryFiltered, _smoothedHeading);
+    final double finalValue = _applyDeadZone(complementaryFiltered, _smoothedHeading);
     
     return finalValue;
   }

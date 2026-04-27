@@ -59,7 +59,7 @@ class ImagePostCard extends StatelessWidget {
                             ? post.thumbnailUrl
                             : post.mediaUrl,
                         fit: BoxFit.cover,
-                        placeholder: (_, __) => Shimmer.fromColors(
+                        placeholder: (_, _) => Shimmer.fromColors(
                           baseColor: isDark
                               ? Colors.grey.shade800
                               : Colors.grey.shade200,
@@ -68,7 +68,7 @@ class ImagePostCard extends StatelessWidget {
                               : Colors.grey.shade100,
                           child: Container(color: Colors.grey),
                         ),
-                        errorWidget: (_, __, ___) => Container(
+                        errorWidget: (_, _, _) => Container(
                           color: isDark
                               ? const Color(0xFF2A2A2A)
                               : const Color(0xFFF0F0F0),

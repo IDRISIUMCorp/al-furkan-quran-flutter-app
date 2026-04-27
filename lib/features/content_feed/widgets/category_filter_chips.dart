@@ -38,7 +38,7 @@ class CategoryFilterChips extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         physics: const BouncingScrollPhysics(),
         itemCount: categories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final cat = categories[index];
           final isActive = cat == activeCategory;

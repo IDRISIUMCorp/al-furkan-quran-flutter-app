@@ -49,7 +49,7 @@ class NonTajweedScriptView extends StatelessWidget {
                 settingsFont == QuranFontFamily.meQuranVolt
             ? settingsFont.flutterFontFamily
             : "AlQuranNeov5x1");
-    TextStyle quranStyle = TextStyle(
+    final TextStyle quranStyle = TextStyle(
       fontSize: scriptInfo.textStyle?.fontSize ?? 24,
       height: scriptInfo.textStyle?.height ?? 2,
       color: scriptInfo.textStyle?.color,
@@ -89,7 +89,7 @@ class NonTajweedScriptView extends StatelessWidget {
       );
     }
 
-    String ayahKey = "${scriptInfo.surahNumber}:${scriptInfo.ayahNumber}";
+    final String ayahKey = "${scriptInfo.surahNumber}:${scriptInfo.ayahNumber}";
 
     if (scriptInfo.forImage == true) {
       return Text.rich(
@@ -104,7 +104,7 @@ class NonTajweedScriptView extends StatelessWidget {
                   ? null
                   : (TapGestureRecognizer()
                       ..onTap = () async {
-                        List<String> wordsKey = List.generate(
+                        final List<String> wordsKey = List.generate(
                           words.length,
                           (i) =>
                               "${scriptInfo.surahNumber}:${scriptInfo.ayahNumber}:${i + 1}",
@@ -122,13 +122,13 @@ class NonTajweedScriptView extends StatelessWidget {
       );
     }
 
-    bool enableWordByWordHighlight =
+    final bool enableWordByWordHighlight =
         context.read<QuranViewCubit>().state.enableWordByWordHighlight == true;
 
     return BlocBuilder<AudioAyahHighlightCubit, AudioAyahHighlightState>(
       buildWhen: (previous, current) {
-        bool wasInScope = previous.activeAyahKey != null && previous.activeAyahKey == ayahKey;
-        bool isInScope = current.activeAyahKey != null && current.activeAyahKey == ayahKey;
+        final bool wasInScope = previous.activeAyahKey != null && previous.activeAyahKey == ayahKey;
+        final bool isInScope = current.activeAyahKey != null && current.activeAyahKey == ayahKey;
         if (wasInScope || isInScope) {
           return previous.activeAyahKey != current.activeAyahKey ||
               previous.activeWordKey != current.activeWordKey;
@@ -153,10 +153,10 @@ class NonTajweedScriptView extends StatelessWidget {
                   )
                 : null,
             children: List<InlineSpan>.generate(words.length, (index) {
-              String word = words[index];
-              bool isLastWord =
+              final String word = words[index];
+              final bool isLastWord =
                   index == (words.length - 1) && word.length < 3;
-              bool willHighLight =
+              final bool willHighLight =
                   enableWordByWordHighlight &&
                   highlightingWordIndex == "$ayahKey:${index + 1}";
 
@@ -176,7 +176,7 @@ class NonTajweedScriptView extends StatelessWidget {
                     ? null
                     : (DoubleTapGestureRecognizer()
                         ..onDoubleTap = () async {
-                          List<String> wordsKey = List.generate(
+                          final List<String> wordsKey = List.generate(
                             words.length,
                             (i) =>
                                 "${scriptInfo.surahNumber}:${scriptInfo.ayahNumber}:${i + 1}",

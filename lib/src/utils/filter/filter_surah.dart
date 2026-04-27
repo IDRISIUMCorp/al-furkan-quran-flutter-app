@@ -11,12 +11,12 @@ List<SurahInfoModel> getFilteredSurah(
   BuildContext context,
   String filterString,
 ) {
-  List<SurahInfoModel> surahInfoList =
+  final List<SurahInfoModel> surahInfoList =
       metaDataSurah.values.map((e) => SurahInfoModel.fromMap(e)).toList();
-  Map<double, SurahInfoModel> mapOfFilteredSurah = {};
+  final Map<double, SurahInfoModel> mapOfFilteredSurah = {};
   if (filterString.isNotEmpty) {
     for (int i = 0; i < surahInfoList.length; i++) {
-      double matched = searchPatternInText(
+      final double matched = searchPatternInText(
         filterString.toLowerCase(),
         "${surahInfoList[i].id} ${getSurahName(context, surahInfoList[i].id)} ${NumberFormat.decimalPattern(context.read<LanguageCubit>().state.locale.languageCode).format(surahInfoList[i].id)}"
             .toLowerCase(),
@@ -26,9 +26,9 @@ List<SurahInfoModel> getFilteredSurah(
   } else {
     return surahInfoList;
   }
-  List<double> matchedValue = mapOfFilteredSurah.keys.toList();
+  final List<double> matchedValue = mapOfFilteredSurah.keys.toList();
   matchedValue.sort((a, b) => b.compareTo(a));
-  List<SurahInfoModel> surahInfoToReturn = [];
+  final List<SurahInfoModel> surahInfoToReturn = [];
   for (var element in matchedValue) {
     surahInfoToReturn.add(mapOfFilteredSurah[element]!);
   }

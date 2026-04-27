@@ -533,7 +533,7 @@ class _AboutAppPageState extends State<AboutAppPage> {
                   child: Image.asset(
                     "assets/dev/dev image.jpg",
                     fit: BoxFit.cover,
-                    errorBuilder: (context, _, __) => Container(
+                    errorBuilder: (context, _, _) => Container(
                       color: isDark ? Colors.white10 : Colors.black12,
                       child: Center(
                         child: Text(

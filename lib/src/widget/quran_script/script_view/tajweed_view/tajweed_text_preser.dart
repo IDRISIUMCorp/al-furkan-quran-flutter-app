@@ -16,7 +16,7 @@ TextSpan parseTajweedWord({
   required bool skipWordTap,
   required wordIndex,
 }) {
-  List<TextSpan> spans = [];
+  final List<TextSpan> spans = [];
   final brightness = Theme.of(context).brightness;
   final bool isLight = brightness == Brightness.light;
 
@@ -86,7 +86,7 @@ TextSpan parseTajweedWord({
                   ? null
                   : (DoubleTapGestureRecognizer()
                     ..onDoubleTap = () async {
-                      List<String> wordsKey = List.generate(
+                      final List<String> wordsKey = List.generate(
                         words.length,
                         (index) => "$surahNumber:$ayahNumber:${index + 1}",
                       );
@@ -100,11 +100,11 @@ TextSpan parseTajweedWord({
         ),
       );
     } else if (node.nodeType == dom.Node.ELEMENT_NODE) {
-      dom.Element element = node as dom.Element;
+      final dom.Element element = node as dom.Element;
       Color nextColor = currentColor;
 
       if (element.localName == "rule") {
-        String? ruleClass = element.attributes["class"];
+        final String? ruleClass = element.attributes["class"];
         if (ruleClass != null && currentThemeColors.containsKey(ruleClass)) {
           nextColor = currentThemeColors[ruleClass]!;
         } else if (ruleClass != null) {
@@ -130,7 +130,7 @@ TextSpan parseTajweedWord({
 }
 
 String getPlainTextAyahFromTajweedWords(List<String> tajweedWords) {
-  List<String> plainWords = [];
+  final List<String> plainWords = [];
   for (String wordWithTajweed in tajweedWords) {
     final documentFragment = parseFragment(wordWithTajweed);
 

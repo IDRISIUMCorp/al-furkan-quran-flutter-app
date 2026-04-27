@@ -32,16 +32,16 @@ class NonTajweedPageRenderer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ThemeState themeState = context.read<ThemeCubit>().state;
-    bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final ThemeState themeState = context.read<ThemeCubit>().state;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final highlightColor = context.watch<QuranSettingsCubit>().state.highlightColor;
 
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: BlocBuilder<AudioAyahHighlightCubit, AudioAyahHighlightState>(
         buildWhen: (previous, current) {
-          bool wasInScope = previous.activeAyahKey != null && ayahsKey.contains(previous.activeAyahKey);
-          bool isInScope = current.activeAyahKey != null && ayahsKey.contains(current.activeAyahKey);
+          final bool wasInScope = previous.activeAyahKey != null && ayahsKey.contains(previous.activeAyahKey);
+          final bool isInScope = current.activeAyahKey != null && ayahsKey.contains(current.activeAyahKey);
           if (wasInScope || isInScope) {
             return previous.activeAyahKey != current.activeAyahKey ||
                 previous.activeWordKey != current.activeWordKey;
@@ -56,7 +56,7 @@ class NonTajweedPageRenderer extends StatelessWidget {
             TextSpan(
               children:
                   ayahsKey.map((ayahKey) {
-                    List words = QuranScriptFunction.getWordListOfAyah(
+                    final List words = QuranScriptFunction.getWordListOfAyah(
                       isUthmani
                           ? QuranScriptType.uthmani
                           : QuranScriptType.indopak,
@@ -74,8 +74,8 @@ class NonTajweedPageRenderer extends StatelessWidget {
                       ),
                       children:
                           List.generate(words.length, (index) {
-                            String word = words[index];
-                            bool isLastWord =
+                            final String word = words[index];
+                            final bool isLastWord =
                                 index == (words.length - 1) &&
                                 word.length < 3;
                             final baseSpan = TextSpan(
@@ -193,11 +193,11 @@ class _AyahInlineStatusIndicator extends StatelessWidget {
 
     return ValueListenableBuilder(
       valueListenable: pinnedBox.listenable(),
-      builder: (context, _, __) {
+      builder: (context, _, _) {
         final isPinned = _isPinned(pinnedBox.values);
         return ValueListenableBuilder(
           valueListenable: notesBox.listenable(),
-          builder: (context, __, ___) {
+          builder: (context, _, _) {
             final isNoted = _isNoted(notesBox.values);
             if (!isPinned && !isNoted) return const SizedBox.shrink();
             return Transform.translate(

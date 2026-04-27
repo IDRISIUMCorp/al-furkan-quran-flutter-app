@@ -80,7 +80,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
       return value;
     }
     
-    double diff = shortestSignedAngleDifference(_emaValue!, value);
+    final double diff = shortestSignedAngleDifference(_emaValue!, value);
     _emaValue = normalizeDegrees(_emaValue! + _emaAlpha * diff);
     
     return _emaValue!;
@@ -94,7 +94,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
       return rawHeading;
     }
     
-    double diff = shortestSignedAngleDifference(_emaValue!, rawHeading);
+    final double diff = shortestSignedAngleDifference(_emaValue!, rawHeading);
     _emaValue = normalizeDegrees(_emaValue! + _emaAlpha * diff);
     
     return _emaValue!;
@@ -160,7 +160,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
     if (_lastUpdateTime != null) {
       final timeDiff = DateTime.now().difference(_lastUpdateTime!).inMilliseconds;
       if (timeDiff > 0) {
-        double freq = 1000 / timeDiff; // Updates per second
+        final double freq = 1000 / timeDiff; // Updates per second
         _frequencyHistory.add(freq);
         if (_frequencyHistory.length > 10) {
           _frequencyHistory.removeAt(0);
@@ -189,7 +189,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
     }
     
     if (_accuracyHistory.isNotEmpty) {
-      double avgDiff = _accuracyHistory.reduce((a, b) => a + b) / _accuracyHistory.length;
+      final double avgDiff = _accuracyHistory.reduce((a, b) => a + b) / _accuracyHistory.length;
       _compassAccuracy = (1 - (avgDiff / 180)) * 100;
       _compassAccuracy = _compassAccuracy.clamp(0, 100);
     }
@@ -198,14 +198,14 @@ class _QiblaDirectionState extends State<QiblaDirection> {
   void _calculateDistance(double userLat, double userLon) {
     // Haversine formula to calculate distance
     const double earthRadius = 6371; // km
-    double dLat = (kaabaLatDegrees - userLat) * math.pi / 180;
-    double dLon = (kaabaLonDegrees - userLon) * math.pi / 180;
+    final double dLat = (kaabaLatDegrees - userLat) * math.pi / 180;
+    final double dLon = (kaabaLonDegrees - userLon) * math.pi / 180;
     
-    double a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+    final double a = math.sin(dLat / 2) * math.sin(dLat / 2) +
         math.cos(userLat * math.pi / 180) * math.cos(kaabaLatDegrees * math.pi / 180) *
         math.sin(dLon / 2) * math.sin(dLon / 2);
     
-    double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+    final double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
     _distanceToKaaba = earthRadius * c;
   }
 
@@ -1564,7 +1564,7 @@ class _QiblaDirectionState extends State<QiblaDirection> {
       "شمال", "شمال شرقي", "شرق", "جنوب شرقي",
       "جنوب", "جنوب غربي", "غرب", "شمال غربي"
     ];
-    int index = ((degrees + 22.5) / 45).floor() % 8;
+    final int index = ((degrees + 22.5) / 45).floor() % 8;
     return directions[index];
   }
 }
@@ -1585,11 +1585,11 @@ class _CompassPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    Offset center = Offset(size.width / 2, size.height / 2);
+    final Offset center = Offset(size.width / 2, size.height / 2);
     canvas.translate(center.dx, center.dy);
 
-    Paint degreeAnglePaint = Paint();
-    Color grayColor = Theme.of(context).brightness != Brightness.light
+    final Paint degreeAnglePaint = Paint();
+    final Color grayColor = Theme.of(context).brightness != Brightness.light
         ? Colors.grey.shade500
         : Colors.grey.shade700;
 
@@ -1600,12 +1600,12 @@ class _CompassPainter extends CustomPainter {
       degreeAnglePaint..color = grayColor,
     );
 
-    double degreeDistanceFromCenter = size.width / 2;
+    final double degreeDistanceFromCenter = size.width / 2;
 
     // Draw kaaba direction line with glow effect
-    double radian = vector.radians(kaabaAngle);
-    double maxX = math.sin(radian) * (degreeDistanceFromCenter - 30);
-    double maxY = -math.cos(radian) * (degreeDistanceFromCenter - 30);
+    final double radian = vector.radians(kaabaAngle);
+    final double maxX = math.sin(radian) * (degreeDistanceFromCenter - 30);
+    final double maxY = -math.cos(radian) * (degreeDistanceFromCenter - 30);
 
     // Glow effect
     canvas.drawLine(
@@ -1632,8 +1632,8 @@ class _CompassPainter extends CustomPainter {
     // Draw angle lines and labels
     for (int degree = 0; degree < 360; degree++) {
       if (degree % 2 == 0) {
-        bool is30 = degree % 30 == 0;
-        bool is90 = degree % 90 == 0;
+        final bool is30 = degree % 30 == 0;
+        final bool is90 = degree % 90 == 0;
         double length = 5;
 
         degreeAnglePaint
@@ -1655,11 +1655,11 @@ class _CompassPainter extends CustomPainter {
           length = 15;
         }
 
-        double radian = vector.radians(degree.toDouble());
-        double maxX = math.sin(radian) * degreeDistanceFromCenter;
-        double maxY = -math.cos(radian) * degreeDistanceFromCenter;
-        double minX = math.sin(radian) * (degreeDistanceFromCenter - length);
-        double minY = -math.cos(radian) * (degreeDistanceFromCenter - length);
+        final double radian = vector.radians(degree.toDouble());
+        final double maxX = math.sin(radian) * degreeDistanceFromCenter;
+        final double maxY = -math.cos(radian) * degreeDistanceFromCenter;
+        final double minX = math.sin(radian) * (degreeDistanceFromCenter - length);
+        final double minY = -math.cos(radian) * (degreeDistanceFromCenter - length);
 
         canvas.drawLine(
           Offset(maxX, maxY),
@@ -1696,13 +1696,13 @@ class _CompassPainter extends CustomPainter {
 
           // Draw cardinal directions [N, E, S, W]
           if (is90) {
-            List<String> directionList = [
+            final List<String> directionList = [
               appLocalizations.north,
               appLocalizations.east,
               appLocalizations.south,
               appLocalizations.west,
             ];
-            String direction = directionList[(degree / 90).toInt()];
+            final String direction = directionList[(degree / 90).toInt()];
 
             textPainter = TextPainter(
               text: TextSpan(

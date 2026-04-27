@@ -23,7 +23,7 @@ class SegmentedResourcesManager {
       if (!Hive.isBoxOpen("user")) {
         await Hive.openBox("user").timeout(const Duration(seconds: 5));
       }
-      String? selectedBox = getSelectedDataBoxName();
+      final String? selectedBox = getSelectedDataBoxName();
       if (selectedBox != null) {
         debugPrint("📦 Opening segments box: $selectedBox");
         await changeSelectedBox(selectedBox).timeout(const Duration(seconds: 8));
@@ -97,13 +97,13 @@ class SegmentedResourcesManager {
   }
 
   static ReciterInfoModel? getOpenSegmentsReciter() {
-    String? metaData = _segmentsBox?.get(_metaKey, defaultValue: null);
+    final String? metaData = _segmentsBox?.get(_metaKey, defaultValue: null);
     if (metaData == null) return null;
     return ReciterInfoModel.fromJson(_segmentsBox!.get(_metaKey));
   }
 
   static Future<void> closeAllBoxes() async {
-    List<String> boxesNames = getDownloadedBoxesNames();
+    final List<String> boxesNames = getDownloadedBoxesNames();
     for (String boxName in boxesNames) {
       if (Hive.isBoxOpen(boxName)) {
         await Hive.box(boxName).close();
@@ -127,7 +127,7 @@ class SegmentedResourcesManager {
 
   static Future<void> changeSelectedBox(String toOpenBox) async {
     // close all opened boxes (with timeout safety)
-    List<String> boxesNames = getDownloadedBoxesNames();
+    final List<String> boxesNames = getDownloadedBoxesNames();
     for (String boxName in boxesNames) {
       if (Hive.isBoxOpen(boxName)) {
         try {
@@ -156,7 +156,7 @@ class SegmentedResourcesManager {
     if (await isAlreadyDownloaded(url)) {
       return true;
     } else {
-      AppLocalizations appLocalizations = AppLocalizations.of(context);
+      final AppLocalizations appLocalizations = AppLocalizations.of(context);
       url = ApisUrls.base + url;
       final response = await dio.Dio().get(url);
       final String boxName = praseStringToBoxName(url);
@@ -166,7 +166,7 @@ class SegmentedResourcesManager {
           null,
           appLocalizations.processingSegmentedQuranRecitation,
         );
-        Map segmentsInfo = await compute(
+        final Map segmentsInfo = await compute(
           (message) => jsonDecode(decodeBZip2String(message)),
           response.data,
         );
@@ -192,7 +192,7 @@ class SegmentedResourcesManager {
 
   static String praseStringToBoxName(String url) {
     final Uri uri = Uri.parse(url);
-    String boxName = uri.pathSegments.last.replaceAll(
+    final String boxName = uri.pathSegments.last.replaceAll(
       RegExp(r"[^a-zA-Z0-9]"),
       "_",
     );

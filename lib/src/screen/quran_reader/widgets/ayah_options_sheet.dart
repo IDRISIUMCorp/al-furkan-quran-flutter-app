@@ -216,6 +216,8 @@ class AyahOptionsSheet extends StatelessWidget {
                 const SizedBox(height: 12),
 
                 _MenuGroup(
+                  cardColor: card,
+                  dividerColor: dividerColor,
                   children: [
                     _MenuItem(
                       title: (currentColor != null && currentColor.isNotEmpty)
@@ -335,12 +337,12 @@ class AyahOptionsSheet extends StatelessWidget {
                             },
                     ),
                   ],
-                  cardColor: card,
-                  dividerColor: dividerColor,
                 ),
                 const SizedBox(height: 12),
 
                 _MenuGroup(
+                  cardColor: card,
+                  dividerColor: dividerColor,
                   children: [
                     _MenuItem(
                       title: "تلاوة",
@@ -369,12 +371,12 @@ class AyahOptionsSheet extends StatelessWidget {
                             },
                     ),
                   ],
-                  cardColor: card,
-                  dividerColor: dividerColor,
                 ),
                 const SizedBox(height: 12),
 
                 _MenuGroup(
+                  cardColor: card,
+                  dividerColor: dividerColor,
                   children: [
                     _MenuItem(
                       title: "المكتبة",
@@ -405,12 +407,12 @@ class AyahOptionsSheet extends StatelessWidget {
                             },
                     ),
                   ],
-                  cardColor: card,
-                  dividerColor: dividerColor,
                 ),
                 const SizedBox(height: 12),
 
                 _MenuGroup(
+                  cardColor: card,
+                  dividerColor: dividerColor,
                   children: [
                     _MenuItem(
                       title: "الملاحظات",
@@ -426,8 +428,6 @@ class AyahOptionsSheet extends StatelessWidget {
                             },
                     ),
                   ],
-                  cardColor: card,
-                  dividerColor: dividerColor,
                 ),
 
                 const SizedBox(height: 6),

@@ -187,7 +187,7 @@ class _AyaIndexPageState extends State<AyaIndexPage>
         return ListView.separated(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
           itemCount: starred.length,
-          separatorBuilder: (_, __) => Divider(
+          separatorBuilder: (_, _) => Divider(
             height: 1,
             color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.06),
             indent: 20,
@@ -300,7 +300,7 @@ class _AyaIndexPageState extends State<AyaIndexPage>
 
         return ListView.separated(
           itemCount: bookmarks.length,
-          separatorBuilder: (_, __) => Divider(
+          separatorBuilder: (_, _) => Divider(
             height: 1,
             color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.06),
             indent: 20,

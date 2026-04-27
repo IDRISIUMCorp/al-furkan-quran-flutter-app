@@ -269,7 +269,7 @@ class _CollectionContentViewState extends State<CollectionContentView> {
         padding: const EdgeInsets.all(12.0),
         itemCount: widget.noteCollectionModel!.notes.length,
         itemBuilder: (context, index) {
-          NoteModel noteModel = widget.noteCollectionModel!.notes[index];
+          final NoteModel noteModel = widget.noteCollectionModel!.notes[index];
           return _buildNoteItem(noteModel, context);
         },
         separatorBuilder: (context, index) => const Gap(0),

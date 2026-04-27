@@ -18,11 +18,11 @@ class QuranHistoryCubit extends Cubit<QuranHistoryState> {
       );
 
   void addHistory({required String ayahKey, int? pageNumber}) {
-    List<HistoryElement> history = state.history;
-    HistoryElement? lastHistory =
+    final List<HistoryElement> history = state.history;
+    final HistoryElement? lastHistory =
         state.history.isEmpty ? null : state.history.last;
-    int ayahNumber = int.parse(ayahKey.split(":")[1]);
-    int surahNumber = int.parse(ayahKey.split(":")[0]);
+    final int ayahNumber = int.parse(ayahKey.split(":")[1]);
+    final int surahNumber = int.parse(ayahKey.split(":")[0]);
     if (lastHistory != null &&
         surahNumber == lastHistory.surahNumber &&
         DateTime.fromMillisecondsSinceEpoch(
