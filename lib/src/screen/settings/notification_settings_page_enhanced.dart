@@ -721,7 +721,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
                 Switch.adaptive(
                   value: enabled,
                   onChanged: onToggle,
-                  activeColor: primary,
+                  activeThumbColor: primary,
                 ),
               ],
             ),
@@ -1558,7 +1558,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
         Switch.adaptive(
           value: value,
           onChanged: onChanged,
-          activeColor: primary,
+          activeThumbColor: primary,
         ),
       ],
     );

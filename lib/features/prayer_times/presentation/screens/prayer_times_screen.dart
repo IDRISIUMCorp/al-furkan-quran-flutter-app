@@ -999,7 +999,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen>
                             ? PrayerThemeColors.green
                             : PrayerThemeColors.textMuted,
                       ),
-                      activeColor: PrayerThemeColors.green,
+                      activeThumbColor: PrayerThemeColors.green,
                       contentPadding: EdgeInsets.zero,
                     ),
                   ),
@@ -1026,7 +1026,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen>
                             ? PrayerThemeColors.gold
                             : PrayerThemeColors.textMuted,
                       ),
-                      activeColor: PrayerThemeColors.gold,
+                      activeThumbColor: PrayerThemeColors.gold,
                       contentPadding: EdgeInsets.zero,
                     ),
                   ),

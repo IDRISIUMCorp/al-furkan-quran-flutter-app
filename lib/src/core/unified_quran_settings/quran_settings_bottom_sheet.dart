@@ -553,7 +553,7 @@ class _SwitchTile extends StatelessWidget {
         children: [
           Switch.adaptive(
             value: value,
-            activeColor: primary,
+            activeThumbColor: primary,
             onChanged: onChanged,
           ),
           const Gap(10),

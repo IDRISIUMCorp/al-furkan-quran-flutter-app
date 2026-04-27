@@ -468,7 +468,7 @@ extension ImageCustomizationTabs on State {
           ),
           Switch(
             value: value,
-            activeColor: SunnahTheme.green,
+            activeThumbColor: SunnahTheme.green,
             onChanged: onChanged,
           ),
         ],

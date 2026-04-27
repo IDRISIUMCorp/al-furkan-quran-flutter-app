@@ -832,7 +832,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
                 children: [
                   Switch(
                     value: _reminderEnabled,
-                    activeColor: themeState.primary,
+                    activeThumbColor: themeState.primary,
                     onChanged: (v) async {
                       await _setReminderEnabled(v);
                     },

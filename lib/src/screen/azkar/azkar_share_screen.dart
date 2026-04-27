@@ -2649,7 +2649,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
           const Spacer(),
           Switch.adaptive(
             value: value,
-            activeColor: primary,
+            activeThumbColor: primary,
             activeTrackColor: primary.withValues(alpha: 0.3),
             onChanged: (val) {
               HapticFeedback.lightImpact();

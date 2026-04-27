@@ -1073,7 +1073,7 @@ class _PremiumOnboardingScreenState extends State<PremiumOnboardingScreen> {
           const Gap(10),
           Switch.adaptive(
             value: value,
-            activeColor: themeState.primary,
+            activeThumbColor: themeState.primary,
             onChanged: onChanged,
           ),
         ],

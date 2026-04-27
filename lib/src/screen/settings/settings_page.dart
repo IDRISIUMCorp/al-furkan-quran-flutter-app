@@ -189,7 +189,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
                                   isDark: isDark,
                                   trailing: Switch(
                                     value: hifzState.isActive,
-                                    activeColor: themeState.primary,
+                                    activeThumbColor: themeState.primary,
                                     onChanged: (_) => context.read<HifzCubit>().toggleHifz(),
                                   ),
                                   onTap: () => _showHifzSettings(context, themeState, isDark),
@@ -210,7 +210,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
                                   isDark: isDark,
                                   trailing: Switch(
                                     value: nightState.isActive,
-                                    activeColor: themeState.primary,
+                                    activeThumbColor: themeState.primary,
                                     onChanged: (_) => context.read<NightReadingCubit>().toggle(),
                                   ),
                                   onTap: () => _showNightSettings(context, themeState, isDark),
@@ -441,7 +441,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
             Switch.adaptive(
               value: _autoScrollEnabled,
               onChanged: (v) => setState(() => _autoScrollEnabled = v),
-              activeColor: themeState.primary,
+              activeThumbColor: themeState.primary,
             ),
           ],
         ),
@@ -517,7 +517,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
                   title: Text("وضع الاختبار", style: TextStyle(color: isDark ? const Color(0xFFF8F9FA) : const Color(0xFF212529), fontWeight: FontWeight.w600)),
                   subtitle: Text("اضغط على الآية لإظهارها", style: TextStyle(color: isDark ? const Color(0xFFADB5BD) : const Color(0xFF495057), fontSize: 12)),
                   value: state.isTestMode,
-                  activeColor: themeState.primary,
+                  activeThumbColor: themeState.primary,
                   onChanged: (_) => context.read<HifzCubit>().toggleTestMode(),
                 ),
               ),
@@ -568,7 +568,7 @@ class _SettingsPageState extends State<SettingsPage> with SingleTickerProviderSt
                     SwitchListTile(
                       title: Text("تفعيل تلقائي عند الغروب", style: TextStyle(color: isDark ? const Color(0xFFF8F9FA) : const Color(0xFF212529), fontWeight: FontWeight.w600)),
                       value: state.autoAtSunset,
-                      activeColor: themeState.primary,
+                      activeThumbColor: themeState.primary,
                       onChanged: (_) => context.read<NightReadingCubit>().setAutoAtSunset(!state.autoAtSunset),
                     ),
                   ],

@@ -1494,7 +1494,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
               ),
               Switch.adaptive(
                 value: _notifEnabled,
-                activeColor: _primaryGreen,
+                activeThumbColor: _primaryGreen,
                 onChanged: !_notifLoaded
                     ? null
                     : (value) async {

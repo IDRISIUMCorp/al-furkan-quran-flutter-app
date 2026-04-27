@@ -1057,7 +1057,7 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
         Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: SunnahTheme.green,
+          activeThumbColor: SunnahTheme.green,
         ),
       ],
     );
