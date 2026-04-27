@@ -326,9 +326,10 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
   }
 
   Future<void> _refreshLocation() async {
+    final cubit = context.read<LocationQiblaPrayerDataCubit>();
     final permission = await Permission.location.status;
     if (permission.isGranted) {
-      await context.read<LocationQiblaPrayerDataCubit>().getLocation();
+      await cubit.getLocation();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -1169,6 +1170,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
     );
     
     if (result != null) {
+      if (!mounted) return;
       context.read<LocationQiblaPrayerDataCubit>().saveMadhab(result);
     }
   }
@@ -1308,6 +1310,7 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
     );
     
     if (result != null) {
+      if (!mounted) return;
       context.read<LocationQiblaPrayerDataCubit>().saveCalculationMethod(
         getCalculationParameters(result),
       );
