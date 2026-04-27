@@ -827,6 +827,7 @@ class _AudioControllerUiState extends State<AudioControllerUi>
       instantPlay: true,
     );
     if (mounted) {
+      // ignore: use_build_context_synchronously
       context.read<AyahKeyCubit>().changeCurrentAyahKey("$prevSurah:1");
     }
   }
@@ -847,6 +848,7 @@ class _AudioControllerUiState extends State<AudioControllerUi>
       instantPlay: true,
     );
     if (mounted) {
+      // ignore: use_build_context_synchronously
       context.read<AyahKeyCubit>().changeCurrentAyahKey("$nextSurah:1");
     }
   }

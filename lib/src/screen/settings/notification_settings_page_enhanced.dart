@@ -281,6 +281,7 @@ class _NotificationSettingsPageEnhancedState extends State<NotificationSettingsP
           onPressed: () async {
             await _svc.sendTestNotification();
             if (!mounted) return;
+            // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(

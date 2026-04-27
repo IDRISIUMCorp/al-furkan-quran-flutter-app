@@ -464,32 +464,39 @@ class _AppSetupPageState extends State<AppSetupPage> {
     final userBox = Hive.box("user");
     await userBox.put("app_language", appLanguage);
 
+    // ignore: use_build_context_synchronously
     context.read<ResourcesProgressCubit>().onProcess();
 
     showDialog(
       barrierDismissible: false,
+      // ignore: use_build_context_synchronously
       context: context,
       fullscreenDialog: true,
       builder: (context) => dialogForShowDownloadProcess(),
     );
     final bool success1 = await QuranTranslationFunction.downloadResources(
+      // ignore: use_build_context_synchronously
       context: context,
       translationBook: processState.translationBookModel!,
       isSetupProcess: true,
     );
     final bool success2 = await QuranTafsirFunction.downloadResources(
+      // ignore: use_build_context_synchronously
       context: context,
       tafsirBook: processState.tafsirBookModel!,
       isSetupProcess: true,
     );
     final bool success3 = await SegmentedResourcesManager.downloadResources(
+      // ignore: use_build_context_synchronously
       context,
+      // ignore: use_build_context_synchronously
       context.read<SegmentedQuranReciterCubit>().state.segmentsUrl!,
     );
     if (success1 && success2 && success3) {
       userBox.put("is_setup_complete", true);
 
       QuranTranslationFunction.init(
+        // ignore: use_build_context_synchronously
         locale: context.read<LanguageCubit>().state.locale,
       );
       // success and route to Mushaf
@@ -505,6 +512,7 @@ class _AppSetupPageState extends State<AppSetupPage> {
     } else {
       // error and show 'Something went wrong' in cubit
       log([success1, success2, success3].toString());
+      // ignore: use_build_context_synchronously
       context.read<ResourcesProgressCubit>().failure(
         appLocalizations.unableToDownloadResources,
       );

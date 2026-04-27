@@ -99,10 +99,12 @@ class _LocationAcquireState extends State<LocationAcquire> {
                           if (permission == LocationPermission.whileInUse || permission == LocationPermission.always) {
                             final Position position = await Geolocator.getCurrentPosition();
                             if (!mounted) return;
+                            // ignore: use_build_context_synchronously
                             context.read<LocationQiblaPrayerDataCubit>().saveLocationData(
                               LatLon(latitude: position.latitude, longitude: position.longitude),
                               save: !widget.backToPage,
                             );
+                            // ignore: use_build_context_synchronously
                             if (widget.backToPage) Navigator.pop(context);
                           }
                         } catch (e) {
@@ -169,6 +171,7 @@ class _LocationAcquireState extends State<LocationAcquire> {
                         ),
                       );
                       if (widget.backToPage && mounted) {
+                        // ignore: use_build_context_synchronously
                         Navigator.pop(context);
                       }
                     },

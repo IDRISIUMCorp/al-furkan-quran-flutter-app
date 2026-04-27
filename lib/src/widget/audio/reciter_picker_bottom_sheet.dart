@@ -122,6 +122,7 @@ class _ReciterPickerBottomSheetState extends State<ReciterPickerBottomSheet>
       await AudioPlayerManager.audioPlayer.stop();
       await AudioPlayerManager.audioPlayer.clearAudioSources();
 
+      // ignore: use_build_context_synchronously
       final newReciter = context.read<SegmentedQuranReciterCubit>().state;
       final shouldPlay = wasPlaying;
 
@@ -144,6 +145,7 @@ class _ReciterPickerBottomSheetState extends State<ReciterPickerBottomSheet>
       }
     }
 
+    // ignore: use_build_context_synchronously
     if (context.mounted) Navigator.pop(context);
   }
 

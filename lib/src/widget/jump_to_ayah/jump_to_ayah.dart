@@ -380,6 +380,7 @@ class _JumpToAyahViewState extends State<JumpToAyahView> {
 
                     final List quranScriptWord =
                         QuranScriptFunction.getWordListOfAyah(
+                          // ignore: use_build_context_synchronously
                           context.read<QuranViewCubit>().state.quranScriptType,
                           ayahKey.split(":").first,
                           ayahKey.split(":").last,
@@ -394,10 +395,12 @@ class _JumpToAyahViewState extends State<JumpToAyahView> {
                       });
                     }
                     text +=
+                        // ignore: use_build_context_synchronously
                         "${getSurahName(context, surahInfoModel.id)} - $ayahKey\n\n${getPlainTextAyahFromTajweedWords(List<String>.from(quranScriptWord))}\n\nTranslation:\n$translationString\n";
                   }
 
                   await SharePlus.instance.share(ShareParams(text: text));
+                  // ignore: use_build_context_synchronously
                   Navigator.pop(context);
                 },
                 icon: const Icon(FluentIcons.textbox_16_regular),

@@ -479,6 +479,7 @@ class _MushafRootState extends State<_MushafRoot> {
                         const Duration(milliseconds: 80),
                       );
                       if (!_mushafPageController.hasClients) {
+                        // ignore: use_build_context_synchronously
                         context.read<AyahKeyCubit>().changeLastScrolledPage(
                           page,
                         );
@@ -489,6 +490,7 @@ class _MushafRootState extends State<_MushafRoot> {
                         duration: const Duration(milliseconds: 520),
                         curve: Curves.easeOutCubic,
                       );
+                      // ignore: use_build_context_synchronously
                       context.read<AyahKeyCubit>().changeLastScrolledPage(page);
                       return;
                     }
@@ -503,10 +505,14 @@ class _MushafRootState extends State<_MushafRoot> {
                     );
 
                     final page = getPageNumber(key) ?? 1;
+                    // ignore: use_build_context_synchronously
                     context.read<AyahKeyCubit>().changeLastScrolledPage(page);
+                    // ignore: use_build_context_synchronously
                     final isAudioPlaying = context.read<AudioAyahHighlightCubit>().state.activeAyahKey != null;
                     if (!isAudioPlaying) {
+                      // ignore: use_build_context_synchronously
                       context.read<AyahKeyCubit>().changeCurrentAyahKey(key);
+                      // ignore: use_build_context_synchronously
                       context.read<AyahToHighlight>().changeAyah(key);
                     }
 

@@ -325,7 +325,9 @@ class WahyFeedbackDialogState extends State<WahyFeedbackDialog> {
 
       final ok = await _sendToTelegram(payload.toString());
       if (ok && context.mounted) {
+        // ignore: use_build_context_synchronously
         Navigator.pop(context);
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: Colors.green,
@@ -336,6 +338,7 @@ class WahyFeedbackDialogState extends State<WahyFeedbackDialog> {
       }
 
       if (context.mounted) {
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: Colors.red,

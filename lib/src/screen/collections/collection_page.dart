@@ -187,6 +187,7 @@ class _CollectionPageState extends State<CollectionPage> {
                                       current.name,
                                     );
                                     await _fetchData();
+                                    // ignore: use_build_context_synchronously
                                     Navigator.pop(context);
                                   },
                                   leading: Icon(
@@ -402,6 +403,7 @@ class _CollectionPageState extends State<CollectionPage> {
                                       pinnedCollectionModel,
                                     );
                                     await _fetchData();
+                                    // ignore: use_build_context_synchronously
                                     Navigator.pop(context);
                                     Fluttertoast.showToast(
                                       msg: l10n.updatedTo(
@@ -553,6 +555,7 @@ class _CollectionPageState extends State<CollectionPage> {
                                       noteCollectionModel,
                                     );
                                     await _fetchData();
+                                    // ignore: use_build_context_synchronously
                                     Navigator.pop(context);
                                     Fluttertoast.showToast(
                                       msg: l10n.updatedTo(

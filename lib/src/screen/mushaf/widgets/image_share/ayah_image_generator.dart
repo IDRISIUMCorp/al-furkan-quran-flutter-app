@@ -178,6 +178,7 @@ class AyahImageGenerator {
       return;
     }
 
+    // ignore: use_build_context_synchronously
     final boundary = ctx.findRenderObject() as RenderRepaintBoundary;
     final image = await boundary.toImage(pixelRatio: 3.0);
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
@@ -413,6 +414,7 @@ class AyahImageGenerator {
 
     final ctx = cardKey.currentContext;
     if (ctx == null) return;
+    // ignore: use_build_context_synchronously
     final boundary = ctx.findRenderObject() as RenderRepaintBoundary;
     final image = await boundary.toImage(pixelRatio: 3.0);
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);

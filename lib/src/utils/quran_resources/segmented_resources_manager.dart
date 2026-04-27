@@ -156,12 +156,14 @@ class SegmentedResourcesManager {
     if (await isAlreadyDownloaded(url)) {
       return true;
     } else {
+      // ignore: use_build_context_synchronously
       final AppLocalizations appLocalizations = AppLocalizations.of(context);
       url = ApisUrls.base + url;
       final response = await dio.Dio().get(url);
       final String boxName = praseStringToBoxName(url);
       if (response.statusCode == 200) {
         _segmentsBox = await Hive.openBox(boxName);
+        // ignore: use_build_context_synchronously
         context.read<ResourcesProgressCubit>().updateProgress(
           null,
           appLocalizations.processingSegmentedQuranRecitation,
@@ -176,6 +178,7 @@ class SegmentedResourcesManager {
         }
         await _segmentsBox?.put(
           _metaKey,
+          // ignore: use_build_context_synchronously
           context.read<SegmentedQuranReciterCubit>().state.toJson(),
         );
         await changeSelectedBox(praseStringToBoxName(url));

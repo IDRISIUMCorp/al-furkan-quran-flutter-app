@@ -41,6 +41,7 @@ class _AddressSelectionState extends State<AddressSelection> {
 
       if (response.statusCode == 200) {
         final Map locationResources = jsonDecode(decodeBZip2String(response.body));
+        // ignore: use_build_context_synchronously
         context.read<ManualLocationSelectionCubit>().changeData(
           locationData: locationResources,
           isLoading: false,
@@ -48,6 +49,7 @@ class _AddressSelectionState extends State<AddressSelection> {
           isSuccess: true,
         );
       } else {
+        // ignore: use_build_context_synchronously
         context.read<ManualLocationSelectionCubit>().changeData(
           isLoading: false,
           isError: true,
@@ -55,6 +57,7 @@ class _AddressSelectionState extends State<AddressSelection> {
         );
       }
     } catch (e) {
+      // ignore: use_build_context_synchronously
       context.read<ManualLocationSelectionCubit>().changeData(
         isLoading: false,
         isError: true,

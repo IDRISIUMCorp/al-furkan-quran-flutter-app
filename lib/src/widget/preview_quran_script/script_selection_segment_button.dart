@@ -42,6 +42,7 @@ Widget getScriptSelectionSegmentedButtons(BuildContext context) {
                     "user",
                   ).put("selected_script", value.first.name);
                   await QuranScriptFunction.initQuranScript(value.first);
+                  // ignore: use_build_context_synchronously
                   context.read<QuranViewCubit>().changeQuranScriptType(
                     value.first,
                   );

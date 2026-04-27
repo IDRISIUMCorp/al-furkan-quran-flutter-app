@@ -173,6 +173,7 @@ class _QuranScriptViewState extends State<QuranScriptView> {
           event.current == scrolledAyahOnAudioPlay) {
         return;
       }
+      // ignore: use_build_context_synchronously
       final isHorizontal = context
           .read<AyahByAyahInScrollInfoCubit>()
           .state

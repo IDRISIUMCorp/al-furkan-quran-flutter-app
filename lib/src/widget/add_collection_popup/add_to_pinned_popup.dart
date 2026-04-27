@@ -68,6 +68,7 @@ Future<void> addAyahToFavoritesPinned(BuildContext context, String ayahKey) asyn
   }
 
   Fluttertoast.showToast(
+    // ignore: use_build_context_synchronously
     msg: AppLocalizations.of(context).pinnedSavedSuccessfully,
   );
 }

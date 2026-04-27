@@ -789,7 +789,9 @@ class _OfflinePlayerScreenState extends State<OfflinePlayerScreen>
     if (shouldNavigate == null) return;
 
     // Switch to this reciter first
+    // ignore: use_build_context_synchronously
     await context.read<SegmentedQuranReciterCubit>().changeReciter(
+          // ignore: use_build_context_synchronously
           context,
           info.reciter,
         );

@@ -19,6 +19,7 @@ Future<void> showBugReportDialog(BuildContext context) async {
   final String deviceInfoString = await _getDeviceInfoString(deviceInfo);
   final String appInfoString = _getAppInfoString(packageInfo);
   await showModalBottomSheet(
+    // ignore: use_build_context_synchronously
     context: context,
     builder: (context) {
       return Container(
@@ -91,6 +92,7 @@ Future<void> showBugReportDialog(BuildContext context) async {
                   }),
                 );
                 if (!await launchUrl(emailLaunchUri)) {}
+                // ignore: use_build_context_synchronously
                 Navigator.pop(context);
               },
               minTileHeight: 40,
@@ -110,6 +112,7 @@ Future<void> showBugReportDialog(BuildContext context) async {
                 // It's not straightforward to prefill messages in Discord channels via URL.
                 // This will just open the channel. User needs to paste the info manually.
                 if (!await launchUrl(discordUrl)) {}
+                // ignore: use_build_context_synchronously
                 Navigator.pop(context);
               },
               minTileHeight: 40,
@@ -128,6 +131,7 @@ Future<void> showBugReportDialog(BuildContext context) async {
                 // It's not straightforward to prefill messages in Discord channels via URL.
                 // This will just open the channel. User needs to paste the info manually.
                 if (!await launchUrl(discordUrl)) {}
+                // ignore: use_build_context_synchronously
                 Navigator.pop(context);
               },
               minTileHeight: 40,

@@ -453,6 +453,7 @@ class QuranTranslationFunction {
           null,
           "Downloading Surah's Info (${translationBook.language})",
         );
+        // ignore: use_build_context_synchronously
         await downloadSurahInfo(context.read<LanguageCubit>().state.locale);
       } else {
         log(

@@ -647,6 +647,7 @@ extension _MushafShareExtension on _MushafViewState {
     required Future<String?> Function() loadTafsir,
   }) async {
     await AyahImageGenerator.shareLibraryAsImage(
+      // ignore: use_build_context_synchronously
       context: context,
       surahNumber: surahNumber,
       verseNumber: verseNumber,
