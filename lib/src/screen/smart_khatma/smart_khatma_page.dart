@@ -128,7 +128,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
   String _formatTimeForUi(TimeOfDay t) {
     final h12 = (t.hourOfPeriod == 0 ? 12 : t.hourOfPeriod);
     final mm = t.minute.toString().padLeft(2, "0");
-    final suffix = t.period == DayPeriod.am ? "ص" : "م";
+    final suffix = t.period == DayPeriod.am ? "Ã˜Âµ" : "Ã™â€¦";
     return "${localizedNumber(context, h12)}:$mm $suffix";
   }
 
@@ -257,16 +257,16 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           backgroundColor: Theme.of(context).colorScheme.surface,
-          title: const Text("حذف الختمة", style: TextStyle(fontWeight: FontWeight.bold)),
-          content: const Text("هل أنت متأكد من حذف الختمة الحالية ومسح جميع بيانات تقدمك؟"),
+          title: const Text("Ã˜Â­Ã˜Â°Ã™Â Ã˜Â§Ã™â€žÃ˜Â®Ã˜ÂªÃ™â€¦Ã˜Â©", style: TextStyle(fontWeight: FontWeight.bold)),
+          content: const Text("Ã™â€¡Ã™â€ž Ã˜Â£Ã™â€ Ã˜Âª Ã™â€¦Ã˜ÂªÃ˜Â£Ã™Æ’Ã˜Â¯ Ã™â€¦Ã™â€  Ã˜Â­Ã˜Â°Ã™Â Ã˜Â§Ã™â€žÃ˜Â®Ã˜ÂªÃ™â€¦Ã˜Â© Ã˜Â§Ã™â€žÃ˜Â­Ã˜Â§Ã™â€žÃ™Å Ã˜Â© Ã™Ë†Ã™â€¦Ã˜Â³Ã˜Â­ Ã˜Â¬Ã™â€¦Ã™Å Ã˜Â¹ Ã˜Â¨Ã™Å Ã˜Â§Ã™â€ Ã˜Â§Ã˜Âª Ã˜ÂªÃ™â€šÃ˜Â¯Ã™â€¦Ã™Æ’Ã˜Å¸"),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text("إلغاء", style: TextStyle(color: Colors.grey)),
+              child: const Text("Ã˜Â¥Ã™â€žÃ˜ÂºÃ˜Â§Ã˜Â¡", style: TextStyle(color: Colors.grey)),
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text("حذف", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              child: const Text("Ã˜Â­Ã˜Â°Ã™Â", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -305,7 +305,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
     final es = int.tryParse(ep.first) ?? 1;
     final ev = int.tryParse(ep.last) ?? 1;
 
-    return "من ${getSurahNameArabic(ss)}: ${localizedNumber(context, sv)}\nإلى ${getSurahNameArabic(es)}: ${localizedNumber(context, ev)}";
+    return "Ã™â€¦Ã™â€  ${getSurahNameArabic(ss)}: ${localizedNumber(context, sv)}\nÃ˜Â¥Ã™â€žÃ™â€° ${getSurahNameArabic(es)}: ${localizedNumber(context, ev)}";
   }
 
   Widget _topTitle(String title, {VoidCallback? onBack}) {
@@ -329,7 +329,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
                 Icons.menu_rounded,
                 color: themeState.primary,
               ),
-              tooltip: "القائمة الرئيسية",
+              tooltip: "Ã˜Â§Ã™â€žÃ™â€šÃ˜Â§Ã˜Â¦Ã™â€¦Ã˜Â© Ã˜Â§Ã™â€žÃ˜Â±Ã˜Â¦Ã™Å Ã˜Â³Ã™Å Ã˜Â©",
             ),
           Expanded(
             child: Text(
@@ -375,7 +375,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 26),
             child: Text(
-              "حدد وردك اليومي أو المدة التي تريد ختم القرآن فيها، وتابع ختمتك في شهر رمضان وطوال العام.",
+              "Ã˜Â­Ã˜Â¯Ã˜Â¯ Ã™Ë†Ã˜Â±Ã˜Â¯Ã™Æ’ Ã˜Â§Ã™â€žÃ™Å Ã™Ë†Ã™â€¦Ã™Å  Ã˜Â£Ã™Ë† Ã˜Â§Ã™â€žÃ™â€¦Ã˜Â¯Ã˜Â© Ã˜Â§Ã™â€žÃ˜ÂªÃ™Å  Ã˜ÂªÃ˜Â±Ã™Å Ã˜Â¯ Ã˜Â®Ã˜ÂªÃ™â€¦ Ã˜Â§Ã™â€žÃ™â€šÃ˜Â±Ã˜Â¢Ã™â€  Ã™ÂÃ™Å Ã™â€¡Ã˜Â§Ã˜Å’ Ã™Ë†Ã˜ÂªÃ˜Â§Ã˜Â¨Ã˜Â¹ Ã˜Â®Ã˜ÂªÃ™â€¦Ã˜ÂªÃ™Æ’ Ã™ÂÃ™Å  Ã˜Â´Ã™â€¡Ã˜Â± Ã˜Â±Ã™â€¦Ã˜Â¶Ã˜Â§Ã™â€  Ã™Ë†Ã˜Â·Ã™Ë†Ã˜Â§Ã™â€ž Ã˜Â§Ã™â€žÃ˜Â¹Ã˜Â§Ã™â€¦.",
               textAlign: TextAlign.center,
               style: TextStyle(
                 height: 1.7,
@@ -401,7 +401,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
                 ),
                 onPressed: () => setState(() => _step = _WahyKhatmaStep.newKhatma),
                 child: const Text(
-                  "بدء ختمة جديدة",
+                  "Ã˜Â¨Ã˜Â¯Ã˜Â¡ Ã˜Â®Ã˜ÂªÃ™â€¦Ã˜Â© Ã˜Â¬Ã˜Â¯Ã™Å Ã˜Â¯Ã˜Â©",
                   style: TextStyle(fontWeight: FontWeight.w900),
                 ),
               ),
@@ -420,14 +420,14 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
         ),
         children: [
           _topTitle(
-            "ختمة جديدة",
+            "Ã˜Â®Ã˜ÂªÃ™â€¦Ã˜Â© Ã˜Â¬Ã˜Â¯Ã™Å Ã˜Â¯Ã˜Â©",
             onBack: () => setState(() => _step = _WahyKhatmaStep.empty),
           ),
           const Gap(6),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 18),
             child: Text(
-              "ختمة مقترحة",
+              "Ã˜Â®Ã˜ÂªÃ™â€¦Ã˜Â© Ã™â€¦Ã™â€šÃ˜ÂªÃ˜Â±Ã˜Â­Ã˜Â©",
               style: TextStyle(
                 fontWeight: FontWeight.w900,
                 color: isDark ? Colors.white60 : Colors.black45,
@@ -438,11 +438,11 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
             ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               title: const Text(
-                "ختمة شهر (29 يوماً)",
+                "Ã˜Â®Ã˜ÂªÃ™â€¦Ã˜Â© Ã˜Â´Ã™â€¡Ã˜Â± (29 Ã™Å Ã™Ë†Ã™â€¦Ã˜Â§Ã™â€¹)",
                 style: TextStyle(fontWeight: FontWeight.w900),
               ),
               subtitle: Text(
-                "الورد اليومي: ${localizedNumber(context, 21)} صفحة تقريباً",
+                "Ã˜Â§Ã™â€žÃ™Ë†Ã˜Â±Ã˜Â¯ Ã˜Â§Ã™â€žÃ™Å Ã™Ë†Ã™â€¦Ã™Å : ${localizedNumber(context, 21)} Ã˜ÂµÃ™ÂÃ˜Â­Ã˜Â© Ã˜ÂªÃ™â€šÃ˜Â±Ã™Å Ã˜Â¨Ã˜Â§Ã™â€¹",
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                   color: isDark ? Colors.white60 : Colors.black45,
@@ -458,7 +458,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 18),
             child: Text(
-              "أخرى",
+              "Ã˜Â£Ã˜Â®Ã˜Â±Ã™â€°",
               style: TextStyle(
                 fontWeight: FontWeight.w900,
                 color: isDark ? Colors.white60 : Colors.black45,
@@ -470,7 +470,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
               children: [
                 ListTile(
                   title: const Text(
-                    "ختمة مقسمة بالمعنى",
+                    "Ã˜Â®Ã˜ÂªÃ™â€¦Ã˜Â© Ã™â€¦Ã™â€šÃ˜Â³Ã™â€¦Ã˜Â© Ã˜Â¨Ã˜Â§Ã™â€žÃ™â€¦Ã˜Â¹Ã™â€ Ã™â€°",
                     style: TextStyle(fontWeight: FontWeight.w900),
                   ),
                   onTap: () {
@@ -481,7 +481,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
                 const Divider(height: 1),
                 ListTile(
                   title: const Text(
-                    "ختمة مقسمة بالأجزاء والأرباع",
+                    "Ã˜Â®Ã˜ÂªÃ™â€¦Ã˜Â© Ã™â€¦Ã™â€šÃ˜Â³Ã™â€¦Ã˜Â© Ã˜Â¨Ã˜Â§Ã™â€žÃ˜Â£Ã˜Â¬Ã˜Â²Ã˜Â§Ã˜Â¡ Ã™Ë†Ã˜Â§Ã™â€žÃ˜Â£Ã˜Â±Ã˜Â¨Ã˜Â§Ã˜Â¹",
                     style: TextStyle(fontWeight: FontWeight.w900),
                   ),
                   onTap: () {
@@ -504,7 +504,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
         ),
         children: [
           _topTitle(
-            "برنامج الختمة",
+            "Ã˜Â¨Ã˜Â±Ã™â€ Ã˜Â§Ã™â€¦Ã˜Â¬ Ã˜Â§Ã™â€žÃ˜Â®Ã˜ÂªÃ™â€¦Ã˜Â©",
             onBack: () => setState(() => _step = _WahyKhatmaStep.newKhatma),
           ),
           _card(
@@ -512,11 +512,11 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
               children: [
                 ListTile(
                   title: const Text(
-                    "ختمة شهرين (60 يوماً)",
+                    "Ã˜Â®Ã˜ÂªÃ™â€¦Ã˜Â© Ã˜Â´Ã™â€¡Ã˜Â±Ã™Å Ã™â€  (60 Ã™Å Ã™Ë†Ã™â€¦Ã˜Â§Ã™â€¹)",
                     style: TextStyle(fontWeight: FontWeight.w900),
                   ),
                   subtitle: Text(
-                    "الورد اليومي: ${localizedNumber(context, 10)} صفحات تقريباً",
+                    "Ã˜Â§Ã™â€žÃ™Ë†Ã˜Â±Ã˜Â¯ Ã˜Â§Ã™â€žÃ™Å Ã™Ë†Ã™â€¦Ã™Å : ${localizedNumber(context, 10)} Ã˜ÂµÃ™ÂÃ˜Â­Ã˜Â§Ã˜Âª Ã˜ÂªÃ™â€šÃ˜Â±Ã™Å Ã˜Â¨Ã˜Â§Ã™â€¹",
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       color: isDark ? Colors.white60 : Colors.black45,
@@ -530,11 +530,11 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
                 const Divider(height: 1),
                 ListTile(
                   title: const Text(
-                    "ختمة شهر (29 يوماً)",
+                    "Ã˜Â®Ã˜ÂªÃ™â€¦Ã˜Â© Ã˜Â´Ã™â€¡Ã˜Â± (29 Ã™Å Ã™Ë†Ã™â€¦Ã˜Â§Ã™â€¹)",
                     style: TextStyle(fontWeight: FontWeight.w900),
                   ),
                   subtitle: Text(
-                    "الورد اليومي: ${localizedNumber(context, 21)} صفحة تقريباً",
+                    "Ã˜Â§Ã™â€žÃ™Ë†Ã˜Â±Ã˜Â¯ Ã˜Â§Ã™â€žÃ™Å Ã™Ë†Ã™â€¦Ã™Å : ${localizedNumber(context, 21)} Ã˜ÂµÃ™ÂÃ˜Â­Ã˜Â© Ã˜ÂªÃ™â€šÃ˜Â±Ã™Å Ã˜Â¨Ã˜Â§Ã™â€¹",
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       color: isDark ? Colors.white60 : Colors.black45,
@@ -548,11 +548,11 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
                 const Divider(height: 1),
                 ListTile(
                   title: const Text(
-                    "ختمة أسبوع (7 أيام)",
+                    "Ã˜Â®Ã˜ÂªÃ™â€¦Ã˜Â© Ã˜Â£Ã˜Â³Ã˜Â¨Ã™Ë†Ã˜Â¹ (7 Ã˜Â£Ã™Å Ã˜Â§Ã™â€¦)",
                     style: TextStyle(fontWeight: FontWeight.w900),
                   ),
                   subtitle: Text(
-                    "الورد اليومي: ${localizedNumber(context, 5)} أجزاء تقريباً",
+                    "Ã˜Â§Ã™â€žÃ™Ë†Ã˜Â±Ã˜Â¯ Ã˜Â§Ã™â€žÃ™Å Ã™Ë†Ã™â€¦Ã™Å : ${localizedNumber(context, 5)} Ã˜Â£Ã˜Â¬Ã˜Â²Ã˜Â§Ã˜Â¡ Ã˜ÂªÃ™â€šÃ˜Â±Ã™Å Ã˜Â¨Ã˜Â§Ã™â€¹",
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       color: isDark ? Colors.white60 : Colors.black45,
@@ -579,7 +579,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
         ),
         children: [
           _topTitle(
-            "بدء الختمة من",
+            "Ã˜Â¨Ã˜Â¯Ã˜Â¡ Ã˜Â§Ã™â€žÃ˜Â®Ã˜ÂªÃ™â€¦Ã˜Â© Ã™â€¦Ã™â€ ",
             onBack: () => setState(() => _step = _WahyKhatmaStep.program),
           ),
           _card(
@@ -587,7 +587,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
               children: [
                 ListTile(
                   title: const Text(
-                    "بداية المصحف",
+                    "Ã˜Â¨Ã˜Â¯Ã˜Â§Ã™Å Ã˜Â© Ã˜Â§Ã™â€žÃ™â€¦Ã˜ÂµÃ˜Â­Ã™Â",
                     style: TextStyle(fontWeight: FontWeight.w900),
                   ),
                   onTap: () async {
@@ -598,7 +598,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
                 const Divider(height: 1),
                 ListTile(
                   title: const Text(
-                    "ورد محدد",
+                    "Ã™Ë†Ã˜Â±Ã˜Â¯ Ã™â€¦Ã˜Â­Ã˜Â¯Ã˜Â¯",
                     style: TextStyle(fontWeight: FontWeight.w900),
                   ),
                   onTap: () => setState(() => _step = _WahyKhatmaStep.allWirds),
@@ -659,7 +659,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
           bottom: 18 + MediaQuery.of(context).padding.bottom,
         ),
         children: [
-          _topTitle("إحصائيات الختمة"),
+          _topTitle("Ã˜Â¥Ã˜Â­Ã˜ÂµÃ˜Â§Ã˜Â¦Ã™Å Ã˜Â§Ã˜Âª Ã˜Â§Ã™â€žÃ˜Â®Ã˜ÂªÃ™â€¦Ã˜Â©"),
           _card(
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 28),
@@ -721,20 +721,20 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
                     spacing: 16,
                     runSpacing: 10,
                     children: [
-                       _LegendItem(color: Colors.green, label: "الختمة", value: "${(percentTotal * 100).toInt()}%", isDark: isDark),
-                       _LegendItem(color: Colors.deepOrange, label: "اليوم", value: percentDaily >= 1.0 ? "مكتمل" : "جاري", isDark: isDark),
-                       _LegendItem(color: Colors.blue, label: "الالتزام", value: "${(percentPacing * 100).toInt()}%", isDark: isDark),
+                       _LegendItem(color: Colors.green, label: "Ã˜Â§Ã™â€žÃ˜Â®Ã˜ÂªÃ™â€¦Ã˜Â©", value: "${(percentTotal * 100).toInt()}%", isDark: isDark),
+                       _LegendItem(color: Colors.deepOrange, label: "Ã˜Â§Ã™â€žÃ™Å Ã™Ë†Ã™â€¦", value: percentDaily >= 1.0 ? "Ã™â€¦Ã™Æ’Ã˜ÂªÃ™â€¦Ã™â€ž" : "Ã˜Â¬Ã˜Â§Ã˜Â±Ã™Å ", isDark: isDark),
+                       _LegendItem(color: Colors.blue, label: "Ã˜Â§Ã™â€žÃ˜Â§Ã™â€žÃ˜ÂªÃ˜Â²Ã˜Â§Ã™â€¦", value: "${(percentPacing * 100).toInt()}%", isDark: isDark),
                     ],
                   ),
                   const Gap(30),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _StatItem(title: "أيام باقية", value: "$daysRemaining", isDark: isDark),
+                      _StatItem(title: "Ã˜Â£Ã™Å Ã˜Â§Ã™â€¦ Ã˜Â¨Ã˜Â§Ã™â€šÃ™Å Ã˜Â©", value: "$daysRemaining", isDark: isDark),
                       Container(width: 1, height: 40, color: isDark ? Colors.white10 : Colors.black12),
-                      _StatItem(title: "صفحات قرأت", value: "$totalPagesRead", isDark: isDark),
+                      _StatItem(title: "Ã˜ÂµÃ™ÂÃ˜Â­Ã˜Â§Ã˜Âª Ã™â€šÃ˜Â±Ã˜Â£Ã˜Âª", value: "$totalPagesRead", isDark: isDark),
                       Container(width: 1, height: 40, color: isDark ? Colors.white10 : Colors.black12),
-                      _StatItem(title: "باقي (ص)", value: "$pagesRemaining", isDark: isDark, isPrimary: true, themeState: themeState),
+                      _StatItem(title: "Ã˜Â¨Ã˜Â§Ã™â€šÃ™Å  (Ã˜Âµ)", value: "$pagesRemaining", isDark: isDark, isPrimary: true, themeState: themeState),
                     ],
                   ),
                 ],
@@ -748,7 +748,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
               children: [
                 const Expanded(
                   child: Text(
-                    "ورد اليوم",
+                    "Ã™Ë†Ã˜Â±Ã˜Â¯ Ã˜Â§Ã™â€žÃ™Å Ã™Ë†Ã™â€¦",
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 16,
@@ -756,7 +756,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
                   ),
                 ),
                 Text(
-                  "أمس",
+                  "Ã˜Â£Ã™â€¦Ã˜Â³",
                   style: TextStyle(
                     fontWeight: FontWeight.w900,
                     fontSize: 16,
@@ -805,7 +805,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
                       onPressed: _markTodayDone,
                       icon: const Icon(Icons.check_circle_rounded),
                       label: const Text(
-                        "أكملت هذا الورد",
+                        "Ã˜Â£Ã™Æ’Ã™â€¦Ã™â€žÃ˜Âª Ã™â€¡Ã˜Â°Ã˜Â§ Ã˜Â§Ã™â€žÃ™Ë†Ã˜Â±Ã˜Â¯",
                         style: TextStyle(fontWeight: FontWeight.w900),
                       ),
                     ),
@@ -818,7 +818,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 18),
             child: Text(
-              "تذكير",
+              "Ã˜ÂªÃ˜Â°Ã™Æ’Ã™Å Ã˜Â±",
               style: TextStyle(
                 fontWeight: FontWeight.w900,
                 color: isDark ? Colors.white60 : Colors.black45,
@@ -860,7 +860,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
                   ),
                   const Gap(10),
                   Text(
-                    "الورد اليومي",
+                    "Ã˜Â§Ã™â€žÃ™Ë†Ã˜Â±Ã˜Â¯ Ã˜Â§Ã™â€žÃ™Å Ã™Ë†Ã™â€¦Ã™Å ",
                     style: TextStyle(
                       fontWeight: FontWeight.w800,
                       color: isDark ? Colors.white70 : Colors.black54,
@@ -872,7 +872,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
                         KhatmaNotificationService.instance.sendTestNotification();
                       },
                       icon: const Icon(Icons.notifications_active_outlined, size: 20, color: Colors.blue),
-                      tooltip: "تجرية الإشعار الآن",
+                      tooltip: "Ã˜ÂªÃ˜Â¬Ã˜Â±Ã™Å Ã˜Â© Ã˜Â§Ã™â€žÃ˜Â¥Ã˜Â´Ã˜Â¹Ã˜Â§Ã˜Â± Ã˜Â§Ã™â€žÃ˜Â¢Ã™â€ ",
                     ),
                 ],
               ),
@@ -884,7 +884,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
               children: [
                 ListTile(
                   title: const Text(
-                    "جميع الأوراد",
+                    "Ã˜Â¬Ã™â€¦Ã™Å Ã˜Â¹ Ã˜Â§Ã™â€žÃ˜Â£Ã™Ë†Ã˜Â±Ã˜Â§Ã˜Â¯",
                     style: TextStyle(fontWeight: FontWeight.w900),
                   ),
                   onTap: () => setState(() => _step = _WahyKhatmaStep.allWirds),
@@ -892,7 +892,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
                 const Divider(height: 1),
                 ListTile(
                   title: const Text(
-                    "حذف الختمة",
+                    "Ã˜Â­Ã˜Â°Ã™Â Ã˜Â§Ã™â€žÃ˜Â®Ã˜ÂªÃ™â€¦Ã˜Â©",
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
                       color: Colors.red,
@@ -918,7 +918,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
         itemBuilder: (c, i) {
           if (i == 0) {
             return _topTitle(
-              "بدء الختمة من",
+              "Ã˜Â¨Ã˜Â¯Ã˜Â¡ Ã˜Â§Ã™â€žÃ˜Â®Ã˜ÂªÃ™â€¦Ã˜Â© Ã™â€¦Ã™â€ ",
               onBack: () => setState(
                 () => _step = _enabled ? _WahyKhatmaStep.active : _WahyKhatmaStep.startFrom,
               ),
@@ -929,7 +929,7 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
             ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               title: Text(
-                "ورد اليوم ${localizedNumber(context, dayIdx + 1)}",
+                "Ã™Ë†Ã˜Â±Ã˜Â¯ Ã˜Â§Ã™â€žÃ™Å Ã™Ë†Ã™â€¦ ${localizedNumber(context, dayIdx + 1)}",
                 style: const TextStyle(fontWeight: FontWeight.w900),
               ),
               subtitle: Text(
@@ -992,57 +992,6 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
           color: Colors.transparent,
           child: current(),
         ),
-      ),
-    );
-  }
-}
-
-class _KeyValueRow extends StatelessWidget {
-  final String title;
-  final String value;
-  final ThemeState themeState;
-
-  const _KeyValueRow({
-    required this.title,
-    required this.value,
-    required this.themeState,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              title,
-              textDirection: TextDirection.rtl,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-                color: isDark ? Colors.white70 : Colors.black54,
-              ),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            decoration: BoxDecoration(
-              color: themeState.primary.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: themeState.primary.withValues(alpha: 0.20)),
-            ),
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w900,
-                color: themeState.primary,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -1157,155 +1106,5 @@ class _LegendItem extends StatelessWidget {
   }
 }
 
-class _PlanPicker extends StatelessWidget {
-  final ThemeState themeState;
-  final SmartKhatmaPlanPreset preset;
-  final int customDays;
-  final ValueChanged<SmartKhatmaPlanPreset> onPresetChanged;
-  final ValueChanged<int> onCustomDaysChanged;
 
-  const _PlanPicker({
-    required this.themeState,
-    required this.preset,
-    required this.customDays,
-    required this.onPresetChanged,
-    required this.onCustomDaysChanged,
-  });
 
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          "اختر خطة",
-          textDirection: TextDirection.rtl,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w900,
-            color: isDark ? Colors.white70 : Colors.black54,
-          ),
-        ),
-        const Gap(10),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            _PresetChip(
-              label: "رمضان (30 يوم)",
-              selected: preset == SmartKhatmaPlanPreset.ramadan30,
-              themeState: themeState,
-              onTap: () => onPresetChanged(SmartKhatmaPlanPreset.ramadan30),
-            ),
-            _PresetChip(
-              label: "20 يوم",
-              selected: preset == SmartKhatmaPlanPreset.days20,
-              themeState: themeState,
-              onTap: () => onPresetChanged(SmartKhatmaPlanPreset.days20),
-            ),
-            _PresetChip(
-              label: "10 أيام",
-              selected: preset == SmartKhatmaPlanPreset.days10,
-              themeState: themeState,
-              onTap: () => onPresetChanged(SmartKhatmaPlanPreset.days10),
-            ),
-            _PresetChip(
-              label: "مخصص",
-              selected: preset == SmartKhatmaPlanPreset.custom,
-              themeState: themeState,
-              onTap: () => onPresetChanged(SmartKhatmaPlanPreset.custom),
-            ),
-          ],
-        ),
-        if (preset == SmartKhatmaPlanPreset.custom) ...[
-          const Gap(12),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  "عدد الأيام",
-                  textDirection: TextDirection.rtl,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w900,
-                    color: isDark ? Colors.white70 : Colors.black54,
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 140,
-                child: TextFormField(
-                  initialValue: customDays.toString(),
-                  keyboardType: TextInputType.number,
-                  textDirection: TextDirection.rtl,
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    filled: true,
-                    fillColor: AppColors.ayaSurface,
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                    ),
-                  ),
-                  onChanged: (v) {
-                    final parsed = int.tryParse(v.trim());
-                    if (parsed == null) return;
-                    onCustomDaysChanged(parsed);
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-class _PresetChip extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final ThemeState themeState;
-  final VoidCallback onTap;
-
-  const _PresetChip({
-    required this.label,
-    required this.selected,
-    required this.themeState,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bg = selected
-        ? themeState.primary.withValues(alpha: 0.14)
-        : Colors.black.withValues(alpha: 0.04);
-    final border = selected
-        ? themeState.primary.withValues(alpha: 0.45)
-        : Colors.black.withValues(alpha: 0.08);
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(999),
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: border),
-        ),
-        child: Text(
-          label,
-          textDirection: TextDirection.rtl,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w900,
-            color: selected ? themeState.primary : AppColors.ayaTextMain,
-          ),
-        ),
-      ),
-    );
-  }
-}
