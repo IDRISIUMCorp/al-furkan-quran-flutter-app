@@ -379,10 +379,10 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
   }
 
   String _toHexAarrggbb(Color c) {
-    final a = c.alpha.toRadixString(16).padLeft(2, '0').toUpperCase();
-    final r = c.red.toRadixString(16).padLeft(2, '0').toUpperCase();
-    final g = c.green.toRadixString(16).padLeft(2, '0').toUpperCase();
-    final b = c.blue.toRadixString(16).padLeft(2, '0').toUpperCase();
+    final a = (c.a * 255.0).round().clamp(0, 255).toRadixString(16).padLeft(2, '0').toUpperCase();
+    final r = (c.r * 255.0).round().clamp(0, 255).toRadixString(16).padLeft(2, '0').toUpperCase();
+    final g = (c.g * 255.0).round().clamp(0, 255).toRadixString(16).padLeft(2, '0').toUpperCase();
+    final b = (c.b * 255.0).round().clamp(0, 255).toRadixString(16).padLeft(2, '0').toUpperCase();
     return '#$a$r$g$b';
   }
 
@@ -3187,10 +3187,10 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
   Color get _selectedColor => HSVColor.fromAHSV(_alpha, _hue, _saturation, _value).toColor();
 
   String _toHex(Color c) {
-    final a = c.alpha.toRadixString(16).padLeft(2, '0').toUpperCase();
-    final r = c.red.toRadixString(16).padLeft(2, '0').toUpperCase();
-    final g = c.green.toRadixString(16).padLeft(2, '0').toUpperCase();
-    final b = c.blue.toRadixString(16).padLeft(2, '0').toUpperCase();
+    final a = (c.a * 255.0).round().clamp(0, 255).toRadixString(16).padLeft(2, '0').toUpperCase();
+    final r = (c.r * 255.0).round().clamp(0, 255).toRadixString(16).padLeft(2, '0').toUpperCase();
+    final g = (c.g * 255.0).round().clamp(0, 255).toRadixString(16).padLeft(2, '0').toUpperCase();
+    final b = (c.b * 255.0).round().clamp(0, 255).toRadixString(16).padLeft(2, '0').toUpperCase();
     return '#$a$r$g$b';
   }
 
