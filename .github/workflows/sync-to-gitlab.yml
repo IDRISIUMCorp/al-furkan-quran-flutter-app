@@ -1,0 +1,22 @@
+name: Sync to GitLab
+
+on:
+  push:
+    branches:
+      - main # لو الـ branch الأساسي في جيت هب اسمه master، غير دي لـ master
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # مهم عشان يجيب كل تاريخ الكوميتس
+
+      - name: Push to GitLab
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: |
+          git remote add gitlab https://oauth2:${GITLAB_TOKEN}@gitlab.com/idris-ghamid/Al-Furkan.git
+          git push gitlab main # لو الـ branch اسمه master، غير دي لـ master
