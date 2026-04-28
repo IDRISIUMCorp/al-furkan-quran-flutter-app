@@ -14,7 +14,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:al_furkan/src/theme/controller/theme_cubit.dart';
 import 'package:al_furkan/src/screen/azkar/widgets/azkar_share_design.dart';
-import 'package:al_furkan/src/core/constants/app_fonts.dart';
 import 'package:al_furkan/src/screen/azkar/models/azkar_share_settings.dart';
 import 'package:al_furkan/src/screen/azkar/services/azkar_share_preferences.dart';
 
