@@ -266,17 +266,6 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
     });
   }
 
-  void _applyPreset(SharePreset preset) {
-    _saveState();
-    setState(() {
-      _themeId = preset.themeId;
-      _templateType = preset.templateType;
-      _fontSize = preset.fontSize;
-      _showBranding = preset.showBranding;
-      _showCategoryHeader = preset.showCategory;
-    });
-  }
-
   // THEMES
 
   static const Map<String, _ThemePreview> _themes = {
@@ -2483,41 +2472,6 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
       ),
     );
   }
-  Widget _buildSubTitle(String title, Color primary) {
-    return Text(title, style: TextStyle(color: primary.withValues(alpha: 0.7), fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 1.2));
-  }
-
-
-  Widget _buildStyleSelector(CustomizationField field, Color primary, bool isDark) {
-    final styles = field == CustomizationField.category 
-      ? {'classic': 'كلاسيكي', 'pill': 'كبسولة', 'modern': 'مودرن'}
-      : {'classic': 'كلاسيكي', 'soft_pill': 'كبسولة ناعمة', 'quote': 'اقتباس', 'underline': 'خط سفلي'};
-
-    final String currentId = field == CustomizationField.category ? _categoryStyleId : _descriptionStyleId;
-
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: styles.entries.map((e) {
-        final bool isSelected = currentId == e.key;
-        return InkWell(
-          onTap: () => setState(() {
-            if (field == CustomizationField.category) _categoryStyleId = e.key;
-            if (field == CustomizationField.description) _descriptionStyleId = e.key;
-          }),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: isSelected ? primary : (isDark ? Colors.white10 : Colors.black12),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(e.value, style: TextStyle(color: isSelected ? Colors.white : (isDark ? Colors.white : Colors.black87), fontSize: 13, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
   Widget _buildImageAction(String label, IconData icon, Color color, VoidCallback onTap) {
     return Expanded(
       child: InkWell(
