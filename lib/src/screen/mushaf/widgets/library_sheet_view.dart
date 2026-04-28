@@ -20,7 +20,6 @@ import "dart:developer";
 import "package:flutter_animate/flutter_animate.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:flutter_screenutil/flutter_screenutil.dart";
-import "package:flutter/services.dart";
 import "package:qcf_quran/qcf_quran.dart" as qcf hide getPageNumber;
 
 enum _LibraryWordTab { translation, eerab, tasreef, recitations }

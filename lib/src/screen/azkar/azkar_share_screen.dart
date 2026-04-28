@@ -120,7 +120,7 @@ class _AzkarShareScreenState extends State<AzkarShareScreen> with TickerProvider
 
   Color? _descriptionColor;
   String? _descriptionFont;
-  String _descriptionStyleId = 'classic';
+  final String _descriptionStyleId = 'classic';
 
   Color? _referenceColor;
   String? _referenceFont;
