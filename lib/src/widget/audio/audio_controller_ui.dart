@@ -57,12 +57,12 @@ class _AudioControllerUiState extends State<AudioControllerUi>
   }
 
   // ─── Design Tokens (Unified Beige Palette) ─────────────────
-  Color _bg(bool d) => d ? AppColors.darkSurface : AppColors.ayaAudioPlayerBg;
-  Color _card(bool d) => d ? AppColors.darkCard : AppColors.ayaCard;
-  Color _text(bool d) => d ? const Color(0xFFF5F5F7) : AppColors.ayaTextMain;
-  Color _sub(bool d) => d ? const Color(0xFF8E8E93) : AppColors.ayaTextMuted;
+  Color _bg(bool d) => d ? AppColors.darkSurface : AppColors.lightAudioPlayerBg;
+  Color _card(bool d) => d ? AppColors.darkCard : AppColors.lightCard;
+  Color _text(bool d) => d ? const Color(0xFFF5F5F7) : AppColors.lightTextMain;
+  Color _sub(bool d) => d ? const Color(0xFF8E8E93) : AppColors.lightTextMuted;
   Color _border(bool d) =>
-      d ? Colors.white.withValues(alpha: 0.06) : AppColors.ayaBorder.withValues(alpha: 0.6);
+      d ? Colors.white.withValues(alpha: 0.06) : AppColors.lightBorder.withValues(alpha: 0.6);
 
   @override
   Widget build(BuildContext context) {

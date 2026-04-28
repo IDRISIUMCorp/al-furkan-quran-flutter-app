@@ -1,0 +1,22 @@
+[
+  { "name": "bug", "color": "C0392B", "description": "Something isn't working" },
+  { "name": "enhancement", "color": "73877B", "description": "New feature or request" },
+  { "name": "documentation", "color": "D4AC0D", "description": "Improvements or additions to documentation" },
+  { "name": "good first issue", "color": "27AE60", "description": "Good for newcomers" },
+  { "name": "help wanted", "color": "839788", "description": "Extra attention is needed" },
+  { "name": "question", "color": "495057", "description": "Further information is requested" },
+  { "name": "wontfix", "color": "6C757D", "description": "This will not be worked on" },
+  { "name": "duplicate", "color": "ADB5BD", "description": "This issue or pull request already exists" },
+  { "name": "invalid", "color": "CED4DA", "description": "This doesn't seem right" },
+  { "name": "tafsir", "color": "5C6E65", "description": "Related to tafsir/translation resources" },
+  { "name": "audio", "color": "1E8449", "description": "Related to audio/reciter system" },
+  { "name": "qibla", "color": "B7950B", "description": "Related to Qibla compass" },
+  { "name": "prayer-times", "color": "922B21", "description": "Related to prayer times/schedule" },
+  { "name": "azkar", "color": "73877B", "description": "Related to Azkar/Adhkar" },
+  { "name": "hifz", "color": "5C6E65", "description": "Related to Hifz/memorization mode" },
+  { "name": "theme", "color": "D6CCC2", "description": "Related to theming/AppColors/AppTheme" },
+  { "name": "architecture", "color": "343A40", "description": "Related to BLoC/Clean Architecture" },
+  { "name": "i18n", "color": "E3D5CA", "description": "Related to localization/translations" },
+  { "name": "performance", "color": "C0392B", "description": "Related to performance optimization" },
+  { "name": "data-accuracy", "color": "922B21", "description": "Quranic data accuracy issue — HIGH PRIORITY" }
+]

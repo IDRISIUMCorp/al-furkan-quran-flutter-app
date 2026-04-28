@@ -583,6 +583,13 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
 - **تحميل أوفلاين** — تحميل سور كاملة مع إدارة التخزين
 - **قوائم تشغيل مخصصة** — إنشاء/حذف/إعادة تسمية
 
+### معمارية الميزات الجديدة (PHASE 4–5)
+- **Presentation BLoCs** لكل ميزة: Audio، Tafsir، Azkar، Qibla، Hifz، Prayer — كل واحد بـ state/events محددة
+- **Shared UI Widgets**: SkeletonLoading، ErrorStateWidget، EmptyStateWidget، Pressable، AppCard، SectionHeader، AppChip
+- **Feature Screens**: Azkar (categories + items with type filter)، Qibla (custom compass painter)، Hifz (dashboard with stats grid)، Tafsir (list + detail)، Audio (reciter list)، Prayer Times (next prayer highlight)
+- **Theme Compliance**: ترحيل كل الـ deprecated `ayaX` color aliases لـ `lightX` token names — صفر hardcoded colors في الموديولات الجديدة
+- **IDRISIUM Signature About Screen**: glassmorphism cards، animated logo reveal، founder photo with glow، social links grid
+
 ### وضع الحفظ والقراءة الليلية
 - **3 مستويات إخفاء**: مرئي، مضبب، مخفي + وضع الاختبار
 - **وضع القراءة الليلية** — ألوان كهرمانية + تفعيل تلقائي عند الغروب

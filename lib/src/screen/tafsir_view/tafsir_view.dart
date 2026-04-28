@@ -484,9 +484,10 @@ class _TafsirViewState extends State<TafsirView>
                   itemCount: workingOrder.length,
                   onReorder: (oldIndex, newIndex) {
                     setSheetState(() {
-                      if (newIndex > oldIndex) newIndex -= 1;
+                      var adjustedIndex = newIndex;
+                      if (adjustedIndex > oldIndex) adjustedIndex -= 1;
                       final item = workingOrder.removeAt(oldIndex);
-                      workingOrder.insert(newIndex, item);
+                      workingOrder.insert(adjustedIndex, item);
                     });
                   },
                   proxyDecorator: (child, index, animation) => AnimatedBuilder(

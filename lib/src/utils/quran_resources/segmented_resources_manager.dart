@@ -158,9 +158,9 @@ class SegmentedResourcesManager {
     } else {
       // ignore: use_build_context_synchronously
       final AppLocalizations appLocalizations = AppLocalizations.of(context);
-      url = ApisUrls.base + url;
-      final response = await dio.Dio().get(url);
-      final String boxName = praseStringToBoxName(url);
+      final fullUrl = ApisUrls.base + url;
+      final response = await dio.Dio().get(fullUrl);
+      final String boxName = praseStringToBoxName(fullUrl);
       if (response.statusCode == 200) {
         _segmentsBox = await Hive.openBox(boxName);
         // ignore: use_build_context_synchronously

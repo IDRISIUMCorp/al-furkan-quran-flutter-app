@@ -82,11 +82,11 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
   // ── SearchSheet-style color tokens ──
   bool get _isDark => Theme.of(context).brightness == Brightness.dark;
   Color get _surfaceColor =>
-      _isDark ? Theme.of(context).colorScheme.surface : AppColors.ayaSurface;
+      _isDark ? Theme.of(context).colorScheme.surface : AppColors.lightSurface;
   Color get _cardColor =>
-      _isDark ? Colors.white.withValues(alpha: 0.05) : AppColors.ayaCard;
-  Color get _textColor => _isDark ? Colors.white : AppColors.ayaTextMain;
-  Color get _mutedColor => _isDark ? Colors.white54 : AppColors.ayaTextMuted;
+      _isDark ? Colors.white.withValues(alpha: 0.05) : AppColors.lightCard;
+  Color get _textColor => _isDark ? Colors.white : AppColors.lightTextMain;
+  Color get _mutedColor => _isDark ? Colors.white54 : AppColors.lightTextMuted;
 
   // 0 = Image, 1 = Text
   int _shareMode = 0;
@@ -1521,7 +1521,7 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                               fontWeight: FontWeight.w900,
                               color: _isDark
                                   ? const Color(0xFFC09B5A)
-                                  : AppColors.ayaPrimary,
+                                  : AppColors.lightPrimary,
                             ),
                           ),
                           Text(
@@ -1568,21 +1568,21 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
             verseNumberColor: Colors.white,
           )
         : QcfThemeData.sepia().copyWith(
-            pageBackgroundColor: AppColors.ayaBackground,
+            pageBackgroundColor: AppColors.lightBackground,
             headerBackgroundColor: const Color(0xFFEFE3D2),
             headerWidthLarge: bannerWidth * 1.25,
             headerWidthSmall: bannerWidth * 1.25,
             surahNameScale: 3.5 * _surahNameScale,
-            headerTextColor: AppColors.ayaTextMain,
-            verseTextColor: AppColors.ayaTextMain,
-            verseNumberColor: AppColors.ayaTextMain,
+            headerTextColor: AppColors.lightTextMain,
+            verseTextColor: AppColors.lightTextMain,
+            verseNumberColor: AppColors.lightTextMain,
           );
 
-    final Color cardBgColor = isDark ? Colors.black : AppColors.ayaBackground;
+    final Color cardBgColor = isDark ? Colors.black : AppColors.lightBackground;
     final Color tafsirBgColor = isDark
         ? const Color(0xFF111111)
         : const Color(0xFFEFE3D2);
-    final Color textColor = isDark ? Colors.white : AppColors.ayaTextMain;
+    final Color textColor = isDark ? Colors.white : AppColors.lightTextMain;
 
     // Build multi-surah-aware content: group verses by surah for individual banners
     // This enables sharing e.g. Al-Ikhlas + Al-Falaq + Al-Nas together with separate banners
@@ -1824,7 +1824,7 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
                           fontWeight: FontWeight.w900,
                           color: isDark
                               ? const Color(0xFFC09B5A)
-                              : AppColors.ayaPrimary,
+                              : AppColors.lightPrimary,
                         ),
                       ),
                       Text(

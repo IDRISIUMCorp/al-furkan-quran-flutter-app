@@ -31,17 +31,17 @@ class SurahInfoView extends StatelessWidget {
           onLinkTap: (url, attributes, element) {
             log(url.toString());
             try {
-              url ??= "";
-              final int countOfSlash = url.characters.count(
+              final effectiveUrl = url ?? "";
+              final int countOfSlash = effectiveUrl.characters.count(
                 (element) => element == "/",
               );
-              final int countOfDash = url.characters.count(
+              final int countOfDash = effectiveUrl.characters.count(
                 (element) => element == "-",
               );
               log(countOfSlash.toString());
               log(countOfDash.toString());
               if (countOfSlash == 1) {
-                final int? surahNumber = int.tryParse(url.split("/").last);
+                final int? surahNumber = int.tryParse(effectiveUrl.split("/").last);
                 if (surahNumber != null) {
                   Navigator.push(
                     context,
@@ -55,8 +55,8 @@ class SurahInfoView extends StatelessWidget {
                   );
                 }
               } else if (countOfSlash == 2) {
-                final String surahNumber = url.split("/")[1];
-                final List<String> ayahsRange = url.split("/").last.split("-");
+                final String surahNumber = effectiveUrl.split("/")[1];
+                final List<String> ayahsRange = effectiveUrl.split("/").last.split("-");
                 final String startAyahKey = "$surahNumber:${ayahsRange.first}";
                 final String endAyahKey = "$surahNumber:${ayahsRange.last}";
                 Navigator.push(

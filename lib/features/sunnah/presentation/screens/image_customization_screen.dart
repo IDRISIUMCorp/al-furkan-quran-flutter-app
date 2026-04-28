@@ -830,7 +830,6 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark ? Colors.white10 : Colors.black12,
-          width: 1,
         ),
       ),
       child: Column(
@@ -1148,7 +1147,6 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isDark ? Colors.white10 : Colors.black12,
-            width: 1,
           ),
         ),
         child: Row(
@@ -1222,37 +1220,23 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
 
   ImageCustomizationSettings _getClassicTemplate() {
     return ImageCustomizationSettings(
-      backgroundType: BackgroundType.solid,
-      backgroundColor: const Color(0xFFF8F6ED),
       fontFamily: 'Amiri',
-      titleFontSize: 32,
-      descriptionFontSize: 20,
-      evidenceFontSize: 16,
-      titleColor: const Color(0xFF2C2C2C),
-      descriptionColor: const Color(0xFF6B6B6B),
-      evidenceColor: const Color(0xFF4A7C59),
       layoutStyle: LayoutStyle.classic,
       cardRadius: 16,
-      showTopDecoration: true,
-      showBottomDecoration: true,
-      decorationType: DecorationType.islamic,
     );
   }
 
   ImageCustomizationSettings _getModernTemplate() {
     return ImageCustomizationSettings(
       backgroundType: BackgroundType.gradient,
-      gradientStartColor: const Color(0xFF4A7C59),
       gradientEndColor: const Color(0xFF2D7A4F),
       gradientDirection: GradientDirection.diagonal,
-      fontFamily: 'Cairo',
       titleFontSize: 36,
       descriptionFontSize: 22,
       evidenceFontSize: 18,
       titleColor: Colors.white,
       descriptionColor: Colors.white.withValues(alpha: 0.9),
       evidenceColor: const Color(0xFFC9A84C),
-      layoutStyle: LayoutStyle.modern,
       cardRadius: 24,
       showTopDecoration: false,
       showBottomDecoration: false,
@@ -1261,15 +1245,12 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
 
   ImageCustomizationSettings _getMinimalTemplate() {
     return ImageCustomizationSettings(
-      backgroundType: BackgroundType.solid,
       backgroundColor: Colors.white,
-      fontFamily: 'Cairo',
       titleFontSize: 28,
       descriptionFontSize: 18,
       evidenceFontSize: 14,
       titleColor: const Color(0xFF1A1F2E),
       descriptionColor: const Color(0xFF6B7280),
-      evidenceColor: const Color(0xFF4A7C59),
       layoutStyle: LayoutStyle.minimal,
       cardRadius: 12,
       showTopDecoration: false,
@@ -1283,7 +1264,6 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
       backgroundType: BackgroundType.gradient,
       gradientStartColor: const Color(0xFF1A1F2E),
       gradientEndColor: const Color(0xFF2A2F3E),
-      gradientDirection: GradientDirection.topToBottom,
       fontFamily: 'Aref Ruqaa',
       titleFontSize: 38,
       descriptionFontSize: 24,
@@ -1292,9 +1272,6 @@ class _ImageCustomizationScreenState extends State<ImageCustomizationScreen>
       descriptionColor: const Color(0xFFDDD9CC),
       evidenceColor: const Color(0xFFC9A84C),
       layoutStyle: LayoutStyle.elegant,
-      cardRadius: 20,
-      showTopDecoration: true,
-      showBottomDecoration: true,
       decorationType: DecorationType.floral,
       decorationColor: const Color(0xFFC9A84C),
     );

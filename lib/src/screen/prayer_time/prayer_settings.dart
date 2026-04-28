@@ -593,10 +593,10 @@ class _PrayerSettingsState extends State<PrayerSettings> {
     int minutes,
     AppLocalizations l10n,
   ) {
-    currentPrayerTime = TimeOfDay(
+    final adjustedTime = TimeOfDay(
       hour: currentPrayerTime.hour,
       minute: currentPrayerTime.minute + minutes,
     );
-    return formatTimeOfDay(context, currentPrayerTime);
+    return formatTimeOfDay(context, adjustedTime);
   }
 }

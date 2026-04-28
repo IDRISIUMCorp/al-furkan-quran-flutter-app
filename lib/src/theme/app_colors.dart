@@ -1,125 +1,71 @@
 import 'package:flutter/material.dart';
 
-/// Al-Furkan Color System — Inspired by Ayah App
-/// Philosophy: Organic Minimalism & Quiet Luxury
-/// Warm earth tones (Light), Deep slate (Dark), Sage green accent
+/// Al-Furkan Color System — Organic Minimalism × Quiet Luxury
+/// Reference: Apple, Linear, Vercel, Raycast, the 'Ayah' Quran app
+/// Philosophy: Restraint is power. Every color must justify its existence.
 class AppColors {
-  // ==========================================
-  // LIGHT MODE — Warm Beige/Cream Palette
-  // ==========================================
+  AppColors._();
 
-  /// Main background — screens, lists
-  static const Color lightBackground = Color(0xFFF5EBE0);
+  // ── LIGHT MODE — Neutral Elegance & Warm Beige ──
 
-  /// Surface — header bars, bottom bars, search fields
-  static const Color lightSurface = Color(0xFFEDE4D4);
-
-  /// Card / Sheet background — bottom sheets, popup cards, index items
+  static const Color lightBackground = Color(0xFFF8F9FA);
+  static const Color lightBackgroundSecondary = Color(0xFFF0EAE2);
+  static const Color lightSurface = Color(0xFFE3D5CA);
+  static const Color lightSurfaceSecondary = Color(0xFFD6CCC2);
   static const Color lightCard = Color(0xFFF5EBE0);
-
-  /// Elevated surface — dialogs, dropdowns
   static const Color lightElevated = Color(0xFFE3D5CA);
 
-  /// Primary Interactive Color — Sage Green (The Signature)
-  static const Color lightPrimary = Color(0xFF5D7263);
-
-  /// Primary light — subtle backgrounds, chips, badges
+  static const Color lightPrimary = Color(0xFF73877B);
+  static const Color lightPrimaryHover = Color(0xFF5C6E65);
   static const Color lightPrimaryLight = Color(0xFFD4E2D9);
-
-  /// Primary container — selected states, active tabs
   static const Color lightPrimaryContainer = Color(0xFFB8CFC0);
-
-  /// Secondary — warm brown accent
   static const Color lightSecondary = Color(0xFF8B7355);
-
-  /// Secondary container — subtle brown backgrounds
   static const Color lightSecondaryContainer = Color(0xFFF0E6D6);
 
-  /// Highlight color for currently reading ayah
   static const Color lightAyahHighlight = Color(0xFFEADBC3);
-
-  /// Audio player background
   static const Color lightAudioPlayerBg = Color(0xFFEDE4D4);
 
-  // --- Light Text Colors ---
   static const Color lightTextMain = Color(0xFF212529);
-  static const Color lightTextSecondary = Color(0xFF6C757D);
-  static const Color lightTextMuted = Color(0xFF8F8F8F);
+  static const Color lightTextSecondary = Color(0xFF495057);
+  static const Color lightTextMuted = Color(0xFF6C757D);
 
-  /// Border and Divider colors
-  static const Color lightBorder = Color(0xFFD6CCC2);
+  static const Color lightBorder = Color(0xFFC8B9AD);
+  static const Color lightBorderSubtle = Color(0xFFEDE8E2);
   static const Color lightOutlineVariant = Color(0xFFE3D5CA);
 
-  // ==========================================
-  // DARK MODE — Deep Slate/Charcoal Palette
-  // ==========================================
+  // ── DARK MODE — Light Steel & Charcoal ──
 
-  /// Main background — screens, lists
   static const Color darkBackground = Color(0xFF212529);
-
-  /// Surface — header bars, bottom bars
+  static const Color darkBackgroundSecondary = Color(0xFF1A1D21);
   static const Color darkSurface = Color(0xFF343A40);
-
-  /// Card / Sheet background
+  static const Color darkSurfaceSecondary = Color(0xFF495057);
   static const Color darkCard = Color(0xFF495057);
-
-  /// Elevated surface — dialogs, dropdowns
   static const Color darkElevated = Color(0xFF545C64);
 
-  /// Primary Interactive Color — Lighter Sage for dark mode
-  static const Color darkPrimary = Color(0xFF839788);
-
-  /// Primary light — subtle backgrounds in dark mode
+  static const Color darkPrimary = Color(0xFF73877B);
+  static const Color darkPrimaryHover = Color(0xFF839788);
   static const Color darkPrimaryLight = Color(0xFF3D4A42);
-
-  /// Primary container — selected states in dark mode
   static const Color darkPrimaryContainer = Color(0xFF4A5B52);
-
-  /// Secondary — warm muted brown
   static const Color darkSecondary = Color(0xFFB8A080);
-
-  /// Secondary container
   static const Color darkSecondaryContainer = Color(0xFF3D3529);
 
-  /// Highlight color for currently reading ayah
   static const Color darkAyahHighlight = Color(0xFF4A5B52);
-
-  /// Audio player background
   static const Color darkAudioPlayerBg = Color(0xFF343A40);
 
-  // --- Dark Text Colors ---
   static const Color darkTextMain = Color(0xFFF8F9FA);
   static const Color darkTextSecondary = Color(0xFFCED4DA);
-  static const Color darkTextMuted = Color(0xFFADB5BD);
+  static const Color darkTextMuted = Color(0xFF6C757D);
 
-  /// Border and Divider colors
-  static const Color darkBorder = Color(0xFF495057);
+  static const Color darkBorder = Color(0xFFADB5BD);
+  static const Color darkBorderSubtle = Color(0xFF2E3338);
   static const Color darkOutlineVariant = Color(0xFF545C64);
 
-  // ==========================================
-  // SHARED — Error & Semantic Colors
-  // ==========================================
-  static const Color error = Color(0xFFB3261E);
-  static const Color errorDark = Color(0xFFF2B8B5);
+  // ── SHARED — Semantic Colors ──
 
-  // ==========================================
-  // LEGACY COMPATIBILITY
-  // ==========================================
-  static const Color ayaBackground = lightBackground;
-  static const Color ayaSurface = lightSurface;
-  static const Color ayaCard = lightCard;
-  static const Color ayaPrimary = lightPrimary;
-  static const Color ayaPrimaryLight = lightPrimaryLight;
-  static const Color ayaAyahHighlight = lightAyahHighlight;
-  static const Color ayaAudioPlayerBg = lightAudioPlayerBg;
-  static const Color ayaTextMain = lightTextMain;
-  static const Color ayaTextSecondary = lightTextSecondary;
-  static const Color ayaTextMuted = lightTextMuted;
-  static const Color ayaBorder = lightBorder;
-
-  static const Color primary = lightPrimary;
-  static const Color background = lightBackground;
-  static const Color surface = lightSurface;
-  static const Color textPrimaryLight = lightTextMain;
-  static const Color textSecondaryLight = lightTextSecondary;
+  static const Color error = Color(0xFF922B21);
+  static const Color errorDark = Color(0xFFC0392B);
+  static const Color success = Color(0xFF1E8449);
+  static const Color successDark = Color(0xFF27AE60);
+  static const Color warning = Color(0xFFB7950B);
+  static const Color warningDark = Color(0xFFD4AC0D);
 }

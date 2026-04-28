@@ -270,7 +270,6 @@ extension ImageCustomizationTabs on State {
             borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
             border: Border.all(
               color: SunnahTheme.green.withValues(alpha: 0.3),
-              width: 1,
             ),
           ),
           child: Column(
@@ -337,7 +336,6 @@ extension ImageCustomizationTabs on State {
             borderRadius: BorderRadius.circular(SunnahTheme.radiusMedium),
             border: Border.all(
               color: SunnahTheme.green.withValues(alpha: 0.3),
-              width: 1,
             ),
           ),
           child: Column(

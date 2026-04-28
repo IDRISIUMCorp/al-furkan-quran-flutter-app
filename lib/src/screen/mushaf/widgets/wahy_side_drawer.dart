@@ -87,11 +87,11 @@ class _WahySideDrawerState extends State<WahySideDrawer>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColors.darkBackground : AppColors.ayaSurface;
+    final bg = isDark ? AppColors.darkBackground : AppColors.lightSurface;
     final card = isDark ? AppColors.darkCard : const Color(0xFFFFFFFF);
-    final onBg = isDark ? const Color(0xFFF0EDE8) : AppColors.ayaTextMain;
-    final sectionLabelColor = isDark ? Colors.white38 : AppColors.ayaTextMuted;
-    final dividerColor = isDark ? Colors.white.withValues(alpha: 0.06) : AppColors.ayaBorder;
+    final onBg = isDark ? const Color(0xFFF0EDE8) : AppColors.lightTextMain;
+    final sectionLabelColor = isDark ? Colors.white38 : AppColors.lightTextMuted;
+    final dividerColor = isDark ? Colors.white.withValues(alpha: 0.06) : AppColors.lightBorder;
     final chevronColor = isDark ? Colors.white24 : Colors.black.withValues(alpha: 0.15);
 
     int i = 0;
@@ -424,8 +424,8 @@ class _AyahDrawerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? const Color(0xFFF0EDE8) : AppColors.ayaTextMain;
-    final subtitleColor = isDark ? Colors.white54 : AppColors.ayaTextSecondary;
+    final titleColor = isDark ? const Color(0xFFF0EDE8) : AppColors.lightTextMain;
+    final subtitleColor = isDark ? Colors.white54 : AppColors.lightTextSecondary;
 
     return Container(
       decoration: BoxDecoration(
@@ -557,8 +557,8 @@ class WahyDrawerItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? const Color(0xFFF0EDE8) : AppColors.ayaTextMain;
-    final subtitleColor = isDark ? Colors.white54 : AppColors.ayaTextSecondary;
+    final titleColor = isDark ? const Color(0xFFF0EDE8) : AppColors.lightTextMain;
+    final subtitleColor = isDark ? Colors.white54 : AppColors.lightTextSecondary;
     final chevronColor = isDark ? Colors.white24 : Colors.black.withValues(alpha: 0.15);
 
     return Material(
@@ -624,7 +624,7 @@ class WahyDrawerDivider extends StatelessWidget {
     return Container(
       height: 0.5,
       margin: const EdgeInsets.symmetric(horizontal: 12),
-      color: isDark ? Colors.white.withValues(alpha: 0.06) : AppColors.ayaBorder,
+      color: isDark ? Colors.white.withValues(alpha: 0.06) : AppColors.lightBorder,
     );
   }
 }

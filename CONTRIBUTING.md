@@ -67,28 +67,46 @@ flutter run
 
 ## Architecture
 
-Al-Furkan follows **BLoC + Clean Architecture**:
+Al-Furkan follows **BLoC + Clean Architecture** with modular feature packages:
 
 ```
 lib/
-├── core/           # Theme, DI, storage, notifications, audio
-├── features/       # Feature modules (admin, analytics, notifications, sunnah)
+├── core/               # Theme, DI, storage, notifications, audio
+├── features/           # Modular feature packages (Clean Architecture)
+│   └── [feature]/
+│       ├── data/       # Models, datasources, repository implementations
+│       ├── domain/     # Entities (ZERO Flutter imports), repo interfaces, use cases
+│       └── presentation/ # BLoC, screens, widgets
 ├── src/
-│   ├── screen/     # UI screens organized by feature
-│   ├── widget/     # Reusable widgets
-│   ├── core/       # Core services (audio, settings, storage, notifications)
-│   ├── resources/  # Translation and localization
-│   ├── theme/      # Theme system
-│   └── utils/      # Utilities and extensions
+│   ├── screen/         # Legacy UI screens (mushaf, settings, about)
+│   ├── widget/         # Legacy reusable widgets
+│   ├── core/           # Core services (audio, settings, storage, notifications)
+│   ├── shared/         # Shared widgets (SkeletonLoading, ErrorState, Pressable, AppCard)
+│   ├── theme/          # Theme system (AppColors, AppTextStyles, AppTheme, AppDecorations)
+│   ├── constants/      # AppStrings, AppSizes, AppAssets, AppDurations
+│   └── utils/          # Utilities and extensions
 └── main.dart
 ```
 
+### Feature Modules (Clean Architecture)
+Each feature under `lib/src/features/` follows the same 3-layer pattern:
+
+| Feature | BLoC | Screen(s) | DI File |
+|---------|------|-----------|---------|
+| Audio | `AudioBloc` | `AudioScreen` | `audio_injection.dart` |
+| Tafsir | `TafsirBloc` | `TafsirScreen`, `TafsirDetailScreen` | `tafsir_injection.dart` |
+| Azkar | `AzkarBloc` | `AzkarCategoriesScreen`, `AzkarItemsScreen` | `azkar_injection.dart` |
+| Qibla | `QiblaBloc` | `QiblaScreen` | `qibla_injection.dart` |
+| Hifz | `HifzBloc` | `HifzDashboardScreen` | `hifz_injection.dart` |
+| Prayer | `PrayerBloc` | `PrayerTimesScreen` | `prayer_injection.dart` |
+
 ### Key Patterns
-- **State Management**: `flutter_bloc` (Cubit + Bloc)
-- **Dependency Injection**: `get_it`
+- **State Management**: `flutter_bloc` (Cubit + Bloc) — BLoC for event-heavy flows, Cubit for simple state
+- **Dependency Injection**: `get_it` with `registerFactory` for BLoCs
+- **Error Handling**: `Either<Failure, T>` from `dartz` — ZERO raw exceptions in domain/presentation
+- **Theme Tokens**: All colors via `AppColors`, all spacing via `AppSizes`, all strings via `AppStrings`
 - **Local Storage**: `hive_ce` + `shared_preferences`
-- **Network**: `http` + `dio`
-- **Error Handling**: Try/catch with user-friendly messages
+- **Network**: `dio` via centralized `ApiClient` singleton
 
 ---
 
@@ -111,6 +129,14 @@ lib/
 - Use English for code comments
 - Document public APIs with `///` doc comments
 - Avoid commenting obvious code — write self-documenting code instead
+
+### Theme Compliance (Non-Negotiable)
+- **ZERO hardcoded colors** — always use `AppColors` tokens (e.g., `AppColors.lightBackground`, `AppColors.accentPrimary`)
+- **ZERO hardcoded font sizes** — use `AppTextStyles` or `AppSizes` tokens
+- **ZERO hardcoded strings** — use `AppStrings` or `AppLocalizations`
+- **ZERO hardcoded spacing** — use `AppSizes` tokens (8dp grid system)
+- **RTL support** — use `EdgeInsets.symmetric()` instead of `EdgeInsets.only(left:/right:)` for Arabic content
+- **Dark/Light mode** — test every screen in both themes before submitting
 
 ### Commits
 - Use [Conventional Commits](https://www.conventionalcommits.org/):

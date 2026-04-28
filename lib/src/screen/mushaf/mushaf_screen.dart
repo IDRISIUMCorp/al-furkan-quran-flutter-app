@@ -336,13 +336,13 @@ class _MushafRootState extends State<_MushafRoot> {
   Widget build(BuildContext context) {
     final themeState = context.read<ThemeCubit>().state;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? Theme.of(context).colorScheme.surface : AppColors.ayaBackground;
+    final bgColor = isDark ? Theme.of(context).colorScheme.surface : AppColors.lightBackground;
     final topBarColor = isDark
         ? Theme.of(context).colorScheme.surface.withValues(alpha: 0.85)
-        : AppColors.ayaSurface.withValues(alpha: 0.85);
+        : AppColors.lightSurface.withValues(alpha: 0.85);
     final topBarBorderColor = isDark
         ? Colors.white10
-        : AppColors.ayaBorder.withValues(alpha: 0.5);
+        : AppColors.lightBorder.withValues(alpha: 0.5);
 
     final media = MediaQuery.of(context);
     final screenH = media.size.height;
@@ -416,7 +416,7 @@ class _MushafRootState extends State<_MushafRoot> {
               topBarColor: topBarColor,
               topBarBorderColor: topBarBorderColor,
               isMushafMode: _isMushafMode,
-              iconPrimaryColor: AppColors.ayaPrimary,
+              iconPrimaryColor: AppColors.lightPrimary,
               menuPrimaryColor: themeState.primary,
               isDark: isDark,
               onOpenIndex: () => _openIndexOverlay(bgColor),

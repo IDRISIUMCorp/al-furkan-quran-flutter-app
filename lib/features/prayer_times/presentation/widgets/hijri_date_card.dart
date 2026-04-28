@@ -150,7 +150,6 @@ class HijriDateCard extends StatelessWidget {
                   
                   // Left Side - Gregorian Date
                   Expanded(
-                    flex: 1,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisAlignment: MainAxisAlignment.center,

@@ -95,8 +95,6 @@ class _ContentFeedViewState extends State<_ContentFeedView> {
         child: RefreshIndicator(
           color: isDark ? const Color(0xFF839788) : const Color(0xFF73877B),
           backgroundColor: isDark ? const Color(0xFF2A2A2A) : Colors.white,
-          strokeWidth: 2.5,
-          displacement: 40,
           onRefresh: () async {
             context.read<ContentFeedBloc>().add(const ContentFeedRefreshRequested());
             await Future<void>.delayed(const Duration(milliseconds: 800));

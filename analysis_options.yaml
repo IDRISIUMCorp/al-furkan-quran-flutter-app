@@ -1,12 +1,4 @@
-# This file configures the analyzer, which statically analyzes Dart code to
-# check for errors, warnings, and lints.
-#
-# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
-# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
-# invoked from the command line by running `flutter analyze`.
-
-# The following line activates a set of recommended lints for Flutter apps,
-# packages, and plugins designed to encourage good coding practices.
+# Al-Furkan Analysis Options — Strict linting for production-grade code
 analyzer:
   exclude:
     - "تطبيق وحي/**"
@@ -21,10 +13,16 @@ analyzer:
     deprecated_member_use: warning
     missing_required_param: error
     missing_return: error
+    invalid_annotation_target: ignore
+    unnecessary_import: warning
+    unnecessary_null_comparison: warning
+    dead_code: warning
+    avoid_print: warning
 include: package:flutter_lints/flutter.yaml
 
 linter:
   rules:
+    # ── Style ──
     prefer_single_quotes: false
     prefer_const_constructors: false
     prefer_const_declarations: false
@@ -35,3 +33,38 @@ linter:
     avoid_unnecessary_containers: true
     sized_box_for_whitespace: true
     use_key_in_widget_constructors: true
+
+    # ── Correctness ──
+    always_declare_return_types: true
+    annotate_overrides: true
+    empty_statements: true
+    no_duplicate_case_values: true
+    no_leading_underscores_for_local_identifiers: true
+    null_check_on_nullable_type_parameter: true
+    prefer_void_to_null: true
+    unnecessary_null_in_if_null_operators: true
+    unrelated_type_equality_checks: true
+    valid_regexps: true
+
+    # ── Design ──
+    avoid_classes_with_only_static_members: false
+    avoid_redundant_argument_values: false
+    avoid_return_types_on_setters: true
+    avoid_unused_constructor_parameters: true
+    camel_case_extensions: true
+    camel_case_types: true
+    constant_identifier_names: true
+    file_names: true
+    non_constant_identifier_names: true
+    parameter_assignments: warning
+    prefer_conditional_assignment: true
+    prefer_interpolation_to_compose_strings: true
+    prefer_is_empty: true
+    prefer_is_not_empty: true
+    prefer_typing_uninitialized_variables: true
+    provide_deprecation_message: true
+    unnecessary_overrides: true
+    unnecessary_parenthesis: true
+    unnecessary_string_escapes: true
+    unnecessary_string_interpolations: true
+    unnecessary_constructor_name: true

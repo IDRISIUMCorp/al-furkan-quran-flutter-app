@@ -106,7 +106,7 @@ class _SurahListViewState extends State<SurahListView> {
                   ),
                 );
               }
-              index--;
+              final surahIndex = index - 1;
 
               return Padding(
                 padding: const EdgeInsets.only(top: 5, right: 5, left: 5),
@@ -124,8 +124,8 @@ class _SurahListViewState extends State<SurahListView> {
                     final onOpen = widget.onOpenLocation;
                     if (onOpen != null) {
                       onOpen(
-                        qcf.getPageNumber(filteredSurah[index].id, 1),
-                        "${filteredSurah[index].id}:1",
+                        qcf.getPageNumber(filteredSurah[surahIndex].id, 1),
+                        "${filteredSurah[surahIndex].id}:1",
                       );
                       return;
                     }
@@ -133,9 +133,9 @@ class _SurahListViewState extends State<SurahListView> {
                       context,
                       WahyPageRoute(
                         page: QuranScriptView(
-                              startKey: "${filteredSurah[index].id}:1",
+                              startKey: "${filteredSurah[surahIndex].id}:1",
                               endKey:
-                                  "${filteredSurah[index].id}:${filteredSurah[index].versesCount}",
+                                  "${filteredSurah[surahIndex].id}:${filteredSurah[surahIndex].versesCount}",
                             ),
                       ),
                     );
@@ -152,7 +152,7 @@ class _SurahListViewState extends State<SurahListView> {
                       children: [
                         getIndexNumberWidget(
                           context,
-                          filteredSurah[index].id,
+                          filteredSurah[surahIndex].id,
                           textColor: textColor,
                           height: 40,
                           width: 40,
@@ -168,7 +168,7 @@ class _SurahListViewState extends State<SurahListView> {
                                   height: 20,
                                   width: 20,
                                   child: Image.asset(
-                                    filteredSurah[index].revelationPlace ==
+                                    filteredSurah[surahIndex].revelationPlace ==
                                             "makkah"
                                         ? "assets/img/kaaba_10171102.png"
                                         : "assets/img/masjid-al-nabawi_16183907.png",
@@ -178,7 +178,7 @@ class _SurahListViewState extends State<SurahListView> {
                                 Text(
                                   getSurahName(
                                     context,
-                                    filteredSurah[index].id,
+                                    filteredSurah[surahIndex].id,
                                   ),
                                   style: TextStyle(
                                     fontSize: 16,
@@ -190,7 +190,7 @@ class _SurahListViewState extends State<SurahListView> {
                             ),
                             const Gap(5),
                             Text(
-                              getSurahMeaning(context, filteredSurah[index].id),
+                              getSurahMeaning(context, filteredSurah[surahIndex].id),
                               style: TextStyle(
                                 color:
                                     brightness == Brightness.light
@@ -209,15 +209,15 @@ class _SurahListViewState extends State<SurahListView> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  "surah${filteredSurah[index].id.toString().padLeft(3, '0')}",
+                                  "surah${filteredSurah[surahIndex].id.toString().padLeft(3, '0')}",
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: textColor,
                                     fontFamily: "surah-name-v1",
                                   ),
                                 ),
-                                if (qcf.isSajdaVerse(filteredSurah[index].id, 1) ||
-                                    qcf.allSajdaVerses.any((s) => s.surah == filteredSurah[index].id))
+                                if (qcf.isSajdaVerse(filteredSurah[surahIndex].id, 1) ||
+                                    qcf.allSajdaVerses.any((s) => s.surah == filteredSurah[surahIndex].id))
                                   Padding(
                                     padding: const EdgeInsets.only(right: 4),
                                     child: Text(
@@ -234,7 +234,7 @@ class _SurahListViewState extends State<SurahListView> {
                               l10n.ayahsCount(
                                 localizedNumber(
                                   context,
-                                  filteredSurah[index].versesCount,
+                                  filteredSurah[surahIndex].versesCount,
                                 ),
                               ),
                               style: TextStyle(

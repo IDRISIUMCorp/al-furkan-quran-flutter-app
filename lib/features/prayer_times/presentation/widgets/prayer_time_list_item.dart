@@ -131,7 +131,6 @@ class _PrayerTimeListItemState extends State<PrayerTimeListItem>
                   DateFormat('hh:mm', 'ar').format(widget.prayerTime),
                   style: PrayerTextStyles.prayerTime(
                     color: timeColor,
-                    isLarge: false,
                   ),
                 ),
                 

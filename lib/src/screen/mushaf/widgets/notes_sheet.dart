@@ -99,7 +99,7 @@ Future<void> showNotesSheet({
                                   "لا توجد ملاحظات",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w800,
-                                    color: AppColors.ayaTextMuted,
+                                    color: AppColors.lightTextMuted,
                                   ),
                                 ),
                               )

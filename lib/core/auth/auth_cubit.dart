@@ -29,7 +29,7 @@ class AuthState {
 class AuthCubit extends Cubit<AuthState> {
   late final StreamSubscription<User?> _authSubscription;
 
-  AuthCubit() : super(const AuthState(isLoading: true)) {
+  AuthCubit() : super(const AuthState()) {
     _init();
   }
 

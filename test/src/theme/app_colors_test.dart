@@ -17,16 +17,6 @@ void main() {
       expect(AppColors.error, isA<Color>());
     });
 
-    test('legacy compatibility aliases point to light colors', () {
-      expect(AppColors.ayaBackground, AppColors.lightBackground);
-      expect(AppColors.ayaSurface, AppColors.lightSurface);
-      expect(AppColors.ayaCard, AppColors.lightCard);
-      expect(AppColors.ayaPrimary, AppColors.lightPrimary);
-      expect(AppColors.ayaTextMain, AppColors.lightTextMain);
-      expect(AppColors.ayaTextSecondary, AppColors.lightTextSecondary);
-      expect(AppColors.ayaBorder, AppColors.lightBorder);
-    });
-
     test('all light colors are opaque (alpha = 255)', () {
       final lightColors = <Color>[
         AppColors.lightBackground,

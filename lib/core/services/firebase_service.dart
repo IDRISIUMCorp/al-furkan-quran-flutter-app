@@ -25,11 +25,7 @@ class FirebaseService {
 
       // Setup FCM.
       final messaging = FirebaseMessaging.instance;
-      await messaging.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
+      await messaging.requestPermission();
 
       // Subscribe to "all" topic for broadcast notifications.
       await messaging.subscribeToTopic('all');

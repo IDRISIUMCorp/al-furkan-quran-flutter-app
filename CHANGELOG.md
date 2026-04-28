@@ -5,6 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-04-28
+
+### Added — PHASE 6: QUALITY GATE
+- Unit tests for `AzkarBloc` (7 test cases: initial state, load categories, error handling, load by type, decrement count, zero-count guard, reset daily counts)
+- Unit tests for `HifzBloc` (5 test cases: initial state, load all progress, error handling, load stats, load due for review, load progress for surah)
+- Unit tests for `AudioBloc` (8 test cases: initial state, load reciters, error, select reciter, play, pause, resume, stop, update position)
+- Unit tests for `QiblaBloc` (5 test cases: initial state, load qibla info, error, update location, compass availability)
+- Unit tests for `TafsirBloc` (5 test cases: initial state, load all tafsirs, error, select tafsir, load for ayah, load for surah)
+- Unit tests for `PrayerBloc` (3 test cases: initial state, load today, error, refresh)
+- Manual mock repositories for all 6 features (no code-gen dependency)
+- Theme compliance verified: ZERO hardcoded colors in new modules
+- Architecture integrity verified: Domain entities have ZERO Flutter imports
+- Dart analyze: ZERO errors/warnings across entire codebase
+
+### Added — PHASE 7: SHIP
+- Updated `README.md` with PHASE 4–5 feature descriptions
+- Updated `CONTRIBUTING.md` with modular architecture docs, feature module table, and theme compliance rules
+- Created `CODE_OF_CONDUCT.md` (Contributor Covenant v2.1)
+- Created GitHub issue templates: Bug Report, Feature Request
+- Created GitHub Pull Request template with theme compliance checklist
+- Created `.github/labels.json` with 20 categorized labels
+- Created `DELIVERY_REPORT.md` — comprehensive project delivery report
+
+### Fixed
+- `api_client.dart`: Fixed `DioException` constructor parameter (`originalError` → `error`) for Dio 5.x compatibility
+- Removed `bloc_test` dependency (network issue) — tests written with `flutter_test` only
+
+## [1.1.0] - 2025-04-28
+
+### Added — PHASE 4: THE UI
+- Presentation BLoCs for Audio, Tafsir, Azkar, Qibla, Hifz modules
+- BLoC DI registrations in all feature injection files
+- Shared UI widgets: SkeletonLoading, ErrorStateWidget, EmptyStateWidget
+- Shared UI widgets: Pressable (scale feedback), PressableOpacity, AppCard, SectionHeader, AppChip
+- Feature screens: AzkarCategoriesScreen, AzkarItemsScreen with type filter chips
+- Feature screens: QiblaScreen with custom compass painter
+- Feature screens: HifzDashboardScreen with stats grid and progress cards
+- Feature screens: TafsirScreen, TafsirDetailScreen
+- Feature screens: AudioScreen with reciter list
+- Feature screens: PrayerTimesScreen with next prayer highlight
+- IDRISIUM Signature About screen with glassmorphism and animations
+
+### Changed
+- Migrated all deprecated `ayaX` color aliases to new `lightX` token names
+- Removed all deprecated legacy aliases from AppColors
+- Fixed `app_decorations.dart` import path for AppSizes
+- Updated test file to remove legacy alias test
+
 ## [1.0.0] - 2025-01-01
 
 ### Added

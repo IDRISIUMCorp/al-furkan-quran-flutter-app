@@ -24,7 +24,7 @@ Future<void> showBookmarksSheet({
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (ctx) {
-      const card = AppColors.ayaCard;
+      const card = AppColors.lightCard;
       final colors = <String, ({String name, Color color})>{
         "red": (name: "الأحمر", color: const Color(0xFFB3261E)),
         "yellow": (name: "الأصفر", color: const Color(0xFFB68A00)),
@@ -116,7 +116,7 @@ Future<void> showBookmarksSheet({
                               subtitle,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.ayaTextMuted,
+                                color: AppColors.lightTextMuted,
                               ),
                             ),
                       trailing: Icon(
@@ -160,7 +160,7 @@ Future<void> showBookmarksSheet({
                                 "لا توجد فواصل",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w800,
-                                  color: AppColors.ayaTextMuted,
+                                  color: AppColors.lightTextMuted,
                                 ),
                               ),
                             )

@@ -155,7 +155,6 @@ class ContentFeedBloc extends Bloc<ContentFeedEvent, ContentFeedState> {
       if (filtered.isNotEmpty) {
         emit(ContentFeedLoaded(
           posts: filtered,
-          hasMore: false,
           activeCategory: cat,
           likedPostIds: _likedPostIds,
         ));
@@ -178,7 +177,6 @@ class ContentFeedBloc extends Bloc<ContentFeedEvent, ContentFeedState> {
           } else {
             emit(ContentFeedLoaded(
               posts: filtered,
-              hasMore: false,
               activeCategory: cat,
               likedPostIds: _likedPostIds,
             ));
@@ -205,7 +203,6 @@ class ContentFeedBloc extends Bloc<ContentFeedEvent, ContentFeedState> {
         } else {
           emit(ContentFeedLoaded(
             posts: filtered,
-            hasMore: false,
             activeCategory: cat,
             likedPostIds: _likedPostIds,
           ));
@@ -221,7 +218,6 @@ class ContentFeedBloc extends Bloc<ContentFeedEvent, ContentFeedState> {
           } else {
             emit(ContentFeedLoaded(
               posts: filtered,
-              hasMore: false,
               activeCategory: cat,
               likedPostIds: _likedPostIds,
             ));

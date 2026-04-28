@@ -59,10 +59,10 @@ class WahyFeedbackDialogState extends State<WahyFeedbackDialog> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surfaceColor = isDark
         ? const Color(0xFF1B1B1F)
-        : AppColors.ayaSurface;
+        : AppColors.lightSurface;
     final borderColor = isDark
         ? Colors.white.withValues(alpha: 0.1)
-        : AppColors.ayaBorder;
+        : AppColors.lightBorder;
     final inputBg = isDark
         ? const Color(0xFF252529)
         : Colors.white.withValues(alpha: 0.5);

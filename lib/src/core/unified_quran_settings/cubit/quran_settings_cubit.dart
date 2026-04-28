@@ -204,11 +204,12 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
   void reorderCustomBackgroundColors(int oldIndex, int newIndex) {
     if (!state.isInitialized) return;
     final updatedList = List<Color>.from(state.customBackgroundColors);
+    var adjustedIndex = newIndex;
     if (oldIndex < newIndex) {
-      newIndex -= 1;
+      adjustedIndex -= 1;
     }
     final item = updatedList.removeAt(oldIndex);
-    updatedList.insert(newIndex, item);
+    updatedList.insert(adjustedIndex, item);
     final next = state.copyWith(customBackgroundColors: updatedList);
     emit(next);
     _persistState(next);

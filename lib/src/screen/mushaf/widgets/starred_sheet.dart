@@ -73,7 +73,7 @@ Future<void> showStarredSheet({
                                   "لا توجد آيات مميزة بنجمة",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w800,
-                                    color: AppColors.ayaTextMuted,
+                                    color: AppColors.lightTextMuted,
                                   ),
                                 ),
                               )
