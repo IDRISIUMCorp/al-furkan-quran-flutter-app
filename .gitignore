@@ -83,3 +83,6 @@ key.properties
 سكرينات من داخل تطبيق ايه/
 سكرينات من داخل تطبيق وحي/
 android/build/reports/problems/
+
+# IDE artifacts
+desiredFileName.txt
