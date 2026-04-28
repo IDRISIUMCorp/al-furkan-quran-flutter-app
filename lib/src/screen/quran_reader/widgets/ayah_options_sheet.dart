@@ -443,32 +443,6 @@ class AyahOptionsSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildOptionButton({
-    required BuildContext context,
-    required IconData icon,
-    required String label,
-    required ThemeState themeState,
-    required VoidCallback onTap,
-  }) {
-    return const SizedBox.shrink();
-  }
-
-  String _formatAyahKey(String key) {
-    final parts = key.split(":");
-    if (parts.length == 2) {
-      return "سورة ${parts[0]} - آية ${parts[1]}";
-    }
-    return key;
-  }
-
-  String _getVerseNumberInBrackets(String key) {
-    final parts = key.split(":");
-    if (parts.length != 2) return "";
-    final verse = parts[1].trim();
-    if (verse.isEmpty) return "";
-    return "﴿${_toArabicDigits(verse)}﴾";
-  }
-
   String _toArabicDigits(String number) {
     const arabics = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
     final buffer = StringBuffer();
@@ -482,114 +456,7 @@ class AyahOptionsSheet extends StatelessWidget {
     }
     return buffer.toString();
   }
-
-  String _stripTrailingVerseNumber(String text) {
-    var t = text.trimRight();
-    t = t.replaceAll(RegExp(r"[\s\u06DD۝]+$"), "");
-    t = t.replaceAll(RegExp(r"[\s0-9٠-٩۰-۹]+$"), "");
-    return t.trimRight();
-  }
-
-  void _showShareOptions(
-    BuildContext context,
-    VoidCallback? onShareAsText,
-    VoidCallback? onShareAsImage,
-    VoidCallback? onShareWithTafsir,
-    Color bg, Color card, Color onBg, Color subtitleColor, Color dividerColor, Color green,
-  ) {
-    showModalBottomSheet(
-      context: context,
-      useRootNavigator: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: Container(
-            decoration: BoxDecoration(
-              color: bg,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(22),
-                topRight: Radius.circular(22),
-              ),
-            ),
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: dividerColor,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      "خيارات المشاركة",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: onBg,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    _MenuGroup(
-                      cardColor: card,
-                      dividerColor: dividerColor,
-                      children: [
-                        _MenuItem(
-                          title: "كنص",
-                          subtitle: "ينسخ الآية + كل التفاسير المختارة بشكل مرتب",
-                          trailing: const Icon(Icons.copy_rounded),
-                          trailingColor: green,
-                          onBg: onBg,
-                          subtitleColor: subtitleColor,
-                          onTap: onShareAsText == null ? null : () {
-                            Navigator.pop(ctx);
-                            onShareAsText();
-                          },
-                        ),
-                        _MenuItem(
-                          title: "كصورة (بدون تفسير)",
-                          subtitle: "مشاركة الاية فقط كصورة - مناسب للآيات الطويلة",
-                          trailing: const Icon(Icons.image_outlined),
-                          trailingColor: green,
-                          onBg: onBg,
-                          subtitleColor: subtitleColor,
-                          onTap: onShareAsImage == null ? null : () {
-                            Navigator.pop(ctx);
-                            onShareAsImage();
-                          },
-                        ),
-                        _MenuItem(
-                          title: "كصورة",
-                          subtitle: "يصنع صورة بنفس تنسيق المكتبة (التفسير الميسر)",
-                          trailing: const Icon(Icons.image_rounded),
-                          trailingColor: green,
-                          onBg: onBg,
-                          subtitleColor: subtitleColor,
-                          onTap: onShareWithTafsir == null ? null : () {
-                            Navigator.pop(ctx);
-                            onShareWithTafsir();
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
 }
-
 class _MenuGroup extends StatelessWidget {
   final List<Widget> children;
   final Color cardColor;
