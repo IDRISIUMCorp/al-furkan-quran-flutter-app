@@ -218,19 +218,6 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
     return convertAyahNumberToKey(endAyahNumber) ?? "1:7";
   }
 
-  Future<void> _startPlan() async {
-    final days = _daysForPreset(_preset);
-    final box = Hive.box(_boxName);
-    final now = DateTime.now();
-
-    await box.put(_kEnabledKey, true);
-    await box.put(_kPlanDaysKey, days);
-    await box.put(_kCurrentDayIndexKey, 0);
-    await box.put(_kStartedAtKey, now.toIso8601String());
-
-    _load();
-  }
-
   Future<void> _markTodayDone() async {
     if (!_enabled) return;
     final box = Hive.box(_boxName);
@@ -275,22 +262,6 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
     if (confirm == true) {
       await _resetPlan();
     }
-  }
-
-  void _openTodayMushaf() {
-    final days = _enabled ? _planDays : _daysForPreset(_preset);
-    final day = _enabled ? _dayIndex : 0;
-    final range = _rangeForDay(day, days);
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => _KhatmaMushafPage(
-          startPage: range.startPage,
-          endPage: range.endPage,
-        ),
-      ),
-    );
   }
 
   String _rangeLabelForDay(int dayIndex, int days) {

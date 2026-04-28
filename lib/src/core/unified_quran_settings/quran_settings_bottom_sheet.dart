@@ -881,49 +881,6 @@ Future<Color?> showAlFurkanColorPicker(
   return confirmed ? newColor : null;
 }
 
-class _CustomColorPickerDot extends StatelessWidget {
-  final Color currentColor;
-  final ValueChanged<Color> onColorChanged;
-
-  const _CustomColorPickerDot({
-    required this.currentColor,
-    required this.onColorChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () async {
-        final newColor = await showAlFurkanColorPicker(context, currentColor);
-        if (newColor != null) {
-          onColorChanged(newColor);
-        }
-      },
-      borderRadius: BorderRadius.circular(999),
-      child: Container(
-        width: 38,
-        height: 38,
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: SweepGradient(
-            colors: [
-              Colors.red,
-              Colors.yellow,
-              Colors.green,
-              Colors.cyan,
-              Colors.blue,
-              Colors.purple,
-              Colors.pink,
-              Colors.red,
-            ],
-          ),
-        ),
-        child: const Icon(Icons.colorize_rounded, size: 20, color: Colors.white),
-      ),
-    );
-  }
-}
-
 class _LayoutModeSection extends StatelessWidget {
   final QuranSettingsState state;
   final Color primary;
