@@ -2,7 +2,6 @@ import "package:al_furkan/src/resources/quran_resources/models/tafsir_book_model
 import "package:al_furkan/src/resources/quran_resources/quran_ayah_count.dart";
 import "package:al_furkan/src/resources/quran_resources/meaning_of_surah.dart";
 import "package:al_furkan/src/core/unified_quran_settings/cubit/quran_settings_cubit.dart";
-import "package:al_furkan/src/core/unified_quran_settings/quran_settings_bottom_sheet.dart";
 import "package:al_furkan/src/screen/quran_resources/quran_resources_view.dart";
 import "package:al_furkan/src/screen/settings/cubit/quran_script_view_cubit.dart";
 import "package:al_furkan/src/theme/controller/theme_cubit.dart";
@@ -14,8 +13,6 @@ import "package:al_furkan/src/utils/quran_resources/quran_tafsir_function.dart";
 import "package:al_furkan/src/utils/quran_resources/word_info_models.dart";
 import "package:al_furkan/src/utils/quran_resources/word_info_repository.dart";
 import "package:al_furkan/src/widget/quran_script/model/script_info.dart";
-import "package:al_furkan/src/widget/add_collection_popup/add_note_popup.dart";
-import "package:al_furkan/src/widget/add_collection_popup/add_to_pinned_popup.dart";
 import "package:al_furkan/src/widget/share/unified_share_bottom_sheet.dart";
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -145,37 +142,6 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
         .toList();
   }
 
-  List<_QcfWord> _getQcfWords(int surah, int verse) {
-    final rawQcf = qcf.getVerseQCFWords(surah, verse, verseEndSymbol: false);
-    final filteredQcf = rawQcf.where((token) {
-      final cleaned = token.replaceAll(RegExp(r"\s+"), "").trim();
-      if (cleaned.isEmpty) return false;
-      if (_isSpecialSymbol(cleaned)) return false;
-      if (RegExp(r"^[0-9٠-٩]+$").hasMatch(cleaned)) return false;
-      if (cleaned == "﴿" || cleaned == "﴾") return false;
-      return true;
-    }).toList();
-
-    final rawPlainText = qcf.getVerse(surah, verse, verseEndSymbol: false);
-    final plainWords = rawPlainText
-        .replaceAllMapped(_specialSymbolPattern, (m) => " ${m.group(0)} ")
-        .split(RegExp(r"\s+"))
-        .where((word) => word.isNotEmpty)
-        .where((word) => !_isSpecialSymbol(word))
-        .toList();
-
-    final limit =
-        filteredQcf.length < plainWords.length ? filteredQcf.length : plainWords.length;
-    return List<_QcfWord>.generate(
-      limit,
-      (i) => _QcfWord(
-        text: filteredQcf[i],
-        displayIndex: i + 1,
-        originalWordNumber: i + 1,
-      ),
-    );
-  }
-
   List<String> _getPlainWords(BuildContext context, int surah, int verse) {
     final scriptType = context.read<QuranViewCubit>().state.quranScriptType;
     final words = QuranScriptFunction.getWordListOfAyah(
@@ -278,16 +244,6 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
     return qcf.getVerse(surah, verse, verseEndSymbol: false);
   }
 
-  String _formatAyahTextForSharing({
-    required String ayahKey,
-    required String ayahText,
-  }) {
-    final parts = ayahKey.split(":");
-    final surah = int.parse(parts[0]);
-    final verse = int.parse(parts[1]);
-    return "$ayahText\n\n[${getSurahNameArabic(surah)}: $verse]\nتمت المشاركة من تطبيق الفرقان";
-  }
-
   String _fallbackSizeLabel(WordInfoKind kind) {
     switch (kind) {
       case WordInfoKind.eerab:
@@ -324,13 +280,6 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
       case WordInfoKind.recitations:
         return "القراءات";
     }
-  }
-
-  String _localizedRevelationPlace(int surahNumber) {
-    final raw = qcf.getPlaceOfRevelation(surahNumber).trim().toLowerCase();
-    if (raw.contains("makk")) return "مكية";
-    if (raw.contains("mad")) return "مدنية";
-    return qcf.getPlaceOfRevelation(surahNumber);
   }
 
   Future<int?> _getWordInfoSize(WordInfoKind kind) {
@@ -393,22 +342,6 @@ class _WahyLibrarySheetViewState extends State<WahyLibrarySheetView> {
       _selectedWordNumber = null;
       _activeTab = _LibraryWordTab.translation;
     });
-  }
-
-  Future<void> _copyText(String text, String message) async {
-    if (text.trim().isEmpty) return;
-    await Clipboard.setData(ClipboardData(text: text));
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
-    );
-  }
-
-  String _selectedWordShareText(BuildContext context) {
-    final word = _selectedWordLabel(context);
-    final ayahText = _getAyahText(context, widget.surahNumber, _currentVerse);
-    if (word.isEmpty) return ayahText;
-    return "الكلمة المختارة: $word\n\n$ayahText\n\n[${getSurahNameArabic(widget.surahNumber)}: $_currentVerse]\nتمت المشاركة من تطبيق الفرقان";
   }
 
   String _tafsirDedupKey(TafsirBookModel book) {
