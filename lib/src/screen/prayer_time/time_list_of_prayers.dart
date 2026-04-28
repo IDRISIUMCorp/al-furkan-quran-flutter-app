@@ -33,7 +33,6 @@ import "sunnah_prayer_page.dart";
 // Design System Colors
 const _primaryGreen = Color(0xFF2D7A5F);
 const _accentGold = Color(0xFFD4AF37);
-const _darkBg = Color(0xFF0F1419);
 const _cardDark = Color(0xFF1A1F26);
 const _cardLight = Color(0xFFFFFCF7);
 const _textLight = Color(0xFFF8F9FA);
@@ -119,11 +118,6 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
     Prayer.isha: 20,
   };
   
-  // New features state
-  bool _mosqueMode = false;
-  String? _savedMosqueName;
-  Map<String, dynamic>? _savedMosqueSettings;
-
   @override
   void initState() {
     super.initState();
@@ -149,13 +143,6 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
       };
     }
     
-    // Load new features
-    _mosqueMode = box.get("mosque_mode", defaultValue: false) as bool;
-    _savedMosqueName = box.get("saved_mosque_name") as String?;
-    final savedSettings = box.get("saved_mosque_settings");
-    if (savedSettings is Map) {
-      _savedMosqueSettings = Map<String, dynamic>.from(savedSettings);
-    }
   }
 
   Future<void> _saveAdjustments() async {
@@ -344,105 +331,6 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
       context,
       MaterialPageRoute(
         builder: (_) => const LocationAcquire(backToPage: true),
-      ),
-    );
-  }
-
-  // Save Mosque Settings
-  Future<void> _saveMosqueSettings() async {
-    final box = Hive.box("user");
-    await box.put("mosque_mode", _mosqueMode);
-    await box.put("saved_mosque_name", _savedMosqueName);
-    if (_savedMosqueSettings != null) {
-      await box.put("saved_mosque_settings", _savedMosqueSettings);
-    }
-  }
-
-  // Toggle Mosque Mode
-  Future<void> _toggleMosqueMode() async {
-    setState(() => _mosqueMode = !_mosqueMode);
-    await _saveMosqueSettings();
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(_mosqueMode ? "تم تفعيل وضع المسجد" : "تم إيقاف وضع المسجد"),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  // Save Current Settings as Mosque
-  Future<void> _saveAsMosque(String mosqueName) async {
-    setState(() {
-      _savedMosqueName = mosqueName;
-      _savedMosqueSettings = {
-        'adjustments': {for (final p in _prayers) p.name: _adjustments[p]},
-        'iqamah_times': {for (final p in _prayers) p.name: _iqamahTimes[p]},
-      };
-    });
-    await _saveMosqueSettings();
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('تم حفظ إعدادات مسجد "$mosqueName"'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  // Load Mosque Settings
-  Future<void> _loadMosqueSettings() async {
-    if (_savedMosqueSettings == null) return;
-    
-    final adj = _savedMosqueSettings!['adjustments'] as Map?;
-    if (adj != null) {
-      setState(() {
-        _adjustments = {
-          for (final p in _prayers) p: (adj[p.name] as int?) ?? 0,
-        };
-      });
-    }
-    
-    final iqamah = _savedMosqueSettings!['iqamah_times'] as Map?;
-    if (iqamah != null) {
-      setState(() {
-        _iqamahTimes = {
-          for (final p in _prayers) p: (iqamah[p.name] as int?) ?? _iqamahTimes[p]!,
-        };
-      });
-    }
-    
-    await _saveAdjustments();
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('تم تحميل إعدادات مسجد "$_savedMosqueName"'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  // Share Prayer Times
-  Future<void> _sharePrayerTimes(PrayerTimes today, String? locationName) async {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("تم نسخ مواقيت الصلاة"),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  // Export Settings
-  Future<void> _exportSettings() async {
-    // Convert to JSON string
-    // final jsonString = jsonEncode(settings);
-    
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("تم تصدير الإعدادات"),
-        behavior: SnackBarBehavior.floating,
       ),
     );
   }
@@ -1930,129 +1818,6 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
     ).animate().fadeIn(duration: 380.ms).slideY(begin: 0.03, curve: Curves.easeOutCubic);
   }
 
-  Widget _featureButton({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required bool isDark,
-    bool enabled = true,
-    VoidCallback? onTap,
-  }) {
-    return InkWell(
-      onTap: enabled ? onTap : null,
-      borderRadius: BorderRadius.circular(14),
-      child: Opacity(
-        opacity: enabled ? 1.0 : 0.5,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: color.withValues(alpha: 0.25),
-              width: 1.5,
-            ),
-          ),
-          child: Column(
-            children: [
-              Icon(icon, color: color, size: 24),
-              const Gap(6),
-              Text(
-                label,
-                style: GoogleFonts.cairo(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  color: color,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _showSaveMosqueDialog(bool isDark) async {
-    final controller = TextEditingController(text: _savedMosqueName ?? '');
-    final result = await showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? _cardDark : _cardLight,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          "حفظ إعدادات المسجد",
-          textAlign: TextAlign.right,
-          style: GoogleFonts.cairo(
-            fontWeight: FontWeight.w900,
-            color: isDark ? _textLight : _textDark,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              "أدخل اسم المسجد لحفظ الإعدادات الحالية",
-              textAlign: TextAlign.right,
-              style: GoogleFonts.cairo(
-                fontSize: 13,
-                color: isDark ? _mutedLight : _mutedDark,
-              ),
-            ),
-            const Gap(16),
-            TextField(
-              controller: controller,
-              textAlign: TextAlign.right,
-              decoration: InputDecoration(
-                hintText: "مثال: مسجد النور",
-                filled: true,
-                fillColor: isDark
-                    ? Colors.white.withValues(alpha: 0.05)
-                    : Colors.black.withValues(alpha: 0.03),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                prefixIcon: const Icon(Icons.mosque_rounded),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              "إلغاء",
-              style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
-            ),
-          ),
-          FilledButton(
-            onPressed: () {
-              final name = controller.text.trim();
-              if (name.isNotEmpty) {
-                Navigator.pop(ctx, name);
-              }
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: _primaryGreen,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: Text(
-              "حفظ",
-              style: GoogleFonts.cairo(fontWeight: FontWeight.w800),
-            ),
-          ),
-        ],
-      ),
-    );
-    
-    if (result != null && result.isNotEmpty) {
-      await _saveAsMosque(result);
-    }
-  }
-
   // Add Mosque Sheet
   Future<void> _showAddMosqueSheet(bool isDark) async {
     await showModalBottomSheet(
@@ -3393,118 +3158,6 @@ class _TimeListOfPrayersState extends State<TimeListOfPrayers> {
         ),
       ),
       child: child,
-    );
-  }
-
-  Widget _iconPill(IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Icon(icon, color: color),
-    );
-  }
-
-  Widget _actionPill({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(999),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: 16),
-            const Gap(6),
-            Text(
-              label,
-              style: TextStyle(color: color, fontWeight: FontWeight.w800),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _infoPill(IconData icon, String label, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.04)
-            : Colors.black.withValues(alpha: 0.03),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: isDark ? Colors.white60 : Colors.black54),
-          const Gap(6),
-          Text(label, style: _mutedStyle(isDark)),
-        ],
-      ),
-    );
-  }
-
-  Widget _metricBox({
-    required String title,
-    required String value,
-    required String subtitle,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(title, textAlign: TextAlign.right, style: _mutedStyle(true)),
-          const Gap(8),
-          Text(
-            value,
-            textAlign: TextAlign.right,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
-            ),
-          ),
-          const Gap(4),
-          Text(subtitle, textAlign: TextAlign.right, style: _mutedStyle(true)),
-        ],
-      ),
-    );
-  }
-
-  Widget _dropdownShell(String title, Widget child, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.04)
-            : Colors.black.withValues(alpha: 0.02),
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(title, textAlign: TextAlign.right, style: _mutedStyle(isDark)),
-          child,
-        ],
-      ),
     );
   }
 
