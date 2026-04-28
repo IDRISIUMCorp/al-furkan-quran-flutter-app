@@ -2,15 +2,7 @@
 
 # 📖 Al-Furkan — الفُرقان
 
-**One of the most advanced open-source Quran apps built with Flutter.**
-
-> Combining BLoC, Clean Architecture, and precise Uthmanic script rendering with audio, Tafsir, and daily Islamic tools.
-
-Al-Furkan is a **production-ready Flutter Quran app (cross-platform ready)** built with **BLoC + Clean Architecture** and **Uthmanic (QCF) script rendering**—designed for daily reading, deep study, remembrance, and personalization.
-
-It includes an interactive mushaf, tafsir and translation resources, a word-level Ayah library, prayer times, qibla, azkar, collections, notifications, and a fully customizable **“Ayah of the Day”** home widget.
-
-_Whether you are a daily Quran reader, a student of knowledge, or a Flutter developer building a serious product… Al-Furkan is made to serve you._
+**One of the most advanced open-source Quran apps built with Flutter, combining BLoC, Clean Architecture, and precise Uthmanic script rendering with audio, Tafsir, and daily Islamic tools.**
 
 <p align="center">
   <img src="assets/img/Quran_Logo_v3.png" width="120" style="border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); margin-bottom: 20px;" /><br>
@@ -23,12 +15,31 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
 [![License](https://img.shields.io/badge/License-Waqf_(Charity)-red?style=for-the-badge)](LICENSE)
 [![Developer](https://img.shields.io/badge/Developed_By-IDRISIUM_Corp-8B5CF6?style=for-the-badge)](https://github.com/IDRISIUM)
 
----
 </div>
 
 ---
 
-## Screenshots (نظرة على واجهة المستخدم)
+## About
+
+Al-Furkan is a **production-ready, cross-platform Flutter Quran app** — not a demo, not a UI showcase, but a **real Islamic application** built with **BLoC + Clean Architecture** and **Uthmanic (QCF) script rendering** that feels close to reading from a physical Mushaf.
+
+It is designed for **daily reading, deep study, memorization, and personalization** — combining an interactive mushaf, 61 tafsirs in 25 languages, 209+ translations in 50+ languages, a word-level Ayah library with 7 analysis tabs, 56 reciters with advanced audio controls, prayer times, qibla, azkar, khatma tracking, smart notifications, and a fully customizable **"Ayah of the Day"** home widget — all in one app.
+
+> _Whether you are a daily Quran reader, a student of knowledge, a hafiz, or a Flutter developer building a serious product… Al-Furkan is made to serve you._
+
+### Why Al-Furkan?
+
+- **Not just text + audio** — QCF Uthmanic Mushaf + Word-level Ayah Library + Resource Management
+- **BLoC + Clean Architecture** — not random state scattered inside screens; testable, scalable, maintainable
+- **Offline-first** — core features work without internet using `hive_ce`; no API keys required
+- **61 Tafsirs & 209+ Translations** — the largest resource library in any open-source Quran app
+- **56 Reciters with multiple Qira'at** — Hafs, Warsh, Qalun, with word-by-word audio tracking
+- **Customizable Home Widget** — "Ayah of the Day" with live preview, 20+ Arabic fonts, theme customization
+- **Production-grade performance** — lazy font loading, deferred initialization, bundle size optimization
+
+---
+
+## Screenshots
 
 <p align="center">
   <img src="assets/img/ScreenSH (1).png" width="22%" style="border-radius: 12px; margin: 4px;" />
@@ -43,39 +54,7 @@ _Whether you are a daily Quran reader, a student of knowledge, or a Flutter deve
   <img src="assets/img/ScreenSH (8).png" width="22%" style="border-radius: 12px; margin: 4px;" />
 </p>
 
-## 🏆 Why Al-Furkan (ليه الفُرقان؟)
-
-- **Production-ready Flutter Quran app** مش مجرد demo: مشروع معماري واضح، قابل للتوسعة، ومتجه للتشغيل الحقيقي.
-- **Uthmanic script rendering (QCF Mushaf)** بتجربة قريبة جدًا من المصحف الورقي، مع دعم Dark/Light.
-- **Ayah Library قوية (Word-level tools)**: اختيار كلمة من الآية وعرض (ترجمة/إعراب/صرف/قراءات) بدون زحمة.
-- **Resource Management محترم**: تحميل/حذف موارد (تفاسير/ترجمات/كلمة بكلمة) مع متابعة الحجم والتقدم.
-- **Daily Muslim utilities** داخل نفس التطبيق: Prayer Times, Qibla, Azkar, Khatma, Notifications.
-- **Performance & Packaging mindset**: تحسينات حقيقية لتقليل حجم الباندل وتسريع الإقلاع.
-
-## ⚖️ Comparison (ليه أحسن من أغلب Quran apps / demo projects؟)
-
-### مقارنة مع تطبيقات قرآن “البسيطة”
-
-- **مش مجرد عرض نص + تشغيل صوت**: عندك مصحف QCF + مكتبة آية Word-level + إدارة موارد.
-- **تخصيص حقيقي**: ويدجت “Ayah of the Day” قابل للتعديل بالكامل مع تحديث فوري.
-- **نظام تذكيرات وإشعارات** للختمة/الأذكار/آية اليوم مش إضافة شكلية.
-- **أدوات يومية** (مواقيت/قبلة/أذكار) متكاملة داخل نفس المنتج.
-
-### مقارنة مع مشاريع UI Demo
-
-- **BLoC + Clean Architecture** بدل State عشوائي داخل الشاشات.
-- **Offline-first** باستخدام `hive_ce`—مش محتاج API keys عشان تبدأ.
-- **Performance/Packaging** محسوب: تحميل خطوط QCF عند الطلب وتخفيف الأصول.
-- **Refactoring موثق** (تفتيت شاشة المصحف العملاقة) عشان contributors يقدروا يشتغلوا بوضوح.
-
-## 👨‍💻 Perfect For Developers
-
-- اللي عايز يدرس أو يطبق **BLoC + Clean Architecture** في Flutter Quran app حقيقي.
-- اللي بيحب مشاريع **production-ready**: modular، قابل للاختبار، ومهيأ للتوسع.
-- اللي مهتم بتجارب **Uthmanic script rendering** (QCF) وTypography/Rendering challenges.
-- اللي عايز يساهم في **open-source Quran application** بنية صادقة كـ _صدقة جارية_.
-
-### 👨‍💻 مخرج المشروع والمطور الرئيسي
+## 👨‍💻 Built By
 
 <div align="center">
 
