@@ -1,7 +1,6 @@
 import "dart:math";
 
 import "package:al_furkan/src/resources/quran_resources/quran_pages_info.dart";
-import "package:al_furkan/src/screen/mushaf/mushaf_screen.dart";
 import "package:al_furkan/src/screen/mushaf/widgets/wahy_side_drawer.dart";
 import "package:al_furkan/src/core/notifications/khatma_notification_service.dart";
 import "package:al_furkan/src/theme/controller/theme_cubit.dart";
@@ -52,9 +51,6 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
 
   static const int _totalPages = 604;
 
-  SmartKhatmaPlanPreset _preset = SmartKhatmaPlanPreset.ramadan30;
-  int _customDays = 30;
-
   bool _enabled = false;
   int _planDays = 30;
   int _dayIndex = 0;
@@ -95,9 +91,6 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
       final rawTime = box.get(_kReminderTimeKey);
       final parsed = _parseTimeOfDay(rawTime);
       if (parsed != null) _reminderTime = parsed;
-
-      _customDays = _planDays;
-      _preset = _presetForDays(_planDays);
 
       if (_enabled) {
         _selectedProgramDays = _planDays;
@@ -172,26 +165,6 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
 
     if (_reminderEnabled) {
       await KhatmaNotificationService.instance.scheduleDailyReminder(time: picked);
-    }
-  }
-
-  SmartKhatmaPlanPreset _presetForDays(int days) {
-    if (days == 30) return SmartKhatmaPlanPreset.ramadan30;
-    if (days == 20) return SmartKhatmaPlanPreset.days20;
-    if (days == 10) return SmartKhatmaPlanPreset.days10;
-    return SmartKhatmaPlanPreset.custom;
-  }
-
-  int _daysForPreset(SmartKhatmaPlanPreset p) {
-    switch (p) {
-      case SmartKhatmaPlanPreset.ramadan30:
-        return 30;
-      case SmartKhatmaPlanPreset.days20:
-        return 20;
-      case SmartKhatmaPlanPreset.days10:
-        return 10;
-      case SmartKhatmaPlanPreset.custom:
-        return max(2, _customDays);
     }
   }
 
@@ -962,28 +935,6 @@ class _SmartKhatmaPageState extends State<SmartKhatmaPage> {
           key: ValueKey(_step),
           color: Colors.transparent,
           child: current(),
-        ),
-      ),
-    );
-  }
-}
-
-class _KhatmaMushafPage extends StatelessWidget {
-  final int startPage;
-  final int endPage;
-
-  const _KhatmaMushafPage({
-    required this.startPage,
-    required this.endPage,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: MushafView(
-          useDefaultAppBar: true,
-          initialPageNumber: startPage,
         ),
       ),
     );
