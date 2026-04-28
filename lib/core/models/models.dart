@@ -6,4 +6,3 @@ export 'notification_model.dart';
 export 'update_config.dart';
 export 'analytics_data.dart';
 export 'app_user.dart';
-export 'media_preview.dart';
