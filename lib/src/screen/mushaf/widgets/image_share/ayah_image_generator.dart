@@ -46,7 +46,7 @@ class AyahImageGenerator {
             headerBackgroundColor: const Color(0xFF111111),
             headerWidthLarge: bannerWidth * 1.25,
             headerWidthSmall: bannerWidth * 1.25,
-            surahNameScale: 3.5,
+
             headerTextColor: Colors.white,
             verseTextColor: Colors.white,
             verseNumberColor: Colors.white,
@@ -56,7 +56,7 @@ class AyahImageGenerator {
             headerBackgroundColor: const Color(0xFFEFE3D2),
             headerWidthLarge: bannerWidth * 1.25,
             headerWidthSmall: bannerWidth * 1.25,
-            surahNameScale: 3.5,
+
             headerTextColor: const Color(0xFF1B1B1B),
             verseTextColor: const Color(0xFF1B1B1B),
             verseNumberColor: const Color(0xFF1B1B1B),
@@ -235,7 +235,7 @@ class AyahImageGenerator {
             headerBackgroundColor: const Color(0xFF111111),
             headerWidthLarge: bannerWidth * 1.25,
             headerWidthSmall: bannerWidth * 1.25,
-            surahNameScale: 3.5,
+
             headerTextColor: Colors.white,
             verseTextColor: Colors.white,
             verseNumberColor: Colors.white,
@@ -245,7 +245,7 @@ class AyahImageGenerator {
             headerBackgroundColor: const Color(0xFFEFE3D2),
             headerWidthLarge: bannerWidth * 1.25,
             headerWidthSmall: bannerWidth * 1.25,
-            surahNameScale: 3.5,
+
             headerTextColor: const Color(0xFF1B1B1B),
             verseTextColor: const Color(0xFF1B1B1B),
             verseNumberColor: const Color(0xFF1B1B1B),

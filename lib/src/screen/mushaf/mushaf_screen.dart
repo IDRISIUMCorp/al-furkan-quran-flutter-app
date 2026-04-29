@@ -1431,7 +1431,6 @@ class _MushafViewState extends State<MushafView> {
                       final effectiveQcfTheme = qcfTheme.copyWith(
                         showBasmala: qSettings.showBasmala,
                         showHeader: qSettings.showSurahHeader,
-                        useClassicBorder: false,
                         contentScale: qSettings.contentScale,
                         verseHeight: baseTheme.verseHeight * qSettings.verseHeightScale,
                         verseBackgroundColor: (surah, verse) {

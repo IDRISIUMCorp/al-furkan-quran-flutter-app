@@ -139,40 +139,6 @@ class QcfThemeData {
   /// Default: `true`
   final bool showHeader;
 
-  /// Whether to show the ۩ sajda indicator after sajda verse numbers.
-  /// Default: `true`
-  final bool showSajdaIndicator;
-
-  /// Color for the ۩ sajda indicator symbol.
-  /// Default: `Color(0xFFAB47BC)` (purple)
-  final Color sajdaIndicatorColor;
-
-  // ============ Classic Border Design (Traditional Mushaf) ============
-
-  /// Whether to use classic Islamic border design with decorative frame.
-  /// Default: `false`
-  final bool useClassicBorder;
-
-  /// Color of the outer border frame.
-  /// Default: `Color(0xFF5D4037)` (dark brown)
-  final Color borderColor;
-
-  /// Width of the outer border.
-  /// Default: `2.0`
-  final double borderWidth;
-
-  /// Color of decorative Islamic ornaments in corners.
-  /// Default: `Color(0xFF8D6E63)` (golden brown)
-  final Color ornamentColor;
-
-  /// Background color for the mushaf page (classic cream/beige).
-  /// Default: `Color(0xFFF5F0E8)` (warm cream)
-  final Color classicPageBackground;
-
-  /// Background color for header/footer areas.
-  /// Default: `Color(0xFFEDE4D4)` (light beige)
-  final Color headerFooterBackground;
-
   // ============ Header Customization ============
 
   /// Width of header image on large screens.
@@ -202,10 +168,6 @@ class QcfThemeData {
   final double headerBorderRadius;
 
   final double headerScale;
-
-  /// Scale factor for surah name text size in the header.
-  /// Default: `1.0`
-  final double surahNameScale;
 
   final Widget Function(int pageNumber, int surahNumber, int startVerse)?
   pageTopOverlayBuilder;
@@ -249,16 +211,6 @@ class QcfThemeData {
     // Component Visibility
     this.showBasmala = true,
     this.showHeader = true,
-    this.showSajdaIndicator = true,
-    this.sajdaIndicatorColor = const Color(0xFFAB47BC),
-
-    // Classic Border Design
-    this.useClassicBorder = false,
-    this.borderColor = const Color(0xFF5D4037),
-    this.borderWidth = 2.0,
-    this.ornamentColor = const Color(0xFF8D6E63),
-    this.classicPageBackground = const Color(0xFFF5F0E8),
-    this.headerFooterBackground = const Color(0xFFEDE4D4),
 
     // Header Customization
     this.headerWidthLarge = 250.0,
@@ -266,7 +218,6 @@ class QcfThemeData {
     this.customHeaderBuilder,
     this.headerBorderRadius = 8.0,
     this.headerScale = 1.0,
-    this.surahNameScale = 0.9,
     this.pageTopOverlayBuilder,
     this.pageBottomOverlayBuilder,
     this.firstPagesTopSpacerFactor = 0.0,
@@ -300,20 +251,11 @@ class QcfThemeData {
     double? headerFontSizeSmall,
     bool? showBasmala,
     bool? showHeader,
-    bool? showSajdaIndicator,
-    Color? sajdaIndicatorColor,
-    bool? useClassicBorder,
-    Color? borderColor,
-    double? borderWidth,
-    Color? ornamentColor,
-    Color? classicPageBackground,
-    Color? headerFooterBackground,
     double? headerWidthLarge,
     double? headerWidthSmall,
     Widget Function(int surahNumber)? customHeaderBuilder,
     double? headerBorderRadius,
     double? headerScale,
-    double? surahNameScale,
     Widget Function(int pageNumber, int surahNumber, int startVerse)?
     pageTopOverlayBuilder,
     Widget Function(int pageNumber, int surahNumber, int startVerse)?
@@ -352,20 +294,11 @@ class QcfThemeData {
       headerFontSizeSmall: headerFontSizeSmall ?? this.headerFontSizeSmall,
       showBasmala: showBasmala ?? this.showBasmala,
       showHeader: showHeader ?? this.showHeader,
-      showSajdaIndicator: showSajdaIndicator ?? this.showSajdaIndicator,
-      sajdaIndicatorColor: sajdaIndicatorColor ?? this.sajdaIndicatorColor,
-      useClassicBorder: useClassicBorder ?? this.useClassicBorder,
-      borderColor: borderColor ?? this.borderColor,
-      borderWidth: borderWidth ?? this.borderWidth,
-      ornamentColor: ornamentColor ?? this.ornamentColor,
-      classicPageBackground: classicPageBackground ?? this.classicPageBackground,
-      headerFooterBackground: headerFooterBackground ?? this.headerFooterBackground,
       headerWidthLarge: headerWidthLarge ?? this.headerWidthLarge,
       headerWidthSmall: headerWidthSmall ?? this.headerWidthSmall,
       customHeaderBuilder: customHeaderBuilder ?? this.customHeaderBuilder,
       headerBorderRadius: headerBorderRadius ?? this.headerBorderRadius,
       headerScale: headerScale ?? this.headerScale,
-      surahNameScale: surahNameScale ?? this.surahNameScale,
       pageTopOverlayBuilder:
           pageTopOverlayBuilder ?? this.pageTopOverlayBuilder,
       pageBottomOverlayBuilder:

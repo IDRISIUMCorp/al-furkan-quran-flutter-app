@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:qcf_quran/qcf_quran.dart';
 import 'package:qcf_quran/src/helpers/qcf_font_ready.dart';
-import 'package:qcf_quran/src/widgets/classic_mushaf_border.dart';
-import 'package:qcf_quran/src/widgets/classic_mushaf_header_footer.dart';
 // ignore: implementation_imports
 
 ///
 /// Use this if you want to build your own [PageView] or layout
 /// and need granular control over each page's state and rendering.
-class QcfPage extends StatefulWidget {
+class QcfPage extends StatelessWidget {
   /// The 1-based page number (1..604).
   final int pageNumber;
 
@@ -65,11 +63,11 @@ class QcfPage extends StatefulWidget {
 
   /// Callback to get Tajweed words list for a specific verse.
   final List<String> Function(int surahNumber, int verseNumber)?
-      tajweedWordsBuilder;
+  tajweedWordsBuilder;
 
   /// Callback to get highlights for a specific verse.
   final List<HighlightRange> Function(int surahNumber, int verseNumber)?
-      highlightsBuilder;
+  highlightsBuilder;
 
   const QcfPage({
     super.key,
@@ -92,77 +90,7 @@ class QcfPage extends StatefulWidget {
   });
 
   @override
-  State<QcfPage> createState() => _QcfPageState();
-}
-
-class _QcfPageState extends State<QcfPage> {
-  /// Cached gesture recognizers keyed by "surah:verse".
-  /// Prevents creating 45+ recognizer objects per page per build.
-  final Map<String, _VerseGestureRecognizer> _recognizers = {};
-
-  @override
-  void dispose() {
-    for (final r in _recognizers.values) {
-      r.dispose();
-    }
-    _recognizers.clear();
-    super.dispose();
-  }
-
-  /// Get or create a cached gesture recognizer for a verse.
-  GestureRecognizer? _getRecognizer(int surah, int v) {
-    final bool hasAnyGesture =
-        widget.onTap != null ||
-        widget.onTapDown != null ||
-        widget.onDoubleTap != null ||
-        widget.onLongPress != null ||
-        widget.onLongPressDown != null ||
-        widget.onLongPressUp != null ||
-        widget.onLongPressCancel != null;
-    if (!hasAnyGesture) return null;
-
-    final key = '$surah:$v';
-    final existing = _recognizers[key];
-    if (existing != null) {
-      // Update callbacks on existing recognizer (cheap pointer swap)
-      existing.updateCallbacks(
-        onTap: widget.onTap != null ? () => widget.onTap!.call(surah, v) : null,
-        onDoubleTap: widget.onDoubleTap != null ? () => widget.onDoubleTap!.call(surah, v) : null,
-        onTapDown: widget.onTapDown != null ? (d) => widget.onTapDown!.call(surah, v, d) : null,
-        onLongPress: widget.onLongPress != null ? () => widget.onLongPress!.call(surah, v) : null,
-        onLongPressDown: widget.onLongPressDown != null ? (d) => widget.onLongPressDown!.call(surah, v, d) : null,
-        onLongPressUp: widget.onLongPressUp != null ? () => widget.onLongPressUp!.call(surah, v) : null,
-        onLongPressCancel: widget.onLongPressCancel != null ? () => widget.onLongPressCancel!.call(surah, v) : null,
-      );
-      return existing;
-    }
-
-    final recognizer = _VerseGestureRecognizer(
-      onTap: widget.onTap != null ? () => widget.onTap!.call(surah, v) : null,
-      onDoubleTap: widget.onDoubleTap != null ? () => widget.onDoubleTap!.call(surah, v) : null,
-      onTapDown: widget.onTapDown != null ? (d) => widget.onTapDown!.call(surah, v, d) : null,
-      onLongPress: widget.onLongPress != null ? () => widget.onLongPress!.call(surah, v) : null,
-      onLongPressDown: widget.onLongPressDown != null ? (d) => widget.onLongPressDown!.call(surah, v, d) : null,
-      onLongPressUp: widget.onLongPressUp != null ? () => widget.onLongPressUp!.call(surah, v) : null,
-      onLongPressCancel: widget.onLongPressCancel != null ? () => widget.onLongPressCancel!.call(surah, v) : null,
-    );
-    _recognizers[key] = recognizer;
-    return recognizer;
-  }
-
-  @override
   Widget build(BuildContext context) {
-    // Local aliases for widget properties (StatefulWidget pattern)
-    final pageNumber = widget.pageNumber;
-    final theme = widget.theme;
-    final fontSize = widget.fontSize;
-    final sp = widget.sp;
-    final h = widget.h;
-    final showTajweed = widget.showTajweed;
-    final tajweedWordsBuilder = widget.tajweedWordsBuilder;
-    final highlightsBuilder = widget.highlightsBuilder;
-    final verseBackgroundColor = widget.verseBackgroundColor;
-
     // Validate page number
     if (pageNumber < 1 || pageNumber > 604) {
       return Center(child: Text('Invalid page number: $pageNumber'));
@@ -177,6 +105,7 @@ class _QcfPageState extends State<QcfPage> {
 
         final size = MediaQuery.sizeOf(context);
         final isTablet = size.shortestSide >= 600;
+        final contentScale = theme.contentScale.clamp(0.92, 1.16);
 
         final double baselineWidth = isTablet ? 640 : 470;
         final double fontScale = isTablet ? 1.30 : 1.18;
@@ -185,15 +114,21 @@ class _QcfPageState extends State<QcfPage> {
 
         final double minAllPagesFontSize =
             (size.width * (isTablet ? 0.048 : 0.045)).clamp(18.0, 34.0);
-        final double minFirstPagesFontSize =
-            (size.width * 0.075).clamp(26.0, 36.0);
+        final double minFirstPagesFontSize = (size.width * 0.075).clamp(
+          26.0,
+          36.0,
+        );
 
         final bool isFirstPages = pageNumber == 1 || pageNumber == 2;
-        final double finalFontSize = isFirstPages
-            ? baseFontSize.clamp(minFirstPagesFontSize, 44.0)
-            : baseFontSize.clamp(minAllPagesFontSize, 44.0);
+        final double finalFontSize =
+            isFirstPages
+                ? baseFontSize.clamp(minFirstPagesFontSize, 44.0)
+                : baseFontSize.clamp(minAllPagesFontSize, 44.0);
         final double finalHeight =
-            isFirstPages ? 2.15 : (theme.verseHeight * (isTablet ? 0.93 : 0.96));
+            isFirstPages
+                ? 2.15
+                : (theme.verseHeight * (isTablet ? 0.93 : 0.96));
+        final adjustedBaselineWidth = baselineWidth / contentScale;
 
         final verseSpans = <InlineSpan>[];
         final firstPagesSpacer =
@@ -271,8 +206,45 @@ class _QcfPageState extends State<QcfPage> {
               }
             }
 
-            // Gesture Handling — uses cached recognizers
-            final recognizer = _getRecognizer(surah, v);
+            // Gesture Handling
+            GestureRecognizer? recognizer;
+            final bool hasAnyGesture =
+                onTap != null ||
+                onTapDown != null ||
+                onDoubleTap != null ||
+                onLongPress != null ||
+                onLongPressDown != null ||
+                onLongPressUp != null ||
+                onLongPressCancel != null;
+            if (hasAnyGesture) {
+              recognizer = _VerseGestureRecognizer(
+                onTap: onTap != null ? () => onTap!.call(surah, v) : null,
+                onDoubleTap:
+                    onDoubleTap != null
+                        ? () => onDoubleTap!.call(surah, v)
+                        : null,
+                onTapDown:
+                    onTapDown != null
+                        ? (d) => onTapDown!.call(surah, v, d)
+                        : null,
+                onLongPress:
+                    onLongPress != null
+                        ? () => onLongPress!.call(surah, v)
+                        : null,
+                onLongPressDown:
+                    onLongPressDown != null
+                        ? (d) => onLongPressDown!.call(surah, v, d)
+                        : null,
+                onLongPressUp:
+                    onLongPressUp != null
+                        ? () => onLongPressUp!.call(surah, v)
+                        : null,
+                onLongPressCancel:
+                    onLongPressCancel != null
+                        ? () => onLongPressCancel!.call(surah, v)
+                        : null,
+              );
+            }
 
             final verseBgColor =
                 theme.verseBackgroundColor?.call(surah, v) ??
@@ -300,7 +272,7 @@ class _QcfPageState extends State<QcfPage> {
             }
 
             if (showTajweed && tajweedWordsBuilder != null) {
-              final words = tajweedWordsBuilder(surah, v);
+              final words = tajweedWordsBuilder!(surah, v);
 
               // Important: if tajweed words aren't available (empty), fallback to
               // standard QCF rendering. Otherwise only the verse number glyph will
@@ -457,26 +429,6 @@ class _QcfPageState extends State<QcfPage> {
             }
 
             verseSpans.add(verseNumberSpan);
-
-            // Sajda indicator — small ۩ symbol after verse number
-            if (theme.showSajdaIndicator && isSajdaVerse(surah, v)) {
-              verseSpans.add(
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.middle,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 2),
-                    child: Text(
-                      '۩',
-                      style: TextStyle(
-                        fontSize: finalFontSize * 0.55,
-                        color: theme.sajdaIndicatorColor,
-                        height: 1.0,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }
           }
         }
 
@@ -492,75 +444,46 @@ class _QcfPageState extends State<QcfPage> {
           int.parse(ranges.first['start'].toString()),
         );
 
-        // Get first surah/verse for classic header/footer
-        final firstSurah = int.parse(ranges.first['surah'].toString());
-        final firstVerse = int.parse(ranges.first['start'].toString());
-
         return LayoutBuilder(
           builder: (context, constraints) {
             // Using a fixed standard width (400) creates a perfect baseline rendering
             // that FittedBox will then cleanly scale to any screen (tablet, web, mobile).
             return ColoredBox(
-              color: theme.useClassicBorder
-                  ? theme.classicPageBackground
-                  : theme.pageBackgroundColor,
+              color: theme.pageBackgroundColor,
               child: SizedBox.expand(
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    // Classic header (top)
-                    if (theme.useClassicBorder)
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        child: ClassicMushafHeader(
-                          surahNumber: firstSurah,
-                          theme: theme,
-                        ),
-                      ),
-                    // Main content
                     Align(
-                      alignment: theme.useClassicBorder
-                          ? const Alignment(0.0, 0.05)
-                          : const Alignment(0.0, 0.1),
+                      alignment: const Alignment(
+                        0.0,
+                        0.1,
+                      ), // Moves the Ayahs slightly down
                       child: FittedBox(
                         fit: BoxFit.fitWidth,
                         alignment: Alignment.center,
                         child: SizedBox(
-                          width: baselineWidth,
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              top: theme.useClassicBorder ? 60.0 : 15.0,
-                              bottom: theme.useClassicBorder ? 60.0 : 15.0,
-                              left: 4.0,
-                              right: 4.0,
-                            ),
-                            child: ColoredBox(
-                              color: theme.useClassicBorder
-                                  ? Colors.transparent
-                                  : theme.pageBackgroundColor,
-                              child: ClassicMushafBorder(
-                                theme: theme,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                    vertical: 4.0,
-                                  ),
-                                  child: ExcludeSemantics(
-                                    child: Text.rich(
-                                      TextSpan(children: verseSpans),
-                                      locale: const Locale("ar"),
-                                      textAlign: TextAlign.center,
-                                      textDirection: TextDirection.rtl,
-                                      style: TextStyle(
-                                        fontSize: finalFontSize,
-                                        color: theme.verseTextColor,
-                                        height: finalHeight,
-                                        letterSpacing: theme.letterSpacing,
-                                        wordSpacing: theme.wordSpacing,
-                                      ),
-                                    ),
+                          width: adjustedBaselineWidth,
+                          child: ColoredBox(
+                            color: theme.pageBackgroundColor,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                left: 4.0,
+                                right: 4.0,
+                                bottom: 15.0,
+                              ),
+                              child: ExcludeSemantics(
+                                child: Text.rich(
+                                  TextSpan(children: verseSpans),
+                                  locale: const Locale("ar"),
+                                  textAlign: TextAlign.center,
+                                  textDirection: TextDirection.rtl,
+                                  style: TextStyle(
+                                    fontSize: finalFontSize,
+                                    color: theme.verseTextColor,
+                                    height: finalHeight,
+                                    letterSpacing: theme.letterSpacing,
+                                    wordSpacing: theme.wordSpacing,
                                   ),
                                 ),
                               ),
@@ -569,40 +492,21 @@ class _QcfPageState extends State<QcfPage> {
                         ),
                       ),
                     ),
-                    // Classic footer (bottom)
-                    if (theme.useClassicBorder)
+                    if (pageOverlayTop != null)
                       Positioned(
-                        bottom: 0,
+                        top:
+                            45.0, // Push Surah/Juz down permanently below notch
                         left: 0,
                         right: 0,
-                        child: ClassicMushafFooter(
-                          pageNumber: pageNumber,
-                          surahNumber: firstSurah,
-                          startVerse: firstVerse,
-                          theme: theme,
-                        ),
+                        child: pageOverlayTop,
                       ),
-                    // Original overlay builders (if not using classic design)
-                    if (!theme.useClassicBorder) ...[
-                      if (pageOverlayTop != null)
-                        Positioned(
-                          top: 45.0,
-                          left: 0,
-                          right: 0,
-                          child: IgnorePointer(
-                            child: pageOverlayTop,
-                          ),
-                        ),
-                      if (pageOverlayBottom != null)
-                        Positioned(
-                          bottom: 20.0,
-                          left: 0,
-                          right: 0,
-                          child: IgnorePointer(
-                            child: pageOverlayBottom,
-                          ),
-                        ),
-                    ],
+                    if (pageOverlayBottom != null)
+                      Positioned(
+                        bottom: 8.0, // Push Page Number down explicitly
+                        left: 0,
+                        right: 0,
+                        child: pageOverlayBottom,
+                      ),
                   ],
                 ),
               ),
@@ -615,13 +519,13 @@ class _QcfPageState extends State<QcfPage> {
 }
 
 class _VerseGestureRecognizer extends GestureRecognizer {
-  VoidCallback? onTap;
-  VoidCallback? onDoubleTap;
-  GestureTapDownCallback? onTapDown;
-  VoidCallback? onLongPress;
-  GestureLongPressStartCallback? onLongPressDown;
-  VoidCallback? onLongPressUp;
-  VoidCallback? onLongPressCancel;
+  final VoidCallback? onTap;
+  final VoidCallback? onDoubleTap;
+  final GestureTapDownCallback? onTapDown;
+  final VoidCallback? onLongPress;
+  final GestureLongPressStartCallback? onLongPressDown;
+  final VoidCallback? onLongPressUp;
+  final VoidCallback? onLongPressCancel;
 
   late final TapGestureRecognizer _tap;
   late final DoubleTapGestureRecognizer _doubleTap;
@@ -654,34 +558,6 @@ class _VerseGestureRecognizer extends GestureRecognizer {
           ..onLongPressStart = onLongPressDown
           ..onLongPressUp = onLongPressUp
           ..onLongPressCancel = onLongPressCancel;
-  }
-
-  /// Efficiently update callbacks on both this recognizer and its sub-recognizers.
-  /// Avoids disposing and recreating the entire gesture recognizer tree.
-  void updateCallbacks({
-    VoidCallback? onTap,
-    VoidCallback? onDoubleTap,
-    GestureTapDownCallback? onTapDown,
-    VoidCallback? onLongPress,
-    GestureLongPressStartCallback? onLongPressDown,
-    VoidCallback? onLongPressUp,
-    VoidCallback? onLongPressCancel,
-  }) {
-    this.onTap = onTap;
-    this.onDoubleTap = onDoubleTap;
-    this.onTapDown = onTapDown;
-    this.onLongPress = onLongPress;
-    this.onLongPressDown = onLongPressDown;
-    this.onLongPressUp = onLongPressUp;
-    this.onLongPressCancel = onLongPressCancel;
-
-    _tap.onTap = onTap;
-    _tap.onTapDown = onTapDown;
-    _doubleTap.onDoubleTap = onDoubleTap;
-    _longPress.onLongPress = onLongPress;
-    _longPress.onLongPressStart = onLongPressDown;
-    _longPress.onLongPressUp = onLongPressUp;
-    _longPress.onLongPressCancel = onLongPressCancel;
   }
 
   @override

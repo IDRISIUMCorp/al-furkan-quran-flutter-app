@@ -1562,7 +1562,7 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
             headerBackgroundColor: const Color(0xFF111111),
             headerWidthLarge: bannerWidth * 1.25,
             headerWidthSmall: bannerWidth * 1.25,
-            surahNameScale: 3.5 * _surahNameScale,
+
             headerTextColor: Colors.white,
             verseTextColor: Colors.white,
             verseNumberColor: Colors.white,
@@ -1572,7 +1572,7 @@ class _UnifiedShareBottomSheetState extends State<UnifiedShareBottomSheet> {
             headerBackgroundColor: const Color(0xFFEFE3D2),
             headerWidthLarge: bannerWidth * 1.25,
             headerWidthSmall: bannerWidth * 1.25,
-            surahNameScale: 3.5 * _surahNameScale,
+
             headerTextColor: AppColors.lightTextMain,
             verseTextColor: AppColors.lightTextMain,
             verseNumberColor: AppColors.lightTextMain,
