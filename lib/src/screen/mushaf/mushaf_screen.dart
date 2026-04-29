@@ -917,7 +917,7 @@ class _MushafViewState extends State<MushafView> {
           final savedLightIndex = prefs.getInt('wahy_pref_light_mushaf_theme');
           final targetTheme = savedLightIndex != null 
               ? QuranTheme.values[savedLightIndex] 
-              : QuranTheme.ayah;
+              : QuranTheme.cream;
               
           if (current.theme != targetTheme) cubit.updateTheme(targetTheme);
         } else {
@@ -947,14 +947,6 @@ class _MushafViewState extends State<MushafView> {
           return QcfThemeData.sand();
         case QuranTheme.nightBlue:
           return QcfThemeData.nightBlue();
-        case QuranTheme.ayah:
-          return QcfThemeData.ayah();
-        case QuranTheme.beige:
-          return QcfThemeData.beige();
-        case QuranTheme.darkBeige:
-          return QcfThemeData.darkBeige();
-        case QuranTheme.creamDark:
-          return QcfThemeData.creamDark();
         case QuranTheme.custom:
           return QcfThemeData(
             pageBackgroundColor: qSettings.customBackgroundColor,
@@ -1075,14 +1067,6 @@ class _MushafViewState extends State<MushafView> {
                 return QcfThemeData.sand();
               case QuranTheme.nightBlue:
                 return QcfThemeData.nightBlue();
-              case QuranTheme.ayah:
-                return QcfThemeData.ayah();
-              case QuranTheme.beige:
-                return QcfThemeData.beige();
-              case QuranTheme.darkBeige:
-                return QcfThemeData.darkBeige();
-              case QuranTheme.creamDark:
-                return QcfThemeData.creamDark();
               case QuranTheme.custom:
                 return QcfThemeData(
                   pageBackgroundColor: qSettings.customBackgroundColor,

@@ -1449,14 +1449,6 @@ extension on QuranTheme {
         return "ورقي أبيض";
       case QuranTheme.sand:
         return "رملي";
-      case QuranTheme.ayah:
-        return "آية";
-      case QuranTheme.beige:
-        return "بيج";
-      case QuranTheme.darkBeige:
-        return "بيج غامق";
-      case QuranTheme.creamDark:
-        return "كريمي غامق";
     }
   }
 
@@ -1473,10 +1465,6 @@ extension on QuranTheme {
       case QuranTheme.cream:
       case QuranTheme.paperWhite:
       case QuranTheme.sand:
-      case QuranTheme.ayah:
-      case QuranTheme.beige:
-      case QuranTheme.darkBeige:
-      case QuranTheme.creamDark:
         return false;
     }
   }
@@ -1494,18 +1482,12 @@ const List<Color> _highlightColors = [
 ];
 
 final List<(QuranTheme, Color, Color)> _themeOptions = [
-  // Dark themes
   (QuranTheme.charcoal, const Color(0xFF212529), Colors.white),
   (QuranTheme.oled, Colors.black, Colors.white),
   (QuranTheme.nightBlue, const Color(0xFF0F172A), Colors.white),
   (QuranTheme.custom, const Color(0xFF111318), Colors.white),
   (QuranTheme.graphite, const Color(0xFF121417), Colors.white),
   (QuranTheme.midnightPurple, const Color(0xFF140B2D), Colors.white),
-  // Light themes — Ayah-inspired palette
-  (QuranTheme.ayah, const Color(0xFFFAF8F5), const Color(0xFF1C1C28)),
-  (QuranTheme.beige, const Color(0xFFF0EBE3), const Color(0xFF2A2A35)),
-  (QuranTheme.darkBeige, const Color(0xFFE0D5C5), const Color(0xFF1A1A22)),
-  (QuranTheme.creamDark, const Color(0xFFD4C4A8), const Color(0xFF151515)),
   (QuranTheme.sepia, const Color(0xFFF4ECD8), const Color(0xFF3E2723)),
   (QuranTheme.cream, const Color(0xFFFFFDD0), const Color(0xFF2F2417)),
   (QuranTheme.paperWhite, Colors.white, const Color(0xFF151515)),
