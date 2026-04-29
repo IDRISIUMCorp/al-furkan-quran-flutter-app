@@ -11,6 +11,10 @@ enum QuranTheme {
   cream,
   paperWhite,
   sand,
+  ayah,
+  beige,
+  darkBeige,
+  creamDark,
 }
 
 enum MushafLayoutMode {
@@ -70,7 +74,7 @@ class QuranSettingsState {
   bool get enableIrab => true;
 
   const QuranSettingsState({
-    this.fontSize = 23.0,
+    this.fontSize = 20.0,
     this.theme = QuranTheme.charcoal,
     this.highlightColor = Colors.amber,
     this.customBackgroundColor = const Color(0xFF111318),
@@ -134,6 +138,10 @@ class QuranSettingsState {
       case QuranTheme.cream:
       case QuranTheme.paperWhite:
       case QuranTheme.sand:
+      case QuranTheme.ayah:
+      case QuranTheme.beige:
+      case QuranTheme.darkBeige:
+      case QuranTheme.creamDark:
         return false;
     }
   }
@@ -174,6 +182,14 @@ class QuranSettingsState {
         return Colors.white;
       case QuranTheme.sand:
         return const Color(0xFFF3E7D3);
+      case QuranTheme.ayah:
+        return const Color(0xFFFAF8F5);
+      case QuranTheme.beige:
+        return const Color(0xFFF0EBE3);
+      case QuranTheme.darkBeige:
+        return const Color(0xFFE0D5C5);
+      case QuranTheme.creamDark:
+        return const Color(0xFFD4C4A8);
     }
   }
 
@@ -190,6 +206,14 @@ class QuranSettingsState {
       case QuranTheme.paperWhite:
       case QuranTheme.sand:
         return Colors.black87;
+      case QuranTheme.ayah:
+        return const Color(0xFF1C1C28);
+      case QuranTheme.beige:
+        return const Color(0xFF2A2A35);
+      case QuranTheme.darkBeige:
+        return const Color(0xFF1A1A22);
+      case QuranTheme.creamDark:
+        return const Color(0xFF151515);
       case QuranTheme.custom:
         return customTextColor;
     }

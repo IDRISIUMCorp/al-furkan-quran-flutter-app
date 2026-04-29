@@ -531,7 +531,7 @@ class _QcfPageState extends State<QcfPage> {
                           width: baselineWidth,
                           child: Padding(
                             padding: EdgeInsets.only(
-                              top: theme.useClassicBorder ? 60.0 : 15.0,
+                              top: theme.useClassicBorder ? 60.0 : 30.0,
                               bottom: theme.useClassicBorder ? 60.0 : 15.0,
                               left: 4.0,
                               right: 4.0,
@@ -586,7 +586,7 @@ class _QcfPageState extends State<QcfPage> {
                     if (!theme.useClassicBorder) ...[
                       if (pageOverlayTop != null)
                         Positioned(
-                          top: 45.0,
+                          top: 8.0,
                           left: 0,
                           right: 0,
                           child: IgnorePointer(

@@ -31,7 +31,7 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
   Future<void> _init() async {
     _box = await Hive.openBox(_boxName);
 
-    final fontSize = _box.get(_kFontSize, defaultValue: 23.0) as double;
+    final fontSize = _box.get(_kFontSize, defaultValue: 20.0) as double;
     final themeString =
         _box.get(_kTheme, defaultValue: QuranTheme.oled.name) as String;
     final customBg =

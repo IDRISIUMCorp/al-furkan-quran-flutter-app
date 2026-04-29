@@ -483,6 +483,51 @@ class QcfThemeData {
     );
   }
 
+  /// Ayah-inspired light theme — warm white with navy-warm text.
+  /// Matches the 'Ayah' Quran app aesthetic with soft beige undertones.
+  factory QcfThemeData.ayah() {
+    return const QcfThemeData(
+      verseTextColor: Color(0xFF1C1C28),
+      verseNumberColor: Color(0xFF6D4C41),
+      basmalaColor: Color(0xFF1C1C28),
+      headerTextColor: Color(0xFF1C1C28),
+      pageBackgroundColor: Color(0xFFFAF8F5),
+    );
+  }
+
+  /// Warm beige theme — soft beige background with dark text.
+  factory QcfThemeData.beige() {
+    return const QcfThemeData(
+      verseTextColor: Color(0xFF2A2A35),
+      verseNumberColor: Color(0xFF6D4C41),
+      basmalaColor: Color(0xFF2A2A35),
+      headerTextColor: Color(0xFF2A2A35),
+      pageBackgroundColor: Color(0xFFF0EBE3),
+    );
+  }
+
+  /// Dark beige theme — deeper beige/brown background for warmer reading.
+  factory QcfThemeData.darkBeige() {
+    return const QcfThemeData(
+      verseTextColor: Color(0xFF1A1A22),
+      verseNumberColor: Color(0xFF5D4037),
+      basmalaColor: Color(0xFF1A1A22),
+      headerTextColor: Color(0xFF1A1A22),
+      pageBackgroundColor: Color(0xFFE0D5C5),
+    );
+  }
+
+  /// Dark cream theme — rich cream/taupe background for cozy reading.
+  factory QcfThemeData.creamDark() {
+    return const QcfThemeData(
+      verseTextColor: Color(0xFF151515),
+      verseNumberColor: Color(0xFF5D4037),
+      basmalaColor: Color(0xFF151515),
+      headerTextColor: Color(0xFF151515),
+      pageBackgroundColor: Color(0xFFD4C4A8),
+    );
+  }
+
   /// Charcoal dark theme — matches the app's "Quiet Luxury" Charcoal aesthetic.
   /// Deep slate background with warm-toned accents for elegant dark reading.
   factory QcfThemeData.charcoal() {
