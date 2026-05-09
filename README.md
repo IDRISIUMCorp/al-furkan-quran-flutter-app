@@ -716,6 +716,19 @@ flutter run
 
 لمزيد من التفاصيل المعقمة وشروط الاستخدام، يرجى مراجعة ملف حقوق الملكية والترخيص المرفق [LICENSE](LICENSE).
 
+
+---
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=IDRISIUMCorp%2Fal-furkan-quran-flutter-app&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=IDRISIUMCorp/al-furkan-quran-flutter-app&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=IDRISIUMCorp/al-furkan-quran-flutter-app&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=IDRISIUMCorp/al-furkan-quran-flutter-app&type=date&legend=top-left" />
+ </picture>
+</a>
+
 ---
 
 <div align="center">
