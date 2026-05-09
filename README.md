@@ -716,6 +716,14 @@ flutter run
 
 لمزيد من التفاصيل المعقمة وشروط الاستخدام، يرجى مراجعة ملف حقوق الملكية والترخيص المرفق [LICENSE](LICENSE).
 
+---
+<div align="center">
+
+يقول عز وجل 
+
+"إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَإِنَّا لَهُ لَحَافِظُونَ"
+
+</div>
 
 ---
 
@@ -728,13 +736,3 @@ flutter run
    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=IDRISIUMCorp/al-furkan-quran-flutter-app&type=date&legend=top-left" />
  </picture>
 </a>
-
----
-
-<div align="center">
-
-يقول عز وجل
-
-"إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَإِنَّا لَهُ لَحَافِظُونَ"
-
-</div>
