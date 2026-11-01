@@ -1,5 +1,5 @@
 import React from 'react';
-import { Moon, Sun, Settings2, Sparkles, BookOpen } from 'lucide-react';
+import { Moon, Sun, Settings2, Sparkles, BookOpen, Download } from 'lucide-react';
 import { Riwayah } from '../types/hifz';
 
 interface ZenNavbarProps {
@@ -54,6 +54,17 @@ export const ZenNavbar: React.FC<ZenNavbarProps> = ({
 
         {/* Right / Actions */}
         <div className="flex items-center gap-2">
+          {/* Export Flutter Code Button */}
+          <a
+            href="/flutter_app.zip"
+            download="flutter_app.zip"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#F2ECE1] dark:bg-[#1A221E] hover:bg-[#EAE2D4] dark:hover:bg-[#232F2A] text-[#4A6B5D] dark:text-[#7FA695] text-xs font-semibold border border-[#E2D9CC] dark:border-[#2C3B34] transition-all"
+            title="تحميل كود فلاتر لبناء حزمة أندرويد APK"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">تحميل كود APK</span>
+          </a>
+
           {/* Setup Session Button */}
           <button
             onClick={onOpenSetup}
