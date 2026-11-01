@@ -1,0 +1,9 @@
+{
+  "name": "Al-Furkan — الفُرقان",
+  "description": "تطبيق قرآني متكامل صُمم بأحدث التقنيات مع تلاوة المصحف الشريف، التفسير الميسر، مواقيت الصلاة، الأذكار اليومية، واتجاه القبلة",
+  "requestFrame": true,
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
