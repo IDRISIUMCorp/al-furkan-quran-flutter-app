@@ -23,13 +23,20 @@ export function App() {
     const saved = localStorage.getItem('zen_hifz_config');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        return {
+          repetitionMode: 'combined_block',
+          blockRepeatCount: 5,
+          ...parsed,
+        };
       } catch (_) {}
     }
     return {
       surahNumber: 1, // Al-Fatihah
       startAyah: 1,
       endAyah: 7,
+      repetitionMode: 'combined_block',
+      blockRepeatCount: 5,
       singleRepeatCount: 10,
       linkGroupSize: 3,
       linkGroupRepeatCount: 3,

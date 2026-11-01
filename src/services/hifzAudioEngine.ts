@@ -8,10 +8,11 @@ export type HifzErrorCallback = (error: string) => void;
 interface PlaylistItem {
   surah: number;
   ayah: number;
-  type: 'single' | 'link';
+  type: 'single' | 'link' | 'block';
   loopIndex: number;
   totalLoops: number;
   description: string;
+  isEndOfPassage: boolean;
 }
 
 export class HifzAudioEngine {
@@ -156,6 +157,8 @@ export class HifzAudioEngine {
       surahNumber,
       startAyah,
       endAyah,
+      repetitionMode,
+      blockRepeatCount,
       singleRepeatCount,
       linkGroupSize,
       linkGroupRepeatCount,
@@ -166,37 +169,63 @@ export class HifzAudioEngine {
     for (let a = startAyah; a <= endAyah; a++) {
       verses.push(a);
     }
+    if (verses.length === 0) return;
 
-    // Step 1: For each verse, repeat N times
-    for (const v of verses) {
-      for (let r = 1; r <= singleRepeatCount; r++) {
-        this.playlist.push({
-          surah: surahNumber,
-          ayah: v,
-          type: 'single',
-          loopIndex: r,
-          totalLoops: singleRepeatCount,
-          description: `آية ${v} • تكرار ${r} من ${singleRepeatCount}`,
+    // Mode 1: Combined Block Repetition (Loops entire passage together)
+    if (repetitionMode === 'combined_block') {
+      const loops = Math.max(1, blockRepeatCount || singleRepeatCount || 5);
+      const blockLabel = `${startAyah}-${endAyah}`;
+
+      for (let r = 1; r <= loops; r++) {
+        verses.forEach((v, idx) => {
+          const isEndOfBlock = idx === verses.length - 1;
+          this.playlist.push({
+            surah: surahNumber,
+            ayah: v,
+            type: 'block',
+            loopIndex: r,
+            totalLoops: loops,
+            description: `المقطع المجمع (${blockLabel}) • دورة ${r} من ${loops} • آية ${v}`,
+            isEndOfPassage: isEndOfBlock,
+          });
         });
       }
-    }
+    } else {
+      // Mode 2: Verse-by-Verse (Single loops then linked groups)
+      // Step 1: For each verse, repeat N times
+      for (const v of verses) {
+        for (let r = 1; r <= singleRepeatCount; r++) {
+          this.playlist.push({
+            surah: surahNumber,
+            ayah: v,
+            type: 'single',
+            loopIndex: r,
+            totalLoops: singleRepeatCount,
+            description: `آية ${v} • تكرار ${r} من ${singleRepeatCount}`,
+            isEndOfPassage: true,
+          });
+        }
+      }
 
-    // Step 2: Linked groups repetition (if more than 1 verse and linkGroupRepeatCount > 0)
-    if (verses.length > 1 && linkGroupRepeatCount > 0) {
-      const gSize = Math.max(2, linkGroupSize);
-      for (let i = 0; i < verses.length; i += gSize) {
-        const group = verses.slice(i, i + gSize);
-        if (group.length > 1) {
-          const groupLabel = `${group[0]} - ${group[group.length - 1]}`;
-          for (let lr = 1; lr <= linkGroupRepeatCount; lr++) {
-            for (const gv of group) {
-              this.playlist.push({
-                surah: surahNumber,
-                ayah: gv,
-                type: 'link',
-                loopIndex: lr,
-                totalLoops: linkGroupRepeatCount,
-                description: `ربط الآيات (${groupLabel}) • دورة ${lr} من ${linkGroupRepeatCount}`,
+      // Step 2: Linked groups repetition (if more than 1 verse and linkGroupRepeatCount > 0)
+      if (verses.length > 1 && linkGroupRepeatCount > 0) {
+        const gSize = Math.max(2, linkGroupSize);
+        for (let i = 0; i < verses.length; i += gSize) {
+          const group = verses.slice(i, i + gSize);
+          if (group.length > 1) {
+            const groupLabel = `${group[0]} - ${group[group.length - 1]}`;
+            for (let lr = 1; lr <= linkGroupRepeatCount; lr++) {
+              group.forEach((gv, gIdx) => {
+                const isEndOfGroup = gIdx === group.length - 1;
+                this.playlist.push({
+                  surah: surahNumber,
+                  ayah: gv,
+                  type: 'link',
+                  loopIndex: lr,
+                  totalLoops: linkGroupRepeatCount,
+                  description: `ربط الآيات (${groupLabel}) • دورة ${lr} من ${linkGroupRepeatCount} • آية ${gv}`,
+                  isEndOfPassage: isEndOfGroup,
+                });
               });
             }
           }
@@ -255,8 +284,11 @@ export class HifzAudioEngine {
     if (!this.isRunning || !this.config) return;
     this.isFallbackAttempted = false;
 
+    const currentItem = this.playlist[this.currentIndex];
     const delay = this.config.pauseDelaySeconds;
-    if (delay > 0) {
+
+    // Apply recitation pause only if at the end of the passage/block
+    if (currentItem?.isEndOfPassage && delay > 0) {
       this.startSilenceCountdown(delay, () => {
         this.currentIndex++;
         this.playCurrentItem();

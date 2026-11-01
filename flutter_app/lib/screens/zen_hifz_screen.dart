@@ -33,6 +33,9 @@ class _ZenHifzScreenState extends State<ZenHifzScreen> {
   int _surah = 1;
   int _startAyah = 1;
   int _endAyah = 7;
+  String _riwayah = 'hafs'; // 'hafs', 'qalun', 'warsh'
+  HifzRepetitionMode _repetitionMode = HifzRepetitionMode.combinedBlock;
+  int _blockRepeat = 5;
   int _singleRepeat = 10;
   int _linkGroupRepeat = 3;
   int _pauseDelaySeconds = 4;
@@ -44,16 +47,39 @@ class _ZenHifzScreenState extends State<ZenHifzScreen> {
   // State from AudioPlayerService
   HifzSessionState _sessionState = const HifzSessionState();
 
-  // Surah Al-Fatihah verses data
-  final List<Map<String, dynamic>> _sampleAyahs = [
-    {'num': 1, 'text': 'بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ'},
-    {'num': 2, 'text': 'ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ'},
-    {'num': 3, 'text': 'ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ'},
-    {'num': 4, 'text': 'مَـٰلِكِ يَوْمِ ٱلدِّينِ'},
-    {'num': 5, 'text': 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ'},
-    {'num': 6, 'text': 'ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ'},
-    {'num': 7, 'text': 'صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ'},
-  ];
+  // Multi-Riwayah Surah Al-Fatihah verses
+  static const Map<String, List<Map<String, dynamic>>> _riwayahAyahs = {
+    'hafs': [
+      {'num': 1, 'text': 'بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ'},
+      {'num': 2, 'text': 'ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ'},
+      {'num': 3, 'text': 'ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ'},
+      {'num': 4, 'text': 'مَـٰلِكِ يَوْمِ ٱلدِّينِ'},
+      {'num': 5, 'text': 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ'},
+      {'num': 6, 'text': 'ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ'},
+      {'num': 7, 'text': 'صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ'},
+    ],
+    'qalun': [
+      {'num': 1, 'text': 'اِ۬لْحَمْدُ لِلهِ رَبِّ اِ۬لْعَٰلَمِينَ'},
+      {'num': 2, 'text': 'اِ۬لرَّحْمَٰنِ اِ۬لرَّحِيمِ'},
+      {'num': 3, 'text': 'مَٰلِكِ يَوْمِ اِ۬لدِّينِ'},
+      {'num': 4, 'text': 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ'},
+      {'num': 5, 'text': 'اِ۬هْدِنَا اِ۬لصِّرَٰطَ اِ۬لْمُسْتَقِيمَ'},
+      {'num': 6, 'text': 'صِرَٰطَ اِ۬لَّذِينَ أَنْعَمْتَ عَلَيْهِمْ'},
+      {'num': 7, 'text': 'غَيْرِ اِ۬لْمَغْضُوبِ عَلَيْهِمْ وَلَا اِ۬لضَّآلِّينَ'},
+    ],
+    'warsh': [
+      {'num': 1, 'text': 'اِ۬لْحَمْدُ لِلهِ رَبِّ اِ۬لْعَٰلَمِينَ'},
+      {'num': 2, 'text': 'اِ۬لرَّحْمَٰنِ اِ۬لرَّحِيمِ'},
+      {'num': 3, 'text': 'مَلِكِ يَوْمِ اِ۬لدِّينِ'},
+      {'num': 4, 'text': 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ'},
+      {'num': 5, 'text': 'اِ۬هْدِنَا اِ۬لصِّرَٰطَ اِ۬لْمُسْتَقِيمَ'},
+      {'num': 6, 'text': 'صِرَٰطَ اِ۬لَّذِينَ أَنْعَمْتَ عَلَيْهِمْ'},
+      {'num': 7, 'text': 'غَيْرِ اِ۬لْمَغْضُوبِ عَلَيْهِمْ وَلَا اِ۬لضَّآلِّينَ'},
+    ],
+  };
+
+  List<Map<String, dynamic>> get _sampleAyahs =>
+      _riwayahAyahs[_riwayah] ?? _riwayahAyahs['hafs']!;
 
   @override
   void initState() {
@@ -147,6 +173,8 @@ class _ZenHifzScreenState extends State<ZenHifzScreen> {
         surah: _surah,
         startAyah: _startAyah,
         endAyah: _endAyah,
+        repetitionMode: _repetitionMode,
+        blockRepeatCount: _blockRepeat,
         singleRepeatCount: _singleRepeat,
         linkGroupRepeat: _linkGroupRepeat,
         pauseDelaySeconds: _pauseDelaySeconds,
@@ -227,9 +255,9 @@ class _ZenHifzScreenState extends State<ZenHifzScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Reciter Selector
+                  // Riwayah Selector (Hafs | Qalun | Warsh)
                   Text(
-                    'القارئ والرواية',
+                    'الرواية القرآنية ومصحف التلاوة',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -237,119 +265,246 @@ class _ZenHifzScreenState extends State<ZenHifzScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  DropdownButtonFormField<String>(
-                    value: _selectedReciterName,
-                    dropdownColor: isDark ? ZenTheme.darkSurface : ZenTheme.lightSurface,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'الحصري (المعلم)',
-                        child: Text('الحصري (المعلم) - حفص'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'مشاري العفاسي',
-                        child: Text('مشاري راشد العفاسي - حفص'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'محمد صديق المنشاوي',
-                        child: Text('محمد صديق المنشاوي (معلم)'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'علي الحذيفي (قالون)',
-                        child: Text('علي الحذيفي - رواية قالون'),
-                      ),
-                    ],
-                    onChanged: (val) {
-                      if (val != null) {
-                        setSheetState(() => _selectedReciterName = val);
-                        setState(() {
-                          _selectedReciterName = val;
-                          if (val == 'الحصري (المعلم)') {
-                            _reciterPattern =
-                                'https://everyayah.com/data/Husary_Muallim_128kbps/{surah:03d}{ayah:03d}.mp3';
-                          } else if (val == 'مشاري العفاسي') {
-                            _reciterPattern =
-                                'https://everyayah.com/data/Alafasy_128kbps/{surah:03d}{ayah:03d}.mp3';
-                          } else if (val == 'محمد صديق المنشاوي') {
-                            _reciterPattern =
-                                'https://everyayah.com/data/Minshawy_Teacher_128kbps/{surah:03d}{ayah:03d}.mp3';
-                          } else if (val == 'علي الحذيفي (قالون)') {
-                            _reciterPattern =
-                                'https://everyayah.com/data/Hudhaify_128kbps/{surah:03d}{ayah:03d}.mp3';
-                          }
-                        });
-                      }
-                    },
+                  Row(
+                    children: [
+                      {'id': 'hafs', 'name': 'حفص عن عاصم'},
+                      {'id': 'qalun', 'name': 'قالون عن نافع'},
+                      {'id': 'warsh', 'name': 'ورش عن نافع'},
+                    ].map((item) {
+                      final id = item['id']!;
+                      final name = item['name']!;
+                      final isSelected = _riwayah == id;
+                      return Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 3),
+                          child: InkWell(
+                            onTap: () {
+                              setSheetState(() => _riwayah = id);
+                              setState(() {
+                                _riwayah = id;
+                                if (id == 'hafs') {
+                                  _selectedReciterName = 'الحصري (المعلم)';
+                                  _reciterPattern =
+                                      'https://everyayah.com/data/Husary_Muallim_128kbps/{surah:03d}{ayah:03d}.mp3';
+                                } else if (id == 'qalun') {
+                                  _selectedReciterName = 'علي الحذيفي (قالون)';
+                                  _reciterPattern =
+                                      'https://everyayah.com/data/Hudhaify_128kbps/{surah:03d}{ayah:03d}.mp3';
+                                } else if (id == 'warsh') {
+                                  _selectedReciterName = 'إبراهيم الدوسري (ورش)';
+                                  _reciterPattern =
+                                      'https://everyayah.com/data/Warsh_Dossary_128kbps/{surah:03d}{ayah:03d}.mp3';
+                                }
+                              });
+                            },
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? sageColor
+                                    : (isDark ? Colors.white10 : Colors.black12),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? sageColor
+                                      : (isDark ? Colors.white24 : Colors.black26),
+                                ),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                name,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: isSelected ? Colors.white : textColor,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
                   const SizedBox(height: 16),
 
-                  // Single Repeat Slider
+                  // Repetition Mode Toggle
+                  Text(
+                    'طريقة التكرار',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'تكرار الآية الواحدة (N مرات)',
-                        style: TextStyle(fontSize: 13, color: textColor),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            setSheetState(() => _repetitionMode = HifzRepetitionMode.combinedBlock);
+                            setState(() => _repetitionMode = HifzRepetitionMode.combinedBlock);
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: _repetitionMode == HifzRepetitionMode.combinedBlock
+                                  ? sageColor
+                                  : (isDark ? Colors.white10 : Colors.black12),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: _repetitionMode == HifzRepetitionMode.combinedBlock
+                                    ? sageColor
+                                    : (isDark ? Colors.white24 : Colors.black26),
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              'تكرار المقطع مجمعاً',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: _repetitionMode == HifzRepetitionMode.combinedBlock
+                                    ? Colors.white
+                                    : textColor,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                      Text(
-                        '$_singleRepeat مرات',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: sageColor,
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            setSheetState(() => _repetitionMode = HifzRepetitionMode.verseByVerse);
+                            setState(() => _repetitionMode = HifzRepetitionMode.verseByVerse);
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: _repetitionMode == HifzRepetitionMode.verseByVerse
+                                  ? sageColor
+                                  : (isDark ? Colors.white10 : Colors.black12),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: _repetitionMode == HifzRepetitionMode.verseByVerse
+                                    ? sageColor
+                                    : (isDark ? Colors.white24 : Colors.black26),
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              'تكرار آية بآية (فردي)',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: _repetitionMode == HifzRepetitionMode.verseByVerse
+                                    ? Colors.white
+                                    : textColor,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  Slider(
-                    value: _singleRepeat.toDouble(),
-                    min: 1,
-                    max: 20,
-                    divisions: 19,
-                    activeColor: sageColor,
-                    onChanged: (v) {
-                      setSheetState(() => _singleRepeat = v.round());
-                      setState(() => _singleRepeat = v.round());
-                    },
-                  ),
+                  const SizedBox(height: 16),
 
-                  // Link Verses Slider
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'ربط المجموعة متسلسلة (M مرات)',
-                        style: TextStyle(fontSize: 13, color: textColor),
-                      ),
-                      Text(
-                        '$_linkGroupRepeat مرات',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: sageColor,
+                  if (_repetitionMode == HifzRepetitionMode.combinedBlock) ...[
+                    // Combined Block Repeat Slider
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'تكرار المقطع بالكامل (N مرات)',
+                          style: TextStyle(fontSize: 13, color: textColor),
                         ),
-                      ),
-                    ],
-                  ),
-                  Slider(
-                    value: _linkGroupRepeat.toDouble(),
-                    min: 0,
-                    max: 10,
-                    divisions: 10,
-                    activeColor: sageColor,
-                    onChanged: (v) {
-                      setSheetState(() => _linkGroupRepeat = v.round());
-                      setState(() => _linkGroupRepeat = v.round());
-                    },
-                  ),
+                        Text(
+                          '$_blockRepeat مرات',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: sageColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Slider(
+                      value: _blockRepeat.toDouble(),
+                      min: 1,
+                      max: 20,
+                      divisions: 19,
+                      activeColor: sageColor,
+                      onChanged: (v) {
+                        setSheetState(() => _blockRepeat = v.round());
+                        setState(() => _blockRepeat = v.round());
+                      },
+                    ),
+                  ] else ...[
+                    // Single Repeat Slider
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'تكرار الآية الواحدة (N مرات)',
+                          style: TextStyle(fontSize: 13, color: textColor),
+                        ),
+                        Text(
+                          '$_singleRepeat مرات',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: sageColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Slider(
+                      value: _singleRepeat.toDouble(),
+                      min: 1,
+                      max: 20,
+                      divisions: 19,
+                      activeColor: sageColor,
+                      onChanged: (v) {
+                        setSheetState(() => _singleRepeat = v.round());
+                        setState(() => _singleRepeat = v.round());
+                      },
+                    ),
+
+                    // Link Verses Slider
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'ربط المجموعة متسلسلة (M مرات)',
+                          style: TextStyle(fontSize: 13, color: textColor),
+                        ),
+                        Text(
+                          '$_linkGroupRepeat مرات',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: sageColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Slider(
+                      value: _linkGroupRepeat.toDouble(),
+                      min: 0,
+                      max: 10,
+                      divisions: 10,
+                      activeColor: sageColor,
+                      onChanged: (v) {
+                        setSheetState(() => _linkGroupRepeat = v.round());
+                        setState(() => _linkGroupRepeat = v.round());
+                      },
+                    ),
+                  ],
 
                   // Pause Delay Slider
                   Row(
@@ -509,10 +664,11 @@ class _ZenHifzScreenState extends State<ZenHifzScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'الآيات $_startAyah - $_endAyah • $_selectedReciterName',
+                            'الآيات $_startAyah - $_endAyah • مصحف ${_riwayah == 'hafs' ? 'حفص' : _riwayah == 'qalun' ? 'قالون' : 'ورش'} • ${_repetitionMode == HifzRepetitionMode.combinedBlock ? 'تكرار مجمع ($_blockRepeat×)' : 'تكرار فردي'}',
                             style: TextStyle(
                               fontSize: 12,
-                              color: isDark ? Colors.white60 : Colors.black54,
+                              fontWeight: FontWeight.w600,
+                              color: sageColor,
                             ),
                           ),
                         ],

@@ -72,7 +72,7 @@ export const ZenHifzView: React.FC<ZenHifzViewProps> = ({
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
-    getSurahAyahs(sessionConfig.surahNumber).then((data) => {
+    getSurahAyahs(sessionConfig.surahNumber, sessionConfig.riwayah).then((data) => {
       if (isMounted) {
         setAyahs(data);
         setLoading(false);
@@ -81,7 +81,7 @@ export const ZenHifzView: React.FC<ZenHifzViewProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [sessionConfig.surahNumber]);
+  }, [sessionConfig.surahNumber, sessionConfig.riwayah]);
 
   // Connect Audio Engine Callbacks
   useEffect(() => {
@@ -315,9 +315,23 @@ export const ZenHifzView: React.FC<ZenHifzViewProps> = ({
         <h1 className="text-xl sm:text-2xl font-bold font-cairo text-[#1E201D] dark:text-[#E6D5B8]">
           سورة {currentSurahMeta.nameAr}
         </h1>
-        <p className="text-xs text-[#7F8D87] dark:text-[#8D9F96] font-mono">
-          الآيات {sessionConfig.startAyah} - {sessionConfig.endAyah} • رواية {sessionConfig.riwayah === 'hafs' ? 'حفص' : sessionConfig.riwayah === 'qalun' ? 'قالون' : 'ورش'}
-        </p>
+        <div className="flex flex-wrap items-center justify-center gap-1.5 text-xs text-[#7F8D87] dark:text-[#8D9F96] font-mono">
+          <span>الآيات {sessionConfig.startAyah} - {sessionConfig.endAyah}</span>
+          <span>•</span>
+          <span className="px-2 py-0.5 rounded-full bg-[#4A6B5D]/10 dark:bg-[#7FA695]/15 text-[#4A6B5D] dark:text-[#7FA695] font-semibold text-[11px]">
+            {sessionConfig.riwayah === 'hafs'
+              ? 'مصحف حفص عن عاصم'
+              : sessionConfig.riwayah === 'qalun'
+              ? 'مصحف قالون عن نافع'
+              : 'مصحف ورش عن نافع'}
+          </span>
+          <span>•</span>
+          <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 font-semibold text-[10px]">
+            {sessionConfig.repetitionMode === 'combined_block'
+              ? `تكرار مجمع (${sessionConfig.blockRepeatCount || 5}×)`
+              : `تكرار فردي (${sessionConfig.singleRepeatCount}×)`}
+          </span>
+        </div>
 
         {sessionConfig.surahNumber !== 1 &&
           sessionConfig.surahNumber !== 9 &&

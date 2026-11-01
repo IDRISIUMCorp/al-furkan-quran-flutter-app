@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Play, RefreshCw, Layers, Clock, Volume2, Sparkles, Gauge } from 'lucide-react';
-import { HifzSessionConfig, Riwayah, MaskingMode } from '../types/hifz';
+import { HifzSessionConfig, Riwayah, MaskingMode, RepetitionMode } from '../types/hifz';
 import { getRecitersByRiwayah } from '../data/hifzReciters';
 import { SURAH_LIST } from '../data/surahList';
 
@@ -36,6 +36,12 @@ export const RepetitionSetupSheet: React.FC<RepetitionSetupSheetProps> = ({
     Math.min(currentConfig.endAyah, maxVerses)
   );
 
+  const [repetitionMode, setRepetitionMode] = useState<RepetitionMode>(
+    currentConfig.repetitionMode || 'combined_block'
+  );
+  const [blockRepeat, setBlockRepeat] = useState<number>(
+    currentConfig.blockRepeatCount || currentConfig.singleRepeatCount || 5
+  );
   const [singleRepeat, setSingleRepeat] = useState<number>(currentConfig.singleRepeatCount);
   const [linkGroupSize, setLinkGroupSize] = useState<number>(currentConfig.linkGroupSize);
   const [linkGroupRepeat, setLinkGroupRepeat] = useState<number>(
@@ -65,16 +71,19 @@ export const RepetitionSetupSheet: React.FC<RepetitionSetupSheetProps> = ({
 
   const applyPreset = (preset: 'intensive' | 'review' | 'listen') => {
     if (preset === 'intensive') {
+      setBlockRepeat(10);
       setSingleRepeat(10);
       setLinkGroupSize(3);
       setLinkGroupRepeat(3);
       setPauseDelay(4);
     } else if (preset === 'review') {
+      setBlockRepeat(5);
       setSingleRepeat(3);
       setLinkGroupSize(5);
       setLinkGroupRepeat(5);
       setPauseDelay(2);
     } else if (preset === 'listen') {
+      setBlockRepeat(1);
       setSingleRepeat(1);
       setLinkGroupSize(0);
       setLinkGroupRepeat(0);
@@ -93,6 +102,8 @@ export const RepetitionSetupSheet: React.FC<RepetitionSetupSheetProps> = ({
       surahNumber,
       startAyah: finalStart,
       endAyah: finalEnd,
+      repetitionMode,
+      blockRepeatCount: blockRepeat,
       singleRepeatCount: singleRepeat,
       linkGroupSize,
       linkGroupRepeatCount: linkGroupRepeat,
@@ -156,28 +167,36 @@ export const RepetitionSetupSheet: React.FC<RepetitionSetupSheetProps> = ({
 
         {/* Riwayah Selector (Hafs | Qalun | Warsh) */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-[#5A6861] dark:text-[#9FB1A8]">
-            الرواية القرآنية
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-semibold text-[#5A6861] dark:text-[#9FB1A8]">
+              الرواية القرآنية ومصحف التلاوة
+            </label>
+            <span className="text-[10px] text-[#4A6B5D] dark:text-[#7FA695] font-medium">
+              يتغير النص القرآني وضبطه مع كل رواية
+            </span>
+          </div>
           <div className="grid grid-cols-3 gap-2">
             {(
               [
-                { id: 'hafs', label: 'حفص عن عاصم' },
-                { id: 'qalun', label: 'قالون عن نافع' },
-                { id: 'warsh', label: 'ورش عن نافع' },
+                { id: 'hafs', label: 'حفص عن عاصم', sub: 'رسم عثماني' },
+                { id: 'qalun', label: 'قالون عن نافع', sub: 'رسم وضبط مدني' },
+                { id: 'warsh', label: 'ورش عن نافع', sub: 'نقط وإمالة ونقل' },
               ] as const
             ).map((item) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => handleRiwayahChange(item.id)}
-                className={`py-2 px-1 rounded-xl text-xs font-bold transition-all border ${
+                className={`py-2 px-1 rounded-xl text-xs font-bold transition-all border flex flex-col items-center justify-center gap-0.5 ${
                   riwayah === item.id
                     ? 'bg-[#4A6B5D] text-white border-[#4A6B5D] shadow-xs'
                     : 'bg-[#F2ECE1] dark:bg-[#1C2520] text-[#1E201D] dark:text-[#C5D5CC] border-[#E2D9CC] dark:border-[#2A3730]'
                 }`}
               >
-                {item.label}
+                <span>{item.label}</span>
+                <span className={`text-[9px] font-normal ${riwayah === item.id ? 'text-white/80' : 'text-[#7D8C84]'}`}>
+                  {item.sub}
+                </span>
               </button>
             ))}
           </div>
@@ -254,109 +273,221 @@ export const RepetitionSetupSheet: React.FC<RepetitionSetupSheetProps> = ({
           </div>
         </div>
 
-        {/* Steppers: Single Repeat (N), Linking (M), Silence Pause (X) */}
+        {/* Repetition Mode Toggle (Combined Block vs Verse by Verse) */}
+        <div className="space-y-1.5 pt-1">
+          <label className="text-xs font-semibold text-[#5A6861] dark:text-[#9FB1A8] flex items-center justify-between">
+            <span>طريقة التكرار والحفظ</span>
+            <span className="text-[10px] text-[#7F8D87]">
+              {repetitionMode === 'combined_block'
+                ? `قراءة المقطع كاملاً (${startAyah} إلى ${endAyah}) في كل دورة`
+                : 'تكرار كل آية منفردة ثم ربطها معاً'}
+            </span>
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setRepetitionMode('combined_block')}
+              className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-1.5 ${
+                repetitionMode === 'combined_block'
+                  ? 'bg-[#4A6B5D] text-white border-[#4A6B5D] shadow-xs'
+                  : 'bg-[#F2ECE1] dark:bg-[#1C2520] text-[#1E201D] dark:text-[#C5D5CC] border-[#E2D9CC] dark:border-[#2A3730] hover:bg-[#E8E0D2] dark:hover:bg-[#25332B]'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>تكرار المقطع مجمعاً (كتلة واحدة)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setRepetitionMode('verse_by_verse')}
+              className={`py-2 px-2 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-1.5 ${
+                repetitionMode === 'verse_by_verse'
+                  ? 'bg-[#4A6B5D] text-white border-[#4A6B5D] shadow-xs'
+                  : 'bg-[#F2ECE1] dark:bg-[#1C2520] text-[#1E201D] dark:text-[#C5D5CC] border-[#E2D9CC] dark:border-[#2A3730] hover:bg-[#E8E0D2] dark:hover:bg-[#25332B]'
+              }`}
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>تكرار آية بآية (فردي ثم ربط)</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Steppers based on repetitionMode */}
         <div className="space-y-3 pt-1">
-          {/* Single Repeat N */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-[#F2ECE1]/70 dark:bg-[#1A221E]/70 border border-[#E2D9CC] dark:border-[#25332B]">
-            <div className="flex items-center gap-2">
-              <RefreshCw className="w-4 h-4 text-[#4A6B5D] dark:text-[#7FA695]" />
-              <div>
-                <p className="text-xs font-bold text-[#1E201D] dark:text-[#E6D5B8]">
-                  تكرار الآية الواحدة (N)
-                </p>
-                <p className="text-[10px] text-[#6E7D76] dark:text-[#889B91]">
-                  تكرر كل آية منفردة قبل الانتقال للتالية
-                </p>
+          {repetitionMode === 'combined_block' ? (
+            <>
+              {/* Block Repeat Stepper */}
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-[#F2ECE1]/70 dark:bg-[#1A221E]/70 border border-[#E2D9CC] dark:border-[#25332B]">
+                <div className="flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-[#4A6B5D] dark:text-[#7FA695]" />
+                  <div>
+                    <p className="text-xs font-bold text-[#1E201D] dark:text-[#E6D5B8]">
+                      تكرار المقطع بالكامل (N مرات)
+                    </p>
+                    <p className="text-[10px] text-[#6E7D76] dark:text-[#889B91]">
+                      الآيات من {startAyah} إلى {endAyah} تُتلى متصلة في كل دورة تكرار
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setBlockRepeat((v) => Math.max(1, v - 1))}
+                    className="w-8 h-8 rounded-lg bg-[#E2D9CC] dark:bg-[#28352F] text-sm font-bold flex items-center justify-center active:scale-95"
+                  >
+                    -
+                  </button>
+                  <span className="w-8 text-center text-sm font-mono font-bold text-[#4A6B5D] dark:text-[#7FA695]">
+                    {blockRepeat}×
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setBlockRepeat((v) => Math.min(50, v + 1))}
+                    className="w-8 h-8 rounded-lg bg-[#E2D9CC] dark:bg-[#28352F] text-sm font-bold flex items-center justify-center active:scale-95"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setSingleRepeat((v) => Math.max(1, v - 1))}
-                className="w-8 h-8 rounded-lg bg-[#E2D9CC] dark:bg-[#28352F] text-sm font-bold flex items-center justify-center active:scale-95"
-              >
-                -
-              </button>
-              <span className="w-8 text-center text-sm font-mono font-bold text-[#4A6B5D] dark:text-[#7FA695]">
-                {singleRepeat}×
-              </span>
-              <button
-                type="button"
-                onClick={() => setSingleRepeat((v) => Math.min(50, v + 1))}
-                className="w-8 h-8 rounded-lg bg-[#E2D9CC] dark:bg-[#28352F] text-sm font-bold flex items-center justify-center active:scale-95"
-              >
-                +
-              </button>
-            </div>
-          </div>
 
-          {/* Link Group Repeat M */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-[#F2ECE1]/70 dark:bg-[#1A221E]/70 border border-[#E2D9CC] dark:border-[#25332B]">
-            <div className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-[#4A6B5D] dark:text-[#7FA695]" />
-              <div>
-                <p className="text-xs font-bold text-[#1E201D] dark:text-[#E6D5B8]">
-                  ربط وتثبيت الآيات (M)
-                </p>
-                <p className="text-[10px] text-[#6E7D76] dark:text-[#889B91]">
-                  قراءة المقاطع مجمعة (حجم المجموعة: {linkGroupSize})
-                </p>
+              {/* Pause Delay after Block */}
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-[#F2ECE1]/70 dark:bg-[#1A221E]/70 border border-[#E2D9CC] dark:border-[#25332B]">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-[#4A6B5D] dark:text-[#7FA695]" />
+                  <div>
+                    <p className="text-xs font-bold text-[#1E201D] dark:text-[#E6D5B8]">
+                      فترة الصمت بعد المقطع (X ثوانٍ)
+                    </p>
+                    <p className="text-[10px] text-[#6E7D76] dark:text-[#889B91]">
+                      وقت صامت لترديد المقطع كاملاً بصوتك قبل الإعادة التالية
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPauseDelay((v) => Math.max(0, v - 1))}
+                    className="w-8 h-8 rounded-lg bg-[#E2D9CC] dark:bg-[#28352F] text-sm font-bold flex items-center justify-center active:scale-95"
+                  >
+                    -
+                  </button>
+                  <span className="w-10 text-center text-sm font-mono font-bold text-[#4A6B5D] dark:text-[#7FA695]">
+                    {pauseDelay} ث
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setPauseDelay((v) => Math.min(30, v + 1))}
+                    className="w-8 h-8 rounded-lg bg-[#E2D9CC] dark:bg-[#28352F] text-sm font-bold flex items-center justify-center active:scale-95"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setLinkGroupRepeat((v) => Math.max(0, v - 1))}
-                className="w-8 h-8 rounded-lg bg-[#E2D9CC] dark:bg-[#28352F] text-sm font-bold flex items-center justify-center active:scale-95"
-              >
-                -
-              </button>
-              <span className="w-8 text-center text-sm font-mono font-bold text-[#4A6B5D] dark:text-[#7FA695]">
-                {linkGroupRepeat}×
-              </span>
-              <button
-                type="button"
-                onClick={() => setLinkGroupRepeat((v) => Math.min(20, v + 1))}
-                className="w-8 h-8 rounded-lg bg-[#E2D9CC] dark:bg-[#28352F] text-sm font-bold flex items-center justify-center active:scale-95"
-              >
-                +
-              </button>
-            </div>
-          </div>
+            </>
+          ) : (
+            <>
+              {/* Single Repeat N */}
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-[#F2ECE1]/70 dark:bg-[#1A221E]/70 border border-[#E2D9CC] dark:border-[#25332B]">
+                <div className="flex items-center gap-2">
+                  <RefreshCw className="w-4 h-4 text-[#4A6B5D] dark:text-[#7FA695]" />
+                  <div>
+                    <p className="text-xs font-bold text-[#1E201D] dark:text-[#E6D5B8]">
+                      تكرار الآية الواحدة (N)
+                    </p>
+                    <p className="text-[10px] text-[#6E7D76] dark:text-[#889B91]">
+                      تكرر كل آية منفردة قبل الانتقال للتالية
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSingleRepeat((v) => Math.max(1, v - 1))}
+                    className="w-8 h-8 rounded-lg bg-[#E2D9CC] dark:bg-[#28352F] text-sm font-bold flex items-center justify-center active:scale-95"
+                  >
+                    -
+                  </button>
+                  <span className="w-8 text-center text-sm font-mono font-bold text-[#4A6B5D] dark:text-[#7FA695]">
+                    {singleRepeat}×
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setSingleRepeat((v) => Math.min(50, v + 1))}
+                    className="w-8 h-8 rounded-lg bg-[#E2D9CC] dark:bg-[#28352F] text-sm font-bold flex items-center justify-center active:scale-95"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
 
-          {/* Pause Delay X */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-[#F2ECE1]/70 dark:bg-[#1A221E]/70 border border-[#E2D9CC] dark:border-[#25332B]">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-[#4A6B5D] dark:text-[#7FA695]" />
-              <div>
-                <p className="text-xs font-bold text-[#1E201D] dark:text-[#E6D5B8]">
-                  فترة الصمت للترديد (X ثوانٍ)
-                </p>
-                <p className="text-[10px] text-[#6E7D76] dark:text-[#889B91]">
-                  وقت صامت مخصص لتردد الآية بصوتك قبل الإعادة
-                </p>
+              {/* Link Group Repeat M */}
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-[#F2ECE1]/70 dark:bg-[#1A221E]/70 border border-[#E2D9CC] dark:border-[#25332B]">
+                <div className="flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-[#4A6B5D] dark:text-[#7FA695]" />
+                  <div>
+                    <p className="text-xs font-bold text-[#1E201D] dark:text-[#E6D5B8]">
+                      ربط وتثبيت الآيات (M)
+                    </p>
+                    <p className="text-[10px] text-[#6E7D76] dark:text-[#889B91]">
+                      قراءة المقاطع مجمعة (حجم المجموعة: {linkGroupSize})
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setLinkGroupRepeat((v) => Math.max(0, v - 1))}
+                    className="w-8 h-8 rounded-lg bg-[#E2D9CC] dark:bg-[#28352F] text-sm font-bold flex items-center justify-center active:scale-95"
+                  >
+                    -
+                  </button>
+                  <span className="w-8 text-center text-sm font-mono font-bold text-[#4A6B5D] dark:text-[#7FA695]">
+                    {linkGroupRepeat}×
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setLinkGroupRepeat((v) => Math.min(20, v + 1))}
+                    className="w-8 h-8 rounded-lg bg-[#E2D9CC] dark:bg-[#28352F] text-sm font-bold flex items-center justify-center active:scale-95"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setPauseDelay((v) => Math.max(0, v - 1))}
-                className="w-8 h-8 rounded-lg bg-[#E2D9CC] dark:bg-[#28352F] text-sm font-bold flex items-center justify-center active:scale-95"
-              >
-                -
-              </button>
-              <span className="w-10 text-center text-sm font-mono font-bold text-[#4A6B5D] dark:text-[#7FA695]">
-                {pauseDelay} ث
-              </span>
-              <button
-                type="button"
-                onClick={() => setPauseDelay((v) => Math.min(15, v + 1))}
-                className="w-8 h-8 rounded-lg bg-[#E2D9CC] dark:bg-[#28352F] text-sm font-bold flex items-center justify-center active:scale-95"
-              >
-                +
-              </button>
-            </div>
-          </div>
+
+              {/* Pause Delay X */}
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-[#F2ECE1]/70 dark:bg-[#1A221E]/70 border border-[#E2D9CC] dark:border-[#25332B]">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-[#4A6B5D] dark:text-[#7FA695]" />
+                  <div>
+                    <p className="text-xs font-bold text-[#1E201D] dark:text-[#E6D5B8]">
+                      فترة الصمت للترديد (X ثوانٍ)
+                    </p>
+                    <p className="text-[10px] text-[#6E7D76] dark:text-[#889B91]">
+                      وقت صامت مخصص لتردد الآية بصوتك قبل الإعادة
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPauseDelay((v) => Math.max(0, v - 1))}
+                    className="w-8 h-8 rounded-lg bg-[#E2D9CC] dark:bg-[#28352F] text-sm font-bold flex items-center justify-center active:scale-95"
+                  >
+                    -
+                  </button>
+                  <span className="w-10 text-center text-sm font-mono font-bold text-[#4A6B5D] dark:text-[#7FA695]">
+                    {pauseDelay} ث
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setPauseDelay((v) => Math.min(15, v + 1))}
+                    className="w-8 h-8 rounded-lg bg-[#E2D9CC] dark:bg-[#28352F] text-sm font-bold flex items-center justify-center active:scale-95"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Playback Voice Speed */}

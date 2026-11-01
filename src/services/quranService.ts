@@ -1,49 +1,77 @@
 import { Ayah, SurahMeta } from '../types/quran';
+import { Riwayah } from '../types/hifz';
 import { SURAH_LIST } from '../data/surahList';
 
 // Cache for Quran scripts and Tafseer
-let uthmaniDataCache: Record<string, Record<string, string[]>> | null = null;
+const scriptCaches: Record<Riwayah, Record<string, Record<string, string[]>> | null> = {
+  hafs: null,
+  warsh: null,
+  qalun: null,
+};
 let tafseerDataCache: string[][] | null = null;
 let translationsCache: Record<number, Record<number, string>> = {};
 
-export async function loadUthmaniScript(): Promise<Record<string, Record<string, string[]>>> {
-  if (uthmaniDataCache) return uthmaniDataCache;
+export async function loadRiwayahScript(riwayah: Riwayah = 'hafs'): Promise<Record<string, Record<string, string[]>>> {
+  if (scriptCaches[riwayah]) return scriptCaches[riwayah]!;
+
+  const fileMap: Record<Riwayah, string> = {
+    hafs: '/assets/quran_script/Uthmani.json',
+    warsh: '/assets/quran_script/Warsh.json',
+    qalun: '/assets/quran_script/Qalun.json',
+  };
+
+  const filePath = fileMap[riwayah] || fileMap.hafs;
+
   try {
-    const res = await fetch('/assets/quran_script/Uthmani.json');
+    const res = await fetch(filePath);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    uthmaniDataCache = await res.json();
-    return uthmaniDataCache!;
+    const data = await res.json();
+    scriptCaches[riwayah] = data;
+    return data;
   } catch (err) {
-    console.warn('Failed to load local Uthmani.json, falling back to CDN:', err);
-    // Fallback: alquran.cloud CDN
+    console.warn(`Failed to load ${filePath}, attempting fallback:`, err);
+    // If Warsh/Qalun fail, fallback to Hafs if available
+    if (riwayah !== 'hafs' && scriptCaches.hafs) {
+      return scriptCaches.hafs!;
+    }
     return {};
   }
 }
 
-export async function getSurahAyahs(surahNumber: number): Promise<Ayah[]> {
+// Backward-compatible export
+export async function loadUthmaniScript(): Promise<Record<string, Record<string, string[]>>> {
+  return loadRiwayahScript('hafs');
+}
+
+export async function getSurahAyahs(surahNumber: number, riwayah: Riwayah = 'hafs'): Promise<Ayah[]> {
   const meta = SURAH_LIST.find((s) => s.number === surahNumber);
-  const totalVerses = meta ? meta.versesCount : 7;
+  const defaultTotalVerses = meta ? meta.versesCount : 7;
 
   try {
-    const uthmani = await loadUthmaniScript();
-    const surahWords = uthmani[String(surahNumber)];
+    const script = await loadRiwayahScript(riwayah);
+    const surahWords = script[String(surahNumber)];
 
     if (surahWords) {
+      const keys = Object.keys(surahWords).map(Number).filter((n) => !isNaN(n));
+      const totalVerses = keys.length > 0 ? Math.max(...keys) : defaultTotalVerses;
+
       const ayahs: Ayah[] = [];
       for (let i = 1; i <= totalVerses; i++) {
         const words = surahWords[String(i)] || [];
         const text = words.join(' ');
-        ayahs.push({
-          numberInSurah: i,
-          surahNumber,
-          textUthmani: text || `آية ${i}`,
-          translationEn: translationsCache[surahNumber]?.[i] || undefined,
-        });
+        if (text || i <= defaultTotalVerses) {
+          ayahs.push({
+            numberInSurah: i,
+            surahNumber,
+            textUthmani: text || `آية ${i}`,
+            translationEn: translationsCache[surahNumber]?.[i] || undefined,
+          });
+        }
       }
-      return ayahs;
+      if (ayahs.length > 0) return ayahs;
     }
   } catch (e) {
-    console.error('Error getting Surah ayahs:', e);
+    console.error(`Error getting Surah ${surahNumber} ayahs for riwayah ${riwayah}:`, e);
   }
 
   // Remote fallback from alquran.cloud if local asset is loading or missing

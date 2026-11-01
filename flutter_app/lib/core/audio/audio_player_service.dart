@@ -31,11 +31,15 @@ class AyahPlaybackTag {
   }
 }
 
+enum HifzRepetitionMode { verseByVerse, combinedBlock }
+
 /// Repetition configuration for Zen Hifz memorization session
 class HifzVerseConfig {
   final int surah;
   final int startAyah;
   final int endAyah;
+  final HifzRepetitionMode repetitionMode; // combinedBlock or verseByVerse
+  final int blockRepeatCount; // loops for combined block
   final int singleRepeatCount; // N: repeats per verse
   final int linkGroupRepeat;   // M: repeats for entire group
   final int pauseDelaySeconds; // X: silence duration for user to recite from memory
@@ -47,6 +51,8 @@ class HifzVerseConfig {
     required this.surah,
     required this.startAyah,
     required this.endAyah,
+    this.repetitionMode = HifzRepetitionMode.combinedBlock,
+    this.blockRepeatCount = 5,
     this.singleRepeatCount = 10,
     this.linkGroupRepeat = 3,
     this.pauseDelaySeconds = 4,
@@ -270,72 +276,109 @@ class AudioPlayerService {
         silentSource = AudioSource.file(silentFile.path);
       }
 
-      // 1. Single Verses Repetition (N times each)
-      for (int a = config.startAyah; a <= config.endAyah; a++) {
-        final primaryUrl = _formatUrl(config.reciterCdnPattern, config.surah, a);
-
-        for (int loop = 1; loop <= config.singleRepeatCount; loop++) {
-          final ayahTag = AyahPlaybackTag(
-            surah: config.surah,
-            ayah: a,
-            loopIndex: loop,
-            totalLoops: config.singleRepeatCount,
-            isSilence: false,
-            isGroupPhase: false,
-          );
-
-          sources.add(AudioSource.uri(Uri.parse(primaryUrl), tag: ayahTag));
+      if (config.repetitionMode == HifzRepetitionMode.combinedBlock) {
+        // Combined block mode: repeats whole selected block consecutively N times
+        for (int bLoop = 1; bLoop <= config.blockRepeatCount; bLoop++) {
+          for (int a = config.startAyah; a <= config.endAyah; a++) {
+            final url = _formatUrl(config.reciterCdnPattern, config.surah, a);
+            final blockAyahTag = AyahPlaybackTag(
+              surah: config.surah,
+              ayah: a,
+              loopIndex: bLoop,
+              totalLoops: config.blockRepeatCount,
+              isSilence: false,
+              isGroupPhase: true,
+              groupLoopIndex: bLoop,
+              totalGroupLoops: config.blockRepeatCount,
+            );
+            sources.add(AudioSource.uri(Uri.parse(url), tag: blockAyahTag));
+          }
 
           if (silentSource != null) {
-            final silenceTag = AyahPlaybackTag(
+            final blockSilenceTag = AyahPlaybackTag(
+              surah: config.surah,
+              ayah: config.endAyah,
+              loopIndex: bLoop,
+              totalLoops: config.blockRepeatCount,
+              isSilence: true,
+              isGroupPhase: true,
+              groupLoopIndex: bLoop,
+              totalGroupLoops: config.blockRepeatCount,
+            );
+            sources.add(AudioSource.uri(
+              (silentSource as UriAudioSource).uri,
+              tag: blockSilenceTag,
+            ));
+          }
+        }
+      } else {
+        // 1. Single Verses Repetition (N times each)
+        for (int a = config.startAyah; a <= config.endAyah; a++) {
+          final primaryUrl = _formatUrl(config.reciterCdnPattern, config.surah, a);
+
+          for (int loop = 1; loop <= config.singleRepeatCount; loop++) {
+            final ayahTag = AyahPlaybackTag(
               surah: config.surah,
               ayah: a,
               loopIndex: loop,
               totalLoops: config.singleRepeatCount,
-              isSilence: true,
+              isSilence: false,
               isGroupPhase: false,
             );
-            sources.add(AudioSource.uri(
-              (silentSource as UriAudioSource).uri,
-              tag: silenceTag,
-            ));
+
+            sources.add(AudioSource.uri(Uri.parse(primaryUrl), tag: ayahTag));
+
+            if (silentSource != null) {
+              final silenceTag = AyahPlaybackTag(
+                surah: config.surah,
+                ayah: a,
+                loopIndex: loop,
+                totalLoops: config.singleRepeatCount,
+                isSilence: true,
+                isGroupPhase: false,
+              );
+              sources.add(AudioSource.uri(
+                (silentSource as UriAudioSource).uri,
+                tag: silenceTag,
+              ));
+            }
           }
         }
-      }
 
-      // 2. Linked Group Repetition (M times over the whole range)
-      if (config.linkGroupRepeat > 0 && config.endAyah > config.startAyah) {
-        for (int gLoop = 1; gLoop <= config.linkGroupRepeat; gLoop++) {
-          for (int a = config.startAyah; a <= config.endAyah; a++) {
-            final url = _formatUrl(config.reciterCdnPattern, config.surah, a);
-            final groupAyahTag = AyahPlaybackTag(
-              surah: config.surah,
-              ayah: a,
-              loopIndex: 1,
-              totalLoops: 1,
-              isSilence: false,
-              isGroupPhase: true,
-              groupLoopIndex: gLoop,
-              totalGroupLoops: config.linkGroupRepeat,
-            );
-            sources.add(AudioSource.uri(Uri.parse(url), tag: groupAyahTag));
-          }
+        // 2. Linked Group Repetition (M times over the whole range)
+        if (config.linkGroupRepeat > 0 && config.endAyah > config.startAyah) {
+          for (int gLoop = 1; gLoop <= config.linkGroupRepeat; gLoop++) {
+            for (int a = config.startAyah; a <= config.endAyah; a++) {
+              final url = _formatUrl(config.reciterCdnPattern, config.surah, a);
+              final groupAyahTag = AyahPlaybackTag(
+                surah: config.surah,
+                ayah: a,
+                loopIndex: 1,
+                totalLoops: 1,
+                isSilence: false,
+                isGroupPhase: true,
+                groupLoopIndex: gLoop,
+                totalGroupLoops: config.linkGroupRepeat,
+              );
+              sources.add(AudioSource.uri(Uri.parse(url), tag: groupAyahTag));
+            }
 
-          if (silentSource != null) {
-            final groupSilenceTag = AyahPlaybackTag(
-              surah: config.surah,
-              ayah: config.endAyah,
-              loopIndex: 1,
-              totalLoops: 1,
-              isSilence: true,
-              isGroupPhase: true,
-              groupLoopIndex: gLoop,
-              totalGroupLoops: config.linkGroupRepeat,
-            );
-            sources.add(AudioSource.uri(
-              (silentSource as UriAudioSource).uri,
-              tag: groupSilenceTag,
-            ));
+            if (silentSource != null) {
+              final groupSilenceTag = AyahPlaybackTag(
+                surah: config.surah,
+                ayah: config.endAyah,
+                loopIndex: 1,
+                totalLoops: 1,
+                isSilence: true,
+                isGroupPhase: true,
+                groupLoopIndex: gLoop,
+                totalGroupLoops: config.linkGroupRepeat,
+              );
+              sources.add(AudioSource.uri(
+                (silentSource as UriAudioSource).uri,
+                tag: groupSilenceTag,
+              ));
+            }
           }
         }
       }

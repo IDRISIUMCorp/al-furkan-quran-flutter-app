@@ -1,5 +1,6 @@
 export type Riwayah = 'hafs' | 'qalun' | 'warsh';
 export type MaskingMode = 'visible' | 'blurred' | 'hidden';
+export type RepetitionMode = 'verse_by_verse' | 'combined_block';
 
 export interface HifzReciter {
   id: string;
@@ -16,6 +17,8 @@ export interface HifzSessionConfig {
   surahNumber: number;
   startAyah: number;
   endAyah: number;
+  repetitionMode: RepetitionMode; // 'verse_by_verse' | 'combined_block'
+  blockRepeatCount: number;       // Number of times to loop the entire combined block
   singleRepeatCount: number; // N
   linkGroupSize: number;     // G
   linkGroupRepeatCount: number; // M
