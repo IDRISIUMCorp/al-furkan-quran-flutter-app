@@ -39,6 +39,7 @@ class HifzVerseConfig {
   final int singleRepeatCount; // N: repeats per verse
   final int linkGroupRepeat;   // M: repeats for entire group
   final int pauseDelaySeconds; // X: silence duration for user to recite from memory
+  final double playbackSpeed;   // 0.75, 1.0, 1.25, 1.5
   final String reciterCdnPattern;
   final String fallbackCdnPattern;
 
@@ -49,6 +50,7 @@ class HifzVerseConfig {
     this.singleRepeatCount = 10,
     this.linkGroupRepeat = 3,
     this.pauseDelaySeconds = 4,
+    this.playbackSpeed = 1.0,
     this.reciterCdnPattern =
         'https://everyayah.com/data/Husary_Muallim_128kbps/{surah:03d}{ayah:03d}.mp3',
     this.fallbackCdnPattern =
@@ -344,6 +346,7 @@ class AudioPlayerService {
       );
 
       await _player.setAudioSource(playlist, preload: true);
+      await _player.setSpeed(config.playbackSpeed);
 
       // CRITICAL: Prevent UI freeze by avoiding direct await on player.play()
       unawaited(_player.play());
@@ -355,6 +358,16 @@ class AudioPlayerService {
         status: HifzPlaybackStatus.error,
         errorMessage: e.toString(),
       ));
+    }
+  }
+
+  Future<void> setSpeed(double speed) async {
+    try {
+      await _player.setSpeed(speed);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error updating speed: $e');
+      }
     }
   }
 

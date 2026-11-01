@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Play, RefreshCw, Layers, Clock, Volume2, Sparkles } from 'lucide-react';
+import { X, Play, RefreshCw, Layers, Clock, Volume2, Sparkles, Gauge } from 'lucide-react';
 import { HifzSessionConfig, Riwayah, MaskingMode } from '../types/hifz';
 import { getRecitersByRiwayah } from '../data/hifzReciters';
 import { SURAH_LIST } from '../data/surahList';
@@ -43,6 +43,7 @@ export const RepetitionSetupSheet: React.FC<RepetitionSetupSheetProps> = ({
   );
   const [pauseDelay, setPauseDelay] = useState<number>(currentConfig.pauseDelaySeconds);
   const [maskingMode, setMaskingMode] = useState<MaskingMode>(currentConfig.maskingMode || 'visible');
+  const [playbackRate, setPlaybackRate] = useState<number>(currentConfig.playbackRate || 1.0);
 
   if (!isOpen) return null;
 
@@ -97,6 +98,7 @@ export const RepetitionSetupSheet: React.FC<RepetitionSetupSheetProps> = ({
       linkGroupRepeatCount: linkGroupRepeat,
       pauseDelaySeconds: pauseDelay,
       maskingMode,
+      playbackRate,
     });
     onClose();
   };
@@ -354,6 +356,44 @@ export const RepetitionSetupSheet: React.FC<RepetitionSetupSheetProps> = ({
                 +
               </button>
             </div>
+          </div>
+        </div>
+
+        {/* Playback Voice Speed */}
+        <div className="space-y-1.5 pt-1">
+          <label className="text-xs font-semibold text-[#5A6861] dark:text-[#9FB1A8] flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <Gauge className="w-3.5 h-3.5 text-[#4A6B5D] dark:text-[#7FA695]" />
+              <span>سرعة التلاوة والصوت (Voice Speed)</span>
+            </span>
+            <span className="text-[10px] text-[#7F8D87]">
+              {playbackRate === 0.75 && '0.75× • متأنٍ وتجويد'}
+              {playbackRate === 1.0 && '1.0× • سرعة طبيعية (افتراضي)'}
+              {playbackRate === 1.25 && '1.25× • مراجعة سريعة'}
+              {playbackRate === 1.5 && '1.5× • حدر سريع'}
+            </span>
+          </label>
+          <div className="grid grid-cols-4 gap-2">
+            {[
+              { rate: 0.75, label: '0.75×', desc: 'متأنٍ' },
+              { rate: 1.0, label: '1.0×', desc: 'عادي' },
+              { rate: 1.25, label: '1.25×', desc: 'سريع' },
+              { rate: 1.5, label: '1.5×', desc: 'حدر' },
+            ].map((item) => (
+              <button
+                key={item.rate}
+                type="button"
+                onClick={() => setPlaybackRate(item.rate)}
+                className={`py-2 px-1 rounded-xl text-xs font-bold transition-all border flex flex-col items-center justify-center gap-0.5 ${
+                  playbackRate === item.rate
+                    ? 'bg-[#4A6B5D] text-white border-[#4A6B5D] shadow-xs'
+                    : 'bg-[#F2ECE1] dark:bg-[#1C2520] text-[#1E201D] dark:text-[#C5D5CC] border-[#E2D9CC] dark:border-[#2A3730] hover:bg-[#E8E0D2] dark:hover:bg-[#25332B]'
+                }`}
+              >
+                <span className="font-mono text-xs">{item.label}</span>
+                <span className="text-[10px] opacity-80">{item.desc}</span>
+              </button>
+            ))}
           </div>
         </div>
 

@@ -179,6 +179,19 @@ export const ZenHifzView: React.FC<ZenHifzViewProps> = ({
     setIsFocusModeActive(false);
   };
 
+  const cyclePlaybackSpeed = useCallback(() => {
+    const speeds = [0.75, 1.0, 1.25, 1.5];
+    const currentRate = sessionConfig.playbackRate || 1.0;
+    const nextIndex = (speeds.indexOf(currentRate) + 1) % speeds.length;
+    const nextRate = speeds[nextIndex];
+
+    hifzAudioEngine.setPlaybackRate(nextRate);
+    onUpdateConfig({
+      ...sessionConfig,
+      playbackRate: nextRate,
+    });
+  }, [sessionConfig, onUpdateConfig]);
+
   // Font Size adjustments
   const handleFontSizeChange = (delta: number) => {
     const newSize = Math.max(22, Math.min(46, sessionConfig.fontSize + delta));
@@ -504,6 +517,15 @@ export const ZenHifzView: React.FC<ZenHifzViewProps> = ({
               ) : (
                 <EyeOff className="w-4 h-4 text-rose-500" />
               )}
+            </button>
+
+            {/* Voice Playback Speed Button */}
+            <button
+              onClick={cyclePlaybackSpeed}
+              className="px-2 py-1.5 rounded-xl text-xs font-mono font-bold bg-[#F2ECE1] dark:bg-[#1F2924] text-[#4A6B5D] dark:text-[#7FA695] border border-[#E2D9CC] dark:border-[#2A3730] hover:bg-[#E5DCD0] dark:hover:bg-[#28362F] transition-all flex items-center justify-center min-w-[40px]"
+              title={`سرعة الصوت الحالية: ${sessionConfig.playbackRate || 1.0}× (انقر للتبديل السريع بين 0.75×، 1.0×، 1.25×، 1.5×)`}
+            >
+              {sessionConfig.playbackRate || 1.0}×
             </button>
 
             {/* Play / Pause / Stop buttons */}

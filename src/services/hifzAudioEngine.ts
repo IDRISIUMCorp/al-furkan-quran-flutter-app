@@ -114,6 +114,16 @@ export class HifzAudioEngine {
     this.emitState(false, 0);
   }
 
+  public setPlaybackRate(rate: number) {
+    if (this.config) {
+      this.config.playbackRate = rate;
+    }
+    if (this.audio) {
+      this.audio.playbackRate = rate;
+      this.audio.defaultPlaybackRate = rate;
+    }
+  }
+
   public stopSession() {
     this.isRunning = false;
     this.isPaused = false;
@@ -214,6 +224,9 @@ export class HifzAudioEngine {
 
     if (this.audio) {
       this.audio.src = audioUrl;
+      const rate = this.config?.playbackRate || 1.0;
+      this.audio.playbackRate = rate;
+      this.audio.defaultPlaybackRate = rate;
       const playPromise = this.audio.play();
 
       if (playPromise !== undefined) {

@@ -38,6 +38,7 @@ export function App() {
       reciterId: 'husary_muallim',
       maskingMode: 'visible',
       fontSize: 28,
+      playbackRate: 1.0,
     };
   });
 

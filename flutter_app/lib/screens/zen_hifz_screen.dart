@@ -36,6 +36,7 @@ class _ZenHifzScreenState extends State<ZenHifzScreen> {
   int _singleRepeat = 10;
   int _linkGroupRepeat = 3;
   int _pauseDelaySeconds = 4;
+  double _playbackSpeed = 1.0;
   String _selectedReciterName = 'الحصري (المعلم)';
   String _reciterPattern =
       'https://everyayah.com/data/Husary_Muallim_128kbps/{surah:03d}{ayah:03d}.mp3';
@@ -149,9 +150,20 @@ class _ZenHifzScreenState extends State<ZenHifzScreen> {
         singleRepeatCount: _singleRepeat,
         linkGroupRepeat: _linkGroupRepeat,
         pauseDelaySeconds: _pauseDelaySeconds,
+        playbackSpeed: _playbackSpeed,
         reciterCdnPattern: _reciterPattern,
       ),
     );
+  }
+
+  void _cyclePlaybackSpeed() {
+    final speeds = [0.75, 1.0, 1.25, 1.5];
+    final nextIndex = (speeds.indexOf(_playbackSpeed) + 1) % speeds.length;
+    final nextSpeed = speeds[nextIndex];
+    setState(() {
+      _playbackSpeed = nextSpeed;
+    });
+    _audioPlayer.setSpeed(nextSpeed);
   }
 
   void _pauseSession() {
@@ -369,6 +381,68 @@ class _ZenHifzScreenState extends State<ZenHifzScreen> {
                     },
                   ),
                   const SizedBox(height: 12),
+
+                  // Voice Speed Control
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'سرعة التلاوة والصوت',
+                        style: TextStyle(fontSize: 13, color: textColor),
+                      ),
+                      Text(
+                        '${_playbackSpeed}x',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: sageColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [0.75, 1.0, 1.25, 1.5].map((speed) {
+                      final isSelected = _playbackSpeed == speed;
+                      return Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 3),
+                          child: InkWell(
+                            onTap: () {
+                              setSheetState(() => _playbackSpeed = speed);
+                              setState(() => _playbackSpeed = speed);
+                              _audioPlayer.setSpeed(speed);
+                            },
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? sageColor
+                                    : (isDark ? Colors.white10 : Colors.black12),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? sageColor
+                                      : (isDark ? Colors.white24 : Colors.black26),
+                                ),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                '${speed}x',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: isSelected ? Colors.white : textColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
 
                   ElevatedButton(
                     onPressed: () {
@@ -652,6 +726,29 @@ class _ZenHifzScreenState extends State<ZenHifzScreen> {
                         onPressed: _toggleMaskingMode,
                         tooltip: 'تبديل وضع الإخفاء',
                       ),
+
+                      // Live Voice Speed Toggle
+                      InkWell(
+                        onTap: _cyclePlaybackSpeed,
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: sageColor.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: sageColor.withValues(alpha: 0.3)),
+                          ),
+                          child: Text(
+                            '${_playbackSpeed}x',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: sageColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
 
                       // Audio Controls
                       if (isPlaying) ...[

@@ -24,6 +24,7 @@ export interface HifzSessionConfig {
   reciterId: string;
   maskingMode: MaskingMode;
   fontSize: number;
+  playbackRate: number; // 0.75, 1.0, 1.25, 1.5
 }
 
 export interface HifzPlaybackState {
